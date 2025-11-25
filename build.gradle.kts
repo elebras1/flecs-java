@@ -26,7 +26,7 @@ val flecsSourceDir = File(flecsDir, "flecs-$flecsVersion")
 val flecsHeaderFile = File(flecsSourceDir, "distr/flecs.h")
 val flecsCFile = File(flecsSourceDir, "distr/flecs.c")
 
-val generatedSourcesDir = file("src/main/java")
+val generatedSourcesDir = file("src/main/generated")
 
 val os = OperatingSystem.current()
 val userHome = System.getProperty("user.home")
@@ -36,11 +36,7 @@ val jextractExecutable = when {
     else -> "$userHome/.local/jextract/jextract-25/bin/jextract"
 }
 
-val nativeLibName = when {
-    os.isWindows -> "flecs.dll"
-    os.isMacOsX -> "libflecs.dylib"
-    else -> "libflecs.so"
-}
+val nativeLibName = "libflecs.so"
 
 val downloadFlecs by tasks.registering {
     description = "Download Flecs release from GitHub"
@@ -107,7 +103,8 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             flecsCFile.absolutePath,
             "-Ofast",
             "-std=c99",
-            "-DFLECS_SHARED"
+            "-DFLECS_SHARED",
+            "-DNDEBUG"
         )
         os.isMacOsX -> listOf(
             "clang",
@@ -117,7 +114,8 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             flecsCFile.absolutePath,
             "-Ofast",
             "-std=c99",
-            "-DFLECS_SHARED"
+            "-DFLECS_SHARED",
+            "-DNDEBUG"
         )
         else -> listOf(
             "gcc",
@@ -128,6 +126,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-Ofast",
             "-std=c99",
             "-DFLECS_SHARED",
+            "-DNDEBUG",
             "-D_POSIX_C_SOURCE=200809L",
             "-D_DEFAULT_SOURCE",
             "-lm",
@@ -147,7 +146,7 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
     description = "Generate Java FFM bindings using jextract"
     group = "flecs"
 
-    dependsOn(extractFlecs)
+    dependsOn(compileFlecsNative)
 
     inputs.file(flecsHeaderFile)
     outputs.dir(generatedSourcesDir)
@@ -232,12 +231,6 @@ tasks.clean {
     dependsOn(cleanFlecs)
 }
 
-val regenerateFlecs by tasks.registering {
-    description = "Clean and fully regenerate Flecs bindings"
-    group = "flecs"
-
-    dependsOn(cleanFlecs, compileFlecsNative, generateFlecsBindings)
-
-    tasks.findByName("compileFlecsNative")?.mustRunAfter(cleanFlecs)
-    tasks.findByName("generateFlecsBindings")?.mustRunAfter(cleanFlecs)
+tasks.withType<JavaExec> {
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
