@@ -29,9 +29,6 @@ hs_err_pid*
 Thumbs.db
 *.bak
 
-# Generated sources
-src/main/generated/
-
 # Native libraries
 *.so
 *.dll
