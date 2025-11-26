@@ -101,8 +101,7 @@ public class Entity {
 
             component.write(dataSegment, data);
 
-            flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId,
-                component.size(), dataSegment);
+            flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
         }
         return this;
     }

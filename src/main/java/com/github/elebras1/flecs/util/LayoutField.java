@@ -1,4 +1,4 @@
-package com.github.elebras1.flecs.utils;
+package com.github.elebras1.flecs.util;
 
 import com.github.elebras1.flecs.generated.flecs_h$shared;
 

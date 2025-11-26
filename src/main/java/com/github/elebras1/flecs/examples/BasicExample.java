@@ -16,42 +16,46 @@ public class BasicExample {
             Velocity velComp = new Velocity();
             Health healthComp = new Health();
 
-            long posId = world.components().register(Position.class, posComp);
-            long velId = world.components().register(Velocity.class, velComp);
-            long healthId = world.components().register(Health.class, healthComp);
+            long posId = world.components().register(posComp);
+            long velId = world.components().register(velComp);
+            long healthId = world.components().register(healthComp);
 
             // Create tags
-            long playerTag = world.entity("PlayerTag").id();
-            long enemyTag = world.entity("EnemyTag").id();
-            long aiTag = world.entity("AIControlled").id();
+            long playerTagId = world.entity("PlayerTag");
+            long enemyTagId = world.entity("EnemyTag");
+            long aiTagId = world.entity("AIControlled");
 
             System.out.println("--- Entity Creation & Components ---");
 
             // Create player entity
-            Entity player = world.entity("Player");
-            player.add(playerTag);
+            long playerId = world.entity("Player");
+            Entity player = world.obtainEntity(playerId);
+            player.add(playerTagId);
             player.set(posId, posComp, new Position.Data(0, 0));
             player.set(velId, velComp, new Velocity.Data(5, 0));
             player.set(healthId, healthComp, new Health.Data(100));
             System.out.println("Created: " + player.getName() + " (ID: " + player.id() + ")");
 
             // Create enemies with different setups
-            Entity enemy1 = world.entity("Enemy1");
-            enemy1.add(enemyTag).add(aiTag);
+            long enemy1Id = world.entity("Enemy1");
+            Entity enemy1 = world.obtainEntity(enemy1Id);
+            enemy1.add(enemyTagId).add(aiTagId);
             enemy1.set(posId, posComp, new Position.Data(100, 50));
             enemy1.set(velId, velComp, new Velocity.Data(-2, 1));
             enemy1.set(healthId, healthComp, new Health.Data(50));
             System.out.println("Created: " + enemy1.getName() + " (ID: " + enemy1.id() + ")");
 
-            Entity enemy2 = world.entity("Enemy2");
-            enemy2.add(enemyTag).add(aiTag);
+            long enemy2Id = world.entity("Enemy2");
+            Entity enemy2 = world.obtainEntity(enemy2Id);
+            enemy2.add(enemyTagId).add(aiTagId);
             enemy2.set(posId, posComp, new Position.Data(150, -30));
             enemy2.set(velId, velComp, new Velocity.Data(-1, -1));
             enemy2.set(healthId, healthComp, new Health.Data(75));
             System.out.println("Created: " + enemy2.getName() + " (ID: " + enemy2.id() + ")");
 
             // Static object (no velocity)
-            Entity obstacle = world.entity("Obstacle");
+            long obstacleId = world.entity("Obstacle");
+            Entity obstacle = world.obtainEntity(obstacleId);
             obstacle.set(posId, posComp, new Position.Data(50, 50));
             System.out.println("Created: " + obstacle.getName() + " (ID: " + obstacle.id() + ")");
 
@@ -62,10 +66,10 @@ public class BasicExample {
                 System.out.println("Entities with Position: " + posQuery.count());
                 posQuery.iter(it -> {
                     for (int i = 0; i < it.count(); i++) {
-                        Entity e = it.entity(i);
-                        Position.Data pos = e.get(posId, posComp);
-                        System.out.printf("  %s at (%.1f, %.1f)%n",
-                                e.getName(), pos.x(), pos.y());
+                        long entityId = it.entity(i);
+                        Entity entity = world.obtainEntity(entityId);
+                        Position.Data pos = entity.get(posId, posComp);
+                        System.out.printf("  %s at (%.1f, %.1f)%n", entity.getName(), pos.x(), pos.y());
                     }
                 });
             }
@@ -76,7 +80,7 @@ public class BasicExample {
             }
 
             // Query enemies with AI
-            try (Query aiQuery = world.query().with(enemyTag).with(aiTag).build()) {
+            try (Query aiQuery = world.query().with(enemyTagId).with(aiTagId).build()) {
                 System.out.println("AI-controlled enemies: " + aiQuery.count());
             }
 
@@ -85,7 +89,7 @@ public class BasicExample {
             // Check entity properties
             System.out.println("Player has Position: " + player.has(posId));
             System.out.println("Obstacle has Velocity: " + obstacle.has(velId));
-            System.out.println("Enemy1 is AI: " + enemy1.has(aiTag));
+            System.out.println("Enemy1 is AI: " + enemy1.has(aiTagId));
 
             System.out.println("\n--- Movement Simulation ---");
 
@@ -95,15 +99,16 @@ public class BasicExample {
 
                     simQuery.iter(it -> {
                         for (int i = 0; i < it.count(); i++) {
-                            Entity e = it.entity(i);
-                            Position.Data pos = e.get(posId, posComp);
-                            Velocity.Data vel = e.get(velId, velComp);
+                            long entityId = it.entity(i);
+                            Entity entity = world.obtainEntity(entityId);
+                            Position.Data pos = entity.get(posId, posComp);
+                            Velocity.Data vel = entity.get(velId, velComp);
 
                             float newX = pos.x() + vel.dx();
                             float newY = pos.y() + vel.dy();
-                            e.set(posId, posComp, new Position.Data(newX, newY));
+                            entity.set(posId, posComp, new Position.Data(newX, newY));
 
-                            System.out.printf("  %s: (%.1f, %.1f)%n", e.getName(), newX, newY);
+                            System.out.printf("  %s: (%.1f, %.1f)%n", entity.getName(), newX, newY);
                         }
                     });
 
@@ -141,15 +146,15 @@ public class BasicExample {
             enemy1.delete();
             System.out.println("Enemy1 is alive: " + enemy1.isAlive());
 
-            try (Query aliveEnemies = world.query().with(enemyTag).build()) {
+            try (Query aliveEnemies = world.query().with(enemyTagId).build()) {
                 System.out.println("Remaining enemies: " + aliveEnemies.count());
             }
 
             System.out.println("\n--- Entity Lookup ---");
 
-            Entity foundPlayer = world.lookup("Player");
-            System.out.println("Found by name: " +
-                    (foundPlayer != null ? foundPlayer.getName() : "null"));
+            long foundPlayerId = world.lookup("Player");
+            Entity foundPlayer = world.obtainEntity(foundPlayerId);
+            System.out.println("Found by name: " + (foundPlayer != null ? foundPlayer.getName() : "null"));
 
             System.out.println("\n=== Example completed successfully! ===");
         }

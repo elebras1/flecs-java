@@ -4,6 +4,8 @@ import com.github.elebras1.flecs.generated.*;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ComponentRegistry {
 
@@ -13,10 +15,10 @@ public class ComponentRegistry {
         this.world = world;
     }
 
-    public <C extends Component<?>> long register(Class<C> clazz, C component) {
+    public <C extends Component<?>> long register(C component) {
         try (Arena arena = Arena.ofConfined()) {
-            String name = clazz.getName();
-            MemorySegment nameSegment = arena.allocateFrom(clazz.getName());
+            String name = component.getClass().getName();
+            MemorySegment nameSegment = arena.allocateFrom(name);
             MemorySegment desc = ecs_component_desc_t.allocate(arena);
 
             MemorySegment entityDesc = ecs_entity_desc_t.allocate(arena);
@@ -40,7 +42,7 @@ public class ComponentRegistry {
     }
 
     public long registerTag(String name) {
-        return this.world.entity(name).id();
+        return this.world.entity(name);
     }
 }
 

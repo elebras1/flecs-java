@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs.examples.components;
 
 import com.github.elebras1.flecs.Component;
-import com.github.elebras1.flecs.utils.LayoutField;
+import com.github.elebras1.flecs.util.LayoutField;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;

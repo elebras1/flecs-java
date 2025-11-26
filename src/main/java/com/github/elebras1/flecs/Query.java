@@ -1,11 +1,10 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.collection.EcsLongList;
 import com.github.elebras1.flecs.generated.*;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Query implements AutoCloseable {
 
@@ -35,8 +34,7 @@ public class Query implements AutoCloseable {
 
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(flecs_h$shared.C_LONG, i);
-                Entity entity = new Entity(this.world, entityId);
-                callback.accept(entity);
+                callback.accept(entityId);
             }
         }
     }
@@ -50,7 +48,7 @@ public class Query implements AutoCloseable {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
 
-        Iter it = new Iter(this.world, iter);
+        Iter it = new Iter(iter);
 
         while (flecs_h.ecs_iter_next(iter)) {
             callback.accept(it);
@@ -70,9 +68,9 @@ public class Query implements AutoCloseable {
         return total;
     }
 
-    public List<Entity> entities() {
+    public EcsLongList entities() {
         this.checkClosed();
-        List<Entity> result = new ArrayList<>();
+        EcsLongList result = new EcsLongList();
         this.each(result::add);
         return result;
     }
@@ -104,7 +102,7 @@ public class Query implements AutoCloseable {
 
     @FunctionalInterface
     public interface EntityCallback {
-        void accept(Entity entity);
+        void accept(long entityId);
     }
 
     @FunctionalInterface

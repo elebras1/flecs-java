@@ -6,11 +6,9 @@ import java.lang.foreign.MemorySegment;
 
 public class Iter {
     
-    private final Flecs world;
     private final MemorySegment nativeIter;
 
-    Iter(Flecs world, MemorySegment nativeIter) {
-        this.world = world;
+    Iter(MemorySegment nativeIter) {
         this.nativeIter = nativeIter;
     }
 
@@ -26,8 +24,8 @@ public class Iter {
         return entities.getAtIndex(flecs_h$shared.C_LONG, index);
     }
 
-    public Entity entity(int index) {
-        return new Entity(this.world, this.entityId(index));
+    public long entity(int index) {
+        return this.entityId(index);
     }
 
     public float deltaTime() {
@@ -88,10 +86,6 @@ public class Iter {
 
     public int fieldCount() {
         return Byte.toUnsignedInt(ecs_iter_t.field_count(this.nativeIter));
-    }
-
-    public Flecs world() {
-        return world;
     }
 
     MemorySegment nativeHandle() {

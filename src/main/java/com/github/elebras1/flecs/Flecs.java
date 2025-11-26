@@ -1,10 +1,14 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.generated.ecs_bulk_desc_t;
 import com.github.elebras1.flecs.generated.ecs_entity_desc_t;
 import com.github.elebras1.flecs.generated.flecs_h;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+
+import static java.lang.foreign.ValueLayout.JAVA_LONG;
 
 public class Flecs implements AutoCloseable {
     
@@ -24,13 +28,13 @@ public class Flecs implements AutoCloseable {
         this.componentRegistry = new ComponentRegistry(this);
     }
 
-    public Entity entity() {
+    public long entity() {
         this.checkClosed();
         long entityId = flecs_h.ecs_new(this.nativeWorld);
-        return new Entity(this, entityId);
+        return entityId;
     }
 
-    public Entity entity(String name) {
+    public long entity(String name) {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment nameSegment = tempArena.allocateFrom(name);
@@ -39,8 +43,36 @@ public class Flecs implements AutoCloseable {
             ecs_entity_desc_t.name(desc, nameSegment);
 
             long entityId = flecs_h.ecs_entity_init(this.nativeWorld, desc);
-            return new Entity(this, entityId);
+            return entityId;
         }
+    }
+
+    public Entity obtainEntity(long entityId) {
+        if(entityId < 0) {
+            throw new IllegalArgumentException("Invalid entity ID: " + entityId);
+        }
+        return new Entity(this, entityId);
+    }
+
+    public EcsLongList entityBulk(int count) {
+        this.checkClosed();
+        EcsLongList ids = new EcsLongList(count);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment desc = ecs_bulk_desc_t.allocate(arena);
+            ecs_bulk_desc_t.count(desc, count);
+            ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
+
+            MemorySegment idsSegment = flecs_h.ecs_bulk_init(nativeWorld, desc);
+
+            for (int i = 0; i < count; i++) {
+                ids.add(idsSegment.get(JAVA_LONG, (long) i * Long.BYTES));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("bulk entity creation failed", t);
+        }
+
+        return ids;
     }
 
     public boolean progress(float deltaTime) {
@@ -62,15 +94,15 @@ public class Flecs implements AutoCloseable {
         return query().expr(expr).build();
     }
 
-    public Entity lookup(String name) {
+    public long lookup(String name) {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment nameSegment = tempArena.allocateFrom(name);
-            long entityId = flecs_h.ecs_lookup(nativeHandle(), nameSegment);
+            long entityId = flecs_h.ecs_lookup(this.nativeHandle(), nameSegment);
             if (entityId == 0) {
-                return null;
+                return -1;
             }
-            return new Entity(this, entityId);
+            return entityId;
         }
     }
 
