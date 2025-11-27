@@ -11,14 +11,9 @@ public class BasicExample {
         try (Flecs world = new Flecs()) {
             System.out.println("=== Flecs Wrapper - Comprehensive Example ===\n");
 
-            // Register components
-            Position posComp = new Position();
-            Velocity velComp = new Velocity();
-            Health healthComp = new Health();
-
-            long posId = world.components().register(posComp);
-            long velId = world.components().register(velComp);
-            long healthId = world.components().register(healthComp);
+            long posId = world.component(Position.class);
+            long velId = world.component(Velocity.class);
+            long healthId = world.component(Health.class);
 
             // Create tags
             long playerTagId = world.entity("PlayerTag");
@@ -31,32 +26,25 @@ public class BasicExample {
             long playerId = world.entity("Player");
             Entity player = world.obtainEntity(playerId);
             player.add(playerTagId);
-            player.set(posId, posComp, new Position.Data(0, 0));
-            player.set(velId, velComp, new Velocity.Data(5, 0));
-            player.set(healthId, healthComp, new Health.Data(100));
+            player.set(new Position(0, 0)).set(new Velocity(5, 0)).set(new Health(100));
             System.out.println("Created: " + player.getName() + " (ID: " + player.id() + ")");
 
             // Create enemies with different setups
             long enemy1Id = world.entity("Enemy1");
             Entity enemy1 = world.obtainEntity(enemy1Id);
             enemy1.add(enemyTagId).add(aiTagId);
-            enemy1.set(posId, posComp, new Position.Data(100, 50));
-            enemy1.set(velId, velComp, new Velocity.Data(-2, 1));
-            enemy1.set(healthId, healthComp, new Health.Data(50));
+            enemy1.set(new Position(100, 50)).set(new Velocity(-2, 1)).set(new Health(50));
             System.out.println("Created: " + enemy1.getName() + " (ID: " + enemy1.id() + ")");
 
             long enemy2Id = world.entity("Enemy2");
             Entity enemy2 = world.obtainEntity(enemy2Id);
-            enemy2.add(enemyTagId).add(aiTagId);
-            enemy2.set(posId, posComp, new Position.Data(150, -30));
-            enemy2.set(velId, velComp, new Velocity.Data(-1, -1));
-            enemy2.set(healthId, healthComp, new Health.Data(75));
+            enemy2.add(enemyTagId).add(aiTagId).set(new Position(150, -30)).set(new Velocity(-1, -1)).set(new Health(75));
             System.out.println("Created: " + enemy2.getName() + " (ID: " + enemy2.id() + ")");
 
             // Static object (no velocity)
             long obstacleId = world.entity("Obstacle");
             Entity obstacle = world.obtainEntity(obstacleId);
-            obstacle.set(posId, posComp, new Position.Data(50, 50));
+            obstacle.set(new Position(50, 50));
             System.out.println("Created: " + obstacle.getName() + " (ID: " + obstacle.id() + ")");
 
             System.out.println("\n--- Component Queries ---");
@@ -68,7 +56,7 @@ public class BasicExample {
                     for (int i = 0; i < it.count(); i++) {
                         long entityId = it.entity(i);
                         Entity entity = world.obtainEntity(entityId);
-                        Position.Data pos = entity.get(posId, posComp);
+                        Position pos = entity.get(posId);
                         System.out.printf("  %s at (%.1f, %.1f)%n", entity.getName(), pos.x(), pos.y());
                     }
                 });
@@ -101,12 +89,12 @@ public class BasicExample {
                         for (int i = 0; i < it.count(); i++) {
                             long entityId = it.entity(i);
                             Entity entity = world.obtainEntity(entityId);
-                            Position.Data pos = entity.get(posId, posComp);
-                            Velocity.Data vel = entity.get(velId, velComp);
+                            Position pos = entity.get(posId);
+                            Velocity vel = entity.get(velId);
 
                             float newX = pos.x() + vel.dx();
                             float newY = pos.y() + vel.dy();
-                            entity.set(posId, posComp, new Position.Data(newX, newY));
+                            entity.set(new Position(newX, newY));
 
                             System.out.printf("  %s: (%.1f, %.1f)%n", entity.getName(), newX, newY);
                         }
@@ -119,16 +107,14 @@ public class BasicExample {
             System.out.println("\n--- Component Modification ---");
 
             // Modify player velocity
-            player.set(velId, velComp, new Velocity.Data(0, 3));
-            Velocity.Data newVel = player.get(velId, velComp);
+            player.set(new Velocity(0, 3));
+            Velocity newVel = player.get(velId);
             System.out.println("Player new velocity: " + newVel);
 
             // Damage enemy
-            Health.Data enemy1Health = enemy1.get(healthId, healthComp);
-            enemy1.set(healthId, healthComp,
-                    new Health.Data(enemy1Health.value() - 25));
-            System.out.println("Enemy1 health: " +
-                    enemy1.get(healthId, healthComp).value());
+            Health enemy1Health = enemy1.get(healthId);
+            enemy1.set(new Health(enemy1Health.value() - 25));
+            System.out.println("Enemy1 health: " + enemy1.get(healthId));
 
             System.out.println("\n--- Component Removal ---");
 
@@ -143,7 +129,7 @@ public class BasicExample {
             System.out.println("\n--- Entity Deletion ---");
 
             // Delete defeated enemy
-            enemy1.delete();
+            enemy1.destruct();
             System.out.println("Enemy1 is alive: " + enemy1.isAlive());
 
             try (Query aliveEnemies = world.query().with(enemyTagId).build()) {

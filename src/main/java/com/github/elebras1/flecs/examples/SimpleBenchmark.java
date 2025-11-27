@@ -11,14 +11,9 @@ public class SimpleBenchmark {
 
         try (Flecs world = new Flecs()) {
 
-            // Register components
-            Position posComp = new Position();
-            Velocity velComp = new Velocity();
-            Health healthComp = new Health();
-
-            long posId = world.components().register(posComp);
-            long velId = world.components().register(velComp);
-            long healthId = world.components().register(healthComp);
+            long posId = world.component(Position.class);
+            long velId = world.component(Velocity.class);
+            long healthId = world.component(Health.class);
 
             int totalEntities = 1_000_000;
             System.out.println("Creating " + totalEntities + " entities...");
@@ -28,17 +23,17 @@ public class SimpleBenchmark {
             for (int i = 0; i < totalEntities; i++) {
                 long entityId = world.entity();
                 Entity entity = world.obtainEntity(entityId);
-                entity.set(posId, posComp, new Position.Data(i % 100, i % 100));
-                entity.set(velId, velComp, new Velocity.Data(1, 1));
-                entity.set(healthId, healthComp, new Health.Data(100));
+                entity.set(new Position(i % 100, i % 100));
+                entity.set(new Velocity(1, 1));
+                entity.set(new Health(100));
             }
 
             EcsLongList entityIds = world.entityBulk(totalEntities);
             for(long entityId : entityIds) {
                 Entity entity = world.obtainEntity(entityId);
-                entity.set(posId, posComp, new Position.Data(entityId % 100, entityId % 100));
-                entity.set(velId, velComp, new Velocity.Data(1, 1));
-                entity.set(healthId, healthComp, new Health.Data(100));
+                entity.set(new Position(entityId % 100, entityId % 100));
+                entity.set(new Velocity(1, 1));
+                entity.set(new Health(100));
             }
 
             long endCreate = System.nanoTime();
@@ -66,9 +61,9 @@ public class SimpleBenchmark {
                         for (int i = 0; i < it.count(); i++) {
                             long entityId = it.entity(i);
                             Entity entity = world.obtainEntity(entityId);
-                            Position.Data pos = entity.get(posId, posComp);
-                            Velocity.Data vel = entity.get(velId, velComp);
-                            entity.set(posId, posComp, new Position.Data(pos.x() + vel.dx(), pos.y() + vel.dy()));
+                            Position pos = entity.get(posId);
+                            Velocity vel = entity.get(velId);
+                            entity.set(new Position(pos.x() + vel.dx(), pos.y() + vel.dy()));
                         }
                     });
                     world.progress(0.016f); // simulation step

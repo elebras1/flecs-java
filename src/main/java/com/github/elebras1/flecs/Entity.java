@@ -65,7 +65,7 @@ public class Entity {
         return nameSegment.getString(0);
     }
 
-    public void delete() {
+    public void destruct() {
         flecs_h.ecs_delete(this.world.nativeHandle(), this.id);
     }
 
@@ -77,13 +77,25 @@ public class Entity {
         return flecs_h.ecs_is_alive(this.world.nativeHandle(), this.id);
     }
 
-    public Entity addRelation(long relation, long target) {
+    public void clear() {
+        flecs_h.ecs_clear(this.world.nativeHandle(), this.id);
+    }
+
+    private Entity addRelation(long relation, long target) {
         long pair = flecs_h.ecs_make_pair(relation, target);
         return this.add(pair);
     }
 
-    public Entity addRelation(Entity relation, Entity target) {
-        return addRelation(relation.id(), target.id());
+    public Entity childOf(long parentId) {
+        return this.addRelation(FlecsConstants.EcsChildOf, parentId);
+    }
+
+    public Entity childOf(Entity parent) {
+        return this.childOf(parent.id());
+    }
+
+    public Entity isA(long entityId) {
+        return this.addRelation(FlecsConstants.EcsIsA, entityId);
     }
 
     public Entity removeRelation(long relation, long target) {
@@ -91,11 +103,10 @@ public class Entity {
         return this.remove(pair);
     }
 
-    public Entity removeRelation(Entity relation, Entity target) {
-        return removeRelation(relation.id(), target.id());
-    }
-
-    public <T> Entity set(long componentId, Component<T> component, T data) {
+    public <T extends EcsComponent<T>> Entity set(T data) {
+        Class<? extends EcsComponent> componentClass = data.getClass();
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment dataSegment = tempArena.allocate(component.layout());
 
@@ -106,7 +117,8 @@ public class Entity {
         return this;
     }
 
-    public <T> T get(long componentId, Component<T> component) {
+    public <T extends EcsComponent<T>> T get(long componentId) {
+        Component<T> component = this.world.componentRegistry().getComponentById(componentId);
         MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
 
         if (dataPtr == null || dataPtr.address() == 0) {
@@ -118,7 +130,7 @@ public class Entity {
         return component.read(dataSegment);
     }
 
-    public <T> T getMut(long componentId, Component<T> component) {
+    public <T extends EcsComponent<T>> T getMut(long componentId, Component<T> component) {
         MemorySegment dataPtr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 
         if (dataPtr == null || dataPtr.address() == 0) {
@@ -128,6 +140,14 @@ public class Entity {
         MemorySegment dataSegment = dataPtr.reinterpret(component.size());
 
         return component.read(dataSegment);
+    }
+
+    public void enable() {
+        flecs_h.ecs_enable(this.world.nativeHandle(), this.id, true);
+    }
+
+    public void disable() {
+        flecs_h.ecs_enable(this.world.nativeHandle(), this.id, false);
     }
 
     @Override

@@ -11,8 +11,13 @@ public interface Component<T> {
 
     T read(MemorySegment segment);
 
+
+
     default long size() {
         return layout().byteSize();
     }
-}
 
+    default long alignment() {
+        return layout().byteAlignment();
+    }
+}

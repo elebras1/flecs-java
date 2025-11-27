@@ -49,6 +49,14 @@ public final class EcsLongList implements Iterable<Long>, RandomAccess, Cloneabl
         this.size++;
     }
 
+    public void addAll(long[] values) {
+        Objects.requireNonNull(values);
+        int numNew = values.length;
+        this.ensureCapacity(this.size + numNew);
+        System.arraycopy(values, 0, this.data, this.size, numNew);
+        this.size += numNew;
+    }
+
     public long getLong(int index) {
         this.rangeCheck(index);
         return this.data[index];
