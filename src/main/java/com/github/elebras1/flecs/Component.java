@@ -11,8 +11,6 @@ public interface Component<T> {
 
     T read(MemorySegment segment);
 
-
-
     default long size() {
         return layout().byteSize();
     }

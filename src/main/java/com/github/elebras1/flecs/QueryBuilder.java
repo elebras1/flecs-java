@@ -43,8 +43,14 @@ public class QueryBuilder {
         return this;
     }
 
+    // Not sure about that one
     public QueryBuilder with(Entity component) {
         return with(component.id());
+    }
+
+    public QueryBuilder with(EcsComponent<?> component) {
+        long componentId = this.world.componentRegistry().getComponentId(component.getClass());
+        return with(componentId);
     }
 
     public Query build() {

@@ -13,9 +13,9 @@ public class BulkExample {
 
         try (Flecs world = new Flecs()) {
 
-            long posId = world.component(Position.class);
-            long velId = world.component(Velocity.class);
-            long healthId = world.component(Health.class);
+            world.component(Position.class);
+            world.component(Velocity.class);
+            world.component(Health.class);
 
             int totalEntities = 1_000_000;
             System.out.println("Creating " + totalEntities + " entities...");
@@ -25,9 +25,9 @@ public class BulkExample {
             EcsLongList entityIds = world.entityBulk(totalEntities);
             for (long entityId : entityIds) {
                 Entity entity = world.obtainEntity(entityId);
-                /*entity.set(posId, posComp, new Position.Data(entityId % 100, entityId % 100));
-                entity.set(velId, velComp, new Velocity.Data(1, 1));
-                entity.set(healthId, healthComp, new Health.Data(100));*/
+                entity.set(new Position(entityId % 100, entityId % 100));
+                entity.set(new Velocity(1, 1));
+                entity.set(new Health(100));
             }
 
             long endCreate = System.nanoTime();

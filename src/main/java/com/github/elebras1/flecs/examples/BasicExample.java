@@ -56,7 +56,7 @@ public class BasicExample {
                     for (int i = 0; i < it.count(); i++) {
                         long entityId = it.entity(i);
                         Entity entity = world.obtainEntity(entityId);
-                        Position pos = entity.get(posId);
+                        Position pos = entity.get(Position.class);
                         System.out.printf("  %s at (%.1f, %.1f)%n", entity.getName(), pos.x(), pos.y());
                     }
                 });
@@ -89,8 +89,8 @@ public class BasicExample {
                         for (int i = 0; i < it.count(); i++) {
                             long entityId = it.entity(i);
                             Entity entity = world.obtainEntity(entityId);
-                            Position pos = entity.get(posId);
-                            Velocity vel = entity.get(velId);
+                            Position pos = entity.get(Position.class);
+                            Velocity vel = entity.get(Velocity.class);
 
                             float newX = pos.x() + vel.dx();
                             float newY = pos.y() + vel.dy();
@@ -108,13 +108,13 @@ public class BasicExample {
 
             // Modify player velocity
             player.set(new Velocity(0, 3));
-            Velocity newVel = player.get(velId);
+            Velocity newVel = player.get(Velocity.class);
             System.out.println("Player new velocity: " + newVel);
 
             // Damage enemy
-            Health enemy1Health = enemy1.get(healthId);
+            Health enemy1Health = enemy1.get(Health.class);
             enemy1.set(new Health(enemy1Health.value() - 25));
-            System.out.println("Enemy1 health: " + enemy1.get(healthId));
+            System.out.println("Enemy1 health: " + enemy1.get(Health.class));
 
             System.out.println("\n--- Component Removal ---");
 

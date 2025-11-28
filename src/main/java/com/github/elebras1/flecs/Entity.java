@@ -41,6 +41,11 @@ public class Entity {
         return this.remove(component.id());
     }
 
+    public Entity remove(Class<? extends EcsComponent> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.remove(componentId);
+    }
+
     public boolean has(long componentId) {
         return flecs_h.ecs_has_id(this.world.nativeHandle(), this.id, componentId);
     }
@@ -130,7 +135,13 @@ public class Entity {
         return component.read(dataSegment);
     }
 
-    public <T extends EcsComponent<T>> T getMut(long componentId, Component<T> component) {
+    public <T extends EcsComponent<T>> T get(Class<? extends EcsComponent> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.get(componentId);
+    }
+
+    public <T extends EcsComponent<T>> T getMut(EcsComponent<T> component) {
+        long componentId = this.world.componentRegistry().getComponentId(component.getClass());
         MemorySegment dataPtr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 
         if (dataPtr == null || dataPtr.address() == 0) {

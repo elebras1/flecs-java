@@ -8,6 +8,7 @@ import com.github.elebras1.flecs.generated.flecs_h;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
 import static java.lang.foreign.ValueLayout.JAVA_LONG;
 
@@ -73,7 +74,6 @@ public class Flecs implements AutoCloseable {
             return flecs_h.ecs_entity_init(this.nativeWorld, desc);
         }
     }
-
 
     public Entity obtainEntity(long entityId) {
         if(entityId < 0) {
@@ -161,6 +161,15 @@ public class Flecs implements AutoCloseable {
     public <T extends EcsComponent<T>> long component(Class<T> componentClass) {
         this.checkClosed();
         return this.componentRegistry.register(componentClass);
+    }
+
+    public <T extends EcsComponent<T>> long component(Class<T> componentClass, Consumer<ComponentHooks<T>> configuration) {
+        long id = this.component(componentClass);
+        Component<T> component = this.componentRegistry.getComponent(componentClass);
+        ComponentHooks<T> hooks = new ComponentHooks<>(this, component, componentClass);
+        configuration.accept(hooks);
+        hooks.install(this.nativeWorld, id);
+        return id;
     }
 
     MemorySegment nativeHandle() {
