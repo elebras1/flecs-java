@@ -41,9 +41,8 @@ public class QueryBuilder {
         return this;
     }
 
-    // Not sure about that one
-    public QueryBuilder with(Entity component) {
-        return with(component.id());
+    public QueryBuilder with(Entity tagEntity) {
+        return with(tagEntity.id());
     }
 
     public QueryBuilder with(FlecsComponent<?> component) {

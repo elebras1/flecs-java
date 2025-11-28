@@ -28,14 +28,6 @@ public class SimpleBenchmark {
                 entity.set(new Health(100));
             }
 
-            EcsLongList entityIds = world.entityBulk(totalEntities);
-            for(long entityId : entityIds) {
-                Entity entity = world.obtainEntity(entityId);
-                entity.set(new Position(entityId % 100, entityId % 100));
-                entity.set(new Velocity(1, 1));
-                entity.set(new Health(100));
-            }
-
             long endCreate = System.nanoTime();
             System.out.printf("Entity creation time: %.3f ms%n", (endCreate - startCreate) / 1_000_000.0);
 
@@ -45,8 +37,7 @@ public class SimpleBenchmark {
                 int count = moveQuery.count();
                 long endQuery = System.nanoTime();
                 System.out.println("Entities with Position + Velocity: " + count);
-                System.out.printf("Query time: %.3f ms%n",
-                        (endQuery - startQuery) / 1_000_000.0);
+                System.out.printf("Query time: %.3f ms%n", (endQuery - startQuery) / 1_000_000.0);
             }
 
             // Benchmark movement simulation
@@ -70,8 +61,7 @@ public class SimpleBenchmark {
                 }
 
                 long endSim = System.nanoTime();
-                System.out.printf("Simulation time for %d frames: %.3f ms%n",
-                        frames, (endSim - startSim) / 1_000_000.0);
+                System.out.printf("Simulation time for %d frames: %.3f ms%n", frames, (endSim - startSim) / 1_000_000.0);
             }
         }
     }
