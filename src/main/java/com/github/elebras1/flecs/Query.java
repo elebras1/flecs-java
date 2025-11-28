@@ -1,8 +1,6 @@
 package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.collection.EcsLongList;
-import com.github.elebras1.flecs.generated.*;
-
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 

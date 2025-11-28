@@ -1,7 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.generated.flecs_h;
-
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
@@ -41,7 +39,7 @@ public class Entity {
         return this.remove(component.id());
     }
 
-    public Entity remove(Class<? extends EcsComponent> componentClass) {
+    public Entity remove(Class<? extends FlecsComponent> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.remove(componentId);
     }
@@ -108,8 +106,8 @@ public class Entity {
         return this.remove(pair);
     }
 
-    public <T extends EcsComponent<T>> Entity set(T data) {
-        Class<? extends EcsComponent> componentClass = data.getClass();
+    public <T extends FlecsComponent<T>> Entity set(T data) {
+        Class<? extends FlecsComponent> componentClass = data.getClass();
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         try (Arena tempArena = Arena.ofConfined()) {
@@ -122,7 +120,7 @@ public class Entity {
         return this;
     }
 
-    public <T extends EcsComponent<T>> T get(long componentId) {
+    public <T extends FlecsComponent<T>> T get(long componentId) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
         MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
 
@@ -135,12 +133,12 @@ public class Entity {
         return component.read(dataSegment);
     }
 
-    public <T extends EcsComponent<T>> T get(Class<? extends EcsComponent> componentClass) {
+    public <T extends FlecsComponent<T>> T get(Class<? extends FlecsComponent> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.get(componentId);
     }
 
-    public <T extends EcsComponent<T>> T getMut(EcsComponent<T> component) {
+    public <T extends FlecsComponent<T>> T getMut(FlecsComponent<T> component) {
         long componentId = this.world.componentRegistry().getComponentId(component.getClass());
         MemorySegment dataPtr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 

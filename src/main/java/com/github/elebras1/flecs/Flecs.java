@@ -1,9 +1,6 @@
 package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.collection.EcsLongList;
-import com.github.elebras1.flecs.generated.ecs_bulk_desc_t;
-import com.github.elebras1.flecs.generated.ecs_entity_desc_t;
-import com.github.elebras1.flecs.generated.flecs_h;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -158,12 +155,12 @@ public class Flecs implements AutoCloseable {
         return entityId == 0 ? -1 : entityId;
     }
 
-    public <T extends EcsComponent<T>> long component(Class<T> componentClass) {
+    public <T extends FlecsComponent<T>> long component(Class<T> componentClass) {
         this.checkClosed();
         return this.componentRegistry.register(componentClass);
     }
 
-    public <T extends EcsComponent<T>> long component(Class<T> componentClass, Consumer<ComponentHooks<T>> configuration) {
+    public <T extends FlecsComponent<T>> long component(Class<T> componentClass, Consumer<ComponentHooks<T>> configuration) {
         long id = this.component(componentClass);
         Component<T> component = this.componentRegistry.getComponent(componentClass);
         ComponentHooks<T> hooks = new ComponentHooks<>(this, component, componentClass);

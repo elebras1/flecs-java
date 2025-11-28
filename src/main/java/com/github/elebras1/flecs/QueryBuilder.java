@@ -1,7 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.generated.*;
-
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -48,7 +46,7 @@ public class QueryBuilder {
         return with(component.id());
     }
 
-    public QueryBuilder with(EcsComponent<?> component) {
+    public QueryBuilder with(FlecsComponent<?> component) {
         long componentId = this.world.componentRegistry().getComponentId(component.getClass());
         return with(componentId);
     }

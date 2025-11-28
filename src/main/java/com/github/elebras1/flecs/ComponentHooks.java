@@ -1,9 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.generated.ecs_iter_t;
-import com.github.elebras1.flecs.generated.ecs_type_hooks_t;
-import com.github.elebras1.flecs.generated.flecs_h;
-
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -12,7 +8,7 @@ import java.lang.reflect.Array;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class ComponentHooks<T extends EcsComponent<T>> {
+public class ComponentHooks<T extends FlecsComponent<T>> {
     private final Linker linker;
     private final Arena arena;
     private final Component<T> component;

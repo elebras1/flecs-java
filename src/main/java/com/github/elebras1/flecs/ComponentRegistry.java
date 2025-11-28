@@ -1,10 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.generated.ecs_component_desc_t;
-import com.github.elebras1.flecs.generated.ecs_entity_desc_t;
-import com.github.elebras1.flecs.generated.ecs_type_info_t;
-import com.github.elebras1.flecs.generated.flecs_h;
-
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.util.Map;
@@ -25,7 +20,7 @@ public class ComponentRegistry {
         this.registrationsById = new ConcurrentHashMap<>();
     }
 
-    protected <T extends EcsComponent<T>> long register(Class<T> componentClass) {
+    protected <T extends FlecsComponent<T>> long register(Class<T> componentClass) {
         if (this.registrations.containsKey(componentClass)) {
             return this.registrations.get(componentClass).id;
         }
@@ -61,7 +56,7 @@ public class ComponentRegistry {
         }
     }
 
-    protected <T extends EcsComponent<T>> long getComponentId(Class<T> componentClass) {
+    protected <T extends FlecsComponent<T>> long getComponentId(Class<T> componentClass) {
         if(!this.registrations.containsKey(componentClass)) {
             throw new IllegalStateException("Component " + componentClass.getName() + " is not registered.");
         }
@@ -69,7 +64,7 @@ public class ComponentRegistry {
         return this.get(componentClass).id;
     }
 
-    protected <T extends EcsComponent<T>> Component<T> getComponent(Class<T> componentClass) {
+    protected <T extends FlecsComponent<T>> Component<T> getComponent(Class<T> componentClass) {
         if(!this.registrations.containsKey(componentClass)) {
             throw new IllegalStateException("Component " + componentClass.getName() + " is not registered.");
         }
@@ -78,7 +73,7 @@ public class ComponentRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T extends EcsComponent<T>> Component<T> getComponentById(long componentId) {
+    protected <T extends FlecsComponent<T>> Component<T> getComponentById(long componentId) {
         ComponentRegistration<?> reg = this.registrationsById.get(componentId);
         if (reg == null) {
             throw new IllegalStateException("Component with ID " + componentId + " is not registered.");
@@ -87,7 +82,7 @@ public class ComponentRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends EcsComponent<T>> Component<T> createComponentInstance(Class<T> componentClass) {
+    private <T extends FlecsComponent<T>> Component<T> createComponentInstance(Class<T> componentClass) {
         try {
             var method = componentClass.getDeclaredMethod("component");
             return (Component<T>) method.invoke(null);

@@ -162,7 +162,7 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
     commandLine(
         jextractExecutable,
         "--output", generatedSourcesDir.absolutePath,
-        "-t", "com.github.elebras1.flecs.generated",
+        "-t", "com.github.elebras1.flecs",
         "-I", File(flecsSourceDir, "distr").absolutePath,
         flecsHeaderFile.absolutePath
     )
