@@ -65,5 +65,20 @@ public final class FlecsConstants {
     public static final long EcsWith = flecs_h.EcsWith();
     public static final long EcsOneOf = flecs_h.EcsOneOf();
     public static final long EcsCanToggle = flecs_h.EcsCanToggle();
+
+    public static final int EcsQueryCacheAuto = flecs_h.EcsQueryCacheAuto();
+    public static final int EcsQueryMatchEmptyTables = flecs_h.EcsQueryMatchEmptyTables();
+    public static final int EcsIn = flecs_h.EcsIn();
+    public static final int EcsOut = flecs_h.EcsOut();
+    public static final int EcsInOut = flecs_h.EcsInOut();
+    public static final int EcsAnd = flecs_h.EcsAnd();
+    public static final int EcsOr = flecs_h.EcsOr();
+    public static final int EcsNot = flecs_h.EcsNot();
+    public static final int EcsOptional = flecs_h.EcsOptional();
+    public static final long EcsEqual = flecs_h.EcsPredEq();
+    public static final long EcsMatch = flecs_h.EcsPredMatch();
+    public static final int EcsAndFrom = flecs_h.EcsAndFrom();
+    public static final int EcsOrFrom = flecs_h.EcsOrFrom();
+    public static final int EcsNotFrom = flecs_h.EcsNotFrom();
 }
 

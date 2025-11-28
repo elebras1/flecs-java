@@ -10,6 +10,10 @@ public class Iter {
         this.nativeIter = nativeIter;
     }
 
+    public boolean next() {
+        return flecs_h.ecs_iter_next(this.nativeIter);
+    }
+
     public int count() {
         return ecs_iter_t.count(this.nativeIter);
     }

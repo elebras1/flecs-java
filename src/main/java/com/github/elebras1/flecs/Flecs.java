@@ -3,10 +3,12 @@ package com.github.elebras1.flecs;
 import com.github.elebras1.flecs.collection.EcsLongList;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static java.lang.foreign.ValueLayout.JAVA_LONG;
 
 public class Flecs implements AutoCloseable {
@@ -167,6 +169,28 @@ public class Flecs implements AutoCloseable {
         configuration.accept(hooks);
         hooks.install(this.nativeWorld, id);
         return id;
+    }
+
+    public int deleteEmptyTables(int limit) {
+        this.checkClosed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemoryLayout memoryLayout = MemoryLayout.structLayout(JAVA_INT.withName("limit"), JAVA_INT.withName("flags"));
+            MemorySegment desc = tempArena.allocate(memoryLayout);
+            desc.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
+            desc.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
+
+            return flecs_h.ecs_delete_empty_tables(this.nativeWorld, desc);
+        }
+    }
+
+    public void deferBegin() {
+        this.checkClosed();
+        flecs_h.ecs_defer_begin(this.nativeWorld);
+    }
+
+    public void deferEnd() {
+        this.checkClosed();
+        flecs_h.ecs_defer_end(this.nativeWorld);
     }
 
     MemorySegment nativeHandle() {

@@ -17,6 +17,21 @@ public class Query implements AutoCloseable {
         this.arena = Arena.ofConfined();
     }
 
+    @FunctionalInterface
+    public interface EntityCallback {
+        void accept(long entityId);
+    }
+
+    @FunctionalInterface
+    public interface IterCallback {
+        void accept(Iter iter);
+    }
+
+    @FunctionalInterface
+    public interface RunCallback {
+        void accept(Iter iter);
+    }
+
     public void each(EntityCallback callback) {
         this.checkClosed();
 
@@ -51,6 +66,19 @@ public class Query implements AutoCloseable {
         while (flecs_h.ecs_iter_next(iter)) {
             callback.accept(it);
         }
+    }
+
+    public void run(RunCallback callback) {
+        this.checkClosed();
+
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+
+        if (iter == null || iter.address() == 0) {
+            throw new IllegalStateException("ecs_query_iter returned a null iterator");
+        }
+
+        Iter it = new Iter(iter);
+        callback.accept(it);
     }
 
 
@@ -96,16 +124,6 @@ public class Query implements AutoCloseable {
             }
             this.arena.close();
         }
-    }
-
-    @FunctionalInterface
-    public interface EntityCallback {
-        void accept(long entityId);
-    }
-
-    @FunctionalInterface
-    public interface IterCallback {
-        void accept(Iter iter);
     }
 }
 
