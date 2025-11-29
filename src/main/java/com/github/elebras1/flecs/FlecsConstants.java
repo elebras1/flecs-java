@@ -78,5 +78,8 @@ public final class FlecsConstants {
     public static final int EcsAndFrom = flecs_h.EcsAndFrom();
     public static final int EcsOrFrom = flecs_h.EcsOrFrom();
     public static final int EcsNotFrom = flecs_h.EcsNotFrom();
+
+    public static final int EcsObserverYieldOnCreate = flecs_h.EcsObserverYieldOnCreate();
+    public static final int EcsObserverYieldOnDelete = flecs_h.EcsObserverYieldOnDelete();
 }
 

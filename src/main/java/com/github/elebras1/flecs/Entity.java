@@ -2,6 +2,7 @@ package com.github.elebras1.flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 public class Entity {
     
@@ -157,6 +158,98 @@ public class Entity {
 
     public void disable() {
         flecs_h.ecs_enable(this.world.nativeHandle(), this.id, false);
+    }
+
+    /**
+     * Creates an entity observer that triggers when this specific entity receives an event.
+     *
+     * @param eventId the event entity ID to listen for
+     * @param callback the callback to invoke when the event occurs
+     * @return the created observer
+     */
+    public FlecsObserver observe(long eventId, Runnable callback) {
+        return this.world.observer()
+            .event(eventId)
+            .with(FlecsConstants.EcsAny)
+            .each((entityId) -> {
+                if (entityId == this.id) {
+                    callback.run();
+                }
+            });
+    }
+
+    /**
+     * Creates an entity observer for a specific event type component.
+     *
+     * @param eventClass the event component class
+     * @param callback the callback that receives the event data
+     * @return the created observer
+     */
+    public <T extends FlecsComponent<T>> FlecsObserver observe(Class<T> eventClass, java.util.function.Consumer<T> callback) {
+        long eventId = this.world.componentRegistry().getComponentId(eventClass);
+        return this.world.observer()
+            .event(eventId)
+            .with(FlecsConstants.EcsAny)
+            .iter((it) -> {
+                for (int i = 0; i < it.count(); i++) {
+                    if (it.entityId(i) == this.id) {
+                        // Get event data if available
+                        T eventData = this.get(eventClass);
+                        if (eventData != null) {
+                            callback.accept(eventData);
+                        }
+                    }
+                }
+            });
+    }
+
+    /**
+     * Emits a custom event for this entity.
+     *
+     * @param eventId the event entity ID
+     */
+    public void emit(long eventId) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
+            eventDesc.fill((byte) 0);
+
+            ecs_event_desc_t.event(eventDesc, eventId);
+            ecs_event_desc_t.entity(eventDesc, this.id);
+
+            flecs_h.ecs_emit(this.world.nativeHandle(), eventDesc);
+        }
+    }
+
+    /**
+     * Emits a custom event for this entity with a specific component.
+     *
+     * @param eventId the event entity ID
+     * @param componentId the component entity ID
+     */
+    public void emit(long eventId, long componentId) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
+            eventDesc.fill((byte) 0);
+
+            // Create ecs_type_t structure
+            MemorySegment typeSegment = ecs_type_t.allocate(tempArena);
+            MemorySegment idsArray = tempArena.allocate(ValueLayout.JAVA_LONG);
+            idsArray.set(ValueLayout.JAVA_LONG, 0, componentId);
+
+            ecs_type_t.array(typeSegment, idsArray);
+            ecs_type_t.count(typeSegment, 1);
+
+            ecs_event_desc_t.event(eventDesc, eventId);
+            ecs_event_desc_t.entity(eventDesc, this.id);
+            ecs_event_desc_t.ids(eventDesc, typeSegment);
+
+            flecs_h.ecs_emit(this.world.nativeHandle(), eventDesc);
+        }
+    }
+
+    public <T extends FlecsComponent<T>> void emit(long eventId, Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        this.emit(eventId, componentId);
     }
 
     @Override

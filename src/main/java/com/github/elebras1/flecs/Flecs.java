@@ -21,6 +21,7 @@ public class Flecs implements AutoCloseable {
     private boolean closed = false;
     private final ThreadLocal<NameBuffer> threadLocalNameBuffer;
     private final Map<Long, SystemCallbacks> systemCallbacks;
+    private final Map<Long, ObserverCallbacks> observerCallbacks;
 
     private static final class SystemCallbacks {
         final Query.IterCallback iterCallback;
@@ -28,6 +29,18 @@ public class Flecs implements AutoCloseable {
         final Query.EntityCallback entityCallback;
 
         SystemCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+            this.iterCallback = iterCallback;
+            this.runCallback = runCallback;
+            this.entityCallback = entityCallback;
+        }
+    }
+
+    private static final class ObserverCallbacks {
+        final Query.IterCallback iterCallback;
+        final Query.RunCallback runCallback;
+        final Query.EntityCallback entityCallback;
+
+        ObserverCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
             this.iterCallback = iterCallback;
             this.runCallback = runCallback;
             this.entityCallback = entityCallback;
@@ -64,6 +77,7 @@ public class Flecs implements AutoCloseable {
         this.componentRegistry = new ComponentRegistry(this);
         this.threadLocalNameBuffer = ThreadLocal.withInitial(() -> new NameBuffer(64));
         this.systemCallbacks = new ConcurrentHashMap<>();
+        this.observerCallbacks = new ConcurrentHashMap<>();
     }
 
     public long entity() {
@@ -229,6 +243,21 @@ public class Flecs implements AutoCloseable {
         return new SystemBuilder(this, name);
     }
 
+    public ObserverBuilder observer() {
+        this.checkClosed();
+        return new ObserverBuilder(this);
+    }
+
+    public ObserverBuilder observer(String name) {
+        this.checkClosed();
+        return new ObserverBuilder(this, name);
+    }
+
+    public <T extends FlecsComponent<T>> ObserverBuilder observer(Class<T> componentClass) {
+        this.checkClosed();
+        return new ObserverBuilder(this).with(componentClass);
+    }
+
     public TimerBuilder timer() {
         this.checkClosed();
         return new TimerBuilder(this);
@@ -247,6 +276,12 @@ public class Flecs implements AutoCloseable {
     void registerSystemCallbacks(long systemId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
         if (iterCallback != null || runCallback != null || entityCallback != null) {
             this.systemCallbacks.put(systemId, new SystemCallbacks(iterCallback, runCallback, entityCallback));
+        }
+    }
+
+    void registerObserverCallbacks(long observerId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+        if (iterCallback != null || runCallback != null || entityCallback != null) {
+            this.observerCallbacks.put(observerId, new ObserverCallbacks(iterCallback, runCallback, entityCallback));
         }
     }
 

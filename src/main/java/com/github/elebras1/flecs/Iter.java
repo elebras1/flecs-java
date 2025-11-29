@@ -95,8 +95,8 @@ public class Iter {
         return Byte.toUnsignedInt(ecs_iter_t.field_count(this.nativeIter));
     }
 
-    MemorySegment nativeHandle() {
-        return this.nativeIter;
+    public long event() {
+        return ecs_iter_t.event(this.nativeIter);
     }
 }
 
