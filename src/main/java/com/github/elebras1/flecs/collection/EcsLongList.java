@@ -57,12 +57,12 @@ public final class EcsLongList implements Iterable<Long>, RandomAccess, Cloneabl
         this.size += numNew;
     }
 
-    public long getLong(int index) {
+    public long get(int index) {
         this.rangeCheck(index);
         return this.data[index];
     }
 
-    public long setLong(int index, long value) {
+    public long set(int index, long value) {
         this.rangeCheck(index);
         long old = this.data[index];
         this.data[index] = value;

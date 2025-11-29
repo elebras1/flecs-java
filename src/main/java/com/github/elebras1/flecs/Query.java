@@ -61,7 +61,7 @@ public class Query implements AutoCloseable {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
 
-        Iter it = new Iter(iter);
+        Iter it = new Iter(iter, this.world);
 
         while (flecs_h.ecs_iter_next(iter)) {
             callback.accept(it);
@@ -77,10 +77,9 @@ public class Query implements AutoCloseable {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
 
-        Iter it = new Iter(iter);
+        Iter it = new Iter(iter, this.world);
         callback.accept(it);
     }
-
 
     public int count() {
         this.checkClosed();

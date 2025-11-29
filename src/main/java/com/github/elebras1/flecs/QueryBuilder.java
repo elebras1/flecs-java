@@ -145,10 +145,7 @@ public class QueryBuilder {
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
         MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long operOffset = ecs_term_t.oper$offset();
-
-        term.set(ValueLayout.JAVA_INT, operOffset, operator);
-
+        ecs_term_t.oper(term, (short) operator);
         return this;
     }
 
@@ -166,38 +163,6 @@ public class QueryBuilder {
 
     public QueryBuilder optional() {
         return this.operator(FlecsConstants.EcsOptional);
-    }
-
-    public QueryBuilder equal() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'equal' modifier to");
-        }
-
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long operOffset = ecs_term_t.oper$offset();
-
-        term.set(ValueLayout.JAVA_LONG, operOffset, FlecsConstants.EcsEqual);
-
-        return this;
-    }
-
-    public QueryBuilder match() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'match' modifier to");
-        }
-
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long operOffset = ecs_term_t.oper$offset();
-
-        term.set(ValueLayout.JAVA_LONG, operOffset, FlecsConstants.EcsMatch);
-
-        return this;
     }
 
     public QueryBuilder andFrom() {

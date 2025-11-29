@@ -5,9 +5,11 @@ import java.lang.foreign.MemorySegment;
 public class Iter {
     
     private final MemorySegment nativeIter;
+    private final Flecs world;
 
-    Iter(MemorySegment nativeIter) {
+    Iter(MemorySegment nativeIter, Flecs world) {
         this.nativeIter = nativeIter;
+        this.world = world;
     }
 
     public boolean next() {
@@ -38,17 +40,20 @@ public class Iter {
         return ecs_iter_t.delta_system_time(this.nativeIter);
     }
 
-    public MemorySegment field(int index) {
+    public <T extends FlecsComponent<T>> Field<T> field(Class<T> componentClass, int index) {
         if (index < 0 || index > 127) {
             throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
         }
 
-        MemorySegment ptrs = ecs_iter_t.ptrs(this.nativeIter);
-        if (ptrs == null || ptrs.address() == 0) {
-            return null;
+        byte flecsIndex = (byte) index;
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), flecsIndex);
+
+        if (columnPtr == null || columnPtr.address() == 0) {
+            return new Field<>(null, this.count(), this.world, componentClass);
         }
 
-        return ptrs.getAtIndex(flecs_h$shared.C_POINTER, index);
+        return new Field<>(columnPtr, this.count(), this.world, componentClass);
     }
 
     public boolean isFieldSet(int index) {
