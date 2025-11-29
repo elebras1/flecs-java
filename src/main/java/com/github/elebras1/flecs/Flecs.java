@@ -6,6 +6,8 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static java.lang.foreign.ValueLayout.JAVA_INT;
@@ -18,6 +20,19 @@ public class Flecs implements AutoCloseable {
     private final ComponentRegistry componentRegistry;
     private boolean closed = false;
     private final ThreadLocal<NameBuffer> threadLocalNameBuffer;
+    private final Map<Long, SystemCallbacks> systemCallbacks;
+
+    private static final class SystemCallbacks {
+        final Query.IterCallback iterCallback;
+        final Query.RunCallback runCallback;
+        final Query.EntityCallback entityCallback;
+
+        SystemCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+            this.iterCallback = iterCallback;
+            this.runCallback = runCallback;
+            this.entityCallback = entityCallback;
+        }
+    }
 
     private static final class NameBuffer {
         MemorySegment segment;
@@ -48,6 +63,7 @@ public class Flecs implements AutoCloseable {
 
         this.componentRegistry = new ComponentRegistry(this);
         this.threadLocalNameBuffer = ThreadLocal.withInitial(() -> new NameBuffer(64));
+        this.systemCallbacks = new ConcurrentHashMap<>();
     }
 
     public long entity() {
@@ -191,6 +207,47 @@ public class Flecs implements AutoCloseable {
     public void deferEnd() {
         this.checkClosed();
         flecs_h.ecs_defer_end(this.nativeWorld);
+    }
+
+    public void deferSuspend() {
+        this.checkClosed();
+        flecs_h.ecs_defer_suspend(this.nativeWorld);
+    }
+
+    public void deferResume() {
+        this.checkClosed();
+        flecs_h.ecs_defer_resume(this.nativeWorld);
+    }
+
+    public SystemBuilder system() {
+        this.checkClosed();
+        return new SystemBuilder(this);
+    }
+
+    public SystemBuilder system(String name) {
+        this.checkClosed();
+        return new SystemBuilder(this, name);
+    }
+
+    public TimerBuilder timer() {
+        this.checkClosed();
+        return new TimerBuilder(this);
+    }
+
+    public void setThreads(int threads) {
+        this.checkClosed();
+        flecs_h.ecs_set_threads(this.nativeWorld, threads);
+    }
+
+    public void setPipeline(long pipelineId) {
+        this.checkClosed();
+        flecs_h.ecs_set_pipeline(this.nativeWorld, pipelineId);
+    }
+
+    void registerSystemCallbacks(long systemId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+        if (iterCallback != null || runCallback != null || entityCallback != null) {
+            this.systemCallbacks.put(systemId, new SystemCallbacks(iterCallback, runCallback, entityCallback));
+        }
     }
 
     MemorySegment nativeHandle() {
