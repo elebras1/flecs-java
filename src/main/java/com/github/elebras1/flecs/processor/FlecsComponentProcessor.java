@@ -17,6 +17,8 @@ public class FlecsComponentProcessor extends AbstractProcessor {
     private Messager messager;
     private Filer filer;
     private ComponentCodeGenerator generator;
+    private ComponentMapGenerator mapGenerator;
+    private List<TypeElement> processedComponents;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -24,6 +26,8 @@ public class FlecsComponentProcessor extends AbstractProcessor {
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
         this.generator = new ComponentCodeGenerator();
+        this.mapGenerator = new ComponentMapGenerator();
+        this.processedComponents = new ArrayList<>();
     }
 
     @Override
@@ -35,6 +39,15 @@ public class FlecsComponentProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
         if (roundEnv.processingOver()) {
+            if (!this.processedComponents.isEmpty()) {
+                try {
+                    JavaFile mapFile = this.mapGenerator.generateComponentMap(this.processedComponents);
+                    mapFile.writeTo(this.filer);
+                    this.messager.printMessage(Diagnostic.Kind.NOTE, "[@FlecsComponent] Generated ComponentMap with " + processedComponents.size() + " components");
+                } catch (IOException e) {
+                    this.messager.printMessage(Diagnostic.Kind.ERROR, "Failed to generate ComponentMap: " + e.getMessage());
+                }
+            }
             return false;
         }
 
@@ -47,9 +60,11 @@ public class FlecsComponentProcessor extends AbstractProcessor {
                 }
 
                 try {
-                    processRecord((TypeElement) element);
+                    TypeElement recordElement = (TypeElement) element;
+                    this.processRecord(recordElement);
+                    this.processedComponents.add(recordElement);
                 } catch (Exception e) {
-                    messager.printMessage(Diagnostic.Kind.ERROR, "Failed to process @FlecsComponent: " + e.getMessage(), element);
+                    this.messager.printMessage(Diagnostic.Kind.ERROR, "Failed to process @FlecsComponent: " + e.getMessage(), element);
                 }
             }
         }
@@ -63,7 +78,7 @@ public class FlecsComponentProcessor extends AbstractProcessor {
 
         for (VariableElement field : fields) {
             if (!isSupportedType(field.asType())) {
-                messager.printMessage(Diagnostic.Kind.ERROR, "Unsupported field type '" + field.asType() + "'. Supported: " + String.join(", ", SUPPORTED_TYPES), field);
+                this.messager.printMessage(Diagnostic.Kind.ERROR, "Unsupported field type '" + field.asType() + "'. Supported: " + String.join(", ", SUPPORTED_TYPES), field);
                 return;
             }
         }
@@ -71,7 +86,7 @@ public class FlecsComponentProcessor extends AbstractProcessor {
         JavaFile javaFile = generator.generateComponentClass(recordElement, fields);
         javaFile.writeTo(filer);
 
-        messager.printMessage(Diagnostic.Kind.NOTE, "[@FlecsComponent] Generated: " + recordElement.getQualifiedName());
+        this.messager.printMessage(Diagnostic.Kind.NOTE, "[@FlecsComponent] Generated: " + recordElement.getQualifiedName());
     }
 
     private List<VariableElement> extractRecordComponents(TypeElement recordElement) {

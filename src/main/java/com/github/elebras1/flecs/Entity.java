@@ -107,7 +107,6 @@ public class Entity {
         return this.remove(pair);
     }
 
-
     @SuppressWarnings("unchecked")
     public <T> Entity set(T data) {
         Class<T> componentClass = (Class<T>) data.getClass();

@@ -21,13 +21,16 @@ public class ComponentCodeGenerator {
         TypeSpec componentClass = TypeSpec.classBuilder(componentClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.bestGuess(COMPONENT_INTERFACE), ClassName.get(packageName, recordName)))
-                .addField(createLayoutField(recordName, fields))
-                .addFields(createOffsetFields(fields))
-                .addMethod(createConstructor())
-                .addMethod(createLayoutMethod())
-                .addMethod(createWriteMethod(recordName, fields))
-                .addMethod(createReadMethod(packageName, recordName, fields))
-                .addMethod(createFactoryMethod(packageName, recordName))
+                .addField(this.createLayoutField(recordName, fields))
+                .addFields(this.createOffsetFields(fields))
+                .addType(this.createSingletonHolder(packageName, recordName))
+                .addMethod(this.createConstructor())
+                .addMethod(this.createLayoutMethod())
+                .addMethod(this.createWriteMethod(recordName, fields))
+                .addMethod(this.createReadMethod(packageName, recordName, fields))
+                .addMethod(this.createArrayMethod(packageName, recordName))
+                .addMethod(this.createFactoryMethod(packageName, recordName))
+                .addMethod(this.createGetInstanceMethod(packageName, recordName))
                 .build();
 
         return JavaFile.builder(packageName, componentClass)
@@ -147,6 +150,38 @@ public class ComponentCodeGenerator {
 
         method.addStatement("return new $LComponent()", recordName);
         return method.build();
+    }
+
+    private TypeSpec createSingletonHolder(String packageName, String recordName) {
+        String componentClassName = recordName + "Component";
+        return TypeSpec.classBuilder("Holder")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .addField(FieldSpec.builder(ClassName.get(packageName, componentClassName), "INSTANCE", Modifier.STATIC, Modifier.FINAL)
+                        .initializer("new $L()", componentClassName)
+                        .build())
+                .build();
+    }
+
+    private MethodSpec createGetInstanceMethod(String packageName, String recordName) {
+        String componentClassName = recordName + "Component";
+        return MethodSpec.methodBuilder("getInstance")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(ClassName.get(packageName, componentClassName))
+                .addStatement("return Holder.INSTANCE")
+                .build();
+    }
+
+    private MethodSpec createArrayMethod(String packageName, String recordName) {
+        TypeName recordType = ClassName.get(packageName, recordName);
+        TypeName arrayType = ArrayTypeName.of(recordType);
+
+        return MethodSpec.methodBuilder("createArray")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(int.class, "size")
+                .returns(arrayType)
+                .addStatement("return new $T[size]", recordType)
+                .build();
     }
 
     private String getLayoutMethod(String type) {

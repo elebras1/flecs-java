@@ -187,23 +187,15 @@ public class Flecs implements AutoCloseable {
         return entityId == 0 ? -1 : entityId;
     }
 
-    /**
-     * Register a component. Supports both old-style FlecsComponent implementations
-     * and new-style @FlecsComponent annotated records.
-     */
     public <T> long component(Class<T> componentClass) {
         this.checkClosed();
         return this.componentRegistry.register(componentClass);
     }
 
-    /**
-     * Register a component with hooks configuration. Supports both old-style FlecsComponent
-     * implementations and new-style @FlecsComponent annotated records.
-     */
     public <T> long component(Class<T> componentClass, Consumer<ComponentHooks<T>> configuration) {
         long id = this.component(componentClass);
         Component<T> component = this.componentRegistry.getComponent(componentClass);
-        ComponentHooks<T> hooks = new ComponentHooks<>(this, component, componentClass);
+        ComponentHooks<T> hooks = new ComponentHooks<>(this, component);
         configuration.accept(hooks);
         hooks.install(this.nativeWorld, id);
         return id;

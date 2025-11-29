@@ -211,7 +211,6 @@ val compileProcessor by tasks.registering(JavaCompile::class) {
     options.compilerArgs.add("--enable-preview")
 }
 
-// Copy processor service files
 val copyProcessorResources by tasks.registering(Copy::class) {
     from("src/main/resources/META-INF/services") {
         include("javax.annotation.processing.Processor")

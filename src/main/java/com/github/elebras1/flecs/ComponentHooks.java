@@ -4,7 +4,6 @@ import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Array;
 
 import static java.lang.foreign.ValueLayout.*;
 
@@ -12,7 +11,6 @@ public class ComponentHooks<T> {
     private final Linker linker;
     private final Arena arena;
     private final Component<T> component;
-    private final Class<T> componentType;
     private IterHookCallback<T> onAddCallback;
     private IterHookCallback<T> onSetCallback;
     private IterHookCallback<T> onRemoveCallback;
@@ -24,11 +22,10 @@ public class ComponentHooks<T> {
     private CopyMoveCallback<T> copyCtorCallback;
     private CopyMoveCallback<T> moveCtorCallback;
 
-    public ComponentHooks(Flecs world, Component<T> component, Class<T> componentType) {
+    public ComponentHooks(Flecs world, Component<T> component) {
         this.linker = Linker.nativeLinker();
         this.arena = world.arena();
         this.component = component;
-        this.componentType = componentType;
     }
 
     @FunctionalInterface
@@ -249,7 +246,7 @@ public class ComponentHooks<T> {
         long size = this.component.size();
         MemorySegment buffer = ptr.reinterpret(size * count);
 
-        T[] array = (T[]) Array.newInstance(this.componentType, count);
+        T[] array = this.component.createArray(count);
 
         for (int i = 0; i < count; i++) {
             MemorySegment componentSegment = buffer.asSlice(i * size, size);

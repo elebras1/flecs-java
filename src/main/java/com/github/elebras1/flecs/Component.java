@@ -11,6 +11,8 @@ public interface Component<T> {
 
     T read(MemorySegment segment);
 
+    T[] createArray(int size);
+
     default long size() {
         return layout().byteSize();
     }
