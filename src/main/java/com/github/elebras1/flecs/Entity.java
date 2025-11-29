@@ -39,7 +39,7 @@ public class Entity {
         return this.remove(component.id());
     }
 
-    public Entity remove(Class<? extends FlecsComponent> componentClass) {
+    public <T extends FlecsComponent<T>> Entity remove(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.remove(componentId);
     }
@@ -108,7 +108,7 @@ public class Entity {
 
     public <T extends FlecsComponent<T>> Entity set(T data) {
         Class<? extends FlecsComponent> componentClass = data.getClass();
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(data.getClass());
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment dataSegment = tempArena.allocate(component.layout());
@@ -133,7 +133,7 @@ public class Entity {
         return component.read(dataSegment);
     }
 
-    public <T extends FlecsComponent<T>> T get(Class<? extends FlecsComponent> componentClass) {
+    public <T extends FlecsComponent<T>> T get(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.get(componentId);
     }

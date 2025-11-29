@@ -75,8 +75,6 @@ public final class FlecsConstants {
     public static final int EcsOr = flecs_h.EcsOr();
     public static final int EcsNot = flecs_h.EcsNot();
     public static final int EcsOptional = flecs_h.EcsOptional();
-    public static final long EcsEqual = flecs_h.EcsPredEq();
-    public static final long EcsMatch = flecs_h.EcsPredMatch();
     public static final int EcsAndFrom = flecs_h.EcsAndFrom();
     public static final int EcsOrFrom = flecs_h.EcsOrFrom();
     public static final int EcsNotFrom = flecs_h.EcsNotFrom();
