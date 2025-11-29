@@ -160,13 +160,6 @@ public class Entity {
         flecs_h.ecs_enable(this.world.nativeHandle(), this.id, false);
     }
 
-    /**
-     * Creates an entity observer that triggers when this specific entity receives an event.
-     *
-     * @param eventId the event entity ID to listen for
-     * @param callback the callback to invoke when the event occurs
-     * @return the created observer
-     */
     public FlecsObserver observe(long eventId, Runnable callback) {
         return this.world.observer()
             .event(eventId)
@@ -178,13 +171,6 @@ public class Entity {
             });
     }
 
-    /**
-     * Creates an entity observer for a specific event type component.
-     *
-     * @param eventClass the event component class
-     * @param callback the callback that receives the event data
-     * @return the created observer
-     */
     public <T extends FlecsComponent<T>> FlecsObserver observe(Class<T> eventClass, java.util.function.Consumer<T> callback) {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
         return this.world.observer()
@@ -193,7 +179,6 @@ public class Entity {
             .iter((it) -> {
                 for (int i = 0; i < it.count(); i++) {
                     if (it.entityId(i) == this.id) {
-                        // Get event data if available
                         T eventData = this.get(eventClass);
                         if (eventData != null) {
                             callback.accept(eventData);
@@ -203,11 +188,6 @@ public class Entity {
             });
     }
 
-    /**
-     * Emits a custom event for this entity.
-     *
-     * @param eventId the event entity ID
-     */
     public void emit(long eventId) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
@@ -220,18 +200,11 @@ public class Entity {
         }
     }
 
-    /**
-     * Emits a custom event for this entity with a specific component.
-     *
-     * @param eventId the event entity ID
-     * @param componentId the component entity ID
-     */
     public void emit(long eventId, long componentId) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
             eventDesc.fill((byte) 0);
 
-            // Create ecs_type_t structure
             MemorySegment typeSegment = ecs_type_t.allocate(tempArena);
             MemorySegment idsArray = tempArena.allocate(ValueLayout.JAVA_LONG);
             idsArray.set(ValueLayout.JAVA_LONG, 0, componentId);
