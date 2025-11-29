@@ -75,7 +75,7 @@ public class ObserverBuilder {
         return with(tagEntity.id());
     }
 
-    public <T extends FlecsComponent<T>> ObserverBuilder with(Class<T> componentClass) {
+    public <T> ObserverBuilder with(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.with(componentId);
     }
@@ -119,7 +119,7 @@ public class ObserverBuilder {
         return this;
     }
 
-    public <T extends FlecsComponent<T>> ObserverBuilder without(Class<T> componentClass) {
+    public <T> ObserverBuilder without(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.without(componentId);
     }

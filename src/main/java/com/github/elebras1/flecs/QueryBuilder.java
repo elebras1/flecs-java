@@ -48,7 +48,7 @@ public class QueryBuilder {
         return with(tagEntity.id());
     }
 
-    public <T extends FlecsComponent<T>> QueryBuilder with(Class<T> componentClass) {
+    public <T> QueryBuilder with(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.with(componentId);
     }
@@ -72,7 +72,7 @@ public class QueryBuilder {
         return this;
     }
 
-    public <T extends FlecsComponent<T>> QueryBuilder with(Class<T> relationClass, Class<T> objectClass) {
+    public <T> QueryBuilder with(Class<T> relationClass, Class<T> objectClass) {
         long relationId = this.world.componentRegistry().getComponentId(relationClass);
         long objectId = this.world.componentRegistry().getComponentId(objectClass);
         return this.with(relationId, objectId);

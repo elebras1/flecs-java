@@ -8,7 +8,7 @@ import java.lang.reflect.Array;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class ComponentHooks<T extends FlecsComponent<T>> {
+public class ComponentHooks<T> {
     private final Linker linker;
     private final Arena arena;
     private final Component<T> component;

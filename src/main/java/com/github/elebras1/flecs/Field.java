@@ -2,7 +2,7 @@ package com.github.elebras1.flecs;
 
 import java.lang.foreign.MemorySegment;
 
-public class Field<T extends FlecsComponent<T>> {
+public class Field<T> {
     private final MemorySegment memorySegment;
     private final int count;
     private final Flecs world;

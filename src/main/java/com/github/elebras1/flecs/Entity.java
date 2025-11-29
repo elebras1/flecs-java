@@ -40,7 +40,7 @@ public class Entity {
         return this.remove(component.id());
     }
 
-    public <T extends FlecsComponent<T>> Entity remove(Class<T> componentClass) {
+    public <T> Entity remove(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.remove(componentId);
     }
@@ -107,9 +107,11 @@ public class Entity {
         return this.remove(pair);
     }
 
-    public <T extends FlecsComponent<T>> Entity set(T data) {
-        Class<? extends FlecsComponent> componentClass = data.getClass();
-        long componentId = this.world.componentRegistry().getComponentId(data.getClass());
+
+    @SuppressWarnings("unchecked")
+    public <T> Entity set(T data) {
+        Class<T> componentClass = (Class<T>) data.getClass();
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment dataSegment = tempArena.allocate(component.layout());
@@ -121,7 +123,7 @@ public class Entity {
         return this;
     }
 
-    public <T extends FlecsComponent<T>> T get(long componentId) {
+    public <T> T get(long componentId) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
         MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
 
@@ -134,22 +136,9 @@ public class Entity {
         return component.read(dataSegment);
     }
 
-    public <T extends FlecsComponent<T>> T get(Class<T> componentClass) {
+    public <T> T get(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.get(componentId);
-    }
-
-    public <T extends FlecsComponent<T>> T getMut(FlecsComponent<T> component) {
-        long componentId = this.world.componentRegistry().getComponentId(component.getClass());
-        MemorySegment dataPtr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
-
-        if (dataPtr == null || dataPtr.address() == 0) {
-            return null;
-        }
-
-        MemorySegment dataSegment = dataPtr.reinterpret(component.size());
-
-        return component.read(dataSegment);
     }
 
     public void enable() {
@@ -171,7 +160,7 @@ public class Entity {
             });
     }
 
-    public <T extends FlecsComponent<T>> FlecsObserver observe(Class<T> eventClass, java.util.function.Consumer<T> callback) {
+    public <T> FlecsObserver observe(Class<T> eventClass, java.util.function.Consumer<T> callback) {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
         return this.world.observer()
             .event(eventId)
@@ -220,7 +209,7 @@ public class Entity {
         }
     }
 
-    public <T extends FlecsComponent<T>> void emit(long eventId, Class<T> componentClass) {
+    public <T> void emit(long eventId, Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         this.emit(eventId, componentId);
     }

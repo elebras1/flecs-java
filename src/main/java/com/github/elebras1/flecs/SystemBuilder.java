@@ -98,7 +98,7 @@ public class SystemBuilder {
         return with(tagEntity.id());
     }
 
-    public <T extends FlecsComponent<T>> SystemBuilder with(Class<T> componentClass) {
+    public <T> SystemBuilder with(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.with(componentId);
     }
@@ -174,12 +174,12 @@ public class SystemBuilder {
         return this;
     }
 
-    public <T extends FlecsComponent<T>> SystemBuilder write(Class<T> componentClass) {
+    public <T> SystemBuilder write(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.with(componentId).out();
     }
 
-    public <T extends FlecsComponent<T>> SystemBuilder read(Class<T> componentClass) {
+    public <T> SystemBuilder read(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.with(componentId).in();
     }

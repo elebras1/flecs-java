@@ -15,6 +15,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.palantir.javapoet:javapoet:0.9.0")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
@@ -27,6 +29,7 @@ val flecsHeaderFile = File(flecsSourceDir, "distr/flecs.h")
 val flecsCFile = File(flecsSourceDir, "distr/flecs.c")
 
 val generatedSourcesDir = file("src/main/generated")
+val annotationGeneratedDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main").get().asFile
 
 val os = OperatingSystem.current()
 val userHome = System.getProperty("user.home")
@@ -136,10 +139,6 @@ val compileFlecsNative by tasks.registering(Exec::class) {
     }
 
     commandLine(compileCommand)
-
-    doLast {
-        println("Native Flecs library compiled: ${outputNativeFile.absolutePath}")
-    }
 }
 
 val generateFlecsBindings by tasks.registering(Exec::class) {
@@ -182,10 +181,10 @@ val copyFlecsNative by tasks.registering(Copy::class) {
         include(nativeLibName)
     }
 
-    into(layout.buildDirectory.dir("resources/main").get().asFile)
+    into(layout.buildDirectory.dir("natives").get().asFile)
 
     doLast {
-        println("Native library copied to resources")
+        println("Native library copied to natives")
     }
 }
 
@@ -193,20 +192,64 @@ sourceSets {
     main {
         java {
             srcDir(generatedSourcesDir)
+            srcDir(annotationGeneratedDir)
         }
         resources {
-            srcDir(layout.buildDirectory.dir("resources/main"))
+            srcDir(layout.buildDirectory.dir("natives"))
         }
     }
 }
 
+val compileProcessor by tasks.registering(JavaCompile::class) {
+    source = fileTree("src/main/java") {
+        include("**/processor/**")
+        include("**/annotation/**")
+    }
+    classpath = configurations.compileClasspath.get()
+    destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))
+    options.release.set(25)
+    options.compilerArgs.add("--enable-preview")
+}
+
+// Copy processor service files
+val copyProcessorResources by tasks.registering(Copy::class) {
+    from("src/main/resources/META-INF/services") {
+        include("javax.annotation.processing.Processor")
+    }
+    into(layout.buildDirectory.dir("classes/java/processor/META-INF/services"))
+    dependsOn(compileProcessor)
+}
+
+
 tasks.compileJava {
-    dependsOn(copyFlecsNative)
+    dependsOn(copyFlecsNative, copyProcessorResources)
+
+    exclude("**/processor/**")
 
     options.release.set(25)
+
+    val processorClasspath = files(
+        compileProcessor.get().destinationDirectory.get().asFile,
+        configurations.compileClasspath.get()
+    )
+
+    options.annotationProcessorPath = processorClasspath
+
     options.compilerArgs.addAll(listOf(
-        "--enable-preview"
+        "--enable-preview",
+        "-s", annotationGeneratedDir.absolutePath
     ))
+
+    doFirst {
+        annotationGeneratedDir.mkdirs()
+    }
+
+    doLast {
+        copy {
+            from(layout.buildDirectory.dir("classes/java/processor"))
+            into(layout.buildDirectory.dir("classes/java/main"))
+        }
+    }
 }
 
 tasks.processResources {
@@ -224,7 +267,7 @@ val cleanFlecs by tasks.registering(Delete::class) {
 
     delete(flecsDir)
     delete(generatedSourcesDir)
-    delete(layout.buildDirectory.dir("resources/main"))
+    delete(layout.buildDirectory.dir("natives"))
 }
 
 tasks.clean {

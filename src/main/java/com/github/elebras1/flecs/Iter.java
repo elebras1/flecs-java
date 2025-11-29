@@ -40,7 +40,7 @@ public class Iter {
         return ecs_iter_t.delta_system_time(this.nativeIter);
     }
 
-    public <T extends FlecsComponent<T>> Field<T> field(Class<T> componentClass, int index) {
+    public <T> Field<T> field(Class<T> componentClass, int index) {
         if (index < 0 || index > 127) {
             throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
         }
