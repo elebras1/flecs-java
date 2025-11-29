@@ -14,6 +14,7 @@ public class BasicExample {
             long posId = world.component(Position.class);
             long velId = world.component(Velocity.class);
             long healthId = world.component(Health.class);
+            long labelId = world.component(Label.class);
 
             // Create tags
             long playerTagId = world.entity("PlayerTag");
@@ -26,7 +27,7 @@ public class BasicExample {
             long playerId = world.entity("Player");
             Entity player = world.obtainEntity(playerId);
             player.add(playerTagId);
-            player.set(new Position(0, 0)).set(new Velocity(5, 0)).set(new Health(100));
+            player.set(new Position(0, 0)).set(new Velocity(5, 0)).set(new Health(100)).set(new Label("Hero"));
             System.out.println("Created: " + player.getName() + " (ID: " + player.id() + ")");
 
             // Create enemies with different setups
@@ -70,6 +71,18 @@ public class BasicExample {
             // Query enemies with AI
             try (Query aiQuery = world.query().with(enemyTagId).with(aiTagId).build()) {
                 System.out.println("AI-controlled enemies: " + aiQuery.count());
+            }
+
+            try (Query labelQuery = world.query().with(labelId).build()) {
+                System.out.println("Entities with Label: " + labelQuery.count());
+                labelQuery.iter(it -> {
+                    for (int i = 0; i < it.count(); i++) {
+                        long entityId = it.entity(i);
+                        Entity entity = world.obtainEntity(entityId);
+                        Label label = entity.get(Label.class);
+                        System.out.printf("  %s has label: %s%n", entity.getName(), label.label());
+                    }
+                });
             }
 
             System.out.println("\n--- Entity Relationships ---");
