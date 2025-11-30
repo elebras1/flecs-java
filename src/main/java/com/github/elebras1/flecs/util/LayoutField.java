@@ -2,95 +2,98 @@ package com.github.elebras1.flecs.util;
 
 import com.github.elebras1.flecs.flecs_h$shared;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 public final class LayoutField {
 
     private LayoutField() {}
 
     public static MemoryLayout floatLayout() {
-        return flecs_h$shared.C_FLOAT;
+        return ValueLayout.JAVA_FLOAT;
     }
 
     public static MemoryLayout doubleLayout() {
-        return flecs_h$shared.C_DOUBLE;
+        return ValueLayout.JAVA_DOUBLE;
     }
 
     public static MemoryLayout shortLayout() {
-        return flecs_h$shared.C_SHORT;
+        return ValueLayout.JAVA_SHORT;
     }
 
     public static MemoryLayout intLayout() {
-        return flecs_h$shared.C_INT;
+        return ValueLayout.JAVA_INT;
     }
 
     public static MemoryLayout longLayout() {
-        return flecs_h$shared.C_LONG;
+        return ValueLayout.JAVA_LONG;
     }
 
     public static MemoryLayout booleanLayout() {
-        return flecs_h$shared.C_BOOL;
+        return ValueLayout.JAVA_BOOLEAN;
     }
 
     public static MemoryLayout stringLayout() {
-        return flecs_h$shared.C_POINTER;
+        return ValueLayout.ADDRESS;
     }
 
     public static void set(MemorySegment segment, long offset, float value) {
-        segment.set(flecs_h$shared.C_FLOAT, offset, value);
+        segment.set(ValueLayout.JAVA_FLOAT, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, double value) {
-        segment.set(flecs_h$shared.C_DOUBLE, offset, value);
+        segment.set(ValueLayout.JAVA_DOUBLE, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, short value) {
-        segment.set(flecs_h$shared.C_SHORT, offset, value);
+        segment.set(ValueLayout.JAVA_SHORT, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, int value) {
-        segment.set(flecs_h$shared.C_INT, offset, value);
+        segment.set(ValueLayout.JAVA_INT, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, long value) {
-        segment.set(flecs_h$shared.C_LONG, offset, value);
+        segment.set(ValueLayout.JAVA_LONG, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, boolean value) {
-        segment.set(flecs_h$shared.C_BOOL, offset, value);
+        segment.set(ValueLayout.JAVA_BOOLEAN, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, String value) {
-        segment.set(flecs_h$shared.C_POINTER, offset, StringUtils.toMemorySegment(value));
+        MemorySegment stringSegment = value == null ? MemorySegment.NULL : Arena.ofAuto().allocateFrom(value);
+        segment.set(ValueLayout.ADDRESS, offset, stringSegment);
     }
 
     public static float getFloat(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_FLOAT, offset);
+        return segment.get(ValueLayout.JAVA_FLOAT, offset);
     }
 
     public static double getDouble(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_DOUBLE, offset);
+        return segment.get(ValueLayout.JAVA_DOUBLE, offset);
     }
 
     public static short getShort(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_SHORT, offset);
+        return segment.get(ValueLayout.JAVA_SHORT, offset);
     }
 
     public static int getInt(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_INT, offset);
+        return segment.get(ValueLayout.JAVA_INT, offset);
     }
 
     public static long getLong(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_LONG, offset);
+        return segment.get(ValueLayout.JAVA_LONG, offset);
     }
 
     public static boolean getBoolean(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_BOOL, offset);
+        return segment.get(ValueLayout.JAVA_BOOLEAN, offset);
     }
 
     public static String getString(MemorySegment segment, long offset) {
-        return segment.get(flecs_h$shared.C_POINTER, offset).getString(0);
+        return segment.get(ValueLayout.ADDRESS, offset).getString(0);
     }
 
     public static long offsetOf(MemoryLayout layout, String fieldName) {
