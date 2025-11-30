@@ -3,7 +3,7 @@ name: Build and Publish
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 permissions:
   contents: read
@@ -77,15 +77,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build project
+        run: ./gradlew build -PNATIVE_ARCH=linux-x64 -x test
+
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
-        run: ./gradlew publish
+        run: ./gradlew publish -PNATIVE_ARCH=linux-x64
 
       - name: Verify JAR contents
         run: |
           VERSION=${GITHUB_REF_NAME#v}
           echo "Verifying JAR contents..."
           jar tf build/libs/flecs-java-$VERSION.jar | grep natives || echo "Warning: No natives found in JAR"
-

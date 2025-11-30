@@ -254,23 +254,10 @@ tasks.compileJava {
     doFirst {
         annotationGeneratedDir.mkdirs()
     }
-
-    doLast {
-        copy {
-            from(layout.buildDirectory.dir("classes/java/processor")) {
-                exclude("META-INF/services/**")
-            }
-            into(layout.buildDirectory.dir("classes/java/main"))
-        }
-    }
 }
 
 tasks.processResources {
     dependsOn(copyFlecsNative)
-}
-
-tasks.jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.test {
