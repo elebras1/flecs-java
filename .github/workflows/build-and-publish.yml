@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   build-natives:
@@ -47,8 +46,8 @@ jobs:
           path: build/natives/${{ matrix.arch }}/libflecs.so
           retention-days: 1
 
-  publish:
-    name: Assemble and Publish
+  publish-maven-central:
+    name: Publish to Maven Central
     needs: build-natives
     runs-on: ubuntu-latest
     
@@ -80,11 +79,13 @@ jobs:
       - name: Build project
         run: ./gradlew build -PNATIVE_ARCH=linux-x64 -x test
 
-      - name: Publish to GitHub Packages
+      - name: Publish to Maven Central
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        run: ./gradlew publish -PNATIVE_ARCH=linux-x64
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -PNATIVE_ARCH=linux-x64
 
       - name: Verify JAR contents
         run: |

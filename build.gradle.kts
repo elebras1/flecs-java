@@ -6,6 +6,8 @@ import java.nio.file.StandardCopyOption
 plugins {
     id("java")
     id("maven-publish")
+    id("signing")
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 group = "com.github.elebras1"
@@ -26,6 +28,8 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
     }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 val flecsVersion = "4.1.2"
@@ -282,6 +286,17 @@ tasks.withType<JavaExec> {
     jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
 
+configure<io.github.gradlenexus.publishplugin.NexusPublishExtension> {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(System.getenv("OSSRH_USERNAME"))
+            password.set(System.getenv("OSSRH_PASSWORD"))
+        }
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -318,15 +333,13 @@ publishing {
             }
         }
     }
+}
 
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/elebras1/flecs-java")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
+configure<SigningExtension> {
+    val signingKey = System.getenv("SIGNING_KEY")
+    val signingPassword = System.getenv("SIGNING_PASSWORD")
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications["maven"])
     }
 }
