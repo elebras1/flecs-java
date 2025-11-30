@@ -257,7 +257,9 @@ tasks.compileJava {
 
     doLast {
         copy {
-            from(layout.buildDirectory.dir("classes/java/processor"))
+            from(layout.buildDirectory.dir("classes/java/processor")) {
+                exclude("META-INF/services/**")
+            }
             into(layout.buildDirectory.dir("classes/java/main"))
         }
     }
@@ -265,6 +267,10 @@ tasks.compileJava {
 
 tasks.processResources {
     dependsOn(copyFlecsNative)
+}
+
+tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.test {
@@ -337,4 +343,3 @@ publishing {
         }
     }
 }
-
