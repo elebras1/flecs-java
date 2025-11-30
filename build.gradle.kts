@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.github.elebras1"
-version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: project.findProperty("version") as String? ?: "0.1-SNAPSHOT"
+version = System.getenv("GITHUB_REF_NAME") ?: project.findProperty("version") as String? ?: "0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -19,9 +19,6 @@ repositories {
 
 dependencies {
     implementation("com.palantir.javapoet:javapoet:0.9.0")
-
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 java {
@@ -97,63 +94,29 @@ val extractFlecs by tasks.registering(Copy::class) {
 val compileFlecsNative by tasks.registering(Exec::class) {
     description = "Compile the Flecs C native library"
     group = "flecs"
-
     dependsOn(extractFlecs)
-
-    doFirst {
-        if (!flecsCFile.exists()) {
-            throw GradleException(
-                "Flecs source file not found: ${flecsCFile.absolutePath}"
-            )
-        }
-    }
 
     workingDir(flecsSourceDir)
     inputs.file(flecsCFile)
-
     val outputNativeFile = File(flecsSourceDir, "distr/$nativeLibName")
     outputs.file(outputNativeFile)
 
-    val compileCommand = when {
-        os.isWindows -> listOf(
-            "gcc",
-            "-shared",
-            "-o", outputNativeFile.absolutePath,
-            flecsCFile.absolutePath,
-            "-Ofast",
-            "-std=c99",
-            "-DFLECS_SHARED",
-            "-DNDEBUG"
-        )
-        os.isMacOsX -> listOf(
-            "clang",
-            "-shared",
-            "-fPIC",
-            "-o", outputNativeFile.absolutePath,
-            flecsCFile.absolutePath,
-            "-Ofast",
-            "-std=c99",
-            "-DFLECS_SHARED",
-            "-DNDEBUG"
-        )
-        else -> listOf(
-            "gcc",
-            "-shared",
-            "-fPIC",
-            "-o", outputNativeFile.absolutePath,
-            flecsCFile.absolutePath,
-            "-Ofast",
-            "-std=c99",
-            "-DFLECS_SHARED",
-            "-DNDEBUG",
-            "-D_POSIX_C_SOURCE=200809L",
-            "-D_DEFAULT_SOURCE",
-            "-lm",
-            "-lrt",
-            "-lpthread"
-        )
-    }
-
+    val compileCommand = listOf(
+        "gcc",
+        "-shared",
+        "-fPIC",
+        "-o", outputNativeFile.absolutePath,
+        flecsCFile.absolutePath,
+        "-Ofast",
+        "-std=c99",
+        "-DFLECS_SHARED",
+        "-DNDEBUG",
+        "-D_POSIX_C_SOURCE=200809L",
+        "-D_DEFAULT_SOURCE",
+        "-lm",
+        "-lrt",
+        "-lpthread"
+    )
     commandLine(compileCommand)
 }
 
@@ -188,19 +151,21 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
 }
 
 val copyFlecsNative by tasks.registering(Copy::class) {
-    description = "Copy compiled Flecs native library to resources"
+    description = "Copy compiled Flecs native library to natives folder"
     group = "flecs"
-
     dependsOn(compileFlecsNative)
-
     from(File(flecsSourceDir, "distr")) {
         include(nativeLibName)
     }
+    into(layout.buildDirectory.dir("natives/$nativeArch"))
+}
 
-    into(layout.buildDirectory.dir("natives/$nativeArch").get().asFile)
-
+val validateGeneratedBindings by tasks.registering {
+    group = "verification"
     doLast {
-        println("Native library copied to natives/$nativeArch")
+        if (!generatedSourcesDir.exists()) {
+            throw GradleException("Bindings not found at: $generatedSourcesDir")
+        }
     }
 }
 
@@ -224,7 +189,6 @@ val compileProcessor by tasks.registering(JavaCompile::class) {
     classpath = configurations.compileClasspath.get()
     destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))
     options.release.set(25)
-    options.compilerArgs.add("--enable-preview")
 }
 
 val copyProcessorResources by tasks.registering(Copy::class) {
@@ -232,26 +196,22 @@ val copyProcessorResources by tasks.registering(Copy::class) {
         include("javax.annotation.processing.Processor")
     }
     into(layout.buildDirectory.dir("classes/java/processor/META-INF/services"))
-    dependsOn(compileProcessor)
 }
 
-
 tasks.compileJava {
-    dependsOn(copyFlecsNative, copyProcessorResources)
+    dependsOn(validateGeneratedBindings, copyFlecsNative, copyProcessorResources, compileProcessor)
 
     exclude("**/processor/**")
+    exclude("**/annotation/**")
 
     options.release.set(25)
 
-    val processorClasspath = files(
-        compileProcessor.get().destinationDirectory.get().asFile,
-        configurations.compileClasspath.get()
-    )
+    val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
+    classpath = files(processorOutput) + classpath
 
-    options.annotationProcessorPath = processorClasspath
+    options.annotationProcessorPath = files(processorOutput) + configurations.annotationProcessor.get()
 
     options.compilerArgs.addAll(listOf(
-        "--enable-preview",
         "-s", annotationGeneratedDir.absolutePath
     ))
 
@@ -260,13 +220,29 @@ tasks.compileJava {
     }
 }
 
-tasks.processResources {
-    dependsOn(copyFlecsNative)
-}
+tasks.jar {
+    dependsOn(compileProcessor, copyProcessorResources, copyFlecsNative)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-tasks.test {
-    useJUnitPlatform()
-    jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
+    from(compileProcessor.get().destinationDirectory)
+    from(copyProcessorResources)
+
+    from(configurations.runtimeClasspath.get().map {
+        if (it.isDirectory) it else zipTree(it)
+    })
+
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+
+    from(layout.buildDirectory.dir("natives")) {
+        into("natives")
+    }
+
+    manifest {
+        attributes(
+            "Implementation-Title" to "Flecs Java",
+            "Implementation-Version" to project.version,
+        )
+    }
 }
 
 val cleanFlecs by tasks.registering(Delete::class) {
@@ -310,6 +286,14 @@ publishing {
                 name.set("Flecs Java")
                 description.set("Java wrapper for the ECS library Flecs using the Java Foreign Function & Memory API (FFM)")
                 url.set("https://github.com/elebras1/flecs-java")
+
+                withXml {
+                    val node = asNode()
+                    val dependenciesNodes = node.get("dependencies") as groovy.util.NodeList
+                    if (dependenciesNodes.isNotEmpty()) {
+                        node.remove(dependenciesNodes[0] as groovy.util.Node)
+                    }
+                }
 
                 licenses {
                     license {
