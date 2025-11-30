@@ -9,8 +9,6 @@ import com.github.elebras1.flecs.examples.components.Velocity;
 
 public class BulkExample {
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
 
             world.component(Position.class);

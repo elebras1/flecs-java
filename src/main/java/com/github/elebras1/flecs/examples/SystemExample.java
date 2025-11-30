@@ -8,8 +8,6 @@ import java.lang.System;
 public class SystemExample {
 
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
             System.out.println("=== Flecs Systems Example ===\n");
 

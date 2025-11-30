@@ -7,8 +7,6 @@ import com.github.elebras1.flecs.examples.components.*;
 public class QueryFeaturesExample {
 
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
             System.out.println("=== Query Features Example ===\n");
 

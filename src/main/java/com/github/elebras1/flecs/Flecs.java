@@ -1,6 +1,7 @@
 package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.util.FlecsLoader;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
@@ -22,6 +23,10 @@ public class Flecs implements AutoCloseable {
     private final ThreadLocal<NameBuffer> threadLocalNameBuffer;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
+
+    static {
+        FlecsLoader.load();
+    }
 
     private static final class SystemCallbacks {
         final Query.IterCallback iterCallback;

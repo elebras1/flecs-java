@@ -7,8 +7,6 @@ import com.github.elebras1.flecs.examples.components.Position;
 public class HooksExample {
 
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
             System.out.println("Registering Position component with hooks...");
 

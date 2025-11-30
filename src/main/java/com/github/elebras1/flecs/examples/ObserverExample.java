@@ -8,15 +8,9 @@ import com.github.elebras1.flecs.examples.components.Velocity;
 
 import static com.github.elebras1.flecs.FlecsConstants.*;
 
-/**
- * Example demonstrating the use of observers in Flecs-Java.
- * Observers react to events such as OnAdd, OnRemove, and OnSet.
- */
 public class ObserverExample {
 
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
             System.out.println("=== Observer Example ===\n");
 

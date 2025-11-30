@@ -6,8 +6,6 @@ import com.github.elebras1.flecs.examples.components.*;
 public class BasicExample {
 
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
             System.out.println("=== Flecs Wrapper - Comprehensive Example ===\n");
 

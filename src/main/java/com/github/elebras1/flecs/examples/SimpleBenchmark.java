@@ -1,14 +1,11 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.*;
-import com.github.elebras1.flecs.collection.EcsLongList;
 import com.github.elebras1.flecs.examples.components.*;
 
 public class SimpleBenchmark {
 
     public static void main(String[] args) {
-        FlecsLoader.load();
-
         try (Flecs world = new Flecs()) {
 
             long posId = world.component(Position.class);
