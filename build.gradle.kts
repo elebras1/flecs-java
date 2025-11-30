@@ -5,10 +5,11 @@ import java.nio.file.StandardCopyOption
 
 plugins {
     id("java")
+    id("maven-publish")
 }
 
-group = "org"
-version = "1.0-SNAPSHOT"
+group = "com.github.elebras1"
+version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: project.findProperty("version") as String? ?: "0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -19,6 +20,12 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
 }
 
 val flecsVersion = "4.1.2"
@@ -40,6 +47,11 @@ val jextractExecutable = when {
 }
 
 val nativeLibName = "libflecs.so"
+val nativeArch = project.findProperty("NATIVE_ARCH") as String? ?: when {
+    os.isLinux && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "linux-x64"
+    os.isLinux && System.getProperty("os.arch") in listOf("aarch64", "arm64") -> "linux-aarch64"
+    else -> "unknown"
+}
 
 val downloadFlecs by tasks.registering {
     description = "Download Flecs release from GitHub"
@@ -181,10 +193,10 @@ val copyFlecsNative by tasks.registering(Copy::class) {
         include(nativeLibName)
     }
 
-    into(layout.buildDirectory.dir("natives").get().asFile)
+    into(layout.buildDirectory.dir("natives/$nativeArch").get().asFile)
 
     doLast {
-        println("Native library copied to natives")
+        println("Native library copied to natives/$nativeArch")
     }
 }
 
@@ -276,3 +288,53 @@ tasks.clean {
 tasks.withType<JavaExec> {
     jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.elebras1"
+            artifactId = "flecs-java"
+            version = project.version.toString()
+
+            from(components["java"])
+
+            pom {
+                name.set("Flecs Java")
+                description.set("Java wrapper for the ECS library Flecs using the Java Foreign Function & Memory API (FFM)")
+                url.set("https://github.com/elebras1/flecs-java")
+
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://github.com/elebras1/flecs-java/blob/main/LICENSE")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("elebras1")
+                        name.set("elebras1")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/elebras1/flecs-java.git")
+                    developerConnection.set("scm:git:ssh://github.com/elebras1/flecs-java.git")
+                    url.set("https://github.com/elebras1/flecs-java")
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/elebras1/flecs-java")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+

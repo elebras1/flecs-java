@@ -19,9 +19,9 @@ public final class FlecsLoader {
         }
 
         try {
-            String libName = getNativeLibraryName();
+            String libPath = getNativeLibraryPath();
 
-            if (loadFromResources(libName)) {
+            if (loadFromResources(libPath)) {
                 loaded = true;
                 return;
             }
@@ -34,28 +34,55 @@ public final class FlecsLoader {
         }
     }
 
-    private static String getNativeLibraryName() {
-        String os = System.getProperty("os.name").toLowerCase();
+    private static String getArchitecture() {
+        String osArch = System.getProperty("os.arch").toLowerCase();
 
-        if (os.contains("win")) {
-            return "flecs.dll";
-        } else if (os.contains("mac")) {
-            return "libflecs.dylib";
-        } else {
-            return "libflecs.so";
+        if (osArch.equals("amd64") || osArch.equals("x86_64")) {
+            return "x64";
+        } else if (osArch.equals("aarch64") || osArch.equals("arm64")) {
+            return "aarch64";
         }
+
+        return osArch;
     }
 
-    private static boolean loadFromResources(String libName) {
+    private static String getNativeLibraryPath() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String arch = getArchitecture();
+        String libName;
+
+        if (os.contains("win")) {
+            libName = "flecs.dll";
+        } else if (os.contains("mac")) {
+            libName = "libflecs.dylib";
+        } else {
+            libName = "libflecs.so";
+        }
+
+        // Try architecture-specific path first for Linux
+        if (os.contains("linux")) {
+            return "/natives/linux-" + arch + "/" + libName;
+        }
+
+        // Fallback to root for backward compatibility
+        return "/" + libName;
+    }
+
+    private static boolean loadFromResources(String libPath) {
         try {
-            String resourcePath = "/" + libName;
-            InputStream in = FlecsLoader.class.getResourceAsStream(resourcePath);
+            InputStream in = FlecsLoader.class.getResourceAsStream(libPath);
 
             if (in == null) {
-                return false;
+                // Try fallback to root for backward compatibility
+                String libName = libPath.substring(libPath.lastIndexOf('/') + 1);
+                in = FlecsLoader.class.getResourceAsStream("/" + libName);
+
+                if (in == null) {
+                    return false;
+                }
             }
 
-            Path tempLib = Files.createTempFile("flecs", getSuffix(libName));
+            Path tempLib = Files.createTempFile("flecs", getSuffix(libPath));
             tempLib.toFile().deleteOnExit();
 
             Files.copy(in, tempLib, StandardCopyOption.REPLACE_EXISTING);

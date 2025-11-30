@@ -1,7 +1,5 @@
 package com.github.elebras1.flecs.util;
 
-import com.github.elebras1.flecs.flecs_h$shared;
-
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
