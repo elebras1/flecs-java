@@ -181,6 +181,10 @@ sourceSets {
     }
 }
 
+tasks.named("processResources") {
+    dependsOn(copyFlecsNative)
+}
+
 val compileProcessor by tasks.registering(JavaCompile::class) {
     source = fileTree("src/main/java") {
         include("**/processor/**")
@@ -209,7 +213,7 @@ tasks.compileJava {
     val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
     classpath = files(processorOutput) + classpath
 
-    options.annotationProcessorPath = files(processorOutput) + configurations.annotationProcessor.get()
+    options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
 
     options.compilerArgs.addAll(listOf(
         "-s", annotationGeneratedDir.absolutePath
