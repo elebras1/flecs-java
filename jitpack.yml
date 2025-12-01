@@ -1,6 +1,0 @@
-jdk:
-  - openjdk25
-install:
-  - ./gradlew compileFlecsNative copyFlecsNative -PNATIVE_ARCH=linux-x64
-  - ./gradlew build publishToMavenLocal -PNATIVE_ARCH=linux-x64 -x test
-

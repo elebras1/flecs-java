@@ -10,8 +10,8 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-group = "com.github.elebras1"
-version = System.getenv("GITHUB_REF_NAME") ?: project.findProperty("version") as String? ?: "0.1-SNAPSHOT"
+group = "io.github.elebras1"
+version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: project.findProperty("version") as String? ?: "0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -121,7 +121,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
 }
 
 val generateFlecsBindings by tasks.registering(Exec::class) {
-    description = "Generate Java FFM bindings using jextract"
+    description = "Generate Java FFM bindings using jextract (maintainer-only task, run when updating Flecs version)"
     group = "flecs"
 
     dependsOn(compileFlecsNative)
@@ -229,7 +229,8 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(compileProcessor.get().destinationDirectory)
-    from(copyProcessorResources)
+
+    from(copyProcessorResources.get().destinationDir)
 
     from(configurations.runtimeClasspath.get().map {
         if (it.isDirectory) it else zipTree(it)
@@ -254,7 +255,6 @@ val cleanFlecs by tasks.registering(Delete::class) {
     group = "flecs"
 
     delete(flecsDir)
-    delete(generatedSourcesDir)
     delete(layout.buildDirectory.dir("natives"))
 }
 
@@ -266,11 +266,15 @@ tasks.withType<JavaExec> {
     jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
 
+tasks.named("sourcesJar") {
+    dependsOn(copyFlecsNative, tasks.compileJava)
+}
+
 configure<io.github.gradlenexus.publishplugin.NexusPublishExtension> {
     repositories {
         sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
             username.set(System.getenv("OSSRH_USERNAME"))
             password.set(System.getenv("OSSRH_PASSWORD"))
         }
@@ -280,7 +284,7 @@ configure<io.github.gradlenexus.publishplugin.NexusPublishExtension> {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.github.elebras1"
+            groupId = "io.github.elebras1"
             artifactId = "flecs-java"
             version = project.version.toString()
 
