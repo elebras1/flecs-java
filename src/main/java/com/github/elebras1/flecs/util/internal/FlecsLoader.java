@@ -43,29 +43,30 @@ public final class FlecsLoader {
             return "aarch64";
         }
 
-        return osArch;
+        throw new UnsupportedOperationException("Unsupported architecture: " + osArch);
     }
 
     private static String getNativeLibraryPath() {
         String os = System.getProperty("os.name").toLowerCase();
         String arch = getArchitecture();
+
+        String osName;
         String libName;
 
         if (os.contains("win")) {
+            osName = "windows";
             libName = "flecs.dll";
         } else if (os.contains("mac")) {
+            osName = "macos";
             libName = "libflecs.dylib";
-        } else {
+        } else if (os.contains("linux") || os.contains("nux")) {
+            osName = "linux";
             libName = "libflecs.so";
+        } else {
+            throw new UnsupportedOperationException("Unsupported OS: " + os);
         }
 
-        // Try architecture-specific path first for Linux
-        if (os.contains("linux")) {
-            return "/natives/linux-" + arch + "/" + libName;
-        }
-
-        // Fallback to root for backward compatibility
-        return "/" + libName;
+        return String.format("/natives/%s-%s/%s", osName, arch, libName);
     }
 
     private static boolean loadFromResources(String libPath) {

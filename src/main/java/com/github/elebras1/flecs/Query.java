@@ -3,6 +3,7 @@ package com.github.elebras1.flecs;
 import com.github.elebras1.flecs.collection.EcsLongList;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 public class Query implements AutoCloseable {
 
@@ -46,7 +47,7 @@ public class Query implements AutoCloseable {
             MemorySegment entities = ecs_iter_t.entities(iter);
 
             for (int i = 0; i < count; i++) {
-                long entityId = entities.getAtIndex(flecs_h$shared.C_LONG, i);
+                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                 callback.accept(entityId);
             }
         }

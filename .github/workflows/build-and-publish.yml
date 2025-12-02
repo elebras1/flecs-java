@@ -9,8 +9,74 @@ permissions:
   contents: read
 
 jobs:
-  build-and-publish:
-    name: Build and Publish to Maven Central
+  build-natives:
+    name: Build natives for ${{ matrix.platform }}-${{ matrix.arch }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            lib: libflecs.so
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            lib: flecs.dll
+          - os: macos-13
+            platform: macos
+            arch: x64
+            lib: libflecs.dylib
+          - os: macos-latest
+            platform: macos
+            arch: aarch64
+            lib: libflecs.dylib
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Install GCC (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc build-essential
+
+      - name: Install GCC (Windows)
+        if: runner.os == 'Windows'
+        run: choco install mingw -y
+
+      - name: Grant execute permission for gradlew
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+
+      - name: Build natives
+        run: ./gradlew copyFlecsNative -PNATIVE_ARCH=${{ matrix.platform }}-${{ matrix.arch }}
+        shell: bash
+
+      - name: Verify native library was built
+        run: |
+          echo "Checking for native library..."
+          ls -la build/natives/${{ matrix.platform }}-${{ matrix.arch }}/
+        shell: bash
+
+      - name: Upload natives artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: natives-${{ matrix.platform }}-${{ matrix.arch }}
+          path: build/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}
+          retention-days: 1
+
+  publish:
+    name: Publish to Maven Central
+    needs: build-natives
     runs-on: ubuntu-latest
 
     steps:
@@ -23,23 +89,58 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
 
-      - name: Install GCC
+      - name: Download all natives
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-natives
+
+      - name: Debug downloaded artifacts
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc build-essential
+          echo "Downloaded artifacts structure:"
+          find downloaded-natives -type f
+
+      - name: Organize natives
+        run: |
+          mkdir -p build/natives
+          
+          # Copy each artifact to the correct structure
+          for artifact_dir in downloaded-natives/natives-*/; do
+            # Extract platform-arch from folder name (e.g. natives-linux-x64 -> linux-x64)
+            platform_arch=$(basename "$artifact_dir" | sed 's/^natives-//')
+          
+            echo "Processing $platform_arch..."
+            mkdir -p "build/natives/$platform_arch"
+          
+            # Copy library file from artifact
+            cp "$artifact_dir"/* "build/natives/$platform_arch/" 2>/dev/null || {
+              echo "Warning: No files found in $artifact_dir"
+            }
+          done
+          
+          echo ""
+          echo "Final native libraries structure:"
+          find build/natives -type f
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build project with natives
-        run: ./gradlew build -PNATIVE_ARCH=linux-x64 -x test
+      - name: Build final JAR with all natives
+        run: ./gradlew jar -x compileFlecsNative -x copyFlecsNative
 
       - name: Verify JAR contents
         run: |
           VERSION=${GITHUB_REF_NAME#v}
           echo "Verifying JAR for version $VERSION..."
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/linux-x64/libflecs.so" && echo "✓ Native library found" || echo "✗ Native NOT found"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "META-INF/services/javax.annotation.processing.Processor" && echo "✓ Processor found" || echo "✗ Processor NOT found"
+          echo ""
+          echo "All natives in JAR:"
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/" | sort
+          echo ""
+          
+          # Check each platform
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/linux-x64/libflecs.so" && echo "✓ Linux x64" || echo "✗ Linux x64 MISSING"
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/windows-x64/flecs.dll" && echo "✓ Windows x64" || echo "✗ Windows x64 MISSING"
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-x64/libflecs.dylib" && echo "✓ macOS x64" || echo "✗ macOS x64 MISSING"
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-aarch64/libflecs.dylib" && echo "✓ macOS ARM64" || echo "✗ macOS ARM64 MISSING"
 
       - name: Publish to Maven Central
         env:
@@ -47,4 +148,4 @@ jobs:
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -PNATIVE_ARCH=linux-x64
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository

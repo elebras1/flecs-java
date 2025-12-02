@@ -218,7 +218,7 @@ public class SystemBuilder {
             MemorySegment entities = ecs_iter_t.entities(it);
             
             for (int i = 0; i < count; i++) {
-                long entityId = entities.getAtIndex(flecs_h$shared.C_LONG, i);
+                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                 callback.accept(entityId);
             }
         }, this.world.arena());

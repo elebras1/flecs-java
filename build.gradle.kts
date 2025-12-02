@@ -47,10 +47,19 @@ val jextractExecutable = when {
     else -> "$userHome/.local/jextract/jextract-25/bin/jextract"
 }
 
-val nativeLibName = "libflecs.so"
+val nativeLibName = when {
+    os.isWindows -> "flecs.dll"
+    os.isMacOsX -> "libflecs.dylib"
+    else -> "libflecs.so"
+}
+
 val nativeArch = project.findProperty("NATIVE_ARCH") as String? ?: when {
     os.isLinux && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "linux-x64"
     os.isLinux && System.getProperty("os.arch") in listOf("aarch64", "arm64") -> "linux-aarch64"
+    os.isWindows && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "windows-x64"
+    os.isWindows && System.getProperty("os.arch") == "aarch64" -> "windows-aarch64"
+    os.isMacOsX && System.getProperty("os.arch") == "aarch64" -> "macos-aarch64"
+    os.isMacOsX && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "macos-x64"
     else -> "unknown"
 }
 
@@ -101,22 +110,47 @@ val compileFlecsNative by tasks.registering(Exec::class) {
     val outputNativeFile = File(flecsSourceDir, "distr/$nativeLibName")
     outputs.file(outputNativeFile)
 
-    val compileCommand = listOf(
-        "gcc",
-        "-shared",
-        "-fPIC",
-        "-o", outputNativeFile.absolutePath,
-        flecsCFile.absolutePath,
-        "-Ofast",
-        "-std=c99",
-        "-DFLECS_SHARED",
-        "-DNDEBUG",
-        "-D_POSIX_C_SOURCE=200809L",
-        "-D_DEFAULT_SOURCE",
-        "-lm",
-        "-lrt",
-        "-lpthread"
-    )
+    val compileCommand = when {
+        os.isWindows -> listOf(
+            "gcc",
+            "-shared",
+            "-o", outputNativeFile.absolutePath,
+            flecsCFile.absolutePath,
+            "-Ofast",
+            "-std=c99",
+            "-DFLECS_SHARED",
+            "-DNDEBUG",
+            "-lws2_32",
+            "-ldbghelp"
+        )
+        os.isMacOsX -> listOf(
+            "gcc",
+            "-dynamiclib",
+            "-o", outputNativeFile.absolutePath,
+            flecsCFile.absolutePath,
+            "-Ofast",
+            "-std=c99",
+            "-DFLECS_SHARED",
+            "-DNDEBUG",
+            "-framework", "CoreFoundation"
+        )
+        else -> listOf(
+            "gcc",
+            "-shared",
+            "-fPIC",
+            "-o", outputNativeFile.absolutePath,
+            flecsCFile.absolutePath,
+            "-Ofast",
+            "-std=c99",
+            "-DFLECS_SHARED",
+            "-DNDEBUG",
+            "-D_POSIX_C_SOURCE=200809L",
+            "-D_DEFAULT_SOURCE",
+            "-lm",
+            "-lrt",
+            "-lpthread"
+        )
+    }
     commandLine(compileCommand)
 }
 
