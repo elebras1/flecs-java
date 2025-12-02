@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.collection.EcsLongList;
-import com.github.elebras1.flecs.util.FlecsLoader;
+import com.github.elebras1.flecs.util.internal.FlecsLoader;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
