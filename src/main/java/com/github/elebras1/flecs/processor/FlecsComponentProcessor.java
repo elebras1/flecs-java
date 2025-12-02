@@ -19,6 +19,7 @@ public class FlecsComponentProcessor extends AbstractProcessor {
     private ComponentCodeGenerator generator;
     private ComponentMapGenerator mapGenerator;
     private List<TypeElement> processedComponents;
+    private boolean mapGenerated;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -28,6 +29,7 @@ public class FlecsComponentProcessor extends AbstractProcessor {
         this.generator = new ComponentCodeGenerator();
         this.mapGenerator = new ComponentMapGenerator();
         this.processedComponents = new ArrayList<>();
+        this.mapGenerated = false;
     }
 
     @Override
@@ -39,15 +41,6 @@ public class FlecsComponentProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
         if (roundEnv.processingOver()) {
-            if (!this.processedComponents.isEmpty()) {
-                try {
-                    JavaFile mapFile = this.mapGenerator.generateComponentMap(this.processedComponents);
-                    mapFile.writeTo(this.filer);
-                    this.messager.printMessage(Diagnostic.Kind.NOTE, "[@FlecsComponent] Generated ComponentMap with " + processedComponents.size() + " components");
-                } catch (IOException e) {
-                    this.messager.printMessage(Diagnostic.Kind.ERROR, "Failed to generate ComponentMap: " + e.getMessage());
-                }
-            }
             return false;
         }
 
@@ -69,6 +62,16 @@ public class FlecsComponentProcessor extends AbstractProcessor {
             }
         }
 
+        if (!this.mapGenerated && !this.processedComponents.isEmpty() && annotations.isEmpty()) {
+            try {
+                JavaFile mapFile = this.mapGenerator.generateComponentMap(this.processedComponents);
+                mapFile.writeTo(this.filer);
+                this.mapGenerated = true;
+            } catch (IOException e) {
+                this.messager.printMessage(Diagnostic.Kind.ERROR, "Failed to generate ComponentMap: " + e.getMessage());
+            }
+        }
+
         return true;
     }
 
@@ -85,8 +88,6 @@ public class FlecsComponentProcessor extends AbstractProcessor {
 
         JavaFile javaFile = generator.generateComponentClass(recordElement, fields);
         javaFile.writeTo(filer);
-
-        this.messager.printMessage(Diagnostic.Kind.NOTE, "[@FlecsComponent] Generated: " + recordElement.getQualifiedName());
     }
 
     private List<VariableElement> extractRecordComponents(TypeElement recordElement) {

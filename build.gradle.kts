@@ -270,6 +270,13 @@ tasks.named("sourcesJar") {
     dependsOn(copyFlecsNative, tasks.compileJava)
 }
 
+tasks.withType<Javadoc>().configureEach {
+    (options as? StandardJavadocDocletOptions)?.apply {
+        addBooleanOption("Xdoclint:none", true)
+        addStringOption("quiet", "-quiet")
+    }
+}
+
 configure<io.github.gradlenexus.publishplugin.NexusPublishExtension> {
     repositories {
         sonatype {
