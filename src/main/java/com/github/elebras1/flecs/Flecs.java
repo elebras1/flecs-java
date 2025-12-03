@@ -6,6 +6,7 @@ import com.github.elebras1.flecs.util.internal.FlecsLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,7 +101,7 @@ public class Flecs implements AutoCloseable {
         NameBuffer nameBuffer = this.threadLocalNameBuffer.get();
         MemorySegment nameSegment = nameBuffer.ensure(len + 1);
         nameSegment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
-        nameSegment.set(java.lang.foreign.ValueLayout.JAVA_BYTE, len, (byte)0);
+        nameSegment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
 
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment desc = ecs_entity_desc_t.allocate(tempArena);
@@ -186,7 +187,7 @@ public class Flecs implements AutoCloseable {
         MemorySegment segment = buffer.ensure(len + 1);
 
         segment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
-        segment.set(java.lang.foreign.ValueLayout.JAVA_BYTE, len, (byte)0);
+        segment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
 
         long entityId = flecs_h.ecs_lookup(this.nativeWorld, segment);
         return entityId == 0 ? -1 : entityId;
@@ -307,6 +308,43 @@ public class Flecs implements AutoCloseable {
     private void checkClosed() {
         if (this.closed) {
             throw new IllegalStateException("The Flecs world has already been closed");
+        }
+    }
+
+    public String toJson(boolean serializeBuiltin, boolean serializeModules) {
+        this.checkClosed();
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment options = ecs_world_to_json_desc_t.allocate(tempArena);
+            ecs_world_to_json_desc_t.serialize_builtin(options, serializeBuiltin);
+            ecs_world_to_json_desc_t.serialize_modules(options, serializeModules);
+
+            MemorySegment jsonSegment = flecs_h.ecs_world_to_json(this.nativeWorld, options);
+            if (jsonSegment == null || jsonSegment.address() == 0) {
+                return null;
+            }
+
+            return jsonSegment.getString(0);
+        }
+    }
+
+    public String toJson() {
+        return this.toJson(false, false);
+    }
+
+    public void fromJson(String json) {
+        this.checkClosed();
+        if (json == null || json.isEmpty()) {
+            throw new IllegalArgumentException("JSON cannot be null or empty");
+        }
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
+            MemorySegment jsonSegment = tempArena.allocate(jsonBytes.length + 1);
+            jsonSegment.asSlice(0, jsonBytes.length).copyFrom(MemorySegment.ofArray(jsonBytes));
+            jsonSegment.set(ValueLayout.JAVA_BYTE, jsonBytes.length, (byte)0);
+
+            MemorySegment ptrSegment = flecs_h.ecs_world_from_json(this.nativeWorld, jsonSegment, MemorySegment.NULL);
         }
     }
 
