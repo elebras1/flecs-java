@@ -46,7 +46,7 @@ public class AdvancedSystemExample {
                 .with(posId)
                 .rate(2)
                 .kind(FlecsConstants.EcsOnUpdate)
-                .run(it -> {
+                .iter(it -> {
                     System.out.println("  [Rate Filter] Running every 2nd frame (matched: " + it.count() + " entities)");
                 });
 
@@ -69,12 +69,13 @@ public class AdvancedSystemExample {
                     for (int i = 0; i < it.count(); i++) {
                         Position pos = positions.get(i);
                         Velocity vel = velocities.get(i);
-                        
+
                         float newX = pos.x() + vel.dx() * it.deltaTime();
                         float newY = pos.y() + vel.dy() * it.deltaTime();
                         long entityId = it.entity(i);
                         Entity entity = world.obtainEntity(entityId);
                         entity.set(new Position(newX, newY));
+                        // Note: System.out.printf removed to avoid synchronization issues with multi-threading
                     }
                 });
 

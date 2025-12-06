@@ -187,14 +187,9 @@ public class SystemBuilder {
     public FlecsSystem iter(Query.IterCallback callback) {
         this.iterCallback = callback;
         
-        final Iter[] iterHolder = new Iter[1];
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            if (iterHolder[0] == null) {
-                iterHolder[0] = new Iter(it, this.world);
-            } else {
-                iterHolder[0].setNativeIter(it);
-            }
-            callback.accept(iterHolder[0]);
+            Iter iter = new Iter(it, this.world);
+            callback.accept(iter);
         }, this.world.arena());
         
         ecs_system_desc_t.callback(this.desc, callbackStub);
@@ -205,14 +200,16 @@ public class SystemBuilder {
     public FlecsSystem run(Query.RunCallback callback) {
         this.runCallback = callback;
         
-        final Iter[] iterHolder = new Iter[1];
+        final ThreadLocal<Iter> iterHolder = new ThreadLocal<>();
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            if (iterHolder[0] == null) {
-                iterHolder[0] = new Iter(it, this.world);
+            Iter iter = iterHolder.get();
+            if (iter == null) {
+                iter = new Iter(it, this.world);
+                iterHolder.set(iter);
             } else {
-                iterHolder[0].setNativeIter(it);
+                iter.setNativeIter(it);
             }
-            callback.accept(iterHolder[0]);
+            callback.accept(iter);
         }, this.world.arena());
         
         ecs_system_desc_t.run(this.desc, callbackStub);

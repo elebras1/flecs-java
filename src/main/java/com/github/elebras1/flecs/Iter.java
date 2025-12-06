@@ -1,6 +1,7 @@
 package com.github.elebras1.flecs;
 
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 public class Iter {
     
@@ -36,7 +37,7 @@ public class Iter {
             throw new IndexOutOfBoundsException("Index " + index + " out of bounds for count " + this.count());
         }
         MemorySegment entities = ecs_iter_t.entities(this.nativeIter);
-        return entities.getAtIndex(flecs_h$shared.C_LONG, index);
+        return entities.getAtIndex(ValueLayout.JAVA_LONG, index);
     }
 
     public long entity(int index) {
@@ -86,7 +87,7 @@ public class Iter {
             return 0;
         }
 
-        return ids.getAtIndex(flecs_h$shared.C_LONG, index);
+        return ids.getAtIndex(ValueLayout.JAVA_LONG, index);
     }
 
     public int fieldSize(int index) {
@@ -99,7 +100,7 @@ public class Iter {
             return 0;
         }
 
-        return sizes.getAtIndex(flecs_h$shared.C_INT, index);
+        return sizes.getAtIndex(ValueLayout.JAVA_INT, index);
     }
 
     public int fieldCount() {
