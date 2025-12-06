@@ -133,6 +133,17 @@ public class Flecs implements AutoCloseable {
         this.observerCallbacks = new ConcurrentHashMap<>();
     }
 
+    private Flecs(MemorySegment stagePtr, ComponentRegistry sharedRegistry) {
+        this.arena = null;
+        this.nativeWorld = stagePtr;
+        this.componentRegistry = sharedRegistry;
+        this.threadLocalNameBuffer = ThreadLocal.withInitial(() -> new NameBuffer(64));
+        this.threadLocalComponentBuffer = ThreadLocal.withInitial(() -> new ComponentBuffer(256));
+        this.threadLocalEntityDesc = ThreadLocal.withInitial(EntityDescBuffer::new);
+        this.systemCallbacks = new ConcurrentHashMap<>();
+        this.observerCallbacks = new ConcurrentHashMap<>();
+    }
+
     public long entity() {
         this.checkClosed();
         long entityId = flecs_h.ecs_new(this.nativeWorld);
@@ -298,12 +309,19 @@ public class Flecs implements AutoCloseable {
     }
 
     public <T> long component(Class<T> componentClass, Consumer<ComponentHooks<T>> configuration) {
+        this.checkClosed();
         long id = this.component(componentClass);
         Component<T> component = this.componentRegistry.getComponent(componentClass);
         ComponentHooks<T> hooks = new ComponentHooks<>(this, component);
         configuration.accept(hooks);
         hooks.install(this.nativeWorld, id);
         return id;
+    }
+
+    public void deleteWith(Class<?> componentClass) {
+        this.checkClosed();
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        flecs_h.ecs_delete_with(this.nativeWorld, componentId);
     }
 
     public int deleteEmptyTables(int limit) {
@@ -553,6 +571,97 @@ public class Flecs implements AutoCloseable {
         }
     }
 
+    public void setStageCount(int stages) {
+        this.checkClosed();
+        flecs_h.ecs_set_stage_count(this.nativeWorld, stages);
+    }
+
+    public int getStageCount() {
+        this.checkClosed();
+        return flecs_h.ecs_get_stage_count(this.nativeWorld);
+    }
+
+    public Flecs getStage(int stageId) {
+        this.checkClosed();
+        MemorySegment stagePtr = flecs_h.ecs_get_stage(this.nativeWorld, stageId);
+        return new Flecs(stagePtr, this.componentRegistry);
+    }
+
+    public int getStageId() {
+        this.checkClosed();
+        return flecs_h.ecs_stage_get_id(this.nativeWorld);
+    }
+
+    public Flecs stage() {
+        this.checkClosed();
+        MemorySegment stagePtr = flecs_h.ecs_stage_new(this.nativeWorld);
+        return new Flecs(stagePtr, this.componentRegistry);
+    }
+
+    public void freeStage() {
+        if (this.nativeWorld != null && this.nativeWorld.address() != 0) {
+            flecs_h.ecs_stage_free(this.nativeWorld);
+        }
+    }
+
+    public void merge() {
+        this.checkClosed();
+        flecs_h.ecs_merge(this.nativeWorld);
+    }
+
+    public boolean readonlyBegin(boolean multiThreaded) {
+        this.checkClosed();
+        return flecs_h.ecs_readonly_begin(this.nativeWorld, multiThreaded);
+    }
+
+    public boolean readonlyBegin() {
+        return this.readonlyBegin(false);
+    }
+
+    public void readonlyEnd() {
+        this.checkClosed();
+        flecs_h.ecs_readonly_end(this.nativeWorld);
+    }
+
+    public boolean isReadonly() {
+        this.checkClosed();
+        return flecs_h.ecs_stage_is_readonly(this.nativeWorld);
+    }
+
+    public boolean isDeferred() {
+        this.checkClosed();
+        return flecs_h.ecs_is_deferred(this.nativeWorld);
+    }
+
+    public long setScope(long scopeId) {
+        this.checkClosed();
+        return flecs_h.ecs_set_scope(this.nativeWorld, scopeId);
+    }
+
+    public long getScope() {
+        this.checkClosed();
+        return flecs_h.ecs_get_scope(this.nativeWorld);
+    }
+
+    public PipelineBuilder pipeline() {
+        this.checkClosed();
+        return new PipelineBuilder(this);
+    }
+
+    public PipelineBuilder pipeline(String name) {
+        this.checkClosed();
+        return new PipelineBuilder(this, name);
+    }
+
+    public void runPipeline(long pipelineId, float deltaTime) {
+        this.checkClosed();
+        flecs_h.ecs_run_pipeline(this.nativeWorld, pipelineId, deltaTime);
+    }
+
+    public void runPipeline(Pipeline pipeline, float deltaTime) {
+        this.runPipeline(pipeline.id(), deltaTime);
+    }
+
     MemorySegment nativeHandle() {
         this.checkClosed();
         return this.nativeWorld;
@@ -614,10 +723,12 @@ public class Flecs implements AutoCloseable {
     public void close() {
         if (!this.closed) {
             this.closed = true;
-            if (this.nativeWorld != null && this.nativeWorld.address() != 0) {
+            if (this.nativeWorld != null && this.nativeWorld.address() != 0 && this.arena != null) {
                 flecs_h.ecs_fini(this.nativeWorld);
             }
-            this.arena.close();
+            if (this.arena != null) {
+                this.arena.close();
+            }
         }
         this.threadLocalNameBuffer.get().close();
         this.threadLocalComponentBuffer.get().close();

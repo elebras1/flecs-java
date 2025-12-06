@@ -3,6 +3,7 @@ package com.github.elebras1.flecs;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.util.function.Consumer;
 
 public class Entity {
 
@@ -209,6 +210,96 @@ public class Entity {
     public <T> void emit(long eventId, Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         this.emit(eventId, componentId);
+    }
+
+    public long target(long relationId, int index) {
+        return flecs_h.ecs_get_target(this.world.nativeHandle(), this.id, relationId, index);
+    }
+
+    public int depth(long relationId) {
+        return flecs_h.ecs_get_depth(this.world.nativeHandle(), this.id, relationId);
+    }
+
+    public boolean owns(long componentId) {
+        return flecs_h.ecs_owns_id(this.world.nativeHandle(), this.id, componentId);
+    }
+
+    public boolean owns(Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.owns(componentId);
+    }
+
+    public boolean enabled(long componentId) {
+        return flecs_h.ecs_is_enabled_id(this.world.nativeHandle(), this.id, componentId);
+    }
+
+    public <T> boolean enabled(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.enabled(componentId);
+    }
+
+    public Entity enable(long componentId) {
+        flecs_h.ecs_enable_id(this.world.nativeHandle(), this.id, componentId, true);
+        return this;
+    }
+
+    public <T> Entity enable(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.enable(componentId);
+    }
+
+    public Entity disable(long componentId) {
+        flecs_h.ecs_enable_id(this.world.nativeHandle(), this.id, componentId, false);
+        return this;
+    }
+
+    public <T> Entity disable(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.disable(componentId);
+    }
+
+    public Entity clone(boolean cloneValues) {
+        long cloneId = flecs_h.ecs_clone(this.world.nativeHandle(), 0, this.id, cloneValues);
+        return new Entity(this.world, cloneId);
+    }
+
+    public Entity lookup(String path) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment pathSegment = tempArena.allocateFrom(path);
+            long childId = flecs_h.ecs_lookup_child(this.world.nativeHandle(), this.id, pathSegment);
+            if (childId == 0) {
+                return null;
+            }
+            return new Entity(this.world, childId);
+        }
+    }
+
+    public void children(Consumer<Entity> callback) {
+        this.children(FlecsConstants.EcsChildOf, callback);
+    }
+
+    public void children(long relationId, Consumer<Entity> callback) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_children(tempArena, this.world.nativeHandle(), this.id);
+
+            while (flecs_h.ecs_children_next(iter)) {
+                int count = ecs_iter_t.count(iter);
+                MemorySegment entities = ecs_iter_t.entities(iter);
+
+                for (int i = 0; i < count; i++) {
+                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    callback.accept(new Entity(this.world, entityId));
+                }
+            }
+        }
+    }
+
+    public Table table() {
+        MemorySegment tablePtr = flecs_h.ecs_get_table(this.world.nativeHandle(), this.id);
+        if (tablePtr == null || tablePtr.address() == 0) {
+            return null;
+        }
+        return new Table(this.world, tablePtr);
     }
 
     @Override

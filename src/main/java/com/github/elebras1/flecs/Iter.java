@@ -110,5 +110,13 @@ public class Iter {
     public long event() {
         return ecs_iter_t.event(this.nativeIter);
     }
+
+    public Table table() {
+        MemorySegment tablePtr = ecs_iter_t.table(this.nativeIter);
+        if (tablePtr == null || tablePtr.address() == 0) {
+            return null;
+        }
+        return new Table(this.world, tablePtr);
+    }
 }
 
