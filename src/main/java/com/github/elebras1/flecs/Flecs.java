@@ -16,12 +16,14 @@ import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static java.lang.foreign.ValueLayout.JAVA_LONG;
 
 public class Flecs implements AutoCloseable {
-    
+
     private final MemorySegment nativeWorld;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
     private boolean closed = false;
     private final ThreadLocal<NameBuffer> threadLocalNameBuffer;
+    private final ThreadLocal<ComponentBuffer> threadLocalComponentBuffer;
+    private final ThreadLocal<EntityDescBuffer> threadLocalEntityDesc;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
 
@@ -29,59 +31,104 @@ public class Flecs implements AutoCloseable {
         FlecsLoader.load();
     }
 
-    private static final class SystemCallbacks {
-        final Query.IterCallback iterCallback;
-        final Query.RunCallback runCallback;
-        final Query.EntityCallback entityCallback;
-
-        SystemCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
-            this.iterCallback = iterCallback;
-            this.runCallback = runCallback;
-            this.entityCallback = entityCallback;
-        }
+    private record SystemCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
     }
 
-    private static final class ObserverCallbacks {
-        final Query.IterCallback iterCallback;
-        final Query.RunCallback runCallback;
-        final Query.EntityCallback entityCallback;
-
-        ObserverCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
-            this.iterCallback = iterCallback;
-            this.runCallback = runCallback;
-            this.entityCallback = entityCallback;
-        }
+    private record ObserverCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
     }
 
-    private static final class NameBuffer {
-        MemorySegment segment;
-        int capacity;
+    private static final class NameBuffer implements AutoCloseable {
+        private Arena arena;
+        private MemorySegment segment;
+        private int capacity;
 
         NameBuffer(int initialCapacity) {
             this.capacity = initialCapacity;
-            this.segment = Arena.ofAuto().allocate(initialCapacity);
+            this.arena = Arena.ofConfined();
+            this.segment = this.arena.allocate(initialCapacity);
         }
 
         MemorySegment ensure(int needed) {
             if (needed > capacity) {
-                Arena arena = Arena.ofAuto();
-                segment = arena.allocate(needed);
-                capacity = needed;
+                this.arena.close();
+                this.arena = Arena.ofConfined();
+                this.segment = this.arena.allocate(needed);
+                this.capacity = needed;
             }
             return segment;
+        }
+
+        @Override
+        public void close() {
+            if (this.arena != null) {
+                this.arena.close();
+                this.arena = null;
+            }
+        }
+    }
+
+    private static final class ComponentBuffer implements AutoCloseable {
+        private Arena arena;
+        private MemorySegment segment;
+        private long capacity;
+
+        ComponentBuffer(long initialCapacity) {
+            this.capacity = initialCapacity;
+            this.arena = Arena.ofConfined();
+            this.segment = this.arena.allocate(initialCapacity);
+        }
+
+        MemorySegment ensure(long needed) {
+            if (needed > capacity) {
+                long newCapacity = Math.max(needed, capacity * 2);
+                this.arena.close();
+                this.arena = Arena.ofConfined();
+                this.segment = this.arena.allocate(newCapacity);
+                this.capacity = newCapacity;
+            }
+            return segment.asSlice(0, needed);
+        }
+
+        @Override
+        public void close() {
+            if (this.arena != null) {
+                this.arena.close();
+                this.arena = null;
+            }
+        }
+    }
+
+    private static final class EntityDescBuffer implements AutoCloseable {
+        private final Arena arena;
+        private final MemorySegment segment;
+
+        EntityDescBuffer() {
+            this.arena = Arena.ofConfined();
+            this.segment = ecs_entity_desc_t.allocate(this.arena);
+        }
+
+        MemorySegment get() {
+            return this.segment;
+        }
+
+        @Override
+        public void close() {
+            this.arena.close();
         }
     }
 
     public Flecs() {
         this.arena = Arena.ofConfined();
         this.nativeWorld = flecs_h.ecs_init();
-        
+
         if (this.nativeWorld == null || this.nativeWorld.address() == 0) {
             throw new IllegalStateException("Flecs world initialization failed");
         }
 
         this.componentRegistry = new ComponentRegistry(this);
         this.threadLocalNameBuffer = ThreadLocal.withInitial(() -> new NameBuffer(64));
+        this.threadLocalComponentBuffer = ThreadLocal.withInitial(() -> new ComponentBuffer(256));
+        this.threadLocalEntityDesc = ThreadLocal.withInitial(EntityDescBuffer::new);
         this.systemCallbacks = new ConcurrentHashMap<>();
         this.observerCallbacks = new ConcurrentHashMap<>();
     }
@@ -103,11 +150,10 @@ public class Flecs implements AutoCloseable {
         nameSegment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
         nameSegment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
 
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment desc = ecs_entity_desc_t.allocate(tempArena);
-            ecs_entity_desc_t.name(desc, nameSegment);
-            return flecs_h.ecs_entity_init(this.nativeWorld, desc);
-        }
+        MemorySegment desc = this.threadLocalEntityDesc.get().get();
+        desc.fill((byte) 0);
+        ecs_entity_desc_t.name(desc, nameSegment);
+        return flecs_h.ecs_entity_init(this.nativeWorld, desc);
     }
 
     public Entity obtainEntity(long entityId) {
@@ -117,18 +163,23 @@ public class Flecs implements AutoCloseable {
         return new Entity(this, entityId);
     }
 
+    MemorySegment getComponentBuffer(long size) {
+        return this.threadLocalComponentBuffer.get().ensure(size);
+    }
+
     public EcsLongList entityBulk(int count) {
         this.checkClosed();
+        try(Arena tempArena = Arena.ofConfined()) {
+            MemorySegment desc = ecs_bulk_desc_t.allocate(tempArena);
+            ecs_bulk_desc_t.count(desc, count);
+            ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
 
-        MemorySegment desc = ecs_bulk_desc_t.allocate(this.arena);
-        ecs_bulk_desc_t.count(desc, count);
-        ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
+            MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.nativeWorld, desc);
 
-        MemorySegment idsSegment = flecs_h.ecs_bulk_init(nativeWorld, desc);
-
-        EcsLongList ids = new EcsLongList(count);
-        ids.addAll(idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG));
-        return ids;
+            EcsLongList ids = new EcsLongList(count);
+            ids.addAll(idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG));
+            return ids;
+        }
     }
 
     public long makeAlive(long entityId) {
@@ -357,6 +408,12 @@ public class Flecs implements AutoCloseable {
             }
             this.arena.close();
         }
+        this.threadLocalNameBuffer.get().close();
+        this.threadLocalComponentBuffer.get().close();
+        this.threadLocalEntityDesc.get().close();
+        this.threadLocalNameBuffer.remove();
+        this.threadLocalComponentBuffer.remove();
+        this.threadLocalEntityDesc.remove();
     }
 
     @Override

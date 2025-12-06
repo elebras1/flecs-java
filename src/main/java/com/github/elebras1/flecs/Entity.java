@@ -5,7 +5,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public class Entity {
-    
+
     private final Flecs world;
     private final long id;
 
@@ -112,13 +112,11 @@ public class Entity {
         Class<T> componentClass = (Class<T>) data.getClass();
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment dataSegment = tempArena.allocate(component.layout());
 
-            component.write(dataSegment, data);
+        MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
+        component.write(dataSegment, data);
+        flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
 
-            flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
-        }
         return this;
     }
 
@@ -150,30 +148,30 @@ public class Entity {
 
     public FlecsObserver observe(long eventId, Runnable callback) {
         return this.world.observer()
-            .event(eventId)
-            .with(FlecsConstants.EcsAny)
-            .each((entityId) -> {
-                if (entityId == this.id) {
-                    callback.run();
-                }
-            });
+                .event(eventId)
+                .with(FlecsConstants.EcsAny)
+                .each((entityId) -> {
+                    if (entityId == this.id) {
+                        callback.run();
+                    }
+                });
     }
 
     public <T> FlecsObserver observe(Class<T> eventClass, java.util.function.Consumer<T> callback) {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
         return this.world.observer()
-            .event(eventId)
-            .with(FlecsConstants.EcsAny)
-            .iter((it) -> {
-                for (int i = 0; i < it.count(); i++) {
-                    if (it.entityId(i) == this.id) {
-                        T eventData = this.get(eventClass);
-                        if (eventData != null) {
-                            callback.accept(eventData);
+                .event(eventId)
+                .with(FlecsConstants.EcsAny)
+                .iter((it) -> {
+                    for (int i = 0; i < it.count(); i++) {
+                        if (it.entityId(i) == this.id) {
+                            T eventData = this.get(eventClass);
+                            if (eventData != null) {
+                                callback.accept(eventData);
+                            }
                         }
                     }
-                }
-            });
+                });
     }
 
     public void emit(long eventId) {
@@ -223,12 +221,12 @@ public class Entity {
         }
         return this.id == other.id && this.world == other.world;
     }
-    
+
     @Override
     public int hashCode() {
         return Long.hashCode(this.id);
     }
-    
+
     @Override
     public String toString() {
         String name = this.getName();
@@ -238,4 +236,3 @@ public class Entity {
         return String.format("Entity[%d]", this.id);
     }
 }
-
