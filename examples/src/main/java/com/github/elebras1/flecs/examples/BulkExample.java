@@ -20,13 +20,7 @@ public class BulkExample {
 
             long startCreate = System.nanoTime();
 
-            EcsLongList entityIds = world.entityBulk(totalEntities);
-            for (long entityId : entityIds) {
-                Entity entity = world.obtainEntity(entityId);
-                entity.set(new Position(entityId % 100, entityId % 100));
-                entity.set(new Velocity(1, 1));
-                entity.set(new Health(100));
-            }
+            EcsLongList entityIds = world.entityBulk(totalEntities, Position.class, Velocity.class, Health.class);
 
             long endCreate = System.nanoTime();
             System.out.printf("Entity creation time: %.3f ms%n", (endCreate - startCreate) / 1_000_000.0);

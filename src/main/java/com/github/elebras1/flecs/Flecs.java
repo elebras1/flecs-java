@@ -182,6 +182,54 @@ public class Flecs implements AutoCloseable {
         }
     }
 
+    public final EcsLongList entityBulk(int count, Class<?>... componentClasses) {
+        this.checkClosed();
+
+        if (count <= 0) {
+            throw new IllegalArgumentException("Count must be positive");
+        }
+
+        if (componentClasses == null || componentClasses.length == 0) {
+            return this.entityBulk(count);
+        }
+
+        if (componentClasses.length > 32) {
+            throw new IllegalArgumentException("Cannot have more than 32 components in bulk creation");
+        }
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            long[] componentIds = new long[componentClasses.length];
+            for (int i = 0; i < componentClasses.length; i++) {
+                long componentId = this.componentRegistry().getComponentId(componentClasses[i]);
+                if (componentId == -1) {
+                    throw new IllegalStateException("Component " + componentClasses[i].getSimpleName() + " is not registered. Call world.component() first.");
+                }
+                componentIds[i] = componentId;
+            }
+
+            MemorySegment desc = ecs_bulk_desc_t.allocate(tempArena);
+
+            ecs_bulk_desc_t._canary(desc, 0);
+            ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
+            ecs_bulk_desc_t.count(desc, count);
+
+            MemorySegment idsArray = ecs_bulk_desc_t.ids(desc);
+            for (int i = 0; i < componentIds.length; i++) {
+                idsArray.setAtIndex(ValueLayout.JAVA_LONG, i, componentIds[i]);
+            }
+
+            ecs_bulk_desc_t.data(desc, MemorySegment.NULL);
+            ecs_bulk_desc_t.table(desc, MemorySegment.NULL);
+
+            MemorySegment entitiesPtr = flecs_h.ecs_bulk_init(this.nativeWorld, desc);
+
+            EcsLongList entities = new EcsLongList(count);
+            entities.addAll(entitiesPtr.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG));
+
+            return entities;
+        }
+    }
+
     public long makeAlive(long entityId) {
         this.checkClosed();
         flecs_h.ecs_make_alive(this.nativeWorld, entityId);
@@ -328,6 +376,169 @@ public class Flecs implements AutoCloseable {
     public void setPipeline(long pipelineId) {
         this.checkClosed();
         flecs_h.ecs_set_pipeline(this.nativeWorld, pipelineId);
+    }
+
+    public long getMaxId() {
+        this.checkClosed();
+        return flecs_h.ecs_get_max_id(this.nativeWorld);
+    }
+
+    public EcsLongList getEntities() {
+        this.checkClosed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment entitiesStruct = flecs_h.ecs_get_entities(tempArena, this.nativeWorld);
+            MemorySegment idsPointer = entitiesStruct.get(ValueLayout.ADDRESS, 0);
+            int count = entitiesStruct.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
+
+            EcsLongList entities = new EcsLongList(count);
+            if (count > 0 && !idsPointer.equals(MemorySegment.NULL)) {
+                MemorySegment idsArray = idsPointer.reinterpret((long) count * Long.BYTES);
+                entities.addAll(idsArray.toArray(ValueLayout.JAVA_LONG));
+            }
+
+            return entities;
+        }
+    }
+
+    public void exclusiveAccessBegin(String threadName) {
+        this.checkClosed();
+
+        if (threadName == null) {
+            flecs_h.ecs_exclusive_access_begin(this.nativeWorld, MemorySegment.NULL);
+        } else {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment nameSegment = arena.allocateFrom(threadName);
+                flecs_h.ecs_exclusive_access_begin(this.nativeWorld, nameSegment);
+            }
+        }
+    }
+
+    public void exclusiveAccessBegin() {
+        this.checkClosed();
+        flecs_h.ecs_exclusive_access_begin(this.nativeWorld, MemorySegment.NULL);
+    }
+
+    public void exclusiveAccessEnd(boolean lockWorld) {
+        this.checkClosed();
+        flecs_h.ecs_exclusive_access_end(this.nativeWorld, lockWorld);
+    }
+
+    public void shrink() {
+        this.checkClosed();
+        flecs_h.ecs_shrink(this.nativeWorld);
+    }
+
+    public void dim(int numberEntities) {
+        this.checkClosed();
+        flecs_h.ecs_dim(this.nativeWorld, numberEntities);
+    }
+
+    public void frameBegin(float deltaTime) {
+        this.checkClosed();
+        flecs_h.ecs_frame_begin(this.nativeWorld, deltaTime);
+    }
+
+    public void frameEnd() {
+        this.checkClosed();
+        flecs_h.ecs_frame_end(this.nativeWorld);
+    }
+
+    public void quit() {
+        this.checkClosed();
+        flecs_h.ecs_quit(this.nativeWorld);
+    }
+
+    public void shouldQuit() {
+        this.checkClosed();
+        flecs_h.ecs_should_quit(this.nativeWorld);
+    }
+
+    public void measureFrameTime(boolean enable) {
+        this.checkClosed();
+        flecs_h.ecs_measure_frame_time(this.nativeWorld, enable);
+    }
+
+    public void measureSystemTime(boolean enable) {
+        this.checkClosed();
+        flecs_h.ecs_measure_system_time(this.nativeWorld, enable);
+    }
+
+    public void setTargetFps(float fps) {
+        this.checkClosed();
+        flecs_h.ecs_set_target_fps(this.nativeWorld, fps);
+    }
+
+    public FlecsInfo getInfo() {
+        this.checkClosed();
+
+        MemorySegment infoPtr = flecs_h.ecs_get_world_info(this.nativeWorld);
+        if (infoPtr.equals(MemorySegment.NULL)) {
+            throw new IllegalStateException("Failed to get world info");
+        }
+
+        MemorySegment info = infoPtr.reinterpret(ecs_world_info_t.layout().byteSize());
+
+        return new FlecsInfo(
+                ecs_world_info_t.last_component_id(info),
+                ecs_world_info_t.min_id(info),
+                ecs_world_info_t.max_id(info),
+                ecs_world_info_t.delta_time_raw(info),
+                ecs_world_info_t.delta_time(info),
+                ecs_world_info_t.time_scale(info),
+                ecs_world_info_t.target_fps(info),
+                ecs_world_info_t.frame_time_total(info),
+                ecs_world_info_t.system_time_total(info),
+                ecs_world_info_t.emit_time_total(info),
+                ecs_world_info_t.merge_time_total(info),
+                ecs_world_info_t.rematch_time_total(info),
+                ecs_world_info_t.world_time_total(info),
+                ecs_world_info_t.world_time_total_raw(info),
+                ecs_world_info_t.frame_count_total(info),
+                ecs_world_info_t.merge_count_total(info),
+                ecs_world_info_t.eval_comp_monitors_total(info),
+                ecs_world_info_t.rematch_count_total(info),
+                ecs_world_info_t.id_create_total(info),
+                ecs_world_info_t.id_delete_total(info),
+                ecs_world_info_t.table_create_total(info),
+                ecs_world_info_t.table_delete_total(info),
+                ecs_world_info_t.pipeline_build_count_total(info),
+                ecs_world_info_t.systems_ran_total(info),
+                ecs_world_info_t.observers_ran_total(info),
+                ecs_world_info_t.queries_ran_total(info),
+                ecs_world_info_t.tag_id_count(info),
+                ecs_world_info_t.component_id_count(info),
+                ecs_world_info_t.pair_id_count(info),
+                ecs_world_info_t.table_count(info),
+                ecs_world_info_t.creation_time(info),
+                extractCommandStats(info),
+                extractNamePrefix(info)
+        );
+    }
+
+    private FlecsInfo.CommandStats extractCommandStats(MemorySegment info) {
+        MemorySegment cmd = ecs_world_info_t.cmd(info);
+        return new FlecsInfo.CommandStats(
+                ecs_world_info_t.cmd.add_count(cmd),
+                ecs_world_info_t.cmd.remove_count(cmd),
+                ecs_world_info_t.cmd.delete_count(cmd),
+                ecs_world_info_t.cmd.clear_count(cmd),
+                ecs_world_info_t.cmd.set_count(cmd),
+                ecs_world_info_t.cmd.ensure_count(cmd),
+                ecs_world_info_t.cmd.modified_count(cmd),
+                ecs_world_info_t.cmd.discard_count(cmd),
+                ecs_world_info_t.cmd.event_count(cmd),
+                ecs_world_info_t.cmd.other_count(cmd),
+                ecs_world_info_t.cmd.batched_entity_count(cmd),
+                ecs_world_info_t.cmd.batched_command_count(cmd)
+        );
+    }
+
+    private String extractNamePrefix(MemorySegment info) {
+        MemorySegment namePrefixPtr = ecs_world_info_t.name_prefix(info);
+        if (namePrefixPtr.equals(MemorySegment.NULL)) {
+            return null;
+        }
+        return namePrefixPtr.reinterpret(Long.MAX_VALUE).getString(0);
     }
 
     void registerSystemCallbacks(long systemId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
