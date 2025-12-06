@@ -20,8 +20,8 @@ public class BulkExample {
 
             long startCreate = System.nanoTime();
 
-            for (int i = 0; i < totalEntities; i++) {
-                long entityId = world.entity();
+            EcsLongList entityIds = world.entityBulk(totalEntities);
+            for (long entityId : entityIds) {
                 Entity entity = world.obtainEntity(entityId);
                 entity.set(new Position(entityId % 100, entityId % 100));
                 entity.set(new Velocity(1, 1));
