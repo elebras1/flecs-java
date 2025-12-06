@@ -4,20 +4,31 @@ import java.lang.foreign.MemorySegment;
 
 public class Iter {
     
-    private final MemorySegment nativeIter;
+    private MemorySegment nativeIter;
     private final Flecs world;
+    private int count;
 
     Iter(MemorySegment nativeIter, Flecs world) {
         this.nativeIter = nativeIter;
         this.world = world;
+        this.count = -1;
+    }
+
+    void setNativeIter(MemorySegment nativeIter) {
+        this.nativeIter = nativeIter;
+        this.count = -1;
     }
 
     public boolean next() {
+        this.count = -1;
         return flecs_h.ecs_iter_next(this.nativeIter);
     }
 
     public int count() {
-        return ecs_iter_t.count(this.nativeIter);
+        if (this.count < 0) {
+            this.count = ecs_iter_t.count(this.nativeIter);
+        }
+        return this.count;
     }
 
     public long entityId(int index) {

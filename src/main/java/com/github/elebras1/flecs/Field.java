@@ -5,14 +5,12 @@ import java.lang.foreign.MemorySegment;
 public class Field<T> {
     private final MemorySegment memorySegment;
     private final int count;
-    private final Flecs world;
-    private final Class<T> componentClass;
+    private final Component<T> component;
 
     Field(MemorySegment memorySegment, int count, Flecs world, Class<T> componentClass) {
         this.memorySegment = memorySegment;
         this.count = count;
-        this.world = world;
-        this.componentClass = componentClass;
+        this.component = world.componentRegistry().getComponent(componentClass);
     }
 
     public boolean isSet() {
@@ -31,11 +29,9 @@ public class Field<T> {
             throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
         }
 
-        Component<T> component = this.world.componentRegistry().getComponent(this.componentClass);
+        long elementOffset = i * this.component.size();
+        MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, this.component.size());
 
-        long elementOffset = i * component.size();
-        MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, component.size());
-
-        return component.read(elementSegment);
+        return this.component.read(elementSegment);
     }
 }

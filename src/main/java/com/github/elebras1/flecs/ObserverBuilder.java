@@ -159,9 +159,14 @@ public class ObserverBuilder {
     public FlecsObserver iter(Query.IterCallback callback) {
         this.iterCallback = callback;
 
+        final Iter[] iterHolder = new Iter[1];
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            Iter iter = new Iter(it, this.world);
-            callback.accept(iter);
+            if (iterHolder[0] == null) {
+                iterHolder[0] = new Iter(it, this.world);
+            } else {
+                iterHolder[0].setNativeIter(it);
+            }
+            callback.accept(iterHolder[0]);
         }, this.world.arena());
 
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -172,9 +177,14 @@ public class ObserverBuilder {
     public FlecsObserver run(Query.RunCallback callback) {
         this.runCallback = callback;
 
+        final Iter[] iterHolder = new Iter[1];
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            Iter iter = new Iter(it, this.world);
-            callback.accept(iter);
+            if (iterHolder[0] == null) {
+                iterHolder[0] = new Iter(it, this.world);
+            } else {
+                iterHolder[0].setNativeIter(it);
+            }
+            callback.accept(iterHolder[0]);
         }, this.world.arena());
 
         ecs_observer_desc_t.run(this.desc, callbackStub);
