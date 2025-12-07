@@ -2,7 +2,6 @@ package com.github.elebras1.flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 
 public class PipelineBuilder {
 
@@ -37,17 +36,17 @@ public class PipelineBuilder {
 
         MemorySegment queryDesc = ecs_pipeline_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-        long operOffset = ecs_term_t.oper$offset();
-
-        term.set(ValueLayout.JAVA_LONG, idOffset, phaseId);
 
         if (this.termCount > 0) {
-            term.set(ValueLayout.JAVA_INT, operOffset, FlecsConstants.EcsOr);
+            long prevTermOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+            MemorySegment prevTerm = queryDesc.asSlice(prevTermOffset, TERM_SIZE);
+            ecs_term_t.oper(prevTerm, (short) FlecsConstants.EcsOr);
         }
+
+        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
+        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        ecs_term_t.id(term, phaseId);
+
 
         this.termCount++;
         return this;

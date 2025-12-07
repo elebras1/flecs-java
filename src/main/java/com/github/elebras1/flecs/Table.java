@@ -19,6 +19,36 @@ public class Table {
         return this.nativeTable != null && this.nativeTable.address() != 0;
     }
 
+    public String str() {
+        if (!this.isValid()) {
+            return "";
+        }
+        MemorySegment strPtr = flecs_h.ecs_table_str(this.world.nativeHandle(), this.nativeTable);
+        if (strPtr == null || strPtr.address() == 0) {
+            return "";
+        }
+        return strPtr.reinterpret(Long.MAX_VALUE).getString(0);
+    }
+
+    public EcsLongList type() {
+        if (!this.isValid()) {
+            return new EcsLongList();
+        }
+        MemorySegment typePtr = flecs_h.ecs_table_get_type(this.nativeTable);
+        if (typePtr == null || typePtr.address() == 0) {
+            return new EcsLongList();
+        }
+        MemorySegment arrayPtr = ecs_type_t.array(typePtr);
+        int count = ecs_type_t.count(typePtr);
+        if (arrayPtr == null || arrayPtr.address() == 0 || count == 0) {
+            return new EcsLongList();
+        }
+        EcsLongList ids = new EcsLongList(count);
+        MemorySegment idsArray = arrayPtr.reinterpret((long) count * Long.BYTES);
+        ids.addAll(idsArray.toArray(ValueLayout.JAVA_LONG));
+        return ids;
+    }
+
     public int count() {
         if (!this.isValid()) {
             return 0;
@@ -83,6 +113,50 @@ public class Table {
             return 0;
         }
         return flecs_h.ecs_table_get_column_size(this.nativeTable, columnIndex);
+    }
+
+    public MemorySegment getColumn(int columnIndex) {
+        if (!this.isValid()) {
+            return MemorySegment.NULL;
+        }
+        return flecs_h.ecs_table_get_column(this.nativeTable, columnIndex, 0);
+    }
+
+    public MemorySegment getColumn(int columnIndex, int offset) {
+        if (!this.isValid()) {
+            return MemorySegment.NULL;
+        }
+        return flecs_h.ecs_table_get_column(this.nativeTable, columnIndex, offset);
+    }
+
+    public <T> T get(Class<T> componentClass, int row) {
+        int colIndex = this.columnIndex(componentClass);
+        if (colIndex == -1) {
+            throw new IllegalArgumentException("Component " + componentClass.getSimpleName() + " not found in table");
+        }
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        MemorySegment columnPtr = this.getColumn(colIndex);
+        if (columnPtr == null || columnPtr.address() == 0) {
+            throw new IllegalStateException("Failed to get column data");
+        }
+        long elementOffset = (long) row * component.size();
+        MemorySegment elementSegment = columnPtr.reinterpret(component.size() * this.count()).asSlice(elementOffset, component.size());
+        return component.read(elementSegment);
+    }
+
+    public <T> T tryGet(Class<T> componentClass, int row) {
+        int colIndex = this.columnIndex(componentClass);
+        if (colIndex == -1) {
+            return null;
+        }
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        MemorySegment columnPtr = this.getColumn(colIndex);
+        if (columnPtr == null || columnPtr.address() == 0) {
+            return null;
+        }
+        long elementOffset = (long) row * component.size();
+        MemorySegment elementSegment = columnPtr.reinterpret(component.size() * this.count()).asSlice(elementOffset, component.size());
+        return component.read(elementSegment);
     }
 
     public EcsLongList entities() {
