@@ -107,6 +107,46 @@ public class Iter {
         return Byte.toUnsignedInt(ecs_iter_t.field_count(this.nativeIter));
     }
 
+    private <T> MemorySegment fieldPtr(Class<T> componentClass, int index, String fieldName, int i, long[] outOffset) {
+        if (index < 0 || index > 127) {
+            throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
+        }
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
+        outOffset[0] = i * component.size() + component.offsetOf(fieldName);
+        return columnPtr;
+    }
+
+    public <T> int fieldInt(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_INT, offset[0]);
+    }
+
+    public <T> float fieldFloat(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_FLOAT, offset[0]);
+    }
+
+    public <T> double fieldDouble(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_DOUBLE, offset[0]);
+    }
+
+    public <T> long fieldLong(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_LONG, offset[0]);
+    }
+
+    public <T> short fieldShort(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_SHORT, offset[0]);
+    }
+
+    public <T> boolean fieldBoolean(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_BOOLEAN, offset[0]);
+    }
+
     public long event() {
         return ecs_iter_t.event(this.nativeIter);
     }

@@ -29,6 +29,7 @@ public class ComponentCodeGenerator {
                 .addMethod(this.createWriteMethod(recordName, fields))
                 .addMethod(this.createReadMethod(packageName, recordName, fields))
                 .addMethod(this.createArrayMethod(packageName, recordName))
+                .addMethod(this.createOffsetOfMethod(fields))
                 .addMethod(this.createFactoryMethod(packageName, recordName))
                 .addMethod(this.createGetInstanceMethod(packageName, recordName))
                 .build();
@@ -208,6 +209,29 @@ public class ComponentCodeGenerator {
             case "java.lang.String" -> "getString";
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
+    }
+
+    private MethodSpec createOffsetOfMethod(List<VariableElement> fields) {
+        MethodSpec.Builder method = MethodSpec.methodBuilder("offsetOf")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(String.class, "fieldName")
+                .returns(long.class);
+
+        if (fields.isEmpty()) {
+            method.addStatement("throw new $T($S + fieldName)", IllegalArgumentException.class, "Unknown field: ");
+        } else {
+            method.beginControlFlow("return switch (fieldName)");
+            for (VariableElement field : fields) {
+                String fieldName = field.getSimpleName().toString();
+                String offsetName = "OFFSET_" + fieldName.toUpperCase();
+                method.addStatement("case $S -> $L", fieldName, offsetName);
+            }
+            method.addStatement("default -> throw new $T($S + fieldName)", IllegalArgumentException.class, "Unknown field: ");
+            method.endControlFlow("");
+        }
+
+        return method.build();
     }
 }
 
