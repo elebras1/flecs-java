@@ -272,6 +272,8 @@ tasks.jar {
 
     exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
 
+    exclude("com/github/elebras1/flecs/ComponentMap.class")
+
     from(layout.buildDirectory.dir("natives")) {
         into("natives")
     }
