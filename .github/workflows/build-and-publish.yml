@@ -22,7 +22,7 @@ jobs:
             platform: windows
             arch: x64
             lib: flecs.dll
-          - os: macos-13
+          - os: macos-15
             platform: macos
             arch: x64
             lib: libflecs.dylib
