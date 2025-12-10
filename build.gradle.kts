@@ -1,5 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
-import java.net.URL
+import java.net.URI
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -39,8 +39,8 @@ val flecsCFile = File(flecsSourceDir, "distr/flecs.c")
 val generatedSourcesDir = file("src/main/generated")
 val annotationGeneratedDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main").get().asFile
 
-val os = OperatingSystem.current()
-val userHome = System.getProperty("user.home")
+val os : OperatingSystem = OperatingSystem.current()
+val userHome : String = System.getProperty("user.home")
 
 val jextractExecutable = when {
     os.isWindows -> "$userHome/.local/jextract/jextract-25/bin/jextract.exe"
@@ -63,6 +63,12 @@ val nativeArch = project.findProperty("NATIVE_ARCH") as String? ?: when {
     else -> "unknown"
 }
 
+val archFlag = when (nativeArch) {
+    "linux-x64", "windows-x64", "macos-x64" -> "-march=x86-64-v2"
+    "linux-aarch64", "windows-aarch64", "macos-aarch64" -> "-march=armv8-a"
+    else -> "-march=native"
+}
+
 val downloadFlecs by tasks.registering {
     description = "Download Flecs release from GitHub"
     group = "flecs"
@@ -75,7 +81,7 @@ val downloadFlecs by tasks.registering {
         val url = "https://github.com/SanderMertens/flecs/archive/refs/tags/v${flecsVersion}.tar.gz"
         println("Downloading Flecs $flecsVersion from $url")
 
-        URL(url).openStream().use { input ->
+        URI(url).toURL().openConnection().getInputStream().use { input ->
             Files.copy(input, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
         println("Flecs downloaded to: ${outputFile.absolutePath}")
@@ -117,9 +123,12 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-o", outputNativeFile.absolutePath,
             flecsCFile.absolutePath,
             "-Ofast",
-            "-march=native",
+            archFlag,
             "-flto",
             "-fomit-frame-pointer",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
             "-std=c99",
             "-DFLECS_SHARED",
             "-DNDEBUG",
@@ -132,9 +141,12 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-o", outputNativeFile.absolutePath,
             flecsCFile.absolutePath,
             "-Ofast",
-            "-march=native",
+            archFlag,
             "-flto",
             "-fomit-frame-pointer",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,-dead_strip",
             "-std=c99",
             "-DFLECS_SHARED",
             "-DNDEBUG",
@@ -147,9 +159,13 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-o", outputNativeFile.absolutePath,
             flecsCFile.absolutePath,
             "-Ofast",
-            "-march=native",
+            archFlag,
             "-flto",
             "-fomit-frame-pointer",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-fvisibility=hidden",
             "-std=c99",
             "-DFLECS_SHARED",
             "-DNDEBUG",
@@ -159,7 +175,6 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-lrt",
             "-lpthread"
         )
-
     }
     commandLine(compileCommand)
 }
