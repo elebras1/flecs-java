@@ -117,6 +117,9 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-o", outputNativeFile.absolutePath,
             flecsCFile.absolutePath,
             "-Ofast",
+            "-march=native",
+            "-flto",
+            "-fomit-frame-pointer",
             "-std=c99",
             "-DFLECS_SHARED",
             "-DNDEBUG",
@@ -129,6 +132,9 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-o", outputNativeFile.absolutePath,
             flecsCFile.absolutePath,
             "-Ofast",
+            "-march=native",
+            "-flto",
+            "-fomit-frame-pointer",
             "-std=c99",
             "-DFLECS_SHARED",
             "-DNDEBUG",
@@ -141,6 +147,9 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-o", outputNativeFile.absolutePath,
             flecsCFile.absolutePath,
             "-Ofast",
+            "-march=native",
+            "-flto",
+            "-fomit-frame-pointer",
             "-std=c99",
             "-DFLECS_SHARED",
             "-DNDEBUG",
@@ -150,6 +159,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-lrt",
             "-lpthread"
         )
+
     }
     commandLine(compileCommand)
 }
