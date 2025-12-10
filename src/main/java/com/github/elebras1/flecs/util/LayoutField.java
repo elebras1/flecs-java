@@ -91,7 +91,11 @@ public final class LayoutField {
     }
 
     public static String getString(MemorySegment segment, long offset) {
-        return segment.get(ValueLayout.ADDRESS, offset).toString();
+        MemorySegment stringPointer = segment.get(ValueLayout.ADDRESS.withByteAlignment(1), offset);
+        if (stringPointer.address() == 0) {
+            return null;
+        }
+        return stringPointer.reinterpret(Long.MAX_VALUE).getString(0);
     }
 
     public static long offsetOf(MemoryLayout layout, String fieldName) {
