@@ -64,7 +64,8 @@ val nativeArch = project.findProperty("NATIVE_ARCH") as String? ?: when {
 }
 
 val archFlag = when (nativeArch) {
-    "linux-x64", "windows-x64", "macos-x64" -> "-march=x86-64-v2"
+    "linux-x64", "windows-x64" -> "-march=x86-64-v2"
+    "macos-x64" -> "-march=x86-64"
     "linux-aarch64", "windows-aarch64", "macos-aarch64" -> "-march=armv8-a"
     else -> "-march=native"
 }
