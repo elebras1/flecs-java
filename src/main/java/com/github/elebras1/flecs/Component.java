@@ -7,7 +7,7 @@ public interface Component<T> {
 
     MemoryLayout layout();
 
-    void write(MemorySegment segment, T data);
+    void write(MemorySegment segment, T data, Flecs world);
 
     T read(MemorySegment segment);
 

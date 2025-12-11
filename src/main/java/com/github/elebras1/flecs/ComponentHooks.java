@@ -9,7 +9,7 @@ import static java.lang.foreign.ValueLayout.*;
 
 public class ComponentHooks<T> {
     private final Linker linker;
-    private final Arena arena;
+    private final Flecs world;
     private final Component<T> component;
     private IterHookCallback<T> onAddCallback;
     private IterHookCallback<T> onSetCallback;
@@ -24,7 +24,7 @@ public class ComponentHooks<T> {
 
     public ComponentHooks(Flecs world, Component<T> component) {
         this.linker = Linker.nativeLinker();
-        this.arena = world.arena();
+        this.world = world;
         this.component = component;
     }
 
@@ -108,7 +108,7 @@ public class ComponentHooks<T> {
 
             MethodHandle target = MethodHandles.lookup().bind(this, "invokeIterHook", MethodType.methodType(void.class, IterHookCallback.class, MemorySegment.class)).bindTo(callback);
 
-            return this.linker.upcallStub(target, descriptor, this.arena);
+            return this.linker.upcallStub(target, descriptor, this.world.arena());
         } catch (Exception e) {
             throw new RuntimeException("Failed to create iter hook stub", e);
         }
@@ -123,7 +123,7 @@ public class ComponentHooks<T> {
 
             MethodHandle target = MethodHandles.lookup().bind(this, "invokeReplaceHook", MethodType.methodType(void.class, ReplaceHookCallback.class, MemorySegment.class)).bindTo(callback);
 
-            return this.linker.upcallStub(target, descriptor, this.arena);
+            return this.linker.upcallStub(target, descriptor, this.world.arena());
         } catch (Exception e) {
             throw new RuntimeException("Failed to create replace hook stub", e);
         }
@@ -138,7 +138,7 @@ public class ComponentHooks<T> {
 
             MethodHandle target = MethodHandles.lookup().bind(this, "invokeXtorHook", MethodType.methodType(void.class, XtorCallback.class, MemorySegment.class, int.class, MemorySegment.class)).bindTo(callback);
 
-            return this.linker.upcallStub(target, descriptor, this.arena);
+            return this.linker.upcallStub(target, descriptor, this.world.arena());
         } catch (Exception e) {
             throw new RuntimeException("Failed to create xtor hook stub", e);
         }
@@ -153,7 +153,7 @@ public class ComponentHooks<T> {
 
             MethodHandle target = MethodHandles.lookup().bind(this, "invokeCopyMoveHook", MethodType.methodType(void.class, CopyMoveCallback.class, MemorySegment.class, MemorySegment.class, int.class, MemorySegment.class)).bindTo(callback);
 
-            return this.linker.upcallStub(target, descriptor, this.arena);
+            return this.linker.upcallStub(target, descriptor, this.world.arena());
         } catch (Exception e) {
             throw new RuntimeException("Failed to create copy/move hook stub", e);
         }
@@ -263,7 +263,7 @@ public class ComponentHooks<T> {
         for (int i = 0; i < count; i++) {
             if (components[i] != null) {
                 MemorySegment componentSegment = buffer.asSlice(i * size, size);
-                this.component.write(componentSegment, components[i]);
+                this.component.write(componentSegment, components[i], this.world);
             }
         }
     }

@@ -103,12 +103,18 @@ public class ComponentCodeGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(MemorySegment.class, "segment")
-                .addParameter(TypeVariableName.get(recordName), "data");
+                .addParameter(TypeVariableName.get(recordName), "data")
+                .addParameter(ClassName.get("com.github.elebras1.flecs", "Flecs"), "world"); // AJOUTER
 
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String offsetName = "OFFSET_" + fieldName.toUpperCase();
-            method.addStatement("$L.set(segment, $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+            String typeName = field.asType().toString();
+            if ("java.lang.String".equals(typeName)) {
+                method.addStatement("$L.set(segment, $L, data.$L(), world)", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+            } else {
+                method.addStatement("$L.set(segment, $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+            }
         }
 
         return method.build();

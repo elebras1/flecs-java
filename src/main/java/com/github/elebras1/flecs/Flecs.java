@@ -667,7 +667,7 @@ public class Flecs implements AutoCloseable {
         return this.nativeWorld;
     }
 
-    Arena arena() {
+    public Arena arena() {
         return this.arena;
     }
 
