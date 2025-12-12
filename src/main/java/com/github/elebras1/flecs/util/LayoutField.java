@@ -1,7 +1,6 @@
 package com.github.elebras1.flecs.util;
 
-import com.github.elebras1.flecs.Flecs;
-
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -62,11 +61,11 @@ public final class LayoutField {
         segment.set(ValueLayout.JAVA_BOOLEAN, offset, value);
     }
 
-    public static void set(MemorySegment segment, long offset, String value, Flecs world) {
+    public static void set(MemorySegment segment, long offset, String value, Arena arena) {
         if (value == null) {
             segment.set(ValueLayout.ADDRESS, offset, MemorySegment.NULL);
         } else {
-            MemorySegment stringSegment = world.arena().allocateFrom(value);
+            MemorySegment stringSegment = arena.allocateFrom(value);
             segment.set(ValueLayout.ADDRESS, offset, stringSegment);
         }
     }

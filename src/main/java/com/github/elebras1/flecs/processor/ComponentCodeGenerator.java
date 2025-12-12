@@ -4,6 +4,7 @@ package com.github.elebras1.flecs.processor;
 import com.palantir.javapoet.*;
 
 import javax.lang.model.element.*;
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.util.List;
@@ -57,7 +58,7 @@ public class ComponentCodeGenerator {
             VariableElement field = fields.get(i);
             String fieldName = field.getSimpleName().toString();
             String layoutMethod = getLayoutMethod(field.asType().toString());
-            
+
             layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
             if (i < fields.size() - 1) {
                 layoutBuilder.add(",\n");
@@ -104,14 +105,14 @@ public class ComponentCodeGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(MemorySegment.class, "segment")
                 .addParameter(TypeVariableName.get(recordName), "data")
-                .addParameter(ClassName.get("com.github.elebras1.flecs", "Flecs"), "world"); // AJOUTER
+                .addParameter(Arena.class, "arena");
 
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String offsetName = "OFFSET_" + fieldName.toUpperCase();
             String typeName = field.asType().toString();
             if ("java.lang.String".equals(typeName)) {
-                method.addStatement("$L.set(segment, $L, data.$L(), world)", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+                method.addStatement("$L.set(segment, $L, data.$L(), arena)", LAYOUT_FIELD_CLASS, offsetName, fieldName);
             } else {
                 method.addStatement("$L.set(segment, $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
             }
@@ -132,7 +133,7 @@ public class ComponentCodeGenerator {
             String offsetName = "OFFSET_" + fieldName.toUpperCase();
             String typeName = field.asType().toString();
             String getterMethod = getGetterMethod(typeName);
-            
+
             method.addStatement("$L $L = $L.$L(segment, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
         }
 

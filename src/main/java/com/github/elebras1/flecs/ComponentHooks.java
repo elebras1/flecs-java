@@ -263,7 +263,7 @@ public class ComponentHooks<T> {
         for (int i = 0; i < count; i++) {
             if (components[i] != null) {
                 MemorySegment componentSegment = buffer.asSlice(i * size, size);
-                this.component.write(componentSegment, components[i], this.world);
+                this.component.write(componentSegment, components[i], this.world.arena());
             }
         }
     }

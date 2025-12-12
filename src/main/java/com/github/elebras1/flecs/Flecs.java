@@ -16,16 +16,15 @@ import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static java.lang.foreign.ValueLayout.JAVA_LONG;
 
 public class Flecs implements AutoCloseable {
-
     private final MemorySegment nativeWorld;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
-    private boolean closed = false;
-    private final ThreadLocal<NameBuffer> threadLocalNameBuffer;
-    private final ThreadLocal<ComponentBuffer> threadLocalComponentBuffer;
-    private final ThreadLocal<EntityDescBuffer> threadLocalEntityDesc;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
+    private static final ScopedValue<FlecsBuffers> CONTEXT = ScopedValue.newInstance();
+    private final FlecsBuffers defaultBuffers;
+    private final boolean owned;
+    private boolean closed;
 
     static {
         FlecsLoader.load();
@@ -35,6 +34,19 @@ public class Flecs implements AutoCloseable {
     }
 
     private record ObserverCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+    }
+
+    public record FlecsBuffers(NameBuffer nameBuffer, ComponentBuffer componentBuffer, EntityDescBuffer entityDescBuffer) implements AutoCloseable {
+        public FlecsBuffers() {
+            this(new NameBuffer(64), new ComponentBuffer(256), new EntityDescBuffer());
+        }
+
+        @Override
+        public void close() {
+            this.nameBuffer.close();
+            this.componentBuffer.close();
+            this.entityDescBuffer.close();
+        }
     }
 
     private static final class NameBuffer implements AutoCloseable {
@@ -118,7 +130,7 @@ public class Flecs implements AutoCloseable {
     }
 
     public Flecs() {
-        this.arena = Arena.ofConfined();
+        this.arena = Arena.ofShared();
         this.nativeWorld = flecs_h.ecs_init();
 
         if (this.nativeWorld == null || this.nativeWorld.address() == 0) {
@@ -126,22 +138,22 @@ public class Flecs implements AutoCloseable {
         }
 
         this.componentRegistry = new ComponentRegistry(this);
-        this.threadLocalNameBuffer = ThreadLocal.withInitial(() -> new NameBuffer(64));
-        this.threadLocalComponentBuffer = ThreadLocal.withInitial(() -> new ComponentBuffer(256));
-        this.threadLocalEntityDesc = ThreadLocal.withInitial(EntityDescBuffer::new);
         this.systemCallbacks = new ConcurrentHashMap<>();
         this.observerCallbacks = new ConcurrentHashMap<>();
+        this.defaultBuffers = new FlecsBuffers();
+        this.closed = false;
+        this.owned = true;
     }
 
     private Flecs(MemorySegment stagePtr, ComponentRegistry sharedRegistry) {
-        this.arena = null;
+        this.arena = Arena.ofConfined();
         this.nativeWorld = stagePtr;
         this.componentRegistry = sharedRegistry;
-        this.threadLocalNameBuffer = ThreadLocal.withInitial(() -> new NameBuffer(64));
-        this.threadLocalComponentBuffer = ThreadLocal.withInitial(() -> new ComponentBuffer(256));
-        this.threadLocalEntityDesc = ThreadLocal.withInitial(EntityDescBuffer::new);
         this.systemCallbacks = new ConcurrentHashMap<>();
         this.observerCallbacks = new ConcurrentHashMap<>();
+        this.defaultBuffers = null;
+        this.closed = false;
+        this.owned = false;
     }
 
     public long entity() {
@@ -156,14 +168,15 @@ public class Flecs implements AutoCloseable {
         byte[] utf8 = name.getBytes(StandardCharsets.UTF_8);
         int len = utf8.length;
 
-        NameBuffer nameBuffer = this.threadLocalNameBuffer.get();
-        MemorySegment nameSegment = nameBuffer.ensure(len + 1);
+        FlecsBuffers buffers = this.getBuffers();
+        MemorySegment nameSegment = buffers.nameBuffer().ensure(len + 1);
         nameSegment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
         nameSegment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
 
-        MemorySegment desc = this.threadLocalEntityDesc.get().get();
+        MemorySegment desc = buffers.entityDescBuffer().get();
         desc.fill((byte) 0);
         ecs_entity_desc_t.name(desc, nameSegment);
+
         return flecs_h.ecs_entity_init(this.nativeWorld, desc);
     }
 
@@ -175,7 +188,8 @@ public class Flecs implements AutoCloseable {
     }
 
     MemorySegment getComponentBuffer(long size) {
-        return this.threadLocalComponentBuffer.get().ensure(size);
+        FlecsBuffers buffers = this.getBuffers();
+        return buffers.componentBuffer().ensure(size);
     }
 
     public EcsLongList entityBulk(int count) {
@@ -293,8 +307,8 @@ public class Flecs implements AutoCloseable {
         byte[] utf8 = name.getBytes(StandardCharsets.UTF_8);
         int len = utf8.length;
 
-        NameBuffer buffer = this.threadLocalNameBuffer.get();
-        MemorySegment segment = buffer.ensure(len + 1);
+        FlecsBuffers buffers = this.getBuffers();
+        MemorySegment segment = buffers.nameBuffer().ensure(len + 1);
 
         segment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
         segment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
@@ -571,6 +585,22 @@ public class Flecs implements AutoCloseable {
         }
     }
 
+    private FlecsBuffers getBuffers() {
+        if (CONTEXT.isBound()) {
+            return CONTEXT.get();
+        } else if (this.defaultBuffers != null) {
+            return this.defaultBuffers;
+        } else {
+            throw new IllegalStateException("No FlecsBuffers available in this context");
+        }
+    }
+
+    public static void runScoped(Runnable runnable) {
+        try (var buffers = new FlecsBuffers()) {
+            ScopedValue.where(CONTEXT, buffers).run(runnable);
+        }
+    }
+
     public void setStageCount(int stages) {
         this.checkClosed();
         flecs_h.ecs_set_stage_count(this.nativeWorld, stages);
@@ -722,20 +752,15 @@ public class Flecs implements AutoCloseable {
     @Override
     public void close() {
         if (!this.closed) {
-            this.closed = true;
-            if (this.nativeWorld != null && this.nativeWorld.address() != 0 && this.arena != null) {
+            if (this.owned && this.nativeWorld != null && this.nativeWorld.address() != 0) {
                 flecs_h.ecs_fini(this.nativeWorld);
             }
+
             if (this.arena != null) {
                 this.arena.close();
             }
         }
-        this.threadLocalNameBuffer.get().close();
-        this.threadLocalComponentBuffer.get().close();
-        this.threadLocalEntityDesc.get().close();
-        this.threadLocalNameBuffer.remove();
-        this.threadLocalComponentBuffer.remove();
-        this.threadLocalEntityDesc.remove();
+        this.closed = true;
     }
 
     @Override

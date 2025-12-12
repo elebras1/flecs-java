@@ -1,5 +1,6 @@
 package com.github.elebras1.flecs;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 
@@ -7,7 +8,7 @@ public interface Component<T> {
 
     MemoryLayout layout();
 
-    void write(MemorySegment segment, T data, Flecs world);
+    void write(MemorySegment segment, T data, Arena arena);
 
     T read(MemorySegment segment);
 

@@ -115,7 +115,7 @@ public class Entity {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
 
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, data, this.world);
+        component.write(dataSegment, data, this.world.arena());
         flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
 
         return this;
