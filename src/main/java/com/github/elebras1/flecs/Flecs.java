@@ -21,7 +21,6 @@ public class Flecs implements AutoCloseable {
     private final ComponentRegistry componentRegistry;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
-    private static final ScopedValue<FlecsBuffers> CONTEXT = ScopedValue.newInstance();
     private final FlecsBuffers defaultBuffers;
     private final boolean owned;
     private boolean closed;
@@ -168,12 +167,11 @@ public class Flecs implements AutoCloseable {
         byte[] utf8 = name.getBytes(StandardCharsets.UTF_8);
         int len = utf8.length;
 
-        FlecsBuffers buffers = this.getBuffers();
-        MemorySegment nameSegment = buffers.nameBuffer().ensure(len + 1);
+        MemorySegment nameSegment = this.defaultBuffers.nameBuffer().ensure(len + 1);
         nameSegment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
         nameSegment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
 
-        MemorySegment desc = buffers.entityDescBuffer().get();
+        MemorySegment desc = this.defaultBuffers.entityDescBuffer().get();
         desc.fill((byte) 0);
         ecs_entity_desc_t.name(desc, nameSegment);
 
@@ -188,8 +186,7 @@ public class Flecs implements AutoCloseable {
     }
 
     MemorySegment getComponentBuffer(long size) {
-        FlecsBuffers buffers = this.getBuffers();
-        return buffers.componentBuffer().ensure(size);
+        return this.defaultBuffers.componentBuffer().ensure(size);
     }
 
     public EcsLongList entityBulk(int count) {
@@ -307,8 +304,7 @@ public class Flecs implements AutoCloseable {
         byte[] utf8 = name.getBytes(StandardCharsets.UTF_8);
         int len = utf8.length;
 
-        FlecsBuffers buffers = this.getBuffers();
-        MemorySegment segment = buffers.nameBuffer().ensure(len + 1);
+        MemorySegment segment = this.defaultBuffers.nameBuffer().ensure(len + 1);
 
         segment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
         segment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
@@ -582,22 +578,6 @@ public class Flecs implements AutoCloseable {
     void registerObserverCallbacks(long observerId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
         if (iterCallback != null || runCallback != null || entityCallback != null) {
             this.observerCallbacks.put(observerId, new ObserverCallbacks(iterCallback, runCallback, entityCallback));
-        }
-    }
-
-    private FlecsBuffers getBuffers() {
-        if (CONTEXT.isBound()) {
-            return CONTEXT.get();
-        } else if (this.defaultBuffers != null) {
-            return this.defaultBuffers;
-        } else {
-            throw new IllegalStateException("No FlecsBuffers available in this context");
-        }
-    }
-
-    public static void runScoped(Runnable runnable) {
-        try (var buffers = new FlecsBuffers()) {
-            ScopedValue.where(CONTEXT, buffers).run(runnable);
         }
     }
 
