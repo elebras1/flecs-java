@@ -17,6 +17,7 @@ public class SystemBuilder {
     private Query.RunCallback runCallback;
     private Query.EntityCallback entityCallback;
     private long phase = 0;
+    private Iter iter;
 
     public SystemBuilder(Flecs world) {
         this.world = world;
@@ -199,17 +200,14 @@ public class SystemBuilder {
 
     public FlecsSystem run(Query.RunCallback callback) {
         this.runCallback = callback;
-        
-        final ThreadLocal<Iter> iterHolder = new ThreadLocal<>();
+
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            Iter iter = iterHolder.get();
-            if (iter == null) {
-                iter = new Iter(it, this.world);
-                iterHolder.set(iter);
+            if (this.iter == null) {
+                this.iter = new Iter(it, this.world);
             } else {
-                iter.setNativeIter(it);
+                this.iter.setNativeIter(it);
             }
-            callback.accept(iter);
+            callback.accept(this.iter);
         }, this.world.arena());
         
         ecs_system_desc_t.run(this.desc, callbackStub);

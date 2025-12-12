@@ -11,19 +11,23 @@ public class ObserverBuilder {
     private final Flecs world;
     private final Arena arena;
     private final MemorySegment desc;
-    private int termCount = 0;
-    private int eventCount = 0;
-    private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
-    private static final int MAX_EVENTS = 8;
+    private int termCount;
+    private int eventCount;
     private Query.IterCallback iterCallback;
     private Query.RunCallback runCallback;
     private Query.EntityCallback entityCallback;
+    private Iter iter;
+    private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
+    private static final int MAX_EVENTS = 8;
 
     public ObserverBuilder(Flecs world) {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_observer_desc_t.allocate(this.arena);
+        this.termCount = 0;
+        this.eventCount = 0;
         this.desc.fill((byte) 0);
+        this.iter = null;
     }
 
     public ObserverBuilder(Flecs world, String name) {
@@ -159,16 +163,13 @@ public class ObserverBuilder {
     public FlecsObserver iter(Query.IterCallback callback) {
         this.iterCallback = callback;
 
-        final ThreadLocal<Iter> iterHolder = new ThreadLocal<>();
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            Iter iter = iterHolder.get();
-            if (iter == null) {
-                iter = new Iter(it, this.world);
-                iterHolder.set(iter);
+            if (this.iter == null) {
+                this.iter = new Iter(it, this.world);
             } else {
                 iter.setNativeIter(it);
             }
-            callback.accept(iter);
+            callback.accept(this.iter);
         }, this.world.arena());
 
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -179,16 +180,13 @@ public class ObserverBuilder {
     public FlecsObserver run(Query.RunCallback callback) {
         this.runCallback = callback;
 
-        final ThreadLocal<Iter> iterHolder = new ThreadLocal<>();
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            Iter iter = iterHolder.get();
-            if (iter == null) {
-                iter = new Iter(it, this.world);
-                iterHolder.set(iter);
+            if (this.iter == null) {
+                this.iter = new Iter(it, this.world);
             } else {
                 iter.setNativeIter(it);
             }
-            callback.accept(iter);
+            callback.accept(this.iter);
         }, this.world.arena());
 
         ecs_observer_desc_t.run(this.desc, callbackStub);
