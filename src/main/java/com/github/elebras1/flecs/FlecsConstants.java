@@ -21,6 +21,7 @@ public final class FlecsConstants {
     public static final long EcsDependsOn = flecs_h.EcsDependsOn();
     public static final long EcsOnDelete = flecs_h.EcsOnDelete();
     public static final long EcsOnDeleteTarget = flecs_h.EcsOnDeleteTarget();
+    public static final long EcsCascade = flecs_h.EcsCascade();
 
     public static final long EcsRemove = flecs_h.EcsRemove();
     public static final long EcsDelete = flecs_h.EcsDelete();
@@ -81,5 +82,18 @@ public final class FlecsConstants {
 
     public static final int EcsObserverYieldOnCreate = flecs_h.EcsObserverYieldOnCreate();
     public static final int EcsObserverYieldOnDelete = flecs_h.EcsObserverYieldOnDelete();
+
+    public static final int EcsHttpGet = flecs_h.EcsHttpGet();
+    public static final int EcsHttpPost = flecs_h.EcsHttpPost();
+    public static final int EcsHttpPut = flecs_h.EcsHttpPut();
+    public static final int EcsHttpDelete = flecs_h.EcsHttpDelete();
+    public static final int EcsHttpOptions = flecs_h.EcsHttpOptions();
+    public static final int EcsHttpMethodUnsupported = flecs_h.EcsHttpMethodUnsupported();
+
+    public static final long EcsPeriod1s = flecs_h.EcsPeriod1s();
+    public static final long EcsPeriod1m = flecs_h.EcsPeriod1m();
+    public static final long EcsPeriod1h = flecs_h.EcsPeriod1h();
+    public static final long EcsPeriod1d = flecs_h.EcsPeriod1d();
+
 }
 

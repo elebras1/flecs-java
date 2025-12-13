@@ -86,7 +86,7 @@ public class Entity {
         flecs_h.ecs_clear(this.world.nativeHandle(), this.id);
     }
 
-    private Entity addRelation(long relation, long target) {
+    public Entity addRelation(long relation, long target) {
         long pair = flecs_h.ecs_make_pair(relation, target);
         return this.add(pair);
     }

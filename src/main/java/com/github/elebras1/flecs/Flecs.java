@@ -728,18 +728,18 @@ public class Flecs implements AutoCloseable {
         }
     }
 
-    public FlecsServer httpServer(int port) {
+    public FlecsServer httpServer(short port) {
         this.checkClosed();
 
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment desc = ecs_http_server_desc_t.allocate(tempArena);
-            ecs_http_server_desc_t.port(desc, (short) port);
-            MemorySegment serverSegment = flecs_h.ecs_http_server_init(desc);
-            if (serverSegment.equals(MemorySegment.NULL)) {
+            ecs_http_server_desc_t.port(desc, port);
+            MemorySegment server = flecs_h.ecs_http_server_init(desc);
+            if (server.equals(MemorySegment.NULL)) {
                 throw new IllegalStateException("Failed to start HTTP server on port " + port);
             }
 
-            return new FlecsServer(serverSegment);
+            return new FlecsServer(server);
         }
     }
 
@@ -747,6 +747,28 @@ public class Flecs implements AutoCloseable {
         this.checkClosed();
         if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
             flecs_h.ecs_http_server_fini(server.getServerSegment());
+        }
+    }
+
+    public FlecsServer restServer(short port) {
+        this.checkClosed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            flecs_h.FlecsRestImport(this.nativeWorld);
+            MemorySegment desc = ecs_http_server_desc_t.allocate(tempArena);
+            ecs_http_server_desc_t.port(desc, port);
+            MemorySegment server = flecs_h.ecs_rest_server_init(this.nativeWorld, desc);
+            if (server.equals(MemorySegment.NULL)) {
+                throw new IllegalStateException("Failed to start REST server on port " + port);
+            }
+
+            return new FlecsServer(server);
+        }
+    }
+
+    public void restServerStop(FlecsServer server) {
+        this.checkClosed();
+        if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
+            flecs_h.ecs_rest_server_fini(server.getServerSegment());
         }
     }
 
