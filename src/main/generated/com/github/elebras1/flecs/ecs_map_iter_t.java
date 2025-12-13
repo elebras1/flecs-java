@@ -19,6 +19,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_bucket_t *bucket;
  *     ecs_bucket_entry_t *entry;
  *     ecs_map_data_t *res;
+ *     int32_t change_count;
  * }
  * }
  */
@@ -32,7 +33,9 @@ public class ecs_map_iter_t {
         flecs_h.C_POINTER.withName("map"),
         flecs_h.C_POINTER.withName("bucket"),
         flecs_h.C_POINTER.withName("entry"),
-        flecs_h.C_POINTER.withName("res")
+        flecs_h.C_POINTER.withName("res"),
+        flecs_h.C_INT.withName("change_count"),
+        MemoryLayout.paddingLayout(4)
     ).withName("ecs_map_iter_t");
 
     /**
@@ -216,6 +219,50 @@ public class ecs_map_iter_t {
      */
     public static void res(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(res$LAYOUT, res$OFFSET, fieldValue);
+    }
+
+    private static final OfInt change_count$LAYOUT = (OfInt)$LAYOUT.select(groupElement("change_count"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static final OfInt change_count$layout() {
+        return change_count$LAYOUT;
+    }
+
+    private static final long change_count$OFFSET = $LAYOUT.byteOffset(groupElement("change_count"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static final long change_count$offset() {
+        return change_count$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static int change_count(MemorySegment struct) {
+        return struct.get(change_count$LAYOUT, change_count$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static void change_count(MemorySegment struct, int fieldValue) {
+        struct.set(change_count$LAYOUT, change_count$OFFSET, fieldValue);
     }
 
     /**

@@ -18,6 +18,187 @@ public class flecs_h extends flecs_h_1 {
         // Should not be called directly
     }
 
+    private static class ecs_table_unlock {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            flecs_h.C_POINTER,
+            flecs_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_table_unlock");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void ecs_table_unlock(ecs_world_t *world, ecs_table_t *table)
+     * }
+     */
+    public static FunctionDescriptor ecs_table_unlock$descriptor() {
+        return ecs_table_unlock.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void ecs_table_unlock(ecs_world_t *world, ecs_table_t *table)
+     * }
+     */
+    public static MethodHandle ecs_table_unlock$handle() {
+        return ecs_table_unlock.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void ecs_table_unlock(ecs_world_t *world, ecs_table_t *table)
+     * }
+     */
+    public static MemorySegment ecs_table_unlock$address() {
+        return ecs_table_unlock.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void ecs_table_unlock(ecs_world_t *world, ecs_table_t *table)
+     * }
+     */
+    public static void ecs_table_unlock(MemorySegment world, MemorySegment table) {
+        var mh$ = ecs_table_unlock.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ecs_table_unlock", world, table);
+            }
+            mh$.invokeExact(world, table);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class ecs_table_has_flags {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            flecs_h.C_BOOL,
+            flecs_h.C_POINTER,
+            flecs_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_table_has_flags");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_flags(ecs_table_t *table, ecs_flags32_t flags)
+     * }
+     */
+    public static FunctionDescriptor ecs_table_has_flags$descriptor() {
+        return ecs_table_has_flags.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_flags(ecs_table_t *table, ecs_flags32_t flags)
+     * }
+     */
+    public static MethodHandle ecs_table_has_flags$handle() {
+        return ecs_table_has_flags.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_flags(ecs_table_t *table, ecs_flags32_t flags)
+     * }
+     */
+    public static MemorySegment ecs_table_has_flags$address() {
+        return ecs_table_has_flags.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_flags(ecs_table_t *table, ecs_flags32_t flags)
+     * }
+     */
+    public static boolean ecs_table_has_flags(MemorySegment table, int flags) {
+        var mh$ = ecs_table_has_flags.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ecs_table_has_flags", table, flags);
+            }
+            return (boolean)mh$.invokeExact(table, flags);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class ecs_table_has_traversable {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            flecs_h.C_BOOL,
+            flecs_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_table_has_traversable");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_traversable(const ecs_table_t *table)
+     * }
+     */
+    public static FunctionDescriptor ecs_table_has_traversable$descriptor() {
+        return ecs_table_has_traversable.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_traversable(const ecs_table_t *table)
+     * }
+     */
+    public static MethodHandle ecs_table_has_traversable$handle() {
+        return ecs_table_has_traversable.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_traversable(const ecs_table_t *table)
+     * }
+     */
+    public static MemorySegment ecs_table_has_traversable$address() {
+        return ecs_table_has_traversable.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * _Bool ecs_table_has_traversable(const ecs_table_t *table)
+     * }
+     */
+    public static boolean ecs_table_has_traversable(MemorySegment table) {
+        var mh$ = ecs_table_has_traversable.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ecs_table_has_traversable", table);
+            }
+            return (boolean)mh$.invokeExact(table);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class ecs_table_swap_rows {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             flecs_h.C_POINTER,
@@ -26418,13 +26599,13 @@ public class flecs_h extends flecs_h_1 {
     }
     /**
      * {@snippet lang=c :
-     * #define FLECS_VERSION "4.1.2"
+     * #define FLECS_VERSION "4.1.4"
      * }
      */
     public static MemorySegment FLECS_VERSION() {
         class Holder {
             static final MemorySegment FLECS_VERSION
-                = flecs_h.LIBRARY_ARENA.allocateFrom("4.1.2");
+                = flecs_h.LIBRARY_ARENA.allocateFrom("4.1.4");
         }
         return Holder.FLECS_VERSION;
     }
@@ -27229,6 +27410,15 @@ public class flecs_h extends flecs_h_1 {
     public static int EcsQueryNested() {
         return EcsQueryNested;
     }
+    private static final int EcsQueryValid = (int)1073741824L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsQueryValid 1073741824
+     * }
+     */
+    public static int EcsQueryValid() {
+        return EcsQueryValid;
+    }
     private static final int EcsTermMatchAny = (int)1L;
     /**
      * {@snippet lang=c :
@@ -27318,15 +27508,6 @@ public class flecs_h extends flecs_h_1 {
      */
     public static int EcsTermIsToggle() {
         return EcsTermIsToggle;
-    }
-    private static final int EcsTermKeepAlive = (int)2048L;
-    /**
-     * {@snippet lang=c :
-     * #define EcsTermKeepAlive 2048
-     * }
-     */
-    public static int EcsTermKeepAlive() {
-        return EcsTermKeepAlive;
     }
     private static final int EcsTermIsSparse = (int)4096L;
     /**

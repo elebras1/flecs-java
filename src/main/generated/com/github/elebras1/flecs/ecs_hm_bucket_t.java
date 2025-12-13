@@ -29,7 +29,7 @@ public class ecs_hm_bucket_t {
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         ecs_vec_t.layout().withName("keys"),
         ecs_vec_t.layout().withName("values")
-    ).withName("$anon$4291:9");
+    ).withName("$anon$4288:9");
 
     /**
      * The layout of this struct

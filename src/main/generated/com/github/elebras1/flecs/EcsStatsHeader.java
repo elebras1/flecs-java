@@ -29,7 +29,7 @@ public class EcsStatsHeader {
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_FLOAT.withName("elapsed"),
         flecs_h.C_INT.withName("reduce_count")
-    ).withName("$anon$13535:9");
+    ).withName("$anon$13587:9");
 
     /**
      * The layout of this struct

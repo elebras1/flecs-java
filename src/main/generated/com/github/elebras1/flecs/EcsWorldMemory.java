@@ -42,8 +42,9 @@ public class EcsWorldMemory {
         ecs_table_histogram_t.layout().withName("table_histogram"),
         ecs_misc_memory_t.layout().withName("misc"),
         ecs_allocator_memory_t.layout().withName("allocators"),
+        MemoryLayout.paddingLayout(4),
         flecs_h.C_DOUBLE.withName("collection_time")
-    ).withName("$anon$13703:9");
+    ).withName("$anon$13756:9");
 
     /**
      * The layout of this struct

@@ -20,6 +20,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     unsigned int count : 26;
  *     unsigned int bucket_shift : 6;
  *     struct ecs_allocator_t *allocator;
+ *     int32_t change_count;
+ *     ecs_map_key_t last_iterated;
  * }
  * }
  */
@@ -33,7 +35,10 @@ public class ecs_map_t {
         flecs_h.C_POINTER.withName("buckets"),
         flecs_h.C_INT.withName("bucket_count"),
         MemoryLayout.paddingLayout(4),
-        flecs_h.C_POINTER.withName("allocator")
+        flecs_h.C_POINTER.withName("allocator"),
+        flecs_h.C_INT.withName("change_count"),
+        MemoryLayout.paddingLayout(4),
+        flecs_h.C_LONG.withName("last_iterated")
     ).withName("ecs_map_t");
 
     /**
@@ -173,6 +178,94 @@ public class ecs_map_t {
      */
     public static void allocator(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(allocator$LAYOUT, allocator$OFFSET, fieldValue);
+    }
+
+    private static final OfInt change_count$LAYOUT = (OfInt)$LAYOUT.select(groupElement("change_count"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static final OfInt change_count$layout() {
+        return change_count$LAYOUT;
+    }
+
+    private static final long change_count$OFFSET = $LAYOUT.byteOffset(groupElement("change_count"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static final long change_count$offset() {
+        return change_count$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static int change_count(MemorySegment struct) {
+        return struct.get(change_count$LAYOUT, change_count$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t change_count
+     * }
+     */
+    public static void change_count(MemorySegment struct, int fieldValue) {
+        struct.set(change_count$LAYOUT, change_count$OFFSET, fieldValue);
+    }
+
+    private static final OfLong last_iterated$LAYOUT = (OfLong)$LAYOUT.select(groupElement("last_iterated"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_map_key_t last_iterated
+     * }
+     */
+    public static final OfLong last_iterated$layout() {
+        return last_iterated$LAYOUT;
+    }
+
+    private static final long last_iterated$OFFSET = $LAYOUT.byteOffset(groupElement("last_iterated"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_map_key_t last_iterated
+     * }
+     */
+    public static final long last_iterated$offset() {
+        return last_iterated$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_map_key_t last_iterated
+     * }
+     */
+    public static long last_iterated(MemorySegment struct) {
+        return struct.get(last_iterated$LAYOUT, last_iterated$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_map_key_t last_iterated
+     * }
+     */
+    public static void last_iterated(MemorySegment struct, long fieldValue) {
+        struct.set(last_iterated$LAYOUT, last_iterated$OFFSET, fieldValue);
     }
 
     /**

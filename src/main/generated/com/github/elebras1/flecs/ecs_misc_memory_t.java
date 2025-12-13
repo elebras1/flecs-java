@@ -21,6 +21,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_size_t bytes_pipelines;
  *     ecs_size_t bytes_table_lookup;
  *     ecs_size_t bytes_component_record_lookup;
+ *     ecs_size_t bytes_locked_components;
  *     ecs_size_t bytes_type_info;
  *     ecs_size_t bytes_commands;
  *     ecs_size_t bytes_rematch_monitor;
@@ -44,6 +45,7 @@ public class ecs_misc_memory_t {
         flecs_h.C_INT.withName("bytes_pipelines"),
         flecs_h.C_INT.withName("bytes_table_lookup"),
         flecs_h.C_INT.withName("bytes_component_record_lookup"),
+        flecs_h.C_INT.withName("bytes_locked_components"),
         flecs_h.C_INT.withName("bytes_type_info"),
         flecs_h.C_INT.withName("bytes_commands"),
         flecs_h.C_INT.withName("bytes_rematch_monitor"),
@@ -51,7 +53,7 @@ public class ecs_misc_memory_t {
         flecs_h.C_INT.withName("bytes_reflection"),
         flecs_h.C_INT.withName("bytes_stats"),
         flecs_h.C_INT.withName("bytes_rest")
-    ).withName("$anon$13670:9");
+    ).withName("$anon$13722:9");
 
     /**
      * The layout of this struct
@@ -322,6 +324,50 @@ public class ecs_misc_memory_t {
      */
     public static void bytes_component_record_lookup(MemorySegment struct, int fieldValue) {
         struct.set(bytes_component_record_lookup$LAYOUT, bytes_component_record_lookup$OFFSET, fieldValue);
+    }
+
+    private static final OfInt bytes_locked_components$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_locked_components"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_locked_components
+     * }
+     */
+    public static final OfInt bytes_locked_components$layout() {
+        return bytes_locked_components$LAYOUT;
+    }
+
+    private static final long bytes_locked_components$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_locked_components"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_locked_components
+     * }
+     */
+    public static final long bytes_locked_components$offset() {
+        return bytes_locked_components$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_locked_components
+     * }
+     */
+    public static int bytes_locked_components(MemorySegment struct) {
+        return struct.get(bytes_locked_components$LAYOUT, bytes_locked_components$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_locked_components
+     * }
+     */
+    public static void bytes_locked_components(MemorySegment struct, int fieldValue) {
+        struct.set(bytes_locked_components$LAYOUT, bytes_locked_components$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_type_info$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_type_info"));

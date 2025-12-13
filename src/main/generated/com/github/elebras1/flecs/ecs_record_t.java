@@ -15,7 +15,6 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 /**
  * {@snippet lang=c :
  * struct ecs_record_t {
- *     ecs_component_record_t *cr;
  *     ecs_table_t *table;
  *     uint32_t row;
  *     int32_t dense;
@@ -29,7 +28,6 @@ public class ecs_record_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        flecs_h.C_POINTER.withName("cr"),
         flecs_h.C_POINTER.withName("table"),
         flecs_h.C_INT.withName("row"),
         flecs_h.C_INT.withName("dense")
@@ -40,50 +38,6 @@ public class ecs_record_t {
      */
     public static final GroupLayout layout() {
         return $LAYOUT;
-    }
-
-    private static final AddressLayout cr$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("cr"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_component_record_t *cr
-     * }
-     */
-    public static final AddressLayout cr$layout() {
-        return cr$LAYOUT;
-    }
-
-    private static final long cr$OFFSET = $LAYOUT.byteOffset(groupElement("cr"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_component_record_t *cr
-     * }
-     */
-    public static final long cr$offset() {
-        return cr$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_component_record_t *cr
-     * }
-     */
-    public static MemorySegment cr(MemorySegment struct) {
-        return struct.get(cr$LAYOUT, cr$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_component_record_t *cr
-     * }
-     */
-    public static void cr(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(cr$LAYOUT, cr$OFFSET, fieldValue);
     }
 
     private static final AddressLayout table$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("table"));
