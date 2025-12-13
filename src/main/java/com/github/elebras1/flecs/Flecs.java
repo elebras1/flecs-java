@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import static java.lang.foreign.ValueLayout.JAVA_INT;
-import static java.lang.foreign.ValueLayout.JAVA_LONG;
+import static java.lang.foreign.ValueLayout.*;
 
 public class Flecs implements AutoCloseable {
     private final MemorySegment nativeWorld;
@@ -726,6 +725,28 @@ public class Flecs implements AutoCloseable {
             jsonSegment.set(ValueLayout.JAVA_BYTE, jsonBytes.length, (byte)0);
 
             MemorySegment ptrSegment = flecs_h.ecs_world_from_json(this.nativeWorld, jsonSegment, MemorySegment.NULL);
+        }
+    }
+
+    public FlecsServer httpServer(int port) {
+        this.checkClosed();
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment desc = ecs_http_server_desc_t.allocate(tempArena);
+            ecs_http_server_desc_t.port(desc, (short) port);
+            MemorySegment serverSegment = flecs_h.ecs_http_server_init(desc);
+            if (serverSegment.equals(MemorySegment.NULL)) {
+                throw new IllegalStateException("Failed to start HTTP server on port " + port);
+            }
+
+            return new FlecsServer(serverSegment);
+        }
+    }
+
+    public void httpServerStop(FlecsServer server) {
+        this.checkClosed();
+        if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
+            flecs_h.ecs_http_server_fini(server.getServerSegment());
         }
     }
 
