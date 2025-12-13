@@ -3,6 +3,7 @@ package com.github.elebras1.flecs.examples;
 import com.github.elebras1.flecs.Entity;
 import com.github.elebras1.flecs.Flecs;
 import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.examples.components.Ideology;
 import com.github.elebras1.flecs.examples.components.Minister;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public class ComplexComponentExample {
 
         Flecs world = new Flecs();
         world.component(Minister.class);
+        world.component(Ideology.class);
 
         long start = System.currentTimeMillis();
         EcsLongList entityIds = new EcsLongList();
@@ -30,6 +32,7 @@ public class ComplexComponentExample {
             int endDate = startDate + 365;
 
             e.set(new Minister("Minister_" + i, "TAG_" + i, 1.0f, startDate, endDate));
+            e.set(new Ideology(i % 256, (short) (i % 100)));
         }
 
         long creationEnd = System.currentTimeMillis();
@@ -37,6 +40,7 @@ public class ComplexComponentExample {
         for (long id : entityIds) {
             Entity e = world.obtainEntity(id);
             System.out.println(e.get(Minister.class));
+            System.out.println(e.get(Ideology.class));
         }
 
         long end = System.currentTimeMillis();

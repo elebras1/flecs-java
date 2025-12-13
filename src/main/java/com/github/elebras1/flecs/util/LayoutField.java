@@ -4,6 +4,8 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class LayoutField {
 
@@ -104,6 +106,41 @@ public final class LayoutField {
 
     public static long offsetOf(MemoryLayout layout, String fieldName) {
         return layout.byteOffset(MemoryLayout.PathElement.groupElement(fieldName));
+    }
+
+    public static MemoryLayout createStructLayout(String name, MemoryLayout... elements) {
+        if (elements == null || elements.length == 0) {
+            return MemoryLayout.structLayout(
+                    MemoryLayout.paddingLayout(1)
+            ).withName(name);
+        }
+
+        List<MemoryLayout> layouts = new ArrayList<>();
+        long offset = 0;
+        long maxAlign = 1;
+
+        for (MemoryLayout elem : elements) {
+            long align = elem.byteAlignment();
+            if (align > maxAlign) {
+                maxAlign = align;
+            }
+
+            if (offset % align != 0) {
+                long pad = align - (offset % align);
+                layouts.add(MemoryLayout.paddingLayout(pad));
+                offset += pad;
+            }
+
+            layouts.add(elem);
+            offset += elem.byteSize();
+        }
+
+        if (offset % maxAlign != 0) {
+            long pad = maxAlign - (offset % maxAlign);
+            layouts.add(MemoryLayout.paddingLayout(pad));
+        }
+
+        return MemoryLayout.structLayout(layouts.toArray(new MemoryLayout[0])).withName(name);
     }
 }
 

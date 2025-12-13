@@ -50,22 +50,26 @@ public class ComponentCodeGenerator {
     }
 
     private FieldSpec createLayoutField(String recordName, List<VariableElement> fields) {
-        CodeBlock.Builder layoutBuilder = CodeBlock.builder()
-                .add("$T.structLayout(\n", MemoryLayout.class)
-                .indent();
+        CodeBlock.Builder layoutBuilder = CodeBlock.builder().add("$L.createStructLayout($S", LAYOUT_FIELD_CLASS, recordName);
 
-        for (int i = 0; i < fields.size(); i++) {
-            VariableElement field = fields.get(i);
-            String fieldName = field.getSimpleName().toString();
-            String layoutMethod = getLayoutMethod(field.asType().toString());
+        if (!fields.isEmpty()) {
+            layoutBuilder.add(",\n").indent();
 
-            layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
-            if (i < fields.size() - 1) {
-                layoutBuilder.add(",\n");
+            for (int i = 0; i < fields.size(); i++) {
+                VariableElement field = fields.get(i);
+                String fieldName = field.getSimpleName().toString();
+                String layoutMethod = getLayoutMethod(field.asType().toString());
+
+                layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
+
+                if (i < fields.size() - 1) {
+                    layoutBuilder.add(",\n");
+                }
             }
+            layoutBuilder.unindent();
         }
 
-        layoutBuilder.unindent().add("\n).withName($S)", recordName);
+        layoutBuilder.add(")");
 
         return FieldSpec.builder(MemoryLayout.class, "LAYOUT", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .initializer(layoutBuilder.build())

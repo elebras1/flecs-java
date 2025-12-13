@@ -121,6 +121,22 @@ public class Entity {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Entity set(long relation, T data) {
+        Class<T> componentClass = (Class<T>) data.getClass();
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+
+        long pairId = flecs_h.ecs_make_pair(relation, componentId);
+
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
+        component.write(dataSegment, data, this.world.arena());
+
+        flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, pairId, component.size(), dataSegment);
+
+        return this;
+    }
+
     public <T> T get(long componentId) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
         MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
