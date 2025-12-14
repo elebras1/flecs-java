@@ -725,6 +725,10 @@ public class Flecs implements AutoCloseable {
         }
     }
 
+    public void enableRest() {
+        this.enableRest((short) 27750);
+    }
+
     public void enableRest(short port) {
         this.checkClosed();
 
@@ -739,13 +743,14 @@ public class Flecs implements AutoCloseable {
             long restCompId = flecs_h.ecs_lookup(this.nativeWorld, restCompName);
 
             if (restCompId == 0) {
-                throw new IllegalStateException("Failed to find flecs.rest.Rest component. Make sure FlecsRest module is imported.");
+                throw new IllegalStateException("Failed to find flecs.rest.Rest component.");
             }
 
-            MemorySegment restData = arena.allocate(2);
+            MemorySegment restData = arena.allocate(32);
+            restData.fill((byte) 0);
             restData.set(ValueLayout.JAVA_SHORT, 0, port);
 
-            flecs_h.ecs_set_id(this.nativeWorld, restCompId, restCompId, 2, restData);
+            flecs_h.ecs_set_id(this.nativeWorld, restCompId, restCompId, 32, restData);
         }
     }
 
