@@ -8,12 +8,11 @@ public class RestExplorerExample {
 
     public static void main(String[] args) throws InterruptedException {
         try (Flecs world = new Flecs()) {
-            flecs_h.ecs_log_set_level(1);
             System.out.println("=== Flecs REST Explorer Example ===");
-            FlecsServer server = world.restServer((short) 27750);
+            world.enableRest((short) 27750);
             System.out.println("Open https://flecs.dev/explorer?remote=true");
 
-            int numberEntities = 1000;
+            int numberEntities = 100000;
             world.component(Position.class);
             world.component(Velocity.class);
             long tagTeamA = world.entity("TeamA");
@@ -52,12 +51,10 @@ public class RestExplorerExample {
 
             float deltaTime = 0.016f;
             while (world.progress(deltaTime)) {
-                world.processHttp(server, deltaTime);
 
                 Thread.sleep(16);
             }
-
-            world.restServerStop(server);
+            world.disableRest();
         }
     }
 }

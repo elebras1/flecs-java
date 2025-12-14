@@ -3,10 +3,7 @@ package com.github.elebras1.flecs;
 import com.github.elebras1.flecs.collection.EcsLongList;
 import com.github.elebras1.flecs.util.internal.FlecsLoader;
 
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -728,73 +725,42 @@ public class Flecs implements AutoCloseable {
         }
     }
 
-    public FlecsServer httpServer(short port) {
+    public void enableRest(short port) {
         this.checkClosed();
 
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment desc = ecs_http_server_desc_t.allocate(tempArena);
-            ecs_http_server_desc_t.port(desc, port);
-            MemorySegment server = flecs_h.ecs_http_server_init(desc);
-            if (server.equals(MemorySegment.NULL)) {
-                throw new IllegalStateException("Failed to start HTTP server on port " + port);
-            }
-
-            return new FlecsServer(server);
-        }
-    }
-
-    public void httpServerStop(FlecsServer server) {
-        this.checkClosed();
-        if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
-            flecs_h.ecs_http_server_fini(server.getServerSegment());
-        }
-    }
-
-    public void processHttp(FlecsServer server, float deltaTime) {
-        this.checkClosed();
-        if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
-            flecs_h.ecs_http_server_dequeue(server.getServerSegment(), deltaTime);
-        }
-    }
-
-    public FlecsServer restServer(short port) {
-        this.checkClosed();
         flecs_h.FlecsDocImport(this.nativeWorld);
+        flecs_h.FlecsRestImport(this.nativeWorld);
+        flecs_h.FlecsAlertsImport(this.nativeWorld);
         flecs_h.FlecsStatsImport(this.nativeWorld);
         flecs_h.FlecsMetricsImport(this.nativeWorld);
-        flecs_h.FlecsWorldMonitorImport(this.nativeWorld);
-        flecs_h.FlecsSystemMonitorImport(this.nativeWorld);
-        flecs_h.FlecsPipelineMonitorImport(this.nativeWorld);
-        flecs_h.FlecsAlertsImport(this.nativeWorld);
-        flecs_h.FlecsRestImport(this.nativeWorld);
 
-        flecs_h.ecs_set_entity_range(this.nativeWorld, 0, 0);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment restCompName = arena.allocateFrom("flecs.rest.Rest");
+            long restCompId = flecs_h.ecs_lookup(this.nativeWorld, restCompName);
 
-        MemorySegment desc = ecs_http_server_desc_t.allocate(this.arena);
-        desc.fill((byte) 0);
-        ecs_http_server_desc_t.port(desc, port);
+            if (restCompId == 0) {
+                throw new IllegalStateException("Failed to find flecs.rest.Rest component. Make sure FlecsRest module is imported.");
+            }
 
-        MemorySegment server = flecs_h.ecs_rest_server_init(this.nativeWorld, desc);
-        if (server == null || server.equals(MemorySegment.NULL)) {
-            throw new IllegalStateException("Failed to initialize REST server");
+            MemorySegment restData = arena.allocate(2);
+            restData.set(ValueLayout.JAVA_SHORT, 0, port);
+
+            flecs_h.ecs_set_id(this.nativeWorld, restCompId, restCompId, 2, restData);
         }
-
-        int result = flecs_h.ecs_http_server_start(server);
-        if (result != 0) {
-            flecs_h.ecs_http_server_fini(server);
-            throw new IllegalStateException("Failed to start REST server on port " + port);
-        }
-
-        System.out.println("REST server started on http://localhost:" + port);
-
-        return new FlecsServer(server);
     }
 
-    public void restServerStop(FlecsServer server) {
+    public void disableRest() {
         this.checkClosed();
-        if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
-            flecs_h.ecs_http_server_stop(server.getServerSegment());
-            flecs_h.ecs_rest_server_fini(server.getServerSegment());
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment restCompName = arena.allocateFrom("flecs.rest.Rest");
+            long restCompId = flecs_h.ecs_lookup(this.nativeWorld, restCompName);
+
+            if( restCompId == 0) {
+                throw new IllegalStateException("Failed to find flecs.rest.Rest component. Make sure FlecsRest module is imported.");
+            }
+
+            flecs_h.ecs_remove_id(this.nativeWorld, restCompId, restCompId);
         }
     }
 
