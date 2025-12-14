@@ -32,7 +32,7 @@ public class ComplexComponentExample {
             int endDate = startDate + 365;
 
             e.set(new Minister("Minister_" + i, "TAG_" + i, 1.0f, startDate, endDate));
-            e.set(new Ideology(i % 256, (short) (i % 100)));
+            e.set(new Ideology(i % 256, (byte) (i % 100), (short) (i % 5000)));
         }
 
         long creationEnd = System.currentTimeMillis();

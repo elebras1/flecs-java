@@ -198,6 +198,7 @@ public class ComponentCodeGenerator {
 
     private String getLayoutMethod(String type) {
         return switch (type) {
+            case "byte" -> "byteLayout";
             case "short" -> "shortLayout";
             case "int" -> "intLayout";
             case "long" -> "longLayout";
@@ -211,6 +212,7 @@ public class ComponentCodeGenerator {
 
     private String getGetterMethod(String type) {
         return switch (type) {
+            case "byte" -> "getByte";
             case "short" -> "getShort";
             case "int" -> "getInt";
             case "long" -> "getLong";

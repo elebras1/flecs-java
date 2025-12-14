@@ -19,6 +19,10 @@ public final class LayoutField {
         return ValueLayout.JAVA_DOUBLE;
     }
 
+    public static MemoryLayout byteLayout() {
+        return ValueLayout.JAVA_BYTE;
+    }
+
     public static MemoryLayout shortLayout() {
         return ValueLayout.JAVA_SHORT;
     }
@@ -45,6 +49,10 @@ public final class LayoutField {
 
     public static void set(MemorySegment segment, long offset, double value) {
         segment.set(ValueLayout.JAVA_DOUBLE, offset, value);
+    }
+
+    public static void set(MemorySegment segment, long offset, byte value) {
+        segment.set(ValueLayout.JAVA_BYTE, offset, value);
     }
 
     public static void set(MemorySegment segment, long offset, short value) {
@@ -78,6 +86,10 @@ public final class LayoutField {
 
     public static double getDouble(MemorySegment segment, long offset) {
         return segment.get(ValueLayout.JAVA_DOUBLE, offset);
+    }
+
+    public static byte getByte(MemorySegment segment, long offset) {
+        return segment.get(ValueLayout.JAVA_BYTE, offset);
     }
 
     public static short getShort(MemorySegment segment, long offset) {

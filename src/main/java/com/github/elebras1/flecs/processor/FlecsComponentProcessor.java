@@ -13,7 +13,7 @@ import java.util.*;
 @SupportedAnnotationTypes("com.github.elebras1.flecs.annotation.FlecsComponent")
 public class FlecsComponentProcessor extends AbstractProcessor {
 
-    private static final Set<String> SUPPORTED_TYPES = Set.of("short", "int", "long", "float", "double", "boolean", "java.lang.String");
+    private static final Set<String> SUPPORTED_TYPES = Set.of("byte", "short", "int", "long", "float", "double", "boolean", "java.lang.String");
     private Messager messager;
     private Filer filer;
     private ComponentCodeGenerator generator;
