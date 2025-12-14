@@ -7,7 +7,7 @@ public class Field<T> {
     private final int count;
     private final Component<T> component;
 
-    Field(MemorySegment memorySegment, int count, Flecs world, Class<T> componentClass) {
+    Field(MemorySegment memorySegment, int count, World world, Class<T> componentClass) {
         this.memorySegment = memorySegment;
         this.count = count;
         this.component = world.componentRegistry().getComponent(componentClass);

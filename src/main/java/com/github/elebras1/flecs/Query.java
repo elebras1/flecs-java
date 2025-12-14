@@ -7,12 +7,12 @@ import java.lang.foreign.ValueLayout;
 
 public class Query implements AutoCloseable {
 
-    private final Flecs world;
+    private final World world;
     private final MemorySegment nativeQuery;
     private final Arena arena;
     private boolean closed = false;
 
-    Query(Flecs world, MemorySegment nativeQuery) {
+    Query(World world, MemorySegment nativeQuery) {
         this.world = world;
         this.nativeQuery = nativeQuery;
         this.arena = Arena.ofConfined();

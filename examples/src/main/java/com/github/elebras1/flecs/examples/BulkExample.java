@@ -1,7 +1,6 @@
 package com.github.elebras1.flecs.examples;
 
-import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.Flecs;
+import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.collection.EcsLongList;
 import com.github.elebras1.flecs.examples.components.Health;
 import com.github.elebras1.flecs.examples.components.Position;
@@ -9,7 +8,7 @@ import com.github.elebras1.flecs.examples.components.Velocity;
 
 public class BulkExample {
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
 
             world.component(Position.class);
             world.component(Velocity.class);

@@ -6,7 +6,7 @@ import com.github.elebras1.flecs.examples.components.*;
 public class DirectFieldAccessExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Direct Field Access Example ===\n");
 
             world.component(Position.class);

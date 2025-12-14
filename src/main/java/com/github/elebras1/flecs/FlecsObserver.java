@@ -2,10 +2,10 @@ package com.github.elebras1.flecs;
 
 public class FlecsObserver {
     
-    private final Flecs world;
+    private final World world;
     private final long observerId;
 
-    FlecsObserver(Flecs world, long observerId) {
+    FlecsObserver(World world, long observerId) {
         this.world = world;
         this.observerId = observerId;
     }
@@ -14,7 +14,7 @@ public class FlecsObserver {
         return this.observerId;
     }
 
-    public Flecs world() {
+    public World world() {
         return this.world;
     }
 

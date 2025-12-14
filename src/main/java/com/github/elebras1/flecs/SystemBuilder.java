@@ -8,7 +8,7 @@ import static com.github.elebras1.flecs.FlecsConstants.*;
 
 public class SystemBuilder {
 
-    private final Flecs world;
+    private final World world;
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount = 0;
@@ -19,14 +19,14 @@ public class SystemBuilder {
     private long phase = 0;
     private Iter iter;
 
-    public SystemBuilder(Flecs world) {
+    public SystemBuilder(World world) {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_system_desc_t.allocate(this.arena);
         this.desc.fill((byte) 0);
     }
 
-    public SystemBuilder(Flecs world, String name) {
+    public SystemBuilder(World world, String name) {
         this(world);
         MemorySegment nameSegment = this.arena.allocateFrom(name);
         

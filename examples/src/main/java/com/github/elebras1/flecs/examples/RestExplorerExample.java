@@ -7,7 +7,7 @@ import java.util.Random;
 public class RestExplorerExample {
 
     public static void main(String[] args) throws InterruptedException {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Flecs REST Explorer Example ===");
             world.enableRest((short) 27750);
             System.out.println("Open https://flecs.dev/explorer?remote=true");

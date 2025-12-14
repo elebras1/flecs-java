@@ -1,6 +1,6 @@
 package com.github.elebras1.flecs.examples;
 
-import com.github.elebras1.flecs.Flecs;
+import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.Position;
 import com.github.elebras1.flecs.examples.components.Velocity;
 
@@ -9,7 +9,7 @@ public class JsonSerializationExample {
     public static void main(String[] args) {
         // Creating and populating the source world
         String json;
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             // Registering components
             world.component(Position.class);
             world.component(Velocity.class);
@@ -34,7 +34,7 @@ public class JsonSerializationExample {
         }
 
         // Deserialization into a new world
-        try (Flecs newWorld = new Flecs()) {
+        try (World newWorld = new World()) {
             // Registering components
             newWorld.component(Position.class);
             newWorld.component(Velocity.class);

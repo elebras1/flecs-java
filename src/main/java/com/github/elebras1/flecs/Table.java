@@ -7,10 +7,10 @@ import java.lang.foreign.ValueLayout;
 
 public class Table {
 
-    private final Flecs world;
+    private final World world;
     private final MemorySegment nativeTable;
 
-    Table(Flecs world, MemorySegment nativeTable) {
+    Table(World world, MemorySegment nativeTable) {
         this.world = world;
         this.nativeTable = nativeTable;
     }

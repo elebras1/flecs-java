@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 
 public class Entity {
 
-    private final Flecs world;
+    private final World world;
     private final long id;
 
-    Entity(Flecs world, long id) {
+    Entity(World world, long id) {
         this.world = world;
         this.id = id;
     }
@@ -19,7 +19,7 @@ public class Entity {
         return id;
     }
 
-    public Flecs world() {
+    public World world() {
         return world;
     }
 

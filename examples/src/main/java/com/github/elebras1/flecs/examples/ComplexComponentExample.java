@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.Flecs;
+import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.collection.EcsLongList;
 import com.github.elebras1.flecs.examples.components.Ideology;
 import com.github.elebras1.flecs.examples.components.Minister;
@@ -16,7 +16,7 @@ public class ComplexComponentExample {
         int N = 100_000;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        Flecs world = new Flecs();
+        World world = new World();
         world.component(Minister.class);
         world.component(Ideology.class);
 

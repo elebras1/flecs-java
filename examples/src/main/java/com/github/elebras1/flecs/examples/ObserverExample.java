@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.Flecs;
+import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.FlecsObserver;
 import com.github.elebras1.flecs.examples.components.Position;
 import com.github.elebras1.flecs.examples.components.Velocity;
@@ -11,7 +11,7 @@ import static com.github.elebras1.flecs.FlecsConstants.*;
 public class ObserverExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Observer Example ===\n");
 
             // Register components

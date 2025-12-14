@@ -9,7 +9,7 @@ import static java.lang.foreign.ValueLayout.*;
 
 public class ComponentHooks<T> {
     private final Linker linker;
-    private final Flecs world;
+    private final World world;
     private final Component<T> component;
     private IterHookCallback<T> onAddCallback;
     private IterHookCallback<T> onSetCallback;
@@ -22,7 +22,7 @@ public class ComponentHooks<T> {
     private CopyMoveCallback<T> copyCtorCallback;
     private CopyMoveCallback<T> moveCtorCallback;
 
-    public ComponentHooks(Flecs world, Component<T> component) {
+    public ComponentHooks(World world, Component<T> component) {
         this.linker = Linker.nativeLinker();
         this.world = world;
         this.component = component;

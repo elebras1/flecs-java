@@ -6,7 +6,7 @@ import com.github.elebras1.flecs.examples.components.*;
 public class PipelineExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Pipeline Example ===\n");
 
             world.component(Position.class);

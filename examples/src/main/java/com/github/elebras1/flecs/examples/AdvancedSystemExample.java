@@ -8,7 +8,7 @@ import java.lang.System;
 public class AdvancedSystemExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Advanced Systems Example ===\n");
 
             // Register components

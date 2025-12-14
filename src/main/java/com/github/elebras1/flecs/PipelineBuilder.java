@@ -5,20 +5,20 @@ import java.lang.foreign.MemorySegment;
 
 public class PipelineBuilder {
 
-    private final Flecs world;
+    private final World world;
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount = 0;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
 
-    public PipelineBuilder(Flecs world) {
+    public PipelineBuilder(World world) {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_pipeline_desc_t.allocate(this.arena);
         this.desc.fill((byte) 0);
     }
 
-    public PipelineBuilder(Flecs world, String name) {
+    public PipelineBuilder(World world, String name) {
         this(world);
         MemorySegment nameSegment = this.arena.allocateFrom(name);
 

@@ -5,11 +5,11 @@ import java.lang.foreign.MemorySegment;
 
 public class TimerBuilder {
     
-    private final Flecs world;
+    private final World world;
     private final Arena arena;
     private final MemorySegment desc;
     
-    TimerBuilder(Flecs world) {
+    TimerBuilder(World world) {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_system_desc_t.allocate(this.arena);

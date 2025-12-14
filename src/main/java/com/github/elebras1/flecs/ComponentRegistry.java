@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ComponentRegistry {
 
-    private final Flecs world;
+    private final World world;
     private final Map<Class<?>, Long> componentIds;
     private final Map<Long, Class<?>> componentClasses;
 
-    protected ComponentRegistry(Flecs world) {
+    protected ComponentRegistry(World world) {
         this.world = world;
         this.componentIds = new ConcurrentHashMap<>();
         this.componentClasses = new ConcurrentHashMap<>();

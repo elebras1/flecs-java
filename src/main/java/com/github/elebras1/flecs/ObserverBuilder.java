@@ -8,7 +8,7 @@ import static com.github.elebras1.flecs.FlecsConstants.*;
 
 public class ObserverBuilder {
 
-    private final Flecs world;
+    private final World world;
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount;
@@ -20,7 +20,7 @@ public class ObserverBuilder {
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private static final int MAX_EVENTS = 8;
 
-    public ObserverBuilder(Flecs world) {
+    public ObserverBuilder(World world) {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_observer_desc_t.allocate(this.arena);
@@ -30,7 +30,7 @@ public class ObserverBuilder {
         this.iter = null;
     }
 
-    public ObserverBuilder(Flecs world, String name) {
+    public ObserverBuilder(World world, String name) {
         this(world);
         MemorySegment nameSegment = this.arena.allocateFrom(name);
 

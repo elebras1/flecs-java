@@ -6,10 +6,10 @@ import java.lang.foreign.ValueLayout;
 public class Iter {
     
     private MemorySegment nativeIter;
-    private final Flecs world;
+    private final World world;
     private int count;
 
-    Iter(MemorySegment nativeIter, Flecs world) {
+    Iter(MemorySegment nativeIter, World world) {
         this.nativeIter = nativeIter;
         this.world = world;
         this.count = -1;

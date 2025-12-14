@@ -1,13 +1,13 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.Flecs;
+import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.Position;
 
 public class HooksExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("Registering Position component with hooks...");
 
             world.component(Position.class, hooks -> {

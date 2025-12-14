@@ -6,7 +6,7 @@ import com.github.elebras1.flecs.examples.components.*;
 public class SimpleBenchmark {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
 
             long posId = world.component(Position.class);
             long velId = world.component(Velocity.class);

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class Flecs implements AutoCloseable {
+public class World implements AutoCloseable {
     private final MemorySegment nativeWorld;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
@@ -124,7 +124,7 @@ public class Flecs implements AutoCloseable {
         }
     }
 
-    public Flecs() {
+    public World() {
         this.arena = Arena.ofShared();
         this.nativeWorld = flecs_h.ecs_init();
 
@@ -140,7 +140,7 @@ public class Flecs implements AutoCloseable {
         this.owned = true;
     }
 
-    private Flecs(MemorySegment stagePtr, ComponentRegistry sharedRegistry) {
+    private World(MemorySegment stagePtr, ComponentRegistry sharedRegistry) {
         this.arena = Arena.ofConfined();
         this.nativeWorld = stagePtr;
         this.componentRegistry = sharedRegistry;
@@ -587,10 +587,10 @@ public class Flecs implements AutoCloseable {
         return flecs_h.ecs_get_stage_count(this.nativeWorld);
     }
 
-    public Flecs getStage(int stageId) {
+    public World getStage(int stageId) {
         this.checkClosed();
         MemorySegment stagePtr = flecs_h.ecs_get_stage(this.nativeWorld, stageId);
-        return new Flecs(stagePtr, this.componentRegistry);
+        return new World(stagePtr, this.componentRegistry);
     }
 
     public int getStageId() {
@@ -598,10 +598,10 @@ public class Flecs implements AutoCloseable {
         return flecs_h.ecs_stage_get_id(this.nativeWorld);
     }
 
-    public Flecs stage() {
+    public World stage() {
         this.checkClosed();
         MemorySegment stagePtr = flecs_h.ecs_stage_new(this.nativeWorld);
-        return new Flecs(stagePtr, this.componentRegistry);
+        return new World(stagePtr, this.componentRegistry);
     }
 
     public void freeStage() {

@@ -5,13 +5,13 @@ import java.lang.foreign.MemorySegment;
 
 public class FlecsSystem implements AutoCloseable {
 
-    private final Flecs world;
+    private final World world;
     private final long entityId;
     private final Entity entity;
     private final Arena arena;
     private boolean closed = false;
 
-    FlecsSystem(Flecs world, long entityId) {
+    FlecsSystem(World world, long entityId) {
         this.world = world;
         this.entityId = entityId;
         this.entity = world.obtainEntity(entityId);

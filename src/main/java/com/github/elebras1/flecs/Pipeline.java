@@ -2,10 +2,10 @@ package com.github.elebras1.flecs;
 
 public class Pipeline {
 
-    private final Flecs world;
+    private final World world;
     private final long id;
 
-    Pipeline(Flecs world, long id) {
+    Pipeline(World world, long id) {
         this.world = world;
         this.id = id;
     }

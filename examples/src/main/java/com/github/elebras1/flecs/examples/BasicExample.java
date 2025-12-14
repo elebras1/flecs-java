@@ -6,7 +6,7 @@ import com.github.elebras1.flecs.examples.components.*;
 public class BasicExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Flecs Wrapper - Comprehensive Example ===\n");
 
             long posId = world.component(Position.class);

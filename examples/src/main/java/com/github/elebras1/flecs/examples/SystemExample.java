@@ -8,7 +8,7 @@ import java.lang.System;
 public class SystemExample {
 
     public static void main(String[] args) {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Flecs Systems Example ===\n");
 
             // Register components

@@ -1,11 +1,11 @@
 package com.github.elebras1.flecs.examples;
 
-import com.github.elebras1.flecs.Flecs;
+import com.github.elebras1.flecs.World;
 
 public class RestLifecycleExample {
 
     public static void main(String[] args) throws InterruptedException {
-        try (Flecs world = new Flecs()) {
+        try (World world = new World()) {
             System.out.println("=== Flecs REST Lifecycle Test ===");
 
             for(int i = 0; i < 50; i++) {

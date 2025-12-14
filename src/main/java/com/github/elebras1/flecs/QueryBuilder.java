@@ -9,13 +9,13 @@ import static com.github.elebras1.flecs.FlecsConstants.EcsQueryCacheAuto;
 
 public class QueryBuilder {
 
-    private final Flecs world;
+    private final World world;
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount = 0;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
 
-    public QueryBuilder(Flecs world) {
+    public QueryBuilder(World world) {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_query_desc_t.allocate(this.arena);
