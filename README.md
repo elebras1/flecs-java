@@ -30,8 +30,8 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.2.0'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.2.0'
+    implementation 'io.github.elebras1:flecs-java:0.3.0'
+    annotationProcessor 'io.github.elebras1:flecs-java:0.3.0'
 
 }
 ```
