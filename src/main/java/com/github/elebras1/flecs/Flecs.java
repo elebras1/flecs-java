@@ -750,24 +750,50 @@ public class Flecs implements AutoCloseable {
         }
     }
 
+    public void processHttp(FlecsServer server, float deltaTime) {
+        this.checkClosed();
+        if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
+            flecs_h.ecs_http_server_dequeue(server.getServerSegment(), deltaTime);
+        }
+    }
+
     public FlecsServer restServer(short port) {
         this.checkClosed();
-        try (Arena tempArena = Arena.ofConfined()) {
-            flecs_h.FlecsRestImport(this.nativeWorld);
-            MemorySegment desc = ecs_http_server_desc_t.allocate(tempArena);
-            ecs_http_server_desc_t.port(desc, port);
-            MemorySegment server = flecs_h.ecs_rest_server_init(this.nativeWorld, desc);
-            if (server.equals(MemorySegment.NULL)) {
-                throw new IllegalStateException("Failed to start REST server on port " + port);
-            }
+        flecs_h.FlecsDocImport(this.nativeWorld);
+        flecs_h.FlecsStatsImport(this.nativeWorld);
+        flecs_h.FlecsMetricsImport(this.nativeWorld);
+        flecs_h.FlecsWorldMonitorImport(this.nativeWorld);
+        flecs_h.FlecsSystemMonitorImport(this.nativeWorld);
+        flecs_h.FlecsPipelineMonitorImport(this.nativeWorld);
+        flecs_h.FlecsAlertsImport(this.nativeWorld);
+        flecs_h.FlecsRestImport(this.nativeWorld);
 
-            return new FlecsServer(server);
+        flecs_h.ecs_set_entity_range(this.nativeWorld, 0, 0);
+
+        MemorySegment desc = ecs_http_server_desc_t.allocate(this.arena);
+        desc.fill((byte) 0);
+        ecs_http_server_desc_t.port(desc, port);
+
+        MemorySegment server = flecs_h.ecs_rest_server_init(this.nativeWorld, desc);
+        if (server == null || server.equals(MemorySegment.NULL)) {
+            throw new IllegalStateException("Failed to initialize REST server");
         }
+
+        int result = flecs_h.ecs_http_server_start(server);
+        if (result != 0) {
+            flecs_h.ecs_http_server_fini(server);
+            throw new IllegalStateException("Failed to start REST server on port " + port);
+        }
+
+        System.out.println("REST server started on http://localhost:" + port);
+
+        return new FlecsServer(server);
     }
 
     public void restServerStop(FlecsServer server) {
         this.checkClosed();
         if (server != null && !server.getServerSegment().equals(MemorySegment.NULL)) {
+            flecs_h.ecs_http_server_stop(server.getServerSegment());
             flecs_h.ecs_rest_server_fini(server.getServerSegment());
         }
     }
