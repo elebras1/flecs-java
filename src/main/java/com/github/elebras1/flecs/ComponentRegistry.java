@@ -26,31 +26,33 @@ public class ComponentRegistry {
         Component<T> component = this.getComponentInstance(componentClass);
         String componentName = componentClass.getName();
 
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment nameSegment = tempArena.allocateFrom(componentName);
+        long componentId = this.world.lookup(componentName);
+        if(componentId == 0) {
+            try (Arena tempArena = Arena.ofConfined()) {
+                MemorySegment nameSegment = tempArena.allocateFrom(componentName);
 
-            MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
-            ecs_entity_desc_t.name(entityDesc, nameSegment);
+                MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
+                ecs_entity_desc_t.name(entityDesc, nameSegment);
 
-            long entityId = flecs_h.ecs_entity_init(this.world.nativeHandle(), entityDesc);
+                long entityId = flecs_h.ecs_entity_init(this.world.nativeHandle(), entityDesc);
 
-            MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
-            ecs_component_desc_t.entity(componentDesc, entityId);
+                MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
+                ecs_component_desc_t.entity(componentDesc, entityId);
 
-            MemorySegment typeInfo = ecs_component_desc_t.type(componentDesc);
-            ecs_type_info_t.size(typeInfo, (int) component.size());
-            ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
+                MemorySegment typeInfo = ecs_component_desc_t.type(componentDesc);
+                ecs_type_info_t.size(typeInfo, (int) component.size());
+                ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
 
-            long componentId = flecs_h.ecs_component_init(world.nativeHandle(), componentDesc);
+                componentId = flecs_h.ecs_component_init(world.nativeHandle(), componentDesc);
 
-            if (componentId == 0) {
-                throw new IllegalStateException("Failed to register component: " + componentName);
+                if (componentId == 0) {
+                    throw new IllegalStateException("Failed to register component: " + componentName);
+                }
             }
-
-            this.componentIds.put(componentClass, componentId);
-            this.componentClasses.put(componentId, componentClass);
-            return componentId;
         }
+        this.componentIds.put(componentClass, componentId);
+        this.componentClasses.put(componentId, componentClass);
+        return componentId;
     }
 
     protected <T> long getComponentId(Class<T> componentClass) {

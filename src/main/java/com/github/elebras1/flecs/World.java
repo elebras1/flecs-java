@@ -392,6 +392,11 @@ public class World implements AutoCloseable {
         return new TimerBuilder(this);
     }
 
+    public ScriptBuilder script(String code) {
+        this.checkClosed();
+        return new ScriptBuilder(this, code);
+    }
+
     public void setThreads(int threads) {
         this.checkClosed();
         flecs_h.ecs_set_threads(this.nativeWorld, threads);
