@@ -27,7 +27,7 @@ public class ComponentRegistry {
         String componentName = componentClass.getName();
 
         long componentId = this.world.lookup(componentName);
-        if(componentId == 0) {
+        if(componentId == -1) {
             try (Arena tempArena = Arena.ofConfined()) {
                 MemorySegment nameSegment = tempArena.allocateFrom(componentName);
 
