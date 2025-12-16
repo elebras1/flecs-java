@@ -13,7 +13,6 @@ public class TimerBuilder {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_system_desc_t.allocate(this.arena);
-        this.desc.fill((byte) 0);
     }
 
     public TimerBuilder interval(float interval) {

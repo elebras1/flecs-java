@@ -168,7 +168,6 @@ public class World implements AutoCloseable {
         nameSegment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
 
         MemorySegment desc = this.defaultBuffers.entityDescBuffer().get();
-        desc.fill((byte) 0);
         ecs_entity_desc_t.name(desc, nameSegment);
 
         return flecs_h.ecs_entity_init(this.nativeWorld, desc);
@@ -752,7 +751,6 @@ public class World implements AutoCloseable {
             }
 
             MemorySegment restData = arena.allocate(32);
-            restData.fill((byte) 0);
             restData.set(ValueLayout.JAVA_SHORT, 0, port);
 
             flecs_h.ecs_set_id(this.nativeWorld, restCompId, restCompId, 32, restData);

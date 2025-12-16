@@ -272,8 +272,6 @@ public class ComponentHooks<T> {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment hooks = ecs_type_hooks_t.allocate(tempArena);
 
-            hooks.fill((byte) 0);
-
             if (this.ctorCallback != null) {
                 MemorySegment ctorStub = this.createXtorStub(this.ctorCallback);
                 ecs_type_hooks_t.ctor(hooks, ctorStub);

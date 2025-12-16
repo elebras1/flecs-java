@@ -15,7 +15,6 @@ public class PipelineBuilder {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_pipeline_desc_t.allocate(this.arena);
-        this.desc.fill((byte) 0);
     }
 
     public PipelineBuilder(World world, String name) {

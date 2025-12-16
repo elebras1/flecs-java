@@ -26,7 +26,6 @@ public class ObserverBuilder {
         this.desc = ecs_observer_desc_t.allocate(this.arena);
         this.termCount = 0;
         this.eventCount = 0;
-        this.desc.fill((byte) 0);
         this.iter = null;
     }
 

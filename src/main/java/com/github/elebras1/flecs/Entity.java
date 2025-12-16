@@ -194,7 +194,6 @@ public class Entity {
     public void emit(long eventId) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
-            eventDesc.fill((byte) 0);
 
             ecs_event_desc_t.event(eventDesc, eventId);
             ecs_event_desc_t.entity(eventDesc, this.id);
@@ -206,7 +205,6 @@ public class Entity {
     public void emit(long eventId, long componentId) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
-            eventDesc.fill((byte) 0);
 
             MemorySegment typeSegment = ecs_type_t.allocate(tempArena);
             MemorySegment idsArray = tempArena.allocate(ValueLayout.JAVA_LONG);

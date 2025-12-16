@@ -19,7 +19,6 @@ public class QueryBuilder {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_query_desc_t.allocate(this.arena);
-        this.desc.fill((byte) 0);
     }
 
     public QueryBuilder expr(String expr) {
