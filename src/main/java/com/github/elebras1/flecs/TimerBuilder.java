@@ -1,18 +1,15 @@
 package com.github.elebras1.flecs;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
 public class TimerBuilder {
     
     private final World world;
-    private final Arena arena;
     private final MemorySegment desc;
     
     TimerBuilder(World world) {
         this.world = world;
-        this.arena = Arena.ofConfined();
-        this.desc = ecs_system_desc_t.allocate(this.arena);
+        this.desc = ecs_system_desc_t.allocate(this.world.arena());
     }
 
     public TimerBuilder interval(float interval) {

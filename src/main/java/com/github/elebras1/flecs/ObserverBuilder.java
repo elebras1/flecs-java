@@ -16,7 +16,6 @@ public class ObserverBuilder {
     private Query.IterCallback iterCallback;
     private Query.RunCallback runCallback;
     private Query.EntityCallback entityCallback;
-    private Iter iter;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private static final int MAX_EVENTS = 8;
 
@@ -26,7 +25,6 @@ public class ObserverBuilder {
         this.desc = ecs_observer_desc_t.allocate(this.arena);
         this.termCount = 0;
         this.eventCount = 0;
-        this.iter = null;
     }
 
     public ObserverBuilder(World world, String name) {
@@ -163,12 +161,8 @@ public class ObserverBuilder {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            if (this.iter == null) {
-                this.iter = new Iter(it, this.world);
-            } else {
-                iter.setNativeIter(it);
-            }
-            callback.accept(this.iter);
+            Iter iter = new Iter(it, this.world);
+            callback.accept(iter);
         }, this.world.arena());
 
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -180,12 +174,8 @@ public class ObserverBuilder {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            if (this.iter == null) {
-                this.iter = new Iter(it, this.world);
-            } else {
-                iter.setNativeIter(it);
-            }
-            callback.accept(this.iter);
+            Iter iter = new Iter(it, this.world);
+            callback.accept(iter);
         }, this.world.arena());
 
         ecs_observer_desc_t.run(this.desc, callbackStub);
