@@ -72,10 +72,7 @@ public class AdvancedSystemExample {
 
                         float newX = pos.x() + vel.dx() * it.deltaTime();
                         float newY = pos.y() + vel.dy() * it.deltaTime();
-                        long entityId = it.entity(i);
-                        Entity entity = world.obtainEntity(entityId);
-                        entity.set(new Position(newX, newY));
-                        // Note: System.out.printf removed to avoid synchronization issues with multi-threading
+                        positions.set(i, new Position(newX, newY));
                     }
                 });
 

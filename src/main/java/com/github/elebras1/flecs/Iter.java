@@ -147,6 +147,59 @@ public class Iter {
         return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_BOOLEAN, offset[0]);
     }
 
+    public <T> byte fieldByte(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_BYTE, offset[0]);
+    }
+
+    public <T> String fieldString(Class<T> componentClass, int index, String fieldName, int i) {
+        long[] offset = new long[1];
+        MemorySegment stringPointer = this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.ADDRESS.withByteAlignment(1), offset[0]);
+        if (stringPointer.address() == 0) {
+            return null;
+        }
+        return stringPointer.reinterpret(Long.MAX_VALUE).getString(0);
+    }
+
+    public <T> void setFieldInt(Class<T> componentClass, int index, String fieldName, int i, int value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_INT, offset[0], value);
+    }
+
+    public <T> void setFieldFloat(Class<T> componentClass, int index, String fieldName, int i, float value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_FLOAT, offset[0], value);
+    }
+
+    public <T> void setFieldDouble(Class<T> componentClass, int index, String fieldName, int i, double value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_DOUBLE, offset[0], value);
+    }
+
+    public <T> void setFieldLong(Class<T> componentClass, int index, String fieldName, int i, long value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_LONG, offset[0], value);
+    }
+
+    public <T> void setFieldShort(Class<T> componentClass, int index, String fieldName, int i, short value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_SHORT, offset[0], value);
+    }
+
+    public <T> void setFieldBoolean(Class<T> componentClass, int index, String fieldName, int i, boolean value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_BOOLEAN, offset[0], value);
+    }
+
+    public <T> void setFieldByte(Class<T> componentClass, int index, String fieldName, int i, byte value) {
+        long[] offset = new long[1];
+        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_BYTE, offset[0], value);
+    }
+
+    public <T> void setFieldString(Class<T> componentClass, int index, String fieldName, int i, String value) {
+        // TODO
+    }
+
     public long event() {
         return ecs_iter_t.event(this.nativeIter);
     }
