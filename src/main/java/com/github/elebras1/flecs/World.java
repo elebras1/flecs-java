@@ -47,22 +47,31 @@ public class World implements AutoCloseable {
     private static final class NameBuffer implements AutoCloseable {
         private Arena arena;
         private MemorySegment segment;
-        private int capacity;
+        private long capacity;
 
-        NameBuffer(int initialCapacity) {
+        NameBuffer(long initialCapacity) {
             this.capacity = initialCapacity;
             this.arena = Arena.ofConfined();
             this.segment = this.arena.allocate(initialCapacity);
         }
 
-        MemorySegment ensure(int needed) {
+        private MemorySegment ensure(long needed) {
             if (needed > capacity) {
                 this.arena.close();
                 this.arena = Arena.ofConfined();
-                this.segment = this.arena.allocate(needed);
-                this.capacity = needed;
+                this.capacity = Math.max(needed, capacity * 2);
+                this.segment = this.arena.allocate(this.capacity);
             }
             return segment;
+        }
+
+        public MemorySegment set(String value) {
+            byte[] utf8 = value.getBytes(StandardCharsets.UTF_8);
+            long needed = utf8.length + 1;
+            MemorySegment seg = ensure(needed);
+            MemorySegment.copy(utf8, 0, seg, JAVA_BYTE, 0, utf8.length);
+            seg.set(JAVA_BYTE, utf8.length, (byte) 0);
+            return seg;
         }
 
         @Override
@@ -125,7 +134,7 @@ public class World implements AutoCloseable {
     }
 
     public World() {
-        this.arena = Arena.ofShared();
+        this.arena = Arena.ofConfined();
         this.nativeWorld = flecs_h.ecs_init();
 
         if (this.nativeWorld == null || this.nativeWorld.address() == 0) {
@@ -159,13 +168,7 @@ public class World implements AutoCloseable {
 
     public long entity(String name) {
         this.checkClosed();
-
-        byte[] utf8 = name.getBytes(StandardCharsets.UTF_8);
-        int len = utf8.length;
-
-        MemorySegment nameSegment = this.defaultBuffers.nameBuffer().ensure(len + 1);
-        nameSegment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
-        nameSegment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
+        MemorySegment nameSegment = this.defaultBuffers.nameBuffer().set(name);
 
         MemorySegment desc = this.defaultBuffers.entityDescBuffer().get();
         ecs_entity_desc_t.name(desc, nameSegment);
@@ -295,14 +298,7 @@ public class World implements AutoCloseable {
 
     public long lookup(String name) {
         this.checkClosed();
-
-        byte[] utf8 = name.getBytes(StandardCharsets.UTF_8);
-        int len = utf8.length;
-
-        MemorySegment segment = this.defaultBuffers.nameBuffer().ensure(len + 1);
-
-        segment.asSlice(0, len).copyFrom(MemorySegment.ofArray(utf8));
-        segment.set(ValueLayout.JAVA_BYTE, len, (byte)0);
+        MemorySegment segment = this.defaultBuffers.nameBuffer().set(name);
 
         long entityId = flecs_h.ecs_lookup(this.nativeWorld, segment);
         return entityId == 0 ? -1 : entityId;
