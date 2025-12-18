@@ -45,6 +45,15 @@ public class DirectFieldAccessExample {
                         float y = iter.fieldFloat(Position.class, 0, "y", i);
                         int health = iter.fieldInt(Health.class, 2, "value", i);
                         System.out.printf("  pos=(%.1f, %.1f) health=%d%n", x, y, health);
+
+                        iter.setFieldFloat(Position.class, 0, "x", i, x + 1.0f);
+                        iter.setFieldFloat(Position.class, 0, "y", i, y + 1.0f);
+                        iter.setFieldInt(Health.class, 2, "value", i, health - 1);
+
+                        x = iter.fieldFloat(Position.class, 0, "x", i);
+                        y = iter.fieldFloat(Position.class, 0, "y", i);
+                        health = iter.fieldInt(Health.class, 2, "value", i);
+                        System.out.println("    After update: pos=(" + x + ", " + y + ") health=" + health);
                     }
                 });
             }

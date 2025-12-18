@@ -2,26 +2,31 @@ package com.github.elebras1.flecs;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.util.Arrays;
 
 public class Iter {
-    
+
     private MemorySegment nativeIter;
     private final World world;
     private int count;
+    private final MemorySegment[] cachedColumns;
 
     Iter(MemorySegment nativeIter, World world) {
         this.nativeIter = nativeIter;
         this.world = world;
         this.count = -1;
+        this.cachedColumns = new MemorySegment[32];
     }
 
     void setNativeIter(MemorySegment nativeIter) {
         this.nativeIter = nativeIter;
         this.count = -1;
+        Arrays.fill(cachedColumns, null);
     }
 
     public boolean next() {
         this.count = -1;
+        Arrays.fill(cachedColumns, null);
         return flecs_h.ecs_iter_next(this.nativeIter);
     }
 
@@ -37,6 +42,9 @@ public class Iter {
             throw new IndexOutOfBoundsException("Index " + index + " out of bounds for count " + this.count());
         }
         MemorySegment entities = ecs_iter_t.entities(this.nativeIter);
+        if (entities == null || entities.address() == 0) {
+            throw new IllegalStateException("Entities array is null");
+        }
         return entities.getAtIndex(ValueLayout.JAVA_LONG, index);
     }
 
@@ -107,97 +115,111 @@ public class Iter {
         return Byte.toUnsignedInt(ecs_iter_t.field_count(this.nativeIter));
     }
 
-    private <T> MemorySegment fieldPtr(Class<T> componentClass, int index, String fieldName, int i, long[] outOffset) {
+    private <T> long fieldPtr(Class<T> componentClass, int index, String fieldName, int i) {
         if (index < 0 || index > 127) {
             throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
         }
+        if (i < 0 || i >= this.count()) {
+            throw new IndexOutOfBoundsException("Entity index " + i + " out of bounds for count " + this.count());
+        }
+
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
-        outOffset[0] = i * component.size() + component.offsetOf(fieldName);
-        return columnPtr;
+
+        MemorySegment columnPtr = this.cachedColumns[index];
+        if (columnPtr == null) {
+            columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
+            if (columnPtr == null || columnPtr.address() == 0) {
+                throw new IllegalStateException("Field " + index + " is not available");
+            }
+            this.cachedColumns[index] = columnPtr;
+        }
+
+        return i * component.size() + component.offsetOf(fieldName);
     }
 
     public <T> int fieldInt(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_INT, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_INT, offset);
     }
 
     public <T> float fieldFloat(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_FLOAT, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_FLOAT, offset);
     }
 
     public <T> double fieldDouble(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_DOUBLE, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_DOUBLE, offset);
     }
 
     public <T> long fieldLong(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_LONG, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_LONG, offset);
     }
 
     public <T> short fieldShort(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_SHORT, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_SHORT, offset);
     }
 
     public <T> boolean fieldBoolean(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_BOOLEAN, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_BOOLEAN, offset);
     }
 
     public <T> byte fieldByte(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        return this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.JAVA_BYTE, offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        return this.cachedColumns[index].get(ValueLayout.JAVA_BYTE, offset);
     }
 
     public <T> String fieldString(Class<T> componentClass, int index, String fieldName, int i) {
-        long[] offset = new long[1];
-        MemorySegment stringPointer = this.fieldPtr(componentClass, index, fieldName, i, offset).get(ValueLayout.ADDRESS.withByteAlignment(1), offset[0]);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        MemorySegment stringPointer = this.cachedColumns[index].get(ValueLayout.ADDRESS.withByteAlignment(1), offset);
+
         if (stringPointer.address() == 0) {
             return null;
         }
-        return stringPointer.reinterpret(Long.MAX_VALUE).getString(0);
+
+        return stringPointer.reinterpret(Short.MAX_VALUE).getString(0);
     }
 
     public <T> void setFieldInt(Class<T> componentClass, int index, String fieldName, int i, int value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_INT, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_INT, offset, value);
     }
 
     public <T> void setFieldFloat(Class<T> componentClass, int index, String fieldName, int i, float value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_FLOAT, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_FLOAT, offset, value);
     }
 
     public <T> void setFieldDouble(Class<T> componentClass, int index, String fieldName, int i, double value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_DOUBLE, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_DOUBLE, offset, value);
     }
 
     public <T> void setFieldLong(Class<T> componentClass, int index, String fieldName, int i, long value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_LONG, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_LONG, offset, value);
     }
 
     public <T> void setFieldShort(Class<T> componentClass, int index, String fieldName, int i, short value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_SHORT, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_SHORT, offset, value);
     }
 
     public <T> void setFieldBoolean(Class<T> componentClass, int index, String fieldName, int i, boolean value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_BOOLEAN, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_BOOLEAN, offset, value);
     }
 
     public <T> void setFieldByte(Class<T> componentClass, int index, String fieldName, int i, byte value) {
-        long[] offset = new long[1];
-        this.fieldPtr(componentClass, index, fieldName, i, offset).set(ValueLayout.JAVA_BYTE, offset[0], value);
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        this.cachedColumns[index].set(ValueLayout.JAVA_BYTE, offset, value);
     }
 
     public <T> void setFieldString(Class<T> componentClass, int index, String fieldName, int i, String value) {
-        // TODO
+        throw new UnsupportedOperationException("setFieldString not yet implemented");
     }
 
     public long event() {
@@ -212,4 +234,3 @@ public class Iter {
         return new Table(this.world, tablePtr);
     }
 }
-
