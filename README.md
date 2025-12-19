@@ -54,13 +54,13 @@ cd flecs-java
 
 ```java
 import com.github.elebras1.flecs.*;
-import com.github.elebras1.flecs.annotation.FlecsComponent;
+import com.github.elebras1.flecs.annotation.Component;
 
 // Define components as records
-@FlecsComponent
+@Component
 record Position(float x, float y) {}
 
-@FlecsComponent
+@Component
 record Velocity(float dx, float dy) {}
 
 public class Example {
