@@ -83,7 +83,7 @@ public class ComponentRegistry {
         Component<T> component = ComponentMap.getInstance(componentClass);
 
         if (component == null) {
-            throw new IllegalStateException("Component not found for " + componentClass.getName() + ". Make sure the record is annotated with @FlecsComponent and annotation processing is enabled.");
+            throw new IllegalStateException("Component not found for " + componentClass.getName() + ". Make sure the record is annotated with @Component and annotation processing is enabled.");
         }
 
         return component;

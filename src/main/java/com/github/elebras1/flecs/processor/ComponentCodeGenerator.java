@@ -170,38 +170,6 @@ public class ComponentCodeGenerator {
         return method.build();
     }
 
-    private MethodSpec createWriteFixedStringHelper() {
-        return MethodSpec.methodBuilder("writeFixedString")
-                .addModifiers(Modifier.PRIVATE)
-                .addParameter(MemorySegment.class, "structPtr")
-                .addParameter(long.class, "offset")
-                .addParameter(String.class, "value")
-                .addParameter(int.class, "capacity")
-                .addCode(CodeBlock.builder()
-                        .addStatement("$T slice = structPtr.asSlice(offset, capacity)", MemorySegment.class)
-                        .beginControlFlow("if (value == null || value.isEmpty())")
-                        .addStatement("slice.set($T.JAVA_BYTE, 0, (byte) 0)", ValueLayout.class)
-                        .addStatement("return")
-                        .endControlFlow()
-                        .addStatement("byte[] bytes = value.getBytes($T.UTF_8)", StandardCharsets.class)
-                        .addStatement("int len = Math.min(bytes.length, capacity - 1)")
-                        .addStatement("$T.copy(bytes, 0, slice, $T.JAVA_BYTE, 0, len)", MemorySegment.class, ValueLayout.class)
-                        .addStatement("slice.set($T.JAVA_BYTE, len, (byte) 0)", ValueLayout.class)
-                        .build())
-                .build();
-    }
-
-    private MethodSpec createReadFixedStringHelper() {
-        return MethodSpec.methodBuilder("readFixedString")
-                .addModifiers(Modifier.PRIVATE)
-                .returns(String.class)
-                .addParameter(MemorySegment.class, "structPtr")
-                .addParameter(long.class, "offset")
-                .addParameter(int.class, "capacity")
-                .addStatement("return structPtr.asSlice(offset, capacity).getString(0)")
-                .build();
-    }
-
     private MethodSpec createFactoryMethod(String packageName, String recordName) {
         MethodSpec.Builder method = MethodSpec.methodBuilder("create")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)

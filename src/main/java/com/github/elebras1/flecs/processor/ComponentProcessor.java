@@ -48,7 +48,7 @@ public class ComponentProcessor extends AbstractProcessor {
             for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
 
                 if (element.getKind() != ElementKind.RECORD) {
-                    this.messager.printMessage(Diagnostic.Kind.ERROR, "@FlecsComponent can only be applied to records", element);
+                    this.messager.printMessage(Diagnostic.Kind.ERROR, "@Component can only be applied to records", element);
                     continue;
                 }
 
@@ -57,7 +57,7 @@ public class ComponentProcessor extends AbstractProcessor {
                     this.processRecord(recordElement);
                     this.processedComponents.add(recordElement);
                 } catch (Exception e) {
-                    this.messager.printMessage(Diagnostic.Kind.ERROR, "Failed to process @FlecsComponent: " + e.getMessage(), element);
+                    this.messager.printMessage(Diagnostic.Kind.ERROR, "Failed to process @Component: " + e.getMessage(), element);
                 }
             }
         }

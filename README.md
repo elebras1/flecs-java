@@ -137,7 +137,7 @@ Flecs-Java uses Java 25's Foreign Function & Memory API for direct C interop:
 
 ### Component System
 
-Components are defined as Java records with the `@FlecsComponent` annotation. An annotation processor generates the necessary memory layouts and accessor code at compile time.
+Components are defined as Java records with the `@Component` annotation. An annotation processor generates the necessary memory layouts and accessor code at compile time.
 
 ## Building
 
