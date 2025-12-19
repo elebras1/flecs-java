@@ -1,11 +1,13 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.util.FlecsConstants;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static com.github.elebras1.flecs.FlecsConstants.EcsIn;
-import static com.github.elebras1.flecs.FlecsConstants.EcsQueryCacheAuto;
+import static com.github.elebras1.flecs.util.FlecsConstants.EcsIn;
+import static com.github.elebras1.flecs.util.FlecsConstants.EcsQueryCacheAuto;
 
 public class QueryBuilder {
 

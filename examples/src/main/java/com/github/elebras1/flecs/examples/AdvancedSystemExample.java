@@ -2,6 +2,7 @@ package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.*;
 import com.github.elebras1.flecs.examples.components.*;
+import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.System;
 
@@ -45,7 +46,7 @@ public class AdvancedSystemExample {
             FlecsSystem everyOtherFrame = world.system("EveryOtherFrame")
                 .with(posId)
                 .rate(2)
-                .kind(FlecsConstants.EcsOnUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsOnUpdate)
                 .iter(it -> {
                     System.out.println("  [Rate Filter] Running every 2nd frame (matched: " + it.count() + " entities)");
                 });
@@ -60,7 +61,7 @@ public class AdvancedSystemExample {
             FlecsSystem mtMoveSystem = world.system("MultiThreadedMove")
                 .with(posId)
                 .with(velId)
-                .kind(FlecsConstants.EcsOnUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsOnUpdate)
                 .multiThreaded(true)
                 .iter(it -> {
                     Field<Position> positions = it.field(Position.class, 0);
@@ -80,7 +81,7 @@ public class AdvancedSystemExample {
 
             // Create an immediate system that can see operations immediately
             FlecsSystem immediateSystem = world.system("ImmediateSystem")
-                .kind(FlecsConstants.EcsPreUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsPreUpdate)
                 .immediate(true)
                 .run(it -> {
                     System.out.println("  [Immediate] Running in non-readonly mode");
@@ -112,7 +113,7 @@ public class AdvancedSystemExample {
 
             // Pause the timer
             System.out.println("Stopping one-second timer...");
-            timerOneSecond.add(FlecsConstants.EcsDisabled);
+            timerOneSecond.add(com.github.elebras1.flecs.util.FlecsConstants.EcsDisabled);
 
             System.out.println("Running 3 more frames with timer stopped:");
             for (int frame = 0; frame < 3; frame++) {
@@ -122,7 +123,7 @@ public class AdvancedSystemExample {
 
             // Resume the timer
             System.out.println("\nRestarting one-second timer...");
-            timerOneSecond.remove(FlecsConstants.EcsDisabled);
+            timerOneSecond.remove(com.github.elebras1.flecs.util.FlecsConstants.EcsDisabled);
 
             System.out.println("Running 3 more frames with timer restarted:");
             for (int frame = 0; frame < 3; frame++) {
@@ -134,11 +135,11 @@ public class AdvancedSystemExample {
 
             // Create systems in different phases
             FlecsSystem preUpdateSys = world.system("PreUpdatePhase")
-                .kind(FlecsConstants.EcsPreUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsPreUpdate)
                 .run(it -> System.out.println("  [PreUpdate] Running"));
 
             FlecsSystem onUpdateSys = world.system("OnUpdatePhase")
-                .kind(FlecsConstants.EcsOnUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsOnUpdate)
                 .run(it -> System.out.println("  [OnUpdate] Running"));
 
             FlecsSystem postUpdateSys = world.system("PostUpdatePhase")

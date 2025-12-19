@@ -48,7 +48,7 @@ public class Field<T> {
             long elementOffset = i * this.component.size();
             MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, this.component.size());
 
-            this.component.write(elementSegment, componentData, tempArena);
+            this.component.write(elementSegment, componentData);
         }
     }
 }

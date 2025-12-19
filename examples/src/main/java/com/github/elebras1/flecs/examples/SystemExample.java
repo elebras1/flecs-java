@@ -2,6 +2,7 @@ package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.*;
 import com.github.elebras1.flecs.examples.components.*;
+import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.System;
 
@@ -31,7 +32,7 @@ public class SystemExample {
             FlecsSystem moveSystem = world.system("MoveSystem")
                 .with(Position.class)
                 .with(Velocity.class)
-                .kind(FlecsConstants.EcsOnUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsOnUpdate)
                 .iter(it -> {
                     System.out.println("MoveSystem running (delta_time: " + it.deltaTime() + "s)");
                     
@@ -55,7 +56,7 @@ public class SystemExample {
             // Create a debug system using the each pattern
             FlecsSystem debugSystem = world.system("DebugSystem")
                 .with(posId)
-                .kind(FlecsConstants.EcsPostUpdate)
+                .kind(com.github.elebras1.flecs.util.FlecsConstants.EcsPostUpdate)
                 .each(entityId -> {
                     Entity entity = world.obtainEntity(entityId);
                     Position pos = entity.get(Position.class);

@@ -1,9 +1,9 @@
 package com.github.elebras1.flecs.util;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +39,8 @@ public final class LayoutField {
         return ValueLayout.JAVA_BOOLEAN;
     }
 
-    public static MemoryLayout stringLayout() {
-        return ValueLayout.ADDRESS;
+    public static MemoryLayout sequenceLayout(int capacity) {
+        return MemoryLayout.sequenceLayout(capacity, ValueLayout.JAVA_BYTE);
     }
 
     public static void set(MemorySegment segment, long offset, float value) {
@@ -71,13 +71,16 @@ public final class LayoutField {
         segment.set(ValueLayout.JAVA_BOOLEAN, offset, value);
     }
 
-    public static void set(MemorySegment segment, long offset, String value, Arena arena) {
-        if (value == null) {
-            segment.set(ValueLayout.ADDRESS, offset, MemorySegment.NULL);
-        } else {
-            MemorySegment stringSegment = arena.allocateFrom(value);
-            segment.set(ValueLayout.ADDRESS, offset, stringSegment);
+    public static void set(MemorySegment segment, long offset, String value, int capacity) {
+        MemorySegment slice = segment.asSlice(offset, capacity);
+        if (value == null || value.isEmpty()) {
+            slice.set(ValueLayout.JAVA_BYTE, 0, (byte) 0);
+            return;
         }
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        int len = Math.min(bytes.length, capacity - 1);
+        MemorySegment.copy(bytes, 0, slice, ValueLayout.JAVA_BYTE, 0, len);
+        slice.set(ValueLayout.JAVA_BYTE, len, (byte) 0);
     }
 
     public static float getFloat(MemorySegment segment, long offset) {
@@ -108,12 +111,8 @@ public final class LayoutField {
         return segment.get(ValueLayout.JAVA_BOOLEAN, offset);
     }
 
-    public static String getString(MemorySegment segment, long offset) {
-        MemorySegment stringPointer = segment.get(ValueLayout.ADDRESS.withByteAlignment(1), offset);
-        if (stringPointer.address() == 0) {
-            return null;
-        }
-        return stringPointer.reinterpret(Long.MAX_VALUE).getString(0);
+    public static String getFixedString(MemorySegment segment, long offset, int capacity) {
+        return segment.asSlice(offset, capacity).getString(0);
     }
 
     public static long offsetOf(MemoryLayout layout, String fieldName) {

@@ -1,4 +1,6 @@
-package com.github.elebras1.flecs;
+package com.github.elebras1.flecs.util;
+
+import com.github.elebras1.flecs.flecs_h;
 
 public final class FlecsConstants {
 

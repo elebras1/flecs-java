@@ -1,5 +1,7 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.util.FlecsConstants;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -115,7 +117,7 @@ public class Entity {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
 
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, data, this.world.arena());
+        component.write(dataSegment, data);
         flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
 
         return this;
@@ -130,7 +132,7 @@ public class Entity {
 
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, data, this.world.arena());
+        component.write(dataSegment, data);
 
         flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, pairId, component.size(), dataSegment);
 

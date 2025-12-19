@@ -1,18 +1,21 @@
 package com.github.elebras1.flecs.processor;
 
 
+import com.github.elebras1.flecs.annotation.FixedString;
 import com.palantir.javapoet.*;
 
 import javax.lang.model.element.*;
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ComponentCodeGenerator {
 
     private static final String LAYOUT_FIELD_CLASS = "com.github.elebras1.flecs.util.LayoutField";
     private static final String COMPONENT_INTERFACE = "com.github.elebras1.flecs.Component";
+    private static final int DEFAULT_STRING_SIZE = 32;
 
     public JavaFile generateComponentClass(TypeElement recordElement, List<VariableElement> fields) {
         String packageName = this.getPackageName(recordElement);
@@ -49,31 +52,41 @@ public class ComponentCodeGenerator {
         return current != null ? ((PackageElement) current).getQualifiedName().toString() : "";
     }
 
+    private int getStringSize(VariableElement field) {
+        FixedString annotation = field.getAnnotation(FixedString.class);
+        if (annotation != null) {
+            int size = annotation.size();
+            if ((size & (size - 1)) != 0) {
+                throw new IllegalArgumentException("Field '" + field.getSimpleName() + "': @FixedString size must be a power of 2. Got: " + size);
+            }
+            return size;
+        }
+        return DEFAULT_STRING_SIZE;
+    }
+
     private FieldSpec createLayoutField(String recordName, List<VariableElement> fields) {
         CodeBlock.Builder layoutBuilder = CodeBlock.builder().add("$L.createStructLayout($S", LAYOUT_FIELD_CLASS, recordName);
 
         if (!fields.isEmpty()) {
             layoutBuilder.add(",\n").indent();
-
             for (int i = 0; i < fields.size(); i++) {
                 VariableElement field = fields.get(i);
                 String fieldName = field.getSimpleName().toString();
-                String layoutMethod = getLayoutMethod(field.asType().toString());
+                String type = field.asType().toString();
 
-                layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
-
-                if (i < fields.size() - 1) {
-                    layoutBuilder.add(",\n");
+                String layoutMethod = getLayoutMethod(type);
+                if ("java.lang.String".equals(type)) {
+                    int size = this.getStringSize(field);
+                    layoutBuilder.add("$L.$L($L).withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, size, fieldName);
+                } else {
+                    layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
                 }
+                if (i < fields.size() - 1) layoutBuilder.add(",\n");
             }
             layoutBuilder.unindent();
         }
-
         layoutBuilder.add(")");
-
-        return FieldSpec.builder(MemoryLayout.class, "LAYOUT", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer(layoutBuilder.build())
-                .build();
+        return FieldSpec.builder(MemoryLayout.class, "LAYOUT", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL).initializer(layoutBuilder.build()).build();
     }
 
     private List<FieldSpec> createOffsetFields(List<VariableElement> fields) {
@@ -108,20 +121,20 @@ public class ComponentCodeGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(MemorySegment.class, "segment")
-                .addParameter(TypeVariableName.get(recordName), "data")
-                .addParameter(Arena.class, "arena");
+                .addParameter(TypeVariableName.get(recordName), "data");
 
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String offsetName = "OFFSET_" + fieldName.toUpperCase();
             String typeName = field.asType().toString();
+
             if ("java.lang.String".equals(typeName)) {
-                method.addStatement("$L.set(segment, $L, data.$L(), arena)", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+                int size = this.getStringSize(field);
+                method.addStatement("$L.set(segment, $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, size);
             } else {
                 method.addStatement("$L.set(segment, $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
             }
         }
-
         return method.build();
     }
 
@@ -136,23 +149,57 @@ public class ComponentCodeGenerator {
             String fieldName = field.getSimpleName().toString();
             String offsetName = "OFFSET_" + fieldName.toUpperCase();
             String typeName = field.asType().toString();
-            String getterMethod = getGetterMethod(typeName);
 
-            method.addStatement("$L $L = $L.$L(segment, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
+            String getterMethod = this.getGetterMethod(typeName);
+            if ("java.lang.String".equals(typeName)) {
+                int size = this.getStringSize(field);
+                method.addStatement("$T $L = $L.$L(segment, $L, $L)", String.class, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, size);
+            } else {
+                method.addStatement("$L $L = $L.$L(segment, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
+            }
         }
 
         CodeBlock.Builder returnStatement = CodeBlock.builder().add("return new $L(", recordName);
-
         for (int i = 0; i < fields.size(); i++) {
             returnStatement.add(fields.get(i).getSimpleName().toString());
-            if (i < fields.size() - 1) {
-                returnStatement.add(", ");
-            }
+            if (i < fields.size() - 1) returnStatement.add(", ");
         }
         returnStatement.add(")");
 
         method.addStatement(returnStatement.build());
         return method.build();
+    }
+
+    private MethodSpec createWriteFixedStringHelper() {
+        return MethodSpec.methodBuilder("writeFixedString")
+                .addModifiers(Modifier.PRIVATE)
+                .addParameter(MemorySegment.class, "structPtr")
+                .addParameter(long.class, "offset")
+                .addParameter(String.class, "value")
+                .addParameter(int.class, "capacity")
+                .addCode(CodeBlock.builder()
+                        .addStatement("$T slice = structPtr.asSlice(offset, capacity)", MemorySegment.class)
+                        .beginControlFlow("if (value == null || value.isEmpty())")
+                        .addStatement("slice.set($T.JAVA_BYTE, 0, (byte) 0)", ValueLayout.class)
+                        .addStatement("return")
+                        .endControlFlow()
+                        .addStatement("byte[] bytes = value.getBytes($T.UTF_8)", StandardCharsets.class)
+                        .addStatement("int len = Math.min(bytes.length, capacity - 1)")
+                        .addStatement("$T.copy(bytes, 0, slice, $T.JAVA_BYTE, 0, len)", MemorySegment.class, ValueLayout.class)
+                        .addStatement("slice.set($T.JAVA_BYTE, len, (byte) 0)", ValueLayout.class)
+                        .build())
+                .build();
+    }
+
+    private MethodSpec createReadFixedStringHelper() {
+        return MethodSpec.methodBuilder("readFixedString")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(String.class)
+                .addParameter(MemorySegment.class, "structPtr")
+                .addParameter(long.class, "offset")
+                .addParameter(int.class, "capacity")
+                .addStatement("return structPtr.asSlice(offset, capacity).getString(0)")
+                .build();
     }
 
     private MethodSpec createFactoryMethod(String packageName, String recordName) {
@@ -205,7 +252,7 @@ public class ComponentCodeGenerator {
             case "float" -> "floatLayout";
             case "double" -> "doubleLayout";
             case "boolean" -> "booleanLayout";
-            case "java.lang.String" -> "stringLayout";
+            case "java.lang.String" -> "sequenceLayout";
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
     }
@@ -219,7 +266,7 @@ public class ComponentCodeGenerator {
             case "float" -> "getFloat";
             case "double" -> "getDouble";
             case "boolean" -> "getBoolean";
-            case "java.lang.String" -> "getString";
+            case "java.lang.String" -> "getFixedString";
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
     }

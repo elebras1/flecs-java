@@ -4,7 +4,7 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static com.github.elebras1.flecs.FlecsConstants.*;
+import static com.github.elebras1.flecs.util.FlecsConstants.*;
 
 public class SystemBuilder {
 
