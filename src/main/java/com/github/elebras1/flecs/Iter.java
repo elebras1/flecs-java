@@ -1,5 +1,6 @@
 package com.github.elebras1.flecs;
 
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.Arrays;
@@ -174,13 +175,9 @@ public class Iter {
 
     public <T> String fieldString(Class<T> componentClass, int index, String fieldName, int i) {
         long offset = fieldPtr(componentClass, index, fieldName, i);
-        MemorySegment stringPointer = this.cachedColumns[index].get(ValueLayout.ADDRESS.withByteAlignment(1), offset);
-
-        if (stringPointer.address() == 0) {
-            return null;
-        }
-
-        return stringPointer.reinterpret(Short.MAX_VALUE).getString(0);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long capacity = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, capacity).getString(0);
     }
 
     public <T> void setFieldInt(Class<T> componentClass, int index, String fieldName, int i, int value) {
@@ -219,7 +216,18 @@ public class Iter {
     }
 
     public <T> void setFieldString(Class<T> componentClass, int index, String fieldName, int i, String value) {
-        throw new UnsupportedOperationException("setFieldString not yet implemented");
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long capacity = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        MemorySegment slice = this.cachedColumns[index].asSlice(offset, capacity);
+        if (value == null || value.isEmpty()) {
+            slice.set(ValueLayout.JAVA_BYTE, 0, (byte) 0);
+            return;
+        }
+        byte[] bytes = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        int len = Math.min(bytes.length, (int) capacity - 1);
+        MemorySegment.copy(bytes, 0, slice, ValueLayout.JAVA_BYTE, 0, len);
+        slice.set(ValueLayout.JAVA_BYTE, len, (byte) 0);
     }
 
     public long event() {
