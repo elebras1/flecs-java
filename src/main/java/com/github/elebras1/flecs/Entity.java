@@ -101,6 +101,14 @@ public class Entity {
         return this.childOf(parent.id());
     }
 
+    public Entity parent() {
+        long parentId = this.target(FlecsConstants.EcsChildOf, 0);
+        if (parentId != 0) {
+            return new Entity(this.world, parentId);
+        }
+        return null;
+    }
+
     public Entity isA(long entityId) {
         return this.addRelation(FlecsConstants.EcsIsA, entityId);
     }
@@ -108,6 +116,24 @@ public class Entity {
     public Entity removeRelation(long relation, long target) {
         long pair = flecs_h.ecs_make_pair(relation, target);
         return this.remove(pair);
+    }
+
+    public boolean hasRelation(long relation, long target) {
+        long pair = flecs_h.ecs_make_pair(relation, target);
+        return this.has(pair);
+    }
+
+    public <T> T get(long relation, long target) {
+        long pair = flecs_h.ecs_make_pair(relation, target);
+        return this.get(pair);
+    }
+
+    public Entity removeRelation(long relation) {
+        return this.removeRelation(relation, FlecsConstants.EcsWildcard);
+    }
+
+    public boolean hasRelation(long relation) {
+        return this.hasRelation(relation, FlecsConstants.EcsWildcard);
     }
 
     @SuppressWarnings("unchecked")
