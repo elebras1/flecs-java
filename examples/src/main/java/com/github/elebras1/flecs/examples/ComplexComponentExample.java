@@ -2,7 +2,7 @@ package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
 import com.github.elebras1.flecs.World;
-import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.collection.LongList;
 import com.github.elebras1.flecs.examples.components.Ideology;
 import com.github.elebras1.flecs.examples.components.Minister;
 
@@ -21,7 +21,7 @@ public class ComplexComponentExample {
         world.component(Ideology.class);
 
         long start = System.currentTimeMillis();
-        EcsLongList entityIds = new EcsLongList();
+        LongList entityIds = new LongList();
 
         for (int i = 0; i < N; i++) {
             long id = world.entity();

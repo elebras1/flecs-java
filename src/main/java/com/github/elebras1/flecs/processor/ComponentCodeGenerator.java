@@ -7,8 +7,6 @@ import com.palantir.javapoet.*;
 import javax.lang.model.element.*;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ComponentCodeGenerator {

@@ -7,16 +7,16 @@ import java.util.*;
  * A dynamic array for primitive long values.
  * Not thread-safe.
  */
-public final class EcsLongList implements Iterable<Long>, RandomAccess, Cloneable {
+public final class LongList implements Iterable<Long>, RandomAccess, Cloneable {
     private static final int DEFAULT_CAPACITY = 16;
     public long[] data;
     private int size;
 
-    public EcsLongList() {
+    public LongList() {
         this.data = new long[DEFAULT_CAPACITY];
     }
 
-    public EcsLongList(int initialCapacity) {
+    public LongList(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Capacity < 0");
         }
@@ -24,7 +24,7 @@ public final class EcsLongList implements Iterable<Long>, RandomAccess, Cloneabl
         this.size = 0;
     }
 
-    public EcsLongList(long[] src) {
+    public LongList(long[] src) {
         Objects.requireNonNull(src);
         this.data = Arrays.copyOf(src, src.length);
         this.size = src.length;
@@ -148,7 +148,7 @@ public final class EcsLongList implements Iterable<Long>, RandomAccess, Cloneabl
                 if (lastRet < 0) {
                     throw new IllegalStateException();
                 }
-                EcsLongList.this.removeAt(lastRet);
+                LongList.this.removeAt(lastRet);
                 cursor = lastRet;
                 lastRet = -1;
             }
@@ -221,9 +221,9 @@ public final class EcsLongList implements Iterable<Long>, RandomAccess, Cloneabl
     }
 
     @Override
-    public EcsLongList clone() {
+    public LongList clone() {
         try {
-            EcsLongList c = (EcsLongList) super.clone();
+            LongList c = (LongList) super.clone();
             c.data = Arrays.copyOf(this.data, this.data.length);
             return c;
         } catch (CloneNotSupportedException e) {

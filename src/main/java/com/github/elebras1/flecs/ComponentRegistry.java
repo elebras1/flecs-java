@@ -1,26 +1,31 @@
 package com.github.elebras1.flecs;
 
 
+import com.github.elebras1.flecs.collection.ClassLongMap;
+import com.github.elebras1.flecs.collection.LongClassMap;
+import com.github.elebras1.flecs.collection.LongObjectMap;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ComponentRegistry {
 
     private final World world;
-    private final Map<Class<?>, Long> componentIds;
-    private final Map<Long, Class<?>> componentClasses;
+    private final ClassLongMap componentIds;
+    private final LongClassMap componentClasses;
+    private final LongObjectMap<Component<?>> components;
 
     protected ComponentRegistry(World world) {
         this.world = world;
-        this.componentIds = new ConcurrentHashMap<>();
-        this.componentClasses = new ConcurrentHashMap<>();
+        this.componentIds = new ClassLongMap();
+        this.componentClasses = new LongClassMap();
+        this.components = new LongObjectMap<>();
     }
 
     protected <T> long register(Class<T> componentClass) {
-        if (this.componentIds.containsKey(componentClass)) {
-            return this.componentIds.get(componentClass);
+        long existingId = this.componentIds.get(componentClass);
+        if(existingId != -1) {
+            return existingId;
         }
 
         Component<T> component = this.getComponentInstance(componentClass);
@@ -56,36 +61,38 @@ public class ComponentRegistry {
     }
 
     protected <T> long getComponentId(Class<T> componentClass) {
-        Long componentId = this.componentIds.get(componentClass);
-        if (componentId == null) {
-            throw new IllegalStateException("Component " + componentClass.getName() + " is not registered.");
-        }
-        return componentId;
+        return this.componentIds.get(componentClass);
     }
 
     protected <T> Component<T> getComponent(Class<T> componentClass) {
-        if (!this.componentIds.containsKey(componentClass)) {
-            throw new IllegalStateException("Component " + componentClass.getName() + " is not registered.");
-        }
         return ComponentMap.getInstance(componentClass);
     }
 
     @SuppressWarnings("unchecked")
     protected <T> Component<T> getComponentById(long componentId) {
-        Class<?> componentClass = this.componentClasses.get(componentId);
-        if (componentClass == null) {
-            throw new IllegalStateException("Component with ID " + componentId + " is not registered.");
-        }
-        return ComponentMap.getInstance((Class<T>) componentClass);
-    }
-
-    private <T> Component<T> getComponentInstance(Class<T> componentClass) {
-        Component<T> component = ComponentMap.getInstance(componentClass);
-
-        if (component == null) {
-            throw new IllegalStateException("Component not found for " + componentClass.getName() + ". Make sure the record is annotated with @Component and annotation processing is enabled.");
+        Component<T> component = (Component<T>) this.components.get(componentId);
+        if(component == null) {
+            return this.getAndCacheComponentInstance(componentId);
         }
 
         return component;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Component<T> getAndCacheComponentInstance(long componentId) {
+        Class<?> rawClass = this.componentClasses.get(componentId);
+        if (rawClass == null) {
+            throw new IllegalArgumentException("Unknown component ID: " + componentId);
+        }
+
+        Class<T> componentClass = (Class<T>) rawClass;
+        Component<T> component = this.getComponentInstance(componentClass);
+
+        this.components.put(componentId, component);
+        return component;
+    }
+
+    private <T> Component<T> getComponentInstance(Class<T> componentClass) {
+        return ComponentMap.getInstance(componentClass);
     }
 }

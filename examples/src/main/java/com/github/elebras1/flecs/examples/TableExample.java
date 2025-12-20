@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.*;
-import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.collection.LongList;
 import com.github.elebras1.flecs.examples.components.*;
 
 public class TableExample {
@@ -29,7 +29,7 @@ public class TableExample {
                     System.out.println("Column count: " + table.columnCount());
 
                     System.out.println("\nComponent IDs in table:");
-                    EcsLongList typeIds = table.type();
+                    LongList typeIds = table.type();
                     for (int i = 0; i < typeIds.size(); i++) {
                         long id = typeIds.get(i);
                         Entity component = world.obtainEntity(id);
@@ -48,7 +48,7 @@ public class TableExample {
                         Position pos = table.get(Position.class, row);
                         Velocity vel = table.get(Velocity.class, row);
 
-                        EcsLongList entities = table.entities();
+                        LongList entities = table.entities();
                         Entity e = world.obtainEntity(entities.get(row));
                         System.out.printf("  %s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n",
                                 e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());

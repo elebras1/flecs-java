@@ -6,7 +6,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.Element;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class ComponentMapGenerator {
     public JavaFile generateComponentMap(List<TypeElement> components) {
         TypeSpec.Builder mapClass = TypeSpec.classBuilder(MAP_CLASS_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addField(this.createMapField())
+                .addField(this.createMapField(components.size()))
                 .addStaticBlock(this.createStaticInitializer(components))
                 .addMethod(this.createConstructor())
                 .addMethod(this.createGetInstanceMethod());
@@ -30,7 +30,7 @@ public class ComponentMapGenerator {
                 .build();
     }
 
-    private FieldSpec createMapField() {
+    private FieldSpec createMapField(int componentsSize) {
         ParameterizedTypeName mapType = ParameterizedTypeName.get(
                 ClassName.get(Map.class),
                 ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)),
@@ -38,7 +38,7 @@ public class ComponentMapGenerator {
         );
 
         return FieldSpec.builder(mapType, "COMPONENT_MAP", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new $T<>()", HashMap.class)
+                .initializer("new $T<>($L)", IdentityHashMap.class, componentsSize)
                 .build();
     }
 

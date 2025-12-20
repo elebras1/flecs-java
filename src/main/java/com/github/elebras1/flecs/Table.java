@@ -1,6 +1,6 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.collection.LongList;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -30,20 +30,20 @@ public class Table {
         return strPtr.reinterpret(Long.MAX_VALUE).getString(0);
     }
 
-    public EcsLongList type() {
+    public LongList type() {
         if (!this.isValid()) {
-            return new EcsLongList();
+            return new LongList();
         }
         MemorySegment typePtr = flecs_h.ecs_table_get_type(this.nativeTable);
         if (typePtr == null || typePtr.address() == 0) {
-            return new EcsLongList();
+            return new LongList();
         }
         MemorySegment arrayPtr = ecs_type_t.array(typePtr);
         int count = ecs_type_t.count(typePtr);
         if (arrayPtr == null || arrayPtr.address() == 0 || count == 0) {
-            return new EcsLongList();
+            return new LongList();
         }
-        EcsLongList ids = new EcsLongList(count);
+        LongList ids = new LongList(count);
         MemorySegment idsArray = arrayPtr.reinterpret((long) count * Long.BYTES);
         ids.addAll(idsArray.toArray(ValueLayout.JAVA_LONG));
         return ids;
@@ -159,22 +159,22 @@ public class Table {
         return component.read(elementSegment);
     }
 
-    public EcsLongList entities() {
+    public LongList entities() {
         if (!this.isValid()) {
-            return new EcsLongList();
+            return new LongList();
         }
 
         int count = this.count();
         if (count == 0) {
-            return new EcsLongList();
+            return new LongList();
         }
 
         MemorySegment entitiesPtr = flecs_h.ecs_table_entities(this.nativeTable);
         if (entitiesPtr == null || entitiesPtr.address() == 0) {
-            return new EcsLongList();
+            return new LongList();
         }
 
-        EcsLongList entities = new EcsLongList(count);
+        LongList entities = new LongList(count);
         MemorySegment entitiesArray = entitiesPtr.reinterpret((long) count * Long.BYTES);
         entities.addAll(entitiesArray.toArray(ValueLayout.JAVA_LONG));
 

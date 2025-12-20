@@ -1,6 +1,6 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.collection.LongList;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -94,9 +94,9 @@ public class Query implements AutoCloseable {
         return total;
     }
 
-    public EcsLongList entities() {
+    public LongList entities() {
         this.checkClosed();
-        EcsLongList result = new EcsLongList();
+        LongList result = new LongList();
         this.each(result::add);
         return result;
     }

@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.*;
-import com.github.elebras1.flecs.collection.EcsLongList;
+import com.github.elebras1.flecs.collection.LongList;
 import com.github.elebras1.flecs.examples.components.*;
 
 public class QueryFeaturesExample {
@@ -154,7 +154,7 @@ public class QueryFeaturesExample {
             // --- Feature 10: entities() list ---
             System.out.println("\n--- 10. Get all entities as list ---");
             try (Query q10 = world.query().with(enemyTag).build()) {
-                EcsLongList entities = q10.entities();
+                LongList entities = q10.entities();
                 System.out.println("Enemies: " + entities.size());
                 for (int i = 0; i < entities.size(); i++) {
                     Entity e = world.obtainEntity(entities.get(i));
