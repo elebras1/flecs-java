@@ -39,7 +39,35 @@ public final class LayoutField {
         return ValueLayout.JAVA_BOOLEAN;
     }
 
-    public static MemoryLayout sequenceLayout(int capacity) {
+    public static MemoryLayout intArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_INT);
+    }
+
+    public static MemoryLayout longArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_LONG);
+    }
+
+    public static MemoryLayout floatArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_FLOAT);
+    }
+
+    public static MemoryLayout doubleArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_DOUBLE);
+    }
+
+    public static MemoryLayout byteArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_BYTE);
+    }
+
+    public static MemoryLayout shortArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_SHORT);
+    }
+
+    public static MemoryLayout booleanArrayLayout(int length) {
+        return MemoryLayout.sequenceLayout(length, ValueLayout.JAVA_BOOLEAN);
+    }
+
+    public static MemoryLayout stringLayout(int capacity) {
         return MemoryLayout.sequenceLayout(capacity, ValueLayout.JAVA_BYTE);
     }
 
@@ -67,8 +95,35 @@ public final class LayoutField {
         segment.set(ValueLayout.JAVA_LONG, offset, value);
     }
 
-    public static void set(MemorySegment segment, long offset, boolean value) {
-        segment.set(ValueLayout.JAVA_BOOLEAN, offset, value);
+    public static void set(MemorySegment segment, long offset, int[] value, int capacity) {
+        MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_INT, offset, capacity);
+    }
+
+    public static void set(MemorySegment segment, long offset, long[] value, int capacity) {
+        MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_LONG, offset, capacity);
+    }
+
+    public static void set(MemorySegment segment, long offset, float[] value, int capacity) {
+        MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_FLOAT, offset, capacity);
+    }
+
+    public static void set(MemorySegment segment, long offset, double[] value, int capacity) {
+        MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_DOUBLE, offset, capacity);
+    }
+
+    public static void set(MemorySegment segment, long offset, byte[] value, int capacity) {
+        MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_BYTE, offset, capacity);
+    }
+
+    public static void set(MemorySegment segment, long offset, short[] value, int capacity) {
+        MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_SHORT, offset, capacity);
+    }
+
+    public static void set(MemorySegment segment, long offset, boolean[] value, int capacity) {
+        int len = Math.min(value.length, capacity);
+        for (int i = 0; i < len; i++) {
+            segment.set(ValueLayout.JAVA_BYTE, offset + i, (byte) (value[i] ? 1 : 0));
+        }
     }
 
     public static void set(MemorySegment segment, long offset, String value, int capacity) {
@@ -109,6 +164,39 @@ public final class LayoutField {
 
     public static boolean getBoolean(MemorySegment segment, long offset) {
         return segment.get(ValueLayout.JAVA_BOOLEAN, offset);
+    }
+
+    public static int[] getIntArray(MemorySegment segment, long offset, int length) {
+        return segment.asSlice(offset, length * ValueLayout.JAVA_INT.byteSize()).toArray(ValueLayout.JAVA_INT);
+    }
+
+    public static long[] getLongArray(MemorySegment segment, long offset, int length) {
+        return segment.asSlice(offset, length * ValueLayout.JAVA_LONG.byteSize()).toArray(ValueLayout.JAVA_LONG);
+    }
+
+    public static float[] getFloatArray(MemorySegment segment, long offset, int length) {
+        return segment.asSlice(offset, length * ValueLayout.JAVA_FLOAT.byteSize()).toArray(ValueLayout.JAVA_FLOAT);
+    }
+
+    public static double[] getDoubleArray(MemorySegment segment, long offset, int length) {
+        return segment.asSlice(offset, length * ValueLayout.JAVA_DOUBLE.byteSize()).toArray(ValueLayout.JAVA_DOUBLE);
+    }
+
+    public static byte[] getByteArray(MemorySegment segment, long offset, int length) {
+        return segment.asSlice(offset, length * ValueLayout.JAVA_BYTE.byteSize()).toArray(ValueLayout.JAVA_BYTE);
+    }
+
+    public static short[] getShortArray(MemorySegment segment, long offset, int length) {
+        return segment.asSlice(offset, length * ValueLayout.JAVA_SHORT.byteSize()).toArray(ValueLayout.JAVA_SHORT);
+    }
+
+    public static boolean[] getBooleanArray(MemorySegment segment, long offset, int length) {
+        boolean[] result = new boolean[length];
+        for (int i = 0; i < length; i++) {
+            byte value = segment.get(ValueLayout.JAVA_BYTE, offset + i);
+            result[i] = value != 0;
+        }
+        return result;
     }
 
     public static String getFixedString(MemorySegment segment, long offset, int capacity) {

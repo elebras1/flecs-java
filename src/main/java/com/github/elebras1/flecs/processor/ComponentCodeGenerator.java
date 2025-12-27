@@ -1,6 +1,7 @@
 package com.github.elebras1.flecs.processor;
 
 
+import com.github.elebras1.flecs.annotation.FixedArray;
 import com.github.elebras1.flecs.annotation.FixedString;
 import com.palantir.javapoet.*;
 
@@ -62,6 +63,18 @@ public class ComponentCodeGenerator {
         return DEFAULT_STRING_SIZE;
     }
 
+    private int getArrayLength(VariableElement field) {
+        FixedArray annotation = field.getAnnotation(FixedArray.class);
+        if (annotation != null) {
+            int length = annotation.length();
+            if (length <= 0) {
+                throw new IllegalArgumentException("Field '" + field.getSimpleName() + "': @FixedArray length must be greater than 0. Got: " + length);
+            }
+            return length;
+        }
+        throw new IllegalArgumentException("Field '" + field.getSimpleName() + "': Missing @FixedArray annotation for array type.");
+    }
+
     private FieldSpec createLayoutField(String recordName, List<VariableElement> fields) {
         CodeBlock.Builder layoutBuilder = CodeBlock.builder().add("$L.createStructLayout($S", LAYOUT_FIELD_CLASS, recordName);
 
@@ -76,10 +89,15 @@ public class ComponentCodeGenerator {
                 if ("java.lang.String".equals(type)) {
                     int size = this.getStringSize(field);
                     layoutBuilder.add("$L.$L($L).withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, size, fieldName);
+                } else if (type.endsWith("[]")) {
+                    int length = this.getArrayLength(field);
+                    layoutBuilder.add("$L.$L($L).withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, length, fieldName);
                 } else {
                     layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
                 }
-                if (i < fields.size() - 1) layoutBuilder.add(",\n");
+                if (i < fields.size() - 1) {
+                    layoutBuilder.add(",\n");
+                }
             }
             layoutBuilder.unindent();
         }
@@ -129,6 +147,9 @@ public class ComponentCodeGenerator {
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
                 method.addStatement("$L.set(segment, $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, size);
+            } else if (typeName.endsWith("[]")) {
+                int length = this.getArrayLength(field);
+                method.addStatement("$L.set(segment, $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, length);
             } else {
                 method.addStatement("$L.set(segment, $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
             }
@@ -152,6 +173,9 @@ public class ComponentCodeGenerator {
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
                 method.addStatement("$T $L = $L.$L(segment, $L, $L)", String.class, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, size);
+            } else if (typeName.endsWith("[]")) {
+                int length = this.getArrayLength(field);
+                method.addStatement("$L $L = $L.$L(segment, $L, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, length);
             } else {
                 method.addStatement("$L $L = $L.$L(segment, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
             }
@@ -218,7 +242,14 @@ public class ComponentCodeGenerator {
             case "float" -> "floatLayout";
             case "double" -> "doubleLayout";
             case "boolean" -> "booleanLayout";
-            case "java.lang.String" -> "sequenceLayout";
+            case "byte[]" -> "byteArrayLayout";
+            case "short[]" -> "shortArrayLayout";
+            case "int[]" -> "intArrayLayout";
+            case "long[]" -> "longArrayLayout";
+            case "float[]" -> "floatArrayLayout";
+            case "double[]" -> "doubleArrayLayout";
+            case "boolean[]" -> "booleanArrayLayout";
+            case "java.lang.String" -> "stringLayout";
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
     }
@@ -232,6 +263,13 @@ public class ComponentCodeGenerator {
             case "float" -> "getFloat";
             case "double" -> "getDouble";
             case "boolean" -> "getBoolean";
+            case "byte[]" -> "getByteArray";
+            case "short[]" -> "getShortArray";
+            case "int[]" -> "getIntArray";
+            case "long[]" -> "getLongArray";
+            case "float[]" -> "getFloatArray";
+            case "double[]" -> "getDoubleArray";
+            case "boolean[]" -> "getBooleanArray";
             case "java.lang.String" -> "getFixedString";
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };

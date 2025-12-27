@@ -3,6 +3,7 @@ package com.github.elebras1.flecs.examples;
 import com.github.elebras1.flecs.Entity;
 import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.collection.LongList;
+import com.github.elebras1.flecs.examples.components.Border;
 import com.github.elebras1.flecs.examples.components.Ideology;
 import com.github.elebras1.flecs.examples.components.Minister;
 
@@ -19,6 +20,7 @@ public class ComplexComponentExample {
         World world = new World();
         world.component(Minister.class);
         world.component(Ideology.class);
+        world.component(Border.class);
 
         long start = System.currentTimeMillis();
         LongList entityIds = new LongList();
@@ -33,6 +35,10 @@ public class ComplexComponentExample {
 
             e.set(new Minister("Minister_" + i, "TAG_" + i, 1.0f, startDate, endDate));
             e.set(new Ideology(i % 256, (byte) (i % 100), (short) (i % 5000)));
+
+            if (i % 10 == 0) {
+                e.set(new Border(new int[2000], new int[2000]));
+            }
         }
 
         long creationEnd = System.currentTimeMillis();
