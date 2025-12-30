@@ -65,6 +65,7 @@ public class Query implements AutoCloseable {
         Iter it = new Iter(iter, this.world);
 
         while (flecs_h.ecs_iter_next(iter)) {
+            it.setNativeIter(iter);
             callback.accept(it);
         }
     }
