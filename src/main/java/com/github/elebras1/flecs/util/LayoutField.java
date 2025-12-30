@@ -95,6 +95,10 @@ public final class LayoutField {
         segment.set(ValueLayout.JAVA_LONG, offset, value);
     }
 
+    public static void set(MemorySegment segment, long offset, boolean value) {
+        segment.set(ValueLayout.JAVA_BOOLEAN, offset, value);
+    }
+
     public static void set(MemorySegment segment, long offset, int[] value, int capacity) {
         MemorySegment.copy(value, 0, segment, ValueLayout.JAVA_INT, offset, capacity);
     }

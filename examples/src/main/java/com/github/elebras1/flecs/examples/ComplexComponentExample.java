@@ -37,7 +37,7 @@ public class ComplexComponentExample {
             e.set(new Ideology(i % 256, (byte) (i % 100), (short) (i % 5000)));
 
             if (i % 10 == 0) {
-                e.set(new Border(new int[2000], new int[2000]));
+                e.set(new Border(new int[2000], new int[2000], true));
             }
         }
 
