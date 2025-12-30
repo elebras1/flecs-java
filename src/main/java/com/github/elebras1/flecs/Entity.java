@@ -254,6 +254,10 @@ public class Entity {
         this.emit(eventId, componentId);
     }
 
+    public long target(long relationId) {
+        return this.target(relationId, 0);
+    }
+
     public long target(long relationId, int index) {
         return flecs_h.ecs_get_target(this.world.nativeHandle(), this.id, relationId, index);
     }
