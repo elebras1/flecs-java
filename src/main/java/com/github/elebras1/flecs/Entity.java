@@ -150,11 +150,11 @@ public class Entity {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Entity set(long relation, T data) {
+    public <T> Entity set(T data, long target) {
         Class<T> componentClass = (Class<T>) data.getClass();
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 
-        long pairId = flecs_h.ecs_make_pair(relation, componentId);
+        long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
