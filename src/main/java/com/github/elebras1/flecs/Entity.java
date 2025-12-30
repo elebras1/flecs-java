@@ -123,11 +123,6 @@ public class Entity {
         return this.has(pair);
     }
 
-    public <T> T get(long relation, long target) {
-        long pair = flecs_h.ecs_make_pair(relation, target);
-        return this.get(pair);
-    }
-
     public Entity removeRelation(long relation) {
         return this.removeRelation(relation, FlecsConstants.EcsWildcard);
     }
@@ -181,6 +176,22 @@ public class Entity {
     public <T> T get(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.get(componentId);
+    }
+
+    public <T> T get(Class<T> componentClass, long target) {
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+
+        long pairId = flecs_h.ecs_make_pair(componentId, target);
+
+        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
+
+        if (dataPtr == null || dataPtr.address() == 0) {
+            return null;
+        }
+
+        MemorySegment dataSegment = dataPtr.reinterpret(component.size());
+        return component.read(dataSegment);
     }
 
     public void enable() {
