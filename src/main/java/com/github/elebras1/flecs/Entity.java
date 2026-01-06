@@ -52,6 +52,11 @@ public class Entity {
         return flecs_h.ecs_has_id(this.world.nativeHandle(), this.id, componentId);
     }
 
+    public boolean has(Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.has(componentId);
+    }
+
     public boolean has(Entity component) {
         return this.has(component.id());
     }
