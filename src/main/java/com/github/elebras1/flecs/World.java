@@ -178,7 +178,7 @@ public class World implements AutoCloseable {
     }
 
     public Entity obtainEntity(long entityId) {
-        if(entityId < 0) {
+        if(entityId <= 0) {
             throw new IllegalArgumentException("Invalid entity ID: " + entityId);
         }
         return new Entity(this, entityId);
