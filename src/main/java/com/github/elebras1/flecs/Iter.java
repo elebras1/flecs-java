@@ -180,6 +180,61 @@ public class Iter {
         return this.cachedColumns[index].asSlice(offset, capacity).getString(0);
     }
 
+    public <T> int[] fieldIntArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_INT);
+    }
+
+    public <T> long[] fieldLongArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_LONG);
+    }
+
+    public <T> float[] fieldFloatArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_FLOAT);
+    }
+
+    public <T> double[] fieldDoubleArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_DOUBLE);
+    }
+
+    public <T> byte[] fieldByteArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_BYTE);
+    }
+
+    public <T> short[] fieldShortArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        return this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_SHORT);
+    }
+
+    public <T> boolean[] fieldBooleanArray(Class<T> componentClass, int index, String fieldName, int i) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+
+        byte[] bytes = this.cachedColumns[index].asSlice(offset, arrayByteSize).toArray(ValueLayout.JAVA_BYTE);
+        boolean[] result = new boolean[bytes.length];
+        for (int j = 0; j < bytes.length; j++) {
+            result[j] = bytes[j] != 0;
+        }
+        return result;
+    }
+
     public <T> void setFieldInt(Class<T> componentClass, int index, String fieldName, int i, int value) {
         long offset = fieldPtr(componentClass, index, fieldName, i);
         this.cachedColumns[index].set(ValueLayout.JAVA_INT, offset, value);
@@ -228,6 +283,71 @@ public class Iter {
         int len = Math.min(bytes.length, (int) capacity - 1);
         MemorySegment.copy(bytes, 0, slice, ValueLayout.JAVA_BYTE, 0, len);
         slice.set(ValueLayout.JAVA_BYTE, len, (byte) 0);
+    }
+
+    public <T> void setFieldIntArray(Class<T> componentClass, int index, String fieldName, int i, int[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) (arrayByteSize / ValueLayout.JAVA_INT.byteSize());
+        int len = Math.min(value.length, capacity);
+        MemorySegment.copy(value, 0, this.cachedColumns[index], ValueLayout.JAVA_INT, offset, len);
+    }
+
+    public <T> void setFieldLongArray(Class<T> componentClass, int index, String fieldName, int i, long[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) (arrayByteSize / ValueLayout.JAVA_LONG.byteSize());
+        int len = Math.min(value.length, capacity);
+        MemorySegment.copy(value, 0, this.cachedColumns[index], ValueLayout.JAVA_LONG, offset, len);
+    }
+
+    public <T> void setFieldFloatArray(Class<T> componentClass, int index, String fieldName, int i, float[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) (arrayByteSize / ValueLayout.JAVA_FLOAT.byteSize());
+        int len = Math.min(value.length, capacity);
+        MemorySegment.copy(value, 0, this.cachedColumns[index], ValueLayout.JAVA_FLOAT, offset, len);
+    }
+
+    public <T> void setFieldDoubleArray(Class<T> componentClass, int index, String fieldName, int i, double[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) (arrayByteSize / ValueLayout.JAVA_DOUBLE.byteSize());
+        int len = Math.min(value.length, capacity);
+        MemorySegment.copy(value, 0, this.cachedColumns[index], ValueLayout.JAVA_DOUBLE, offset, len);
+    }
+
+    public <T> void setFieldByteArray(Class<T> componentClass, int index, String fieldName, int i, byte[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) (arrayByteSize / ValueLayout.JAVA_BYTE.byteSize());
+        int len = Math.min(value.length, capacity);
+        MemorySegment.copy(value, 0, this.cachedColumns[index], ValueLayout.JAVA_BYTE, offset, len);
+    }
+
+    public <T> void setFieldShortArray(Class<T> componentClass, int index, String fieldName, int i, short[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) (arrayByteSize / ValueLayout.JAVA_SHORT.byteSize());
+        int len = Math.min(value.length, capacity);
+        MemorySegment.copy(value, 0, this.cachedColumns[index], ValueLayout.JAVA_SHORT, offset, len);
+    }
+
+    public <T> void setFieldBooleanArray(Class<T> componentClass, int index, String fieldName, int i, boolean[] value) {
+        long offset = fieldPtr(componentClass, index, fieldName, i);
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long arrayByteSize = component.layout().select(MemoryLayout.PathElement.groupElement(fieldName)).byteSize();
+        int capacity = (int) arrayByteSize;
+        int len = Math.min(value.length, capacity);
+        for (int j = 0; j < len; j++) {
+            this.cachedColumns[index].set(ValueLayout.JAVA_BYTE, offset + j, (byte) (value[j] ? 1 : 0));
+        }
     }
 
     public long event() {
