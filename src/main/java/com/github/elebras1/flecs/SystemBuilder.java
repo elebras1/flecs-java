@@ -9,8 +9,8 @@ import static com.github.elebras1.flecs.util.FlecsConstants.*;
 public class SystemBuilder {
 
     private final World world;
-    private final Arena arena;
     private final MemorySegment desc;
+    private final Arena arena;
     private int termCount = 0;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private Query.IterCallback iterCallback;
@@ -27,12 +27,10 @@ public class SystemBuilder {
     public SystemBuilder(World world, String name) {
         this(world);
         MemorySegment nameSegment = this.arena.allocateFrom(name);
-        
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(tempArena);
-            ecs_entity_desc_t.name(entityDescTemp, nameSegment);
-            ecs_system_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
-        }
+
+        MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(this.arena);
+        ecs_entity_desc_t.name(entityDescTemp, nameSegment);
+        ecs_system_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
     }
 
     public SystemBuilder kind(long phase) {
@@ -242,6 +240,8 @@ public class SystemBuilder {
         }
 
         this.world.registerSystemCallbacks(systemId, this.iterCallback, this.runCallback, this.entityCallback);
+
+        this.arena.close();
 
         return new FlecsSystem(this.world, systemId);
     }

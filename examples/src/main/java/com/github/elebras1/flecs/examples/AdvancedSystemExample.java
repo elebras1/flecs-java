@@ -149,15 +149,6 @@ public class AdvancedSystemExample {
             System.out.println("\nRunning one frame to show phase order:");
             world.progress(0.016f);
 
-            // Clean up
-            oneSecondSystem.close();
-            everyOtherFrame.close();
-            mtMoveSystem.close();
-            immediateSystem.close();
-            preUpdateSys.close();
-            onUpdateSys.close();
-            postUpdateSys.close();
-
             System.out.println("\n=== Advanced Systems Example Complete ===");
         }
     }

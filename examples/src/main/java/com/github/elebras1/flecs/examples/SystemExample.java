@@ -117,11 +117,6 @@ public class SystemExample {
                 });
             }
 
-            // Clean up systems
-            moveSystem.close();
-            debugSystem.close();
-            taskSystem.close();
-
             System.out.println("\n=== Systems Example Complete ===");
         }
     }
