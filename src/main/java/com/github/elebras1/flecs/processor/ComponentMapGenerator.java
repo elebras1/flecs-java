@@ -14,10 +14,10 @@ public class ComponentMapGenerator {
 
     private static final ClassName COMPONENT_INTERFACE = ClassName.get("com.github.elebras1.flecs", "Component");
     private static final String MAP_PACKAGE = "com.github.elebras1.flecs";
-    private static final String MAP_CLASS_NAME = "ComponentMap";
+    private static final String MAP_COMPONENT_CLASS_NAME = "ComponentMap";
 
     public JavaFile generateComponentMap(List<TypeElement> components) {
-        TypeSpec.Builder mapClass = TypeSpec.classBuilder(MAP_CLASS_NAME)
+        TypeSpec.Builder mapClass = TypeSpec.classBuilder(MAP_COMPONENT_CLASS_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(this.createMapField(components.size()))
                 .addStaticBlock(this.createStaticInitializer(components))

@@ -16,8 +16,8 @@ public class ComponentProcessor extends AbstractProcessor {
     private static final Set<String> SUPPORTED_TYPES = Set.of("byte", "short", "int", "long", "float", "double", "boolean", "byte[]", "short[]", "int[]", "long[]", "float[]", "double[]", "boolean[]", "java.lang.String");
     private Messager messager;
     private Filer filer;
-    private ComponentAbstractGenerator componentGenerator;
-    private ComponentViewAbstractGenerator componentViewGenerator;
+    private ComponentGenerator componentGenerator;
+    private ComponentViewGenerator componentViewGenerator;
     private ComponentMapGenerator mapGenerator;
     private List<TypeElement> processedComponents;
     private boolean mapGenerated;
@@ -27,8 +27,8 @@ public class ComponentProcessor extends AbstractProcessor {
         super.init(processingEnv);
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
-        this.componentGenerator = new ComponentAbstractGenerator();
-        this.componentViewGenerator = new ComponentViewAbstractGenerator();
+        this.componentGenerator = new ComponentGenerator();
+        this.componentViewGenerator = new ComponentViewGenerator();
         this.mapGenerator = new ComponentMapGenerator();
         this.processedComponents = new ArrayList<>();
         this.mapGenerated = false;

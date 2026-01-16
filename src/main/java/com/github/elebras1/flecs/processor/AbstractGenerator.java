@@ -8,7 +8,7 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
-import static com.github.elebras1.flecs.processor.ComponentAbstractGenerator.DEFAULT_STRING_SIZE;
+import static com.github.elebras1.flecs.processor.ComponentGenerator.DEFAULT_STRING_SIZE;
 
 public abstract class AbstractGenerator implements Generator {
 

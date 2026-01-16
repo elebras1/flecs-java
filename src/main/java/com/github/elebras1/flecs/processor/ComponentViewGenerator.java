@@ -6,9 +6,11 @@ import javax.lang.model.element.*;
 import java.lang.foreign.MemorySegment;
 import java.util.List;
 
-import static com.github.elebras1.flecs.processor.ComponentAbstractGenerator.LAYOUT_FIELD_CLASS;
+import static com.github.elebras1.flecs.processor.ComponentGenerator.LAYOUT_FIELD_CLASS;
 
-public class ComponentViewAbstractGenerator extends AbstractGenerator {
+public class ComponentViewGenerator extends AbstractGenerator {
+    private static final String COMPONENT_VIEW_INTERFACE = "com.github.elebras1.flecs.ComponentView";
+
     public JavaFile generate(TypeElement recordElement, List<VariableElement> fields)  {
         String packageName = this.getPackageName(recordElement);
         String recordName = recordElement.getSimpleName().toString();
@@ -18,6 +20,7 @@ public class ComponentViewAbstractGenerator extends AbstractGenerator {
 
         TypeSpec componentClass = TypeSpec.classBuilder(componentViewClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addSuperinterface(ClassName.bestGuess(COMPONENT_VIEW_INTERFACE))
                 .addField(this.createField())
                 .addMethod(this.createSetterMethod())
                 .addMethods(this.createMethods(fields, componentReference))
@@ -32,6 +35,7 @@ public class ComponentViewAbstractGenerator extends AbstractGenerator {
 
     private MethodSpec createSetterMethod() {
         return MethodSpec.methodBuilder("setMemorySegment")
+                .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(MemorySegment.class, "memorySegment")
                 .addJavadoc("Internal API - Do not use.\n")

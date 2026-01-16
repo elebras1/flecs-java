@@ -7,7 +7,7 @@ import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.util.List;
 
-public class ComponentAbstractGenerator extends AbstractGenerator {
+public class ComponentGenerator extends AbstractGenerator {
 
     protected static final String LAYOUT_FIELD_CLASS = "com.github.elebras1.flecs.util.LayoutField";
     protected static final String COMPONENT_INTERFACE = "com.github.elebras1.flecs.Component";
