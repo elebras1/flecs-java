@@ -16,7 +16,8 @@ public class ComponentProcessor extends AbstractProcessor {
     private static final Set<String> SUPPORTED_TYPES = Set.of("byte", "short", "int", "long", "float", "double", "boolean", "byte[]", "short[]", "int[]", "long[]", "float[]", "double[]", "boolean[]", "java.lang.String");
     private Messager messager;
     private Filer filer;
-    private ComponentCodeGenerator generator;
+    private ComponentAbstractGenerator componentGenerator;
+    private ComponentViewAbstractGenerator componentViewGenerator;
     private ComponentMapGenerator mapGenerator;
     private List<TypeElement> processedComponents;
     private boolean mapGenerated;
@@ -26,7 +27,8 @@ public class ComponentProcessor extends AbstractProcessor {
         super.init(processingEnv);
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
-        this.generator = new ComponentCodeGenerator();
+        this.componentGenerator = new ComponentAbstractGenerator();
+        this.componentViewGenerator = new ComponentViewAbstractGenerator();
         this.mapGenerator = new ComponentMapGenerator();
         this.processedComponents = new ArrayList<>();
         this.mapGenerated = false;
@@ -86,8 +88,11 @@ public class ComponentProcessor extends AbstractProcessor {
             }
         }
 
-        JavaFile javaFile = generator.generateComponentClass(recordElement, fields);
-        javaFile.writeTo(filer);
+        JavaFile javaComponentFile = this.componentGenerator.generate(recordElement, fields);
+        javaComponentFile.writeTo(this.filer);
+
+        JavaFile javaComponentViewFile = this.componentViewGenerator.generate(recordElement, fields);
+        javaComponentViewFile.writeTo(this.filer);
     }
 
     private List<VariableElement> extractRecordComponents(TypeElement recordElement) {
