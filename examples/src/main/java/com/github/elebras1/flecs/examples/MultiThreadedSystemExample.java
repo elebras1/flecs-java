@@ -7,7 +7,7 @@ import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.util.Random;
 
-public class MultiThreadedSystemExemple {
+public class MultiThreadedSystemExample {
     public static void main(String[] args) {
         try (World world = new World()) {
             System.out.println("=== Test Multithreaded system + native access ===");

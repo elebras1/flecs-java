@@ -1,6 +1,5 @@
 package com.github.elebras1.flecs.examples;
 
-import com.github.elebras1.flecs.Entity;
 import com.github.elebras1.flecs.EntityView;
 import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.*;
@@ -14,7 +13,6 @@ public class ViewExample {
             world.component(Velocity.class);
             world.component(Inventory.class);
 
-            // obtainEntityView() requires an active scope to function properly.
             world.scope(() -> {
                 for (int i = 0; i < 10; i++) {
                     long entityId = world.entity("Entity_" + i);
@@ -32,24 +30,14 @@ public class ViewExample {
             world.system("MovementSystem").kind(FlecsConstants.EcsOnUpdate).with(Position.class).with(Velocity.class).multiThreaded().each(entityId -> {
                 EntityView entityView = world.obtainEntityView(entityId);
 
-                PositionView positionView = entityView.getMutView(Position.class);
-                VelocityView velocityView = entityView.getMutView(Velocity.class);
-                InventoryView inventoryView = entityView.getMutView(Inventory.class);
+                PositionView posView = entityView.getMutView(Position.class);
+                VelocityView velView = entityView.getMutView(Velocity.class);
+                InventoryView invView = entityView.getMutView(Inventory.class);
 
-                float currentX = positionView.x();
-                float currentY = positionView.y();
-                float dx = velocityView.dx();
-                float dy = velocityView.dy();
-                positionView.x(currentX + dx).y(currentY + dy);
+                posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
 
-                for(int i = 0; i < inventoryView.elementsLength(); i++) {
-                    int element = inventoryView.elements(i);
-                    inventoryView.elements(i, element + 1);
-                }
-
-                System.out.printf("Entity %d moved to position (%.2f, %.2f) with inventory: ", entityId, positionView.x(), positionView.y());
-                for(int i = 0; i < inventoryView.elementsLength(); i++) {
-                    System.out.print(inventoryView.elements(i) + "\n");
+                for(int i = 0; i < invView.elementsLength(); i++) {
+                    invView.elements(i, invView.elements(i) + 1);
                 }
             });
 
