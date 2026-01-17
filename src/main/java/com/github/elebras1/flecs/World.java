@@ -312,8 +312,7 @@ public class World implements AutoCloseable {
         this.checkClosed();
         MemorySegment segment = this.defaultBuffers.nameBuffer().set(name);
 
-        long entityId = flecs_h.ecs_lookup(this.nativeWorld, segment);
-        return entityId == 0 ? -1 : entityId;
+        return flecs_h.ecs_lookup(this.nativeWorld, segment);
     }
 
     public <T> long component(Class<T> componentClass) {
