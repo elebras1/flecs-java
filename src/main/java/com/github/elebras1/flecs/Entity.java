@@ -199,6 +199,42 @@ public class Entity {
         return component.read(dataSegment);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T getView(Class<?> componentClass) {
+        ComponentView view = FlecsContext.CURRENT_CACHE.get().get(componentClass);
+
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+
+        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
+
+        if (dataPtr == null || dataPtr.address() == 0) {
+            return null;
+        }
+
+        view.setMemorySegment(dataPtr);
+
+        return (T) view;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getView(Class<?> componentClass, long target) {
+        ComponentView view = FlecsContext.CURRENT_CACHE.get().get(componentClass);
+
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+
+        long pairId = flecs_h.ecs_make_pair(componentId, target);
+
+        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
+
+        if (dataPtr == null || dataPtr.address() == 0) {
+            return null;
+        }
+
+        view.setMemorySegment(dataPtr);
+
+        return (T) view;
+    }
+
     public void enable() {
         flecs_h.ecs_enable(this.world.nativeHandle(), this.id, true);
     }

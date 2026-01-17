@@ -183,14 +183,17 @@ public class SystemBuilder {
 
     public FlecsSystem iter(Query.IterCallback callback) {
         this.iterCallback = callback;
-        
+
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
             Iter iter = new Iter(it, this.world);
-            callback.accept(iter);
+            var cache = new FlecsContext.ViewCache();
+            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
+                callback.accept(iter);
+            });
         }, this.world.arena());
-        
+
         ecs_system_desc_t.callback(this.desc, callbackStub);
-        
+
         return build();
     }
 
@@ -199,7 +202,10 @@ public class SystemBuilder {
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
             Iter iter = new Iter(it, this.world);
-            callback.accept(iter);
+            var cache = new FlecsContext.ViewCache();
+            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
+                callback.accept(iter);
+            });
         }, this.world.arena());
 
         ecs_system_desc_t.run(this.desc, callbackStub);
@@ -209,19 +215,22 @@ public class SystemBuilder {
 
     public FlecsSystem each(Query.EntityCallback callback) {
         this.entityCallback = callback;
-        
+
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            int count = ecs_iter_t.count(it);
-            MemorySegment entities = ecs_iter_t.entities(it);
-            
-            for (int i = 0; i < count; i++) {
-                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                callback.accept(entityId);
-            }
+            var cache = new FlecsContext.ViewCache();
+            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
+                int count = ecs_iter_t.count(it);
+                MemorySegment entities = ecs_iter_t.entities(it);
+
+                for (int i = 0; i < count; i++) {
+                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    callback.accept(entityId);
+                }
+            });
         }, this.world.arena());
-        
+
         ecs_system_desc_t.callback(this.desc, callbackStub);
-        
+
         return build();
     }
 
