@@ -200,7 +200,7 @@ public class Entity {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getView(Class<?> componentClass) {
+    public <T> T getMutView(Class<?> componentClass) {
         ComponentView view = FlecsContext.CURRENT_CACHE.get().get(componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
@@ -217,7 +217,7 @@ public class Entity {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getView(Class<?> componentClass, long target) {
+    public <T> T getMutView(Class<?> componentClass, long target) {
         ComponentView view = FlecsContext.CURRENT_CACHE.get().get(componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(componentClass);

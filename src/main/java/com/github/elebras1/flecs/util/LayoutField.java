@@ -207,6 +207,62 @@ public final class LayoutField {
         return segment.asSlice(offset, capacity).getString(0);
     }
 
+    public static int getIntAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_INT, offset + ((long) index * Integer.BYTES));
+    }
+
+    public static void setIntAtIndex(MemorySegment segment, long offset, int index, int value) {
+        segment.set(ValueLayout.JAVA_INT, offset + ((long) index * Integer.BYTES), value);
+    }
+
+    public static float getFloatAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_FLOAT, offset + ((long) index * Float.BYTES));
+    }
+
+    public static void setFloatAtIndex(MemorySegment segment, long offset, int index, float value) {
+        segment.set(ValueLayout.JAVA_FLOAT, offset + ((long) index * Float.BYTES), value);
+    }
+
+    public static long getLongAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_LONG, offset + ((long) index * Long.BYTES));
+    }
+
+    public static void setLongAtIndex(MemorySegment segment, long offset, int index, long value) {
+        segment.set(ValueLayout.JAVA_LONG, offset + ((long) index * Long.BYTES), value);
+    }
+
+    public static double getDoubleAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_DOUBLE, offset + ((long) index * Double.BYTES));
+    }
+
+    public static void setDoubleAtIndex(MemorySegment segment, long offset, int index, double value) {
+        segment.set(ValueLayout.JAVA_DOUBLE, offset + ((long) index * Double.BYTES), value);
+    }
+
+    public static byte getByteAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_BYTE, offset + index);
+    }
+
+    public static void setByteAtIndex(MemorySegment segment, long offset, int index, byte value) {
+        segment.set(ValueLayout.JAVA_BYTE, offset + index, value);
+    }
+
+    public static short getShortAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_SHORT, offset + ((long) index * Short.BYTES));
+    }
+
+    public static void setShortAtIndex(MemorySegment segment, long offset, int index, short value) {
+        segment.set(ValueLayout.JAVA_SHORT, offset + ((long) index * Short.BYTES), value);
+    }
+
+    public static boolean getBooleanAtIndex(MemorySegment segment, long offset, int index) {
+        return segment.get(ValueLayout.JAVA_BYTE, offset + index) != 0;
+    }
+
+    public static void setBooleanAtIndex(MemorySegment segment, long offset, int index, boolean value) {
+        segment.set(ValueLayout.JAVA_BYTE, offset + index, (byte)(value ? 1 : 0));
+    }
+
     public static long offsetOf(MemoryLayout layout, String fieldName) {
         return layout.byteOffset(MemoryLayout.PathElement.groupElement(fieldName));
     }
