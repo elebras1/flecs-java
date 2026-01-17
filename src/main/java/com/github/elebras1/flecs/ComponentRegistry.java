@@ -61,7 +61,13 @@ public class ComponentRegistry {
     }
 
     protected <T> long getComponentId(Class<T> componentClass) {
-        return this.componentIds.get(componentClass);
+        long id = this.componentIds.get(componentClass);
+
+        if (id == -1) {
+            throw new IllegalArgumentException("Component not registered: " + componentClass.getName());
+        }
+
+        return id;
     }
 
     protected <T> Component<T> getComponent(Class<T> componentClass) {
