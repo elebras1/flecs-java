@@ -5,7 +5,7 @@ import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.*;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
-public class ComponentViewExample {
+public class ViewExample {
 
     public static void main(String[] args) {
         try (World world = new World()) {

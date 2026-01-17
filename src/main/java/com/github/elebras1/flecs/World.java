@@ -769,6 +769,10 @@ public class World implements AutoCloseable {
         }
     }
 
+    public void scope(Runnable action) {
+        ScopedValue.where(FlecsContext.CURRENT_CACHE, new FlecsContext.ViewCache()).run(action);
+    }
+
     @Override
     public void close() {
         if (!this.closed) {
