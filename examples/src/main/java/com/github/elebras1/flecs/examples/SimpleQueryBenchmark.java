@@ -42,10 +42,16 @@ public class SimpleQueryBenchmark {
                 System.out.println("--- Benchmark 1: each() + entity.get(Component.class) ---");
                 runBenchmark("each+get", () -> benchmarkEachGet(world, query));
 
-                System.out.println("--- Benchmark 2: iter() + Field<T>.get(i) ---");
-                runBenchmark("iter+Field", () -> benchmarkIterField(query));
+                System.out.println("--- Benchmark 2: each() + entity.getMutView(Component.class) ---");
+                runBenchmark("each+getMutView", () -> benchmarkEachGetMutView(world, query));
 
-                System.out.println("--- Benchmark 3: iter() + fieldFloat() (native) ---");
+                System.out.println("--- Benchmark 3: iter() + Field<T>.get(i) ---");
+                runBenchmark("iter+Field+get", () -> benchmarkIterFieldGet(query));
+
+                System.out.println("--- Benchmark 4: iter() + Field<T>.getMutView(i) ---");
+                runBenchmark("iter+Field+getMutView", () -> benchmarkIterFieldGetMutView(query));
+
+                System.out.println("--- Benchmark 5: iter() + fieldFloat() (native) ---");
                 runBenchmark("iter+native", () -> benchmarkIterNative(query));
 
                 System.out.println();
@@ -67,7 +73,20 @@ public class SimpleQueryBenchmark {
         return sum[0];
     }
 
-    private static float benchmarkIterField(Query query) {
+    private static float benchmarkEachGetMutView(World world, Query query) {
+        final float[] sum = {0.0f};
+
+        query.each(entityId -> {
+            Entity entity = world.obtainEntity(entityId);
+            PositionView pos = entity.getMutView(Position.class);
+            VelocityView vel = entity.getMutView(Velocity.class);
+            sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy();
+        });
+
+        return sum[0];
+    }
+
+    private static float benchmarkIterFieldGet(Query query) {
         final float[] sum = {0.0f};
 
         query.iter(iter -> {
@@ -77,6 +96,23 @@ public class SimpleQueryBenchmark {
             for (int i = 0; i < iter.count(); i++) {
                 Position pos = positions.get(i);
                 Velocity vel = velocities.get(i);
+                sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy();
+            }
+        });
+
+        return sum[0];
+    }
+
+    private static float benchmarkIterFieldGetMutView(Query query) {
+        final float[] sum = {0.0f};
+
+        query.iter(iter -> {
+            Field<Position> positions = iter.field(Position.class, 0);
+            Field<Velocity> velocities = iter.field(Velocity.class, 1);
+
+            for (int i = 0; i < iter.count(); i++) {
+                PositionView pos = positions.getMutView(i);
+                VelocityView vel = velocities.getMutView(i);
                 sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy();
             }
         });

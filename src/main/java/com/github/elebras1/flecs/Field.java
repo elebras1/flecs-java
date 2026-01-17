@@ -7,11 +7,13 @@ public class Field<T> {
     private final MemorySegment memorySegment;
     private final int count;
     private final Component<T> component;
+    private final ComponentView componentView;
 
     Field(MemorySegment memorySegment, int count, World world, Class<T> componentClass) {
         this.memorySegment = memorySegment;
         this.count = count;
         this.component = world.componentRegistry().getComponent(componentClass);
+        this.componentView = FlecsContext.CURRENT_CACHE.get().get(componentClass);
     }
 
     public boolean isSet() {
@@ -34,6 +36,22 @@ public class Field<T> {
         MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, this.component.size());
 
         return this.component.read(elementSegment);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <V extends ComponentView> V getMutView(int i) {
+        if (!this.isSet()) {
+            throw new IllegalStateException("Field is not set.");
+        }
+        if (i < 0 || i >= this.count) {
+            throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
+        }
+
+        long elementOffset = i * this.component.size();
+        MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, this.component.size());
+        this.componentView.setMemorySegment(elementSegment);
+
+        return (V) this.componentView;
     }
 
     public void set(int i, T componentData) {
