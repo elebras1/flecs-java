@@ -30,8 +30,8 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.3.0'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.3.0'
+    implementation 'io.github.elebras1:flecs-java:0.4.1'
+    annotationProcessor 'io.github.elebras1:flecs-java:0.4.1'
 
 }
 ```
@@ -81,22 +81,21 @@ public class Example {
             
             // Create a movement system
             world.system("MoveSystem")
+                .kind(FlecsConstants.EcsOnUpdate)
                 .with(Position.class)
                 .with(Velocity.class)
-                .kind(FlecsConstants.EcsOnUpdate)
+                .multithreaded()
                 .iter(it -> {
                     Field<Position> positions = it.field(Position.class, 0);
                     Field<Velocity> velocities = it.field(Velocity.class, 1);
                     
                     for (int i = 0; i < it.count(); i++) {
-                        Position pos = positions.get(i);
-                        Velocity vel = velocities.get(i);
+                        PositionView positionView = positions.getMutView(i);
+                        VelocityView velocityView = velocities.getMutView(i);
                         
                         // Update position
-                        positions.set(i, new Position(
-                            pos.x() + vel.dx() * it.deltaTime(),
-                            pos.y() + vel.dy() * it.deltaTime()
-                        ));
+                        positionView.x(positionView.x() + velocityView.dx() * it.deltaTime());
+                        positionView.y(positionView.y() + velocityView.dy() * it.deltaTime());
                     }
                 });
             
@@ -106,14 +105,11 @@ public class Example {
             }
             
             // Query entities
-            try (Query query = world.query()
-                    .with(Position.class)
-                    .build()) {
+            try (Query query = world.query().with(Position.class).build()) {
                 query.each(entityId -> {
                     Entity e = world.obtainEntity(entityId);
                     Position pos = e.get(Position.class);
-                    System.out.printf("%s: (%.2f, %.2f)%n", 
-                        e.getName(), pos.x(), pos.y());
+                    System.out.printf("%s: (%.2f, %.2f)%n", e.getName(), pos.x(), pos.y());
                 });
             }
         }
