@@ -186,7 +186,7 @@ public class SystemBuilder {
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
             Iter iter = new Iter(it, this.world);
-            var cache = new FlecsContext.ViewCache();
+            var cache = new FlecsContext.ViewCache(this.world);
             ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
                 callback.accept(iter);
             });
@@ -202,7 +202,7 @@ public class SystemBuilder {
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
             Iter iter = new Iter(it, this.world);
-            var cache = new FlecsContext.ViewCache();
+            var cache = new FlecsContext.ViewCache(this.world);
             ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
                 callback.accept(iter);
             });
@@ -217,7 +217,7 @@ public class SystemBuilder {
         this.entityCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            var cache = new FlecsContext.ViewCache();
+            var cache = new FlecsContext.ViewCache(this.world);
             ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
                 int count = ecs_iter_t.count(it);
                 MemorySegment entities = ecs_iter_t.entities(it);

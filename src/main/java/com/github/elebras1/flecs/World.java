@@ -189,10 +189,7 @@ public class World implements AutoCloseable {
             throw new IllegalArgumentException("Invalid entity ID: " + entityId);
         }
 
-        EntityView entityView = FlecsContext.CURRENT_CACHE.get().getEntityView();
-        entityView.setWorld(this);
-        entityView.setId(entityId);
-        return entityView;
+        return FlecsContext.CURRENT_CACHE.get().getEntityView(entityId);
     }
 
     MemorySegment getComponentBuffer(long size) {
@@ -780,7 +777,7 @@ public class World implements AutoCloseable {
     }
 
     public void scope(Runnable action) {
-        ScopedValue.where(FlecsContext.CURRENT_CACHE, new FlecsContext.ViewCache()).run(action);
+        ScopedValue.where(FlecsContext.CURRENT_CACHE, new FlecsContext.ViewCache(this)).run(action);
     }
 
     @Override

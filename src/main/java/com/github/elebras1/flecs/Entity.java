@@ -9,16 +9,12 @@ import java.util.function.Consumer;
 
 public class Entity {
 
-    private World world;
+    private final World world;
     private long id;
 
     Entity(World world, long id) {
         this.world = world;
         this.id = id;
-    }
-
-    protected void setWorld(World world) {
-        this.world = world;
     }
 
     protected void setId(long id) {
@@ -214,7 +210,7 @@ public class Entity {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T getMutView(Class<?> componentClass) {
-        ComponentView view = FlecsContext.CURRENT_CACHE.get().get(componentClass);
+        ComponentView view = FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 

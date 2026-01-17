@@ -36,7 +36,7 @@ public class Query implements AutoCloseable {
     public void each(EntityCallback callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            var cache = new FlecsContext.ViewCache();
+            var cache = new FlecsContext.ViewCache(this.world);
             ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
                 MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
                 if (iter == null || iter.address() == 0) {
@@ -59,7 +59,7 @@ public class Query implements AutoCloseable {
     public void iter(IterCallback callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            var cache = new FlecsContext.ViewCache();
+            var cache = new FlecsContext.ViewCache(this.world);
             ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
                 MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
                 if (iter == null || iter.address() == 0) {
@@ -79,7 +79,7 @@ public class Query implements AutoCloseable {
     public void run(RunCallback callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            var cache = new FlecsContext.ViewCache();
+            var cache = new FlecsContext.ViewCache(this.world);
             ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
                 MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
 
