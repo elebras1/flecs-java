@@ -18,7 +18,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
     public JavaFile generate(TypeElement recordElement, List<VariableElement> fields)  {
         String packageName = this.getPackageName(recordElement);
         String recordName = recordElement.getSimpleName().toString();
-        String componentViewClassName = recordName + "ComponentView";
+        String componentViewClassName = recordName + "View";
 
         String componentReference = packageName + "." + recordName + "Component";
 

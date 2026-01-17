@@ -68,7 +68,7 @@ public class ComponentMapGenerator {
 
             ClassName recordClass = ClassName.get(packageName, recordName);
             ClassName componentClass = ClassName.get(packageName, recordName + "Component");
-            ClassName viewClass = ClassName.get(packageName, recordName + "ComponentView");
+            ClassName viewClass = ClassName.get(packageName, recordName + "View");
 
             builder.addStatement("COMPONENT_MAP.put($T.class, $T.getInstance())", recordClass, componentClass);
             builder.addStatement("VIEW_MAP.put($T.class, $T::new)", recordClass, viewClass);

@@ -28,9 +28,9 @@ public class ComponentViewExample {
             world.system("MovementSystem").kind(FlecsConstants.EcsOnUpdate).with(Position.class).with(Velocity.class).multiThreaded().each(entityId -> {
                 Entity entity = world.obtainEntity(entityId);
 
-                PositionComponentView positionView = entity.getMutView(Position.class);
-                VelocityComponentView velocityView = entity.getMutView(Velocity.class);
-                InventoryComponentView inventoryView = entity.getMutView(Inventory.class);
+                PositionView positionView = entity.getMutView(Position.class);
+                VelocityView velocityView = entity.getMutView(Velocity.class);
+                InventoryView inventoryView = entity.getMutView(Inventory.class);
 
                 float currentX = positionView.x();
                 float currentY = positionView.y();
