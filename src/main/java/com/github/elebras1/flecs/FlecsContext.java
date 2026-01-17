@@ -8,9 +8,11 @@ public class FlecsContext {
 
     public static class ViewCache {
         private final Map<Class<?>, ComponentView> views;
+        private final EntityView entityView;
 
         public ViewCache() {
             this.views = new IdentityHashMap<>(8);
+            this.entityView = new EntityView(null, 0);
         }
 
         public ComponentView get(Class<?> componentClass) {
@@ -26,6 +28,10 @@ public class FlecsContext {
             }
 
             return view;
+        }
+
+        public EntityView getEntityView() {
+            return this.entityView;
         }
     }
 }

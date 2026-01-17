@@ -9,11 +9,19 @@ import java.util.function.Consumer;
 
 public class Entity {
 
-    private final World world;
-    private final long id;
+    private World world;
+    private long id;
 
     Entity(World world, long id) {
         this.world = world;
+        this.id = id;
+    }
+
+    protected void setWorld(World world) {
+        this.world = world;
+    }
+
+    protected void setId(long id) {
         this.id = id;
     }
 

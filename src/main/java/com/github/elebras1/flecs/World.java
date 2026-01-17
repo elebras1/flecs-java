@@ -184,6 +184,17 @@ public class World implements AutoCloseable {
         return new Entity(this, entityId);
     }
 
+    public EntityView obtainEntityView(long entityId) {
+        if(entityId <= 0) {
+            throw new IllegalArgumentException("Invalid entity ID: " + entityId);
+        }
+
+        EntityView entityView = FlecsContext.CURRENT_CACHE.get().getEntityView();
+        entityView.setWorld(this);
+        entityView.setId(entityId);
+        return entityView;
+    }
+
     MemorySegment getComponentBuffer(long size) {
         return this.defaultBuffers.componentBuffer().ensure(size);
     }
