@@ -30,12 +30,12 @@ public class ComponentHooks<T> {
 
     @FunctionalInterface
     public interface IterHookCallback<T> {
-        void invoke(MemorySegment it, T[] components);
+        void invoke(T[] components);
     }
 
     @FunctionalInterface
     public interface ReplaceHookCallback<T> {
-        void invoke(MemorySegment it, T[] oldComponents, T[] newComponents);
+        void invoke(T[] oldComponents, T[] newComponents);
     }
 
     @FunctionalInterface
@@ -174,7 +174,7 @@ public class ComponentHooks<T> {
 
             T[] components = this.readComponentArray(fieldPtr, count);
 
-            callback.invoke(iter, components);
+            callback.invoke(components);
 
             this.writeComponentArray(fieldPtr, components, count);
 
@@ -197,7 +197,7 @@ public class ComponentHooks<T> {
             T[] oldComponents = this.readComponentArray(oldPtr, count);
             T[] newComponents = this.readComponentArray(newPtr, count);
 
-            callback.invoke(iter, oldComponents, newComponents);
+            callback.invoke(oldComponents, newComponents);
 
             this.writeComponentArray(newPtr, newComponents, count);
         } catch (Throwable e) {

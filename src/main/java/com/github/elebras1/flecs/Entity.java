@@ -33,22 +33,27 @@ public class Entity {
         return world;
     }
 
-    public Entity add(long componentId) {
-        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, componentId);
+    public Entity add(long entityId) {
+        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, entityId);
         return this;
     }
 
-    public Entity add(Entity component) {
-        return this.add(component.id());
+    public Entity add(Entity entity) {
+        return this.add(entity.id());
     }
 
-    public Entity remove(long componentId) {
-        flecs_h.ecs_remove_id(world.nativeHandle(), this.id, componentId);
+    public Entity add(Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.add(componentId);
+    }
+
+    public Entity remove(long entityId) {
+        flecs_h.ecs_remove_id(world.nativeHandle(), this.id, entityId);
         return this;
     }
 
-    public Entity remove(Entity component) {
-        return this.remove(component.id());
+    public Entity remove(Entity entity) {
+        return this.remove(entity.id());
     }
 
     public <T> Entity remove(Class<T> componentClass) {
@@ -65,8 +70,8 @@ public class Entity {
         return this.has(componentId);
     }
 
-    public boolean has(Entity component) {
-        return this.has(component.id());
+    public boolean has(Entity entity) {
+        return this.has(entity.id());
     }
 
     public Entity setName(String name) {

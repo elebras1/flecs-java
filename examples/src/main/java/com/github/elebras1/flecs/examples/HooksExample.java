@@ -9,9 +9,9 @@ public class HooksExample {
     public static void main(String[] args) {
         try (World world = new World()) {
             world.component(Position.class, hooks -> {
-                hooks.onAdd((it, components) ->
+                hooks.onAdd((components) ->
                     System.out.println("onAdd: " + components.length + " elements"));
-                hooks.onSet((it, components) ->
+                hooks.onSet((components) ->
                     System.out.println("onSet: " + components[0]));
                 hooks.ctor((components, count) ->
                     System.out.println("ctor: " + count + " elements"));
