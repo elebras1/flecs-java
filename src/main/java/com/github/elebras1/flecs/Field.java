@@ -13,7 +13,7 @@ public class Field<T> {
         this.memorySegment = memorySegment;
         this.count = count;
         this.component = world.componentRegistry().getComponent(componentClass);
-        this.componentView = FlecsContext.CURRENT_CACHE.get().get(componentClass);
+        this.componentView = FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
     }
 
     public boolean isSet() {
