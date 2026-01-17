@@ -51,9 +51,6 @@ public class SimpleQueryBenchmark {
                 System.out.println("--- Benchmark 4: iter() + Field<T>.getMutView(i) ---");
                 runBenchmark("iter+Field+getMutView", () -> benchmarkIterFieldGetMutView(query));
 
-                System.out.println("--- Benchmark 5: iter() + fieldFloat() (native) ---");
-                runBenchmark("iter+native", () -> benchmarkIterNative(query));
-
                 System.out.println();
                 System.out.println("=== Benchmark Complete ===");
             }
@@ -114,22 +111,6 @@ public class SimpleQueryBenchmark {
                 PositionView pos = positions.getMutView(i);
                 VelocityView vel = velocities.getMutView(i);
                 sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy();
-            }
-        });
-
-        return sum[0];
-    }
-
-    private static float benchmarkIterNative(Query query) {
-        final float[] sum = {0.0f};
-
-        query.iter(iter -> {
-            for (int i = 0; i < iter.count(); i++) {
-                float posX = iter.fieldFloat(Position.class, 0, "x", i);
-                float posY = iter.fieldFloat(Position.class, 0, "y", i);
-                float velDx = iter.fieldFloat(Velocity.class, 1, "dx", i);
-                float velDy = iter.fieldFloat(Velocity.class, 1, "dy", i);
-                sum[0] += posX + posY + velDx + velDy;
             }
         });
 

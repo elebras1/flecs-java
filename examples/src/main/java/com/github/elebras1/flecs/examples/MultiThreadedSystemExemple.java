@@ -2,6 +2,7 @@ package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.*;
 import com.github.elebras1.flecs.examples.components.Minister;
+import com.github.elebras1.flecs.examples.components.MinisterView;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.util.Random;
@@ -18,22 +19,18 @@ public class MultiThreadedSystemExemple {
                 world.obtainEntity(world.entity("Min_" + i)).set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
             }
 
-            world.system("LoyaltySystem")
-                    .with(Minister.class)
-                    .kind(FlecsConstants.EcsOnUpdate)
-                    .multiThreaded(true)
-                    .iter(it -> {
-                        int count = it.count();
-                        for (int i = 0; i < count; i++) {
-                            float loyalty = it.fieldFloat(Minister.class, 0, "loyalty", i);
+            world.system("LoyaltySystem").with(Minister.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded(true).iter(it -> {
+                Field<Minister> ministerField = it.field(Minister.class, 0);
+                for (int i = 0; i < it.count(); i++) {
+                    MinisterView ministerView = ministerField.getMutView(i);
 
-                            float newLoyalty = Math.min(loyalty + 10.0f, 100.0f);
-                            String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
+                    float newLoyalty = Math.min(ministerView.loyalty() + 10.0f, 100.0f);
+                    String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
 
-                            it.setFieldFloat(Minister.class, 0, "loyalty", i, newLoyalty);
-                            it.setFieldString(Minister.class, 0, "imageFileName", i, newImg);
-                        }
-                    });
+                    ministerView.loyalty(newLoyalty);
+                    ministerView.imageFileName(newImg);
+                }
+            });
 
             for (int f = 0; f < 5; f++) {
                 world.progress(0.016f);
