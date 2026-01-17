@@ -32,7 +32,7 @@ public class ComponentRegistry {
         String componentName = componentClass.getName();
 
         long componentId = this.world.lookup(componentName);
-        if(componentId == -1) {
+        if(componentId == 0) {
             try (Arena tempArena = Arena.ofConfined()) {
                 MemorySegment nameSegment = tempArena.allocateFrom(componentName);
 
@@ -63,7 +63,7 @@ public class ComponentRegistry {
     protected <T> long getComponentId(Class<T> componentClass) {
         long id = this.componentIds.get(componentClass);
 
-        if (id == -1) {
+        if (id <= 0) {
             throw new IllegalArgumentException("Component not registered: " + componentClass.getName());
         }
 
