@@ -27,9 +27,9 @@ public class ComponentViewGenerator extends AbstractGenerator {
         TypeSpec componentClass = TypeSpec.classBuilder(componentViewClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(ClassName.bestGuess(COMPONENT_VIEW_INTERFACE))
-                .addField(this.createField())
-                .addMethod(this.createSetterMemorySegment())
-                .addMethods(this.createGetterFields(fields, componentReference, viewType))
+                .addFields(this.createFields())
+                .addMethod(this.createSetterResource())
+                .addMethods(this.createGetterSetterFields(fields, componentReference, viewType))
                 .build();
 
         return JavaFile.builder(packageName, componentClass)
@@ -38,27 +38,32 @@ public class ComponentViewGenerator extends AbstractGenerator {
                 .build();
     }
 
-    private FieldSpec createField() {
-        return FieldSpec.builder(MemorySegment.class, "memorySegment", Modifier.PRIVATE).build();
+    private List<FieldSpec> createFields() {
+        return List.of(
+                FieldSpec.builder(MemorySegment.class, "memorySegment", Modifier.PRIVATE).build(),
+                FieldSpec.builder(long.class, "offset", Modifier.PRIVATE).build()
+        );
     }
 
-    private MethodSpec createSetterMemorySegment() {
-        return MethodSpec.methodBuilder("setMemorySegment")
+    private MethodSpec createSetterResource() {
+        return MethodSpec.methodBuilder("setResource")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(MemorySegment.class, "memorySegment")
+                .addParameter(long.class, "offset")
                 .addJavadoc("Internal API - Do not use.\n")
                 .addStatement("this.memorySegment = memorySegment")
+                .addStatement("this.offset = offset")
                 .build();
     }
 
-    private Iterable<MethodSpec> createGetterFields(List<VariableElement> fields, String componentReference, ClassName viewType) {
+    private Iterable<MethodSpec> createGetterSetterFields(List<VariableElement> fields, String componentReference, ClassName viewType) {
         return fields.stream()
-                .flatMap(field -> this.createGetters(field, componentReference, viewType).stream())
+                .flatMap(field -> this.createGetterSetterFields(field, componentReference, viewType).stream())
                 .toList();
     }
 
-    private List<MethodSpec> createGetters(VariableElement field, String componentReference, ClassName viewType) {
+    private List<MethodSpec> createGetterSetterFields(VariableElement field, String componentReference, ClassName viewType) {
         List<MethodSpec> methods = new ArrayList<>();
         String fieldName = field.getSimpleName().toString();
         String offsetName = "OFFSET_" + fieldName.toUpperCase();
@@ -83,7 +88,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(int.class, "index")
                     .returns(elementType)
-                    .addStatement("return $T.$L(memorySegment, $L.$L, index)", LAYOUT_FIELD_CLASS, methodAtIndex, componentReference, offsetName)
+                    .addStatement("return $T.$L(memorySegment, offset + $L.$L, index)", LAYOUT_FIELD_CLASS, methodAtIndex, componentReference, offsetName)
                     .build());
 
             methods.add(MethodSpec.methodBuilder(fieldName)
@@ -91,7 +96,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                     .addParameter(int.class, "index")
                     .addParameter(elementType, "value")
                     .returns(viewType)
-                    .addStatement("$T.$L(memorySegment, $L.$L, index, value)", LAYOUT_FIELD_CLASS, setterAtIndex, componentReference, offsetName)
+                    .addStatement("$T.$L(memorySegment, offset + $L.$L, index, value)", LAYOUT_FIELD_CLASS, setterAtIndex, componentReference, offsetName)
                     .addStatement("return this")
                     .build());
 
@@ -100,18 +105,18 @@ public class ComponentViewGenerator extends AbstractGenerator {
             String getterHelper = this.getGetterMethod(typeName);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                getter.addStatement("return $T.$L(memorySegment, $L.$L, $L)", LAYOUT_FIELD_CLASS, getterHelper, componentReference, offsetName, size);
+                getter.addStatement("return $T.$L(memorySegment, offset + $L.$L, $L)", LAYOUT_FIELD_CLASS, getterHelper, componentReference, offsetName, size);
             } else {
-                getter.addStatement("return $T.$L(memorySegment, $L.$L)", LAYOUT_FIELD_CLASS, getterHelper, componentReference, offsetName);
+                getter.addStatement("return $T.$L(memorySegment, offset + $L.$L)", LAYOUT_FIELD_CLASS, getterHelper, componentReference, offsetName);
             }
             methods.add(getter.build());
 
             MethodSpec.Builder setter = MethodSpec.methodBuilder(fieldName).addModifiers(Modifier.PUBLIC).addParameter(TypeName.get(field.asType()), "value").returns(viewType);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                setter.addStatement("$T.set(memorySegment, $L.$L, value, $L)", LAYOUT_FIELD_CLASS, componentReference, offsetName, size);
+                setter.addStatement("$T.set(memorySegment, offset + $L.$L, value, $L)", LAYOUT_FIELD_CLASS, componentReference, offsetName, size);
             } else {
-                setter.addStatement("$T.set(memorySegment, $L.$L, value)", LAYOUT_FIELD_CLASS, componentReference, offsetName);
+                setter.addStatement("$T.set(memorySegment, offset + $L.$L, value)", LAYOUT_FIELD_CLASS, componentReference, offsetName);
             }
             setter.addStatement("return this");
             methods.add(setter.build());

@@ -220,7 +220,7 @@ public class Entity {
             return null;
         }
 
-        view.setMemorySegment(dataPtr);
+        view.setResource(dataPtr, 0);
 
         return (T) view;
     }
@@ -239,7 +239,7 @@ public class Entity {
             return null;
         }
 
-        view.setMemorySegment(dataPtr);
+        view.setResource(dataPtr, 0);
 
         return (T) view;
     }
