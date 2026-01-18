@@ -32918,7 +32918,7 @@ class flecs_h_1 extends flecs_h$shared {
 
     private static class ecs_get_id {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            flecs_h.C_POINTER,
+            flecs_h.C_LONG,
             flecs_h.C_POINTER,
             flecs_h.C_LONG,
             flecs_h.C_LONG
@@ -32926,7 +32926,7 @@ class flecs_h_1 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_get_id");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -32964,13 +32964,13 @@ class flecs_h_1 extends flecs_h$shared {
      * const void *ecs_get_id(const ecs_world_t *world, ecs_entity_t entity, ecs_id_t component)
      * }
      */
-    public static MemorySegment ecs_get_id(MemorySegment world, long entity, long component) {
+    public static long ecs_get_id(MemorySegment world, long entity, long component) {
         var mh$ = ecs_get_id.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_id", world, entity, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity, component);
+            return (long)mh$.invokeExact(world, entity, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ComponentGenerator extends AbstractGenerator {
 
-    protected static final String LAYOUT_FIELD_CLASS = "com.github.elebras1.flecs.util.LayoutField";
+    protected static final String MEMORY_ACCESS_CLASS = "com.github.elebras1.flecs.util.internal.MemoryAccess";
     protected static final String COMPONENT_INTERFACE = "com.github.elebras1.flecs.Component";
     protected static final int DEFAULT_STRING_SIZE = 32;
 
@@ -38,7 +38,7 @@ public class ComponentGenerator extends AbstractGenerator {
     }
 
     private FieldSpec createLayoutField(String recordName, List<VariableElement> fields) {
-        CodeBlock.Builder layoutBuilder = CodeBlock.builder().add("$L.createStructLayout($S", LAYOUT_FIELD_CLASS, recordName);
+        CodeBlock.Builder layoutBuilder = CodeBlock.builder().add("$L.createStructLayout($S", MEMORY_ACCESS_CLASS, recordName);
 
         if (!fields.isEmpty()) {
             layoutBuilder.add(",\n").indent();
@@ -50,12 +50,12 @@ public class ComponentGenerator extends AbstractGenerator {
                 String layoutMethod = getLayoutMethod(type);
                 if ("java.lang.String".equals(type)) {
                     int size = this.getStringSize(field);
-                    layoutBuilder.add("$L.$L($L).withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, size, fieldName);
+                    layoutBuilder.add("$L.$L($L).withName($S)", MEMORY_ACCESS_CLASS, layoutMethod, size, fieldName);
                 } else if (type.endsWith("[]")) {
                     int length = this.getArrayLength(field);
-                    layoutBuilder.add("$L.$L($L).withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, length, fieldName);
+                    layoutBuilder.add("$L.$L($L).withName($S)", MEMORY_ACCESS_CLASS, layoutMethod, length, fieldName);
                 } else {
-                    layoutBuilder.add("$L.$L().withName($S)", LAYOUT_FIELD_CLASS, layoutMethod, fieldName);
+                    layoutBuilder.add("$L.$L().withName($S)", MEMORY_ACCESS_CLASS, layoutMethod, fieldName);
                 }
                 if (i < fields.size() - 1) {
                     layoutBuilder.add(",\n");
@@ -73,7 +73,7 @@ public class ComponentGenerator extends AbstractGenerator {
                     String fieldName = field.getSimpleName().toString();
                     String constantName = "OFFSET_" + fieldName.toUpperCase();
                     return FieldSpec.builder(long.class, constantName, Modifier.PROTECTED, Modifier.STATIC, Modifier.FINAL)
-                            .initializer("$L.offsetOf(LAYOUT, $S)", LAYOUT_FIELD_CLASS, fieldName)
+                            .initializer("$L.offsetOf(LAYOUT, $S)", MEMORY_ACCESS_CLASS, fieldName)
                             .build();
                 })
                 .toList();
@@ -109,12 +109,12 @@ public class ComponentGenerator extends AbstractGenerator {
 
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                method.addStatement("$L.set(segment, offset + $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, size);
+                method.addStatement("$L.set(segment, offset + $L, data.$L(), $L)", MEMORY_ACCESS_CLASS, offsetName, fieldName, size);
             } else if (typeName.endsWith("[]")) {
                 int length = this.getArrayLength(field);
-                method.addStatement("$L.set(segment, offset + $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, length);
+                method.addStatement("$L.set(segment, offset + $L, data.$L(), $L)", MEMORY_ACCESS_CLASS, offsetName, fieldName, length);
             } else {
-                method.addStatement("$L.set(segment, offset + $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+                method.addStatement("$L.set(segment, offset + $L, data.$L())", MEMORY_ACCESS_CLASS, offsetName, fieldName);
             }
         }
         return method.build();
@@ -136,12 +136,12 @@ public class ComponentGenerator extends AbstractGenerator {
             String getterMethod = this.getGetterMethod(typeName);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                method.addStatement("$T $L = $L.$L(segment, offset + $L, $L)", String.class, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, size);
+                method.addStatement("$T $L = $L.$L(segment, offset + $L, $L)", String.class, fieldName, MEMORY_ACCESS_CLASS, getterMethod, offsetName, size);
             } else if (typeName.endsWith("[]")) {
                 int length = this.getArrayLength(field);
-                method.addStatement("$L $L = $L.$L(segment, offset + $L, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, length);
+                method.addStatement("$L $L = $L.$L(segment, offset + $L, $L)", typeName, fieldName, MEMORY_ACCESS_CLASS, getterMethod, offsetName, length);
             } else {
-                method.addStatement("$L $L = $L.$L(segment, offset + $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
+                method.addStatement("$L $L = $L.$L(segment, offset + $L)", typeName, fieldName, MEMORY_ACCESS_CLASS, getterMethod, offsetName);
             }
         }
 

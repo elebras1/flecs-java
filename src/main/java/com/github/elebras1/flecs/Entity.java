@@ -176,13 +176,13 @@ public class Entity {
 
     public <T> T get(long componentId) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
-        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
+        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
 
-        if (dataPtr == null || dataPtr.address() == 0) {
+        if (address == 0) {
             return null;
         }
 
-        MemorySegment dataSegment = dataPtr.reinterpret(component.size());
+        MemorySegment dataSegment = MemorySegment.ofAddress(address).reinterpret(component.size());
 
         return component.read(dataSegment, 0);
     }
@@ -198,29 +198,28 @@ public class Entity {
 
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
-        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
+        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
 
-        if (dataPtr == null || dataPtr.address() == 0) {
+        if (address == 0) {
             return null;
         }
 
-        MemorySegment dataSegment = dataPtr.reinterpret(component.size());
+        MemorySegment dataSegment = MemorySegment.ofAddress(address).reinterpret(component.size());
         return component.read(dataSegment, 0);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T getMutView(Class<?> componentClass) {
         ComponentView view = FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
-
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 
-        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
+        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
 
-        if (dataPtr == null || dataPtr.address() == 0) {
+        if (address == 0) {
             return null;
         }
 
-        view.setResource(dataPtr, 0);
+        view.setResource(address, 0);
 
         return (T) view;
     }
@@ -233,13 +232,13 @@ public class Entity {
 
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
-        MemorySegment dataPtr = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
+        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
 
-        if (dataPtr == null || dataPtr.address() == 0) {
+        if (address == 0) {
             return null;
         }
 
-        view.setResource(dataPtr, 0);
+        view.setResource(address, 0);
 
         return (T) view;
     }

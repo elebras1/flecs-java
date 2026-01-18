@@ -46,7 +46,7 @@ public class Field<T> {
         }
 
         long elementOffset = i * this.component.size();
-        this.componentView.setResource(this.memorySegment, elementOffset);
+        this.componentView.setResource(this.memorySegment.address(), elementOffset);
 
         return (V) this.componentView;
     }

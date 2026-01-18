@@ -1,4 +1,4 @@
-package com.github.elebras1.flecs.util;
+package com.github.elebras1.flecs.util.internal;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
@@ -7,9 +7,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class LayoutField {
+public final class MemoryAccess {
 
-    private LayoutField() {}
+    private MemoryAccess() {}
 
     public static MemoryLayout floatLayout() {
         return ValueLayout.JAVA_FLOAT;

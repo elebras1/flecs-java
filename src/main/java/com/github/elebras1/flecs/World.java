@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import static java.lang.foreign.ValueLayout.*;
 
 public class World implements AutoCloseable {
+    public static final MemorySegment WHOLE_MEMORY = MemorySegment.NULL.reinterpret(Long.MAX_VALUE);
     private final MemorySegment nativeWorld;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;

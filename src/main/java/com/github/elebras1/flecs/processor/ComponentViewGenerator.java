@@ -5,7 +5,6 @@ import com.palantir.javapoet.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.TypeMirror;
-import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,8 @@ public class ComponentViewGenerator extends AbstractGenerator {
 
     private static final String COMPONENT_VIEW_INTERFACE = "com.github.elebras1.flecs.ComponentView";
 
-    private static final ClassName LAYOUT_FIELD_CLASS = ClassName.get("com.github.elebras1.flecs.util", "LayoutField");
+    private static final ClassName MEMORY_ACCESS_CLASS = ClassName.get("com.github.elebras1.flecs.util.internal", "MemoryAccess");
+    private static final ClassName WORLD_CLASS = ClassName.get("com.github.elebras1.flecs", "World");
 
     public JavaFile generate(TypeElement recordElement, List<VariableElement> fields)  {
         String packageName = this.getPackageName(recordElement);
@@ -40,7 +40,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
 
     private List<FieldSpec> createFields() {
         return List.of(
-                FieldSpec.builder(MemorySegment.class, "memorySegment", Modifier.PRIVATE).build(),
+                FieldSpec.builder(long.class, "address", Modifier.PRIVATE).build(),
                 FieldSpec.builder(long.class, "offset", Modifier.PRIVATE).build()
         );
     }
@@ -49,10 +49,10 @@ public class ComponentViewGenerator extends AbstractGenerator {
         return MethodSpec.methodBuilder("setResource")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(MemorySegment.class, "memorySegment")
+                .addParameter(long.class, "address")
                 .addParameter(long.class, "offset")
                 .addJavadoc("Internal API - Do not use.\n")
-                .addStatement("this.memorySegment = memorySegment")
+                .addStatement("this.address = address")
                 .addStatement("this.offset = offset")
                 .build();
     }
@@ -88,7 +88,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(int.class, "index")
                     .returns(elementType)
-                    .addStatement("return $T.$L(memorySegment, offset + $L.$L, index)", LAYOUT_FIELD_CLASS, methodAtIndex, componentReference, offsetName)
+                    .addStatement("return $T.$L($T.WHOLE_MEMORY, address + offset + $L.$L, index)", MEMORY_ACCESS_CLASS, methodAtIndex, WORLD_CLASS, componentReference, offsetName)
                     .build());
 
             methods.add(MethodSpec.methodBuilder(fieldName)
@@ -96,7 +96,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                     .addParameter(int.class, "index")
                     .addParameter(elementType, "value")
                     .returns(viewType)
-                    .addStatement("$T.$L(memorySegment, offset + $L.$L, index, value)", LAYOUT_FIELD_CLASS, setterAtIndex, componentReference, offsetName)
+                    .addStatement("$T.$L($T.WHOLE_MEMORY, address + offset + $L.$L, index, value)", MEMORY_ACCESS_CLASS, setterAtIndex, WORLD_CLASS, componentReference, offsetName)
                     .addStatement("return this")
                     .build());
 
@@ -105,18 +105,18 @@ public class ComponentViewGenerator extends AbstractGenerator {
             String getterHelper = this.getGetterMethod(typeName);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                getter.addStatement("return $T.$L(memorySegment, offset + $L.$L, $L)", LAYOUT_FIELD_CLASS, getterHelper, componentReference, offsetName, size);
+                getter.addStatement("return $T.$L($T.WHOLE_MEMORY, address + offset + $L.$L, $L)", MEMORY_ACCESS_CLASS, getterHelper, WORLD_CLASS, componentReference, offsetName, size);
             } else {
-                getter.addStatement("return $T.$L(memorySegment, offset + $L.$L)", LAYOUT_FIELD_CLASS, getterHelper, componentReference, offsetName);
+                getter.addStatement("return $T.$L($T.WHOLE_MEMORY, address + offset + $L.$L)", MEMORY_ACCESS_CLASS, getterHelper, WORLD_CLASS, componentReference, offsetName);
             }
             methods.add(getter.build());
 
             MethodSpec.Builder setter = MethodSpec.methodBuilder(fieldName).addModifiers(Modifier.PUBLIC).addParameter(TypeName.get(field.asType()), "value").returns(viewType);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                setter.addStatement("$T.set(memorySegment, offset + $L.$L, value, $L)", LAYOUT_FIELD_CLASS, componentReference, offsetName, size);
+                setter.addStatement("$T.set($T.WHOLE_MEMORY, address + offset + $L.$L, value, $L)", MEMORY_ACCESS_CLASS, WORLD_CLASS, componentReference, offsetName, size);
             } else {
-                setter.addStatement("$T.set(memorySegment, offset + $L.$L, value)", LAYOUT_FIELD_CLASS, componentReference, offsetName);
+                setter.addStatement("$T.set($T.WHOLE_MEMORY, address + offset + $L.$L, value)", MEMORY_ACCESS_CLASS, WORLD_CLASS, componentReference, offsetName);
             }
             setter.addStatement("return this");
             methods.add(setter.build());
