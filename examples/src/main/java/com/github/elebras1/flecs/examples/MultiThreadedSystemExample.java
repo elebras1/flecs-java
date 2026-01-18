@@ -10,7 +10,6 @@ import java.util.Random;
 public class MultiThreadedSystemExample {
     public static void main(String[] args) {
         try (World world = new World()) {
-            System.out.println("=== Test Multithreaded system + native access ===");
             world.component(Minister.class);
             world.setThreads(4);
 

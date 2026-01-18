@@ -250,7 +250,7 @@ public class ComponentHooks<T> {
 
         for (int i = 0; i < count; i++) {
             MemorySegment componentSegment = buffer.asSlice(i * size, size);
-            array[i] = this.component.read(componentSegment);
+            array[i] = this.component.read(componentSegment, 0);
         }
 
         return array;
@@ -262,8 +262,7 @@ public class ComponentHooks<T> {
 
         for (int i = 0; i < count; i++) {
             if (components[i] != null) {
-                MemorySegment componentSegment = buffer.asSlice(i * size, size);
-                this.component.write(componentSegment, components[i]);
+                this.component.write(buffer, i * size, components[i]);
             }
         }
     }

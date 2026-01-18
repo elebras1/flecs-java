@@ -7,9 +7,9 @@ public interface Component<T> {
 
     MemoryLayout layout();
 
-    void write(MemorySegment segment, T data);
+    void write(MemorySegment segment, long offset, T data);
 
-    T read(MemorySegment segment);
+    T read(MemorySegment segment, long offset);
 
     T[] createArray(int size);
 

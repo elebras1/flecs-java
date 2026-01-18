@@ -152,7 +152,7 @@ public class Entity {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
 
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, data);
+        component.write(dataSegment, 0, data);
         flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
 
         return this;
@@ -167,7 +167,7 @@ public class Entity {
 
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, data);
+        component.write(dataSegment, 0, data);
 
         flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, pairId, component.size(), dataSegment);
 
@@ -184,7 +184,7 @@ public class Entity {
 
         MemorySegment dataSegment = dataPtr.reinterpret(component.size());
 
-        return component.read(dataSegment);
+        return component.read(dataSegment, 0);
     }
 
     public <T> T get(Class<T> componentClass) {
@@ -205,7 +205,7 @@ public class Entity {
         }
 
         MemorySegment dataSegment = dataPtr.reinterpret(component.size());
-        return component.read(dataSegment);
+        return component.read(dataSegment, 0);
     }
 
     @SuppressWarnings("unchecked")

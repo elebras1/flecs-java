@@ -99,6 +99,7 @@ public class ComponentGenerator extends AbstractGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(MemorySegment.class, "segment")
+                .addParameter(long.class, "offset")
                 .addParameter(TypeVariableName.get(recordName), "data");
 
         for (VariableElement field : fields) {
@@ -108,12 +109,12 @@ public class ComponentGenerator extends AbstractGenerator {
 
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                method.addStatement("$L.set(segment, $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, size);
+                method.addStatement("$L.set(segment, offset + $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, size);
             } else if (typeName.endsWith("[]")) {
                 int length = this.getArrayLength(field);
-                method.addStatement("$L.set(segment, $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, length);
+                method.addStatement("$L.set(segment, offset + $L, data.$L(), $L)", LAYOUT_FIELD_CLASS, offsetName, fieldName, length);
             } else {
-                method.addStatement("$L.set(segment, $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
+                method.addStatement("$L.set(segment, offset + $L, data.$L())", LAYOUT_FIELD_CLASS, offsetName, fieldName);
             }
         }
         return method.build();
@@ -124,7 +125,8 @@ public class ComponentGenerator extends AbstractGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, recordName))
-                .addParameter(MemorySegment.class, "segment");
+                .addParameter(MemorySegment.class, "segment")
+                .addParameter(long.class, "offset");
 
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
@@ -134,12 +136,12 @@ public class ComponentGenerator extends AbstractGenerator {
             String getterMethod = this.getGetterMethod(typeName);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                method.addStatement("$T $L = $L.$L(segment, $L, $L)", String.class, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, size);
+                method.addStatement("$T $L = $L.$L(segment, offset + $L, $L)", String.class, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, size);
             } else if (typeName.endsWith("[]")) {
                 int length = this.getArrayLength(field);
-                method.addStatement("$L $L = $L.$L(segment, $L, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, length);
+                method.addStatement("$L $L = $L.$L(segment, offset + $L, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName, length);
             } else {
-                method.addStatement("$L $L = $L.$L(segment, $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
+                method.addStatement("$L $L = $L.$L(segment, offset + $L)", typeName, fieldName, LAYOUT_FIELD_CLASS, getterMethod, offsetName);
             }
         }
 

@@ -141,7 +141,7 @@ public class Table {
         }
         long elementOffset = (long) row * component.size();
         MemorySegment elementSegment = columnPtr.reinterpret(component.size() * this.count()).asSlice(elementOffset, component.size());
-        return component.read(elementSegment);
+        return component.read(elementSegment, 0);
     }
 
     public <T> T tryGet(Class<T> componentClass, int row) {
@@ -156,7 +156,7 @@ public class Table {
         }
         long elementOffset = (long) row * component.size();
         MemorySegment elementSegment = columnPtr.reinterpret(component.size() * this.count()).asSlice(elementOffset, component.size());
-        return component.read(elementSegment);
+        return component.read(elementSegment, 0);
     }
 
     public LongList entities() {

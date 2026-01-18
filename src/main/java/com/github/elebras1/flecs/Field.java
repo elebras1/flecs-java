@@ -33,9 +33,7 @@ public class Field<T> {
         }
 
         long elementOffset = i * this.component.size();
-        MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, this.component.size());
-
-        return this.component.read(elementSegment);
+        return this.component.read(this.memorySegment, elementOffset);
     }
 
     @SuppressWarnings("unchecked")
@@ -61,11 +59,7 @@ public class Field<T> {
             throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
         }
 
-        try (Arena tempArena = Arena.ofConfined()) {
-            long elementOffset = i * this.component.size();
-            MemorySegment elementSegment = this.memorySegment.asSlice(elementOffset, this.component.size());
-
-            this.component.write(elementSegment, componentData);
-        }
+        long elementOffset = i * this.component.size();
+        this.component.write(this.memorySegment, elementOffset, componentData);
     }
 }
