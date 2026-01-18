@@ -63,8 +63,27 @@ jobs:
 
       - name: Verify native library was built
         run: |
-          echo "Checking for native library..."
-          ls -la build/natives/${{ matrix.platform }}-${{ matrix.arch }}/
+          FILE_PATH="build/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}"
+          echo "Checking for native library at $FILE_PATH..."
+          
+          if [ ! -f "$FILE_PATH" ]; then
+            echo "Error: Native library not found!"
+            exit 1
+          fi
+          
+          # Vérification de la taille (102400 octets = 100ko)
+          FILE_SIZE=$(wc -c < "$FILE_PATH")
+          MIN_SIZE=102400
+          
+          echo "File size: $FILE_SIZE bytes"
+          
+          if [ "$FILE_SIZE" -lt "$MIN_SIZE" ]; then
+            echo "Error: File size is too small ($FILE_SIZE bytes). Expected at least $MIN_SIZE bytes."
+            exit 1
+          fi
+          
+          echo "✓ File exists and size is valid."
+          ls -la "$FILE_PATH"
         shell: bash
 
       - name: Upload natives artifact
