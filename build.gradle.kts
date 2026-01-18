@@ -158,7 +158,6 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-Ofast",
             archFlag,
             "-flto",
-            "-fvisibility=hidden",
             "-fno-semantic-interposition",
             "-fno-plt",
             "-fomit-frame-pointer",
