@@ -1,6 +1,5 @@
 package com.github.elebras1.flecs;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
 public class Field<T> {

@@ -1,5 +1,7 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.util.FlecsConstants;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -169,6 +171,47 @@ public class SystemBuilder {
         term.set(ValueLayout.JAVA_INT, inoutOffset, EcsInOut);
 
         return this;
+    }
+
+    public SystemBuilder operator(int operator) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'operator' modifier to");
+        }
+
+        long termsOffset = ecs_query_desc_t.terms$offset();
+        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+
+        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
+        ecs_term_t.oper(term, (short) operator);
+        return this;
+    }
+
+    public SystemBuilder and() {
+        return this.operator(FlecsConstants.EcsAnd);
+    }
+
+    public SystemBuilder or() {
+        return this.operator(FlecsConstants.EcsOr);
+    }
+
+    public SystemBuilder not() {
+        return this.operator(FlecsConstants.EcsNot);
+    }
+
+    public SystemBuilder optional() {
+        return this.operator(FlecsConstants.EcsOptional);
+    }
+
+    public SystemBuilder andFrom() {
+        return this.operator(FlecsConstants.EcsAndFrom);
+    }
+
+    public SystemBuilder orFrom() {
+        return this.operator(FlecsConstants.EcsOrFrom);
+    }
+
+    public SystemBuilder notFrom() {
+        return this.operator(FlecsConstants.EcsNotFrom);
     }
 
     public <T> SystemBuilder write(Class<T> componentClass) {

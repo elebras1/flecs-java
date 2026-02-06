@@ -1,5 +1,7 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.util.FlecsConstants;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -101,45 +103,96 @@ public class ObserverBuilder {
         return this;
     }
 
-    public ObserverBuilder without(long componentId) {
-        this.with(componentId);
-
+    public ObserverBuilder in() {
         if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'without' modifier to");
+            throw new IllegalStateException("No term to apply 'in' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long operOffset = ecs_term_t.oper$offset();
-
-        term.set(ValueLayout.JAVA_SHORT, operOffset, (short) EcsNot);
-
-        return this;
-    }
-
-    public <T> ObserverBuilder without(Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.without(componentId);
-    }
-
-    public ObserverBuilder filter() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'filter' modifier to");
-        }
-
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
+        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
         MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_SHORT, inoutOffset, (short) EcsIn);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsIn);
 
         return this;
+    }
+
+    public ObserverBuilder out() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'out' modifier to");
+        }
+
+        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        long termsOffset = ecs_query_desc_t.terms$offset();
+        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+
+        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        long inoutOffset = ecs_term_t.inout$offset();
+
+        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsOut);
+
+        return this;
+    }
+
+    public ObserverBuilder inOut() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'inout' modifier to");
+        }
+
+        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        long termsOffset = ecs_query_desc_t.terms$offset();
+        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+
+        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        long inoutOffset = ecs_term_t.inout$offset();
+
+        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsInOut);
+
+        return this;
+    }
+
+    public ObserverBuilder operator(int operator) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'operator' modifier to");
+        }
+
+        long termsOffset = ecs_query_desc_t.terms$offset();
+        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+
+        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
+        ecs_term_t.oper(term, (short) operator);
+        return this;
+    }
+
+    public ObserverBuilder and() {
+        return this.operator(FlecsConstants.EcsAnd);
+    }
+
+    public ObserverBuilder or() {
+        return this.operator(FlecsConstants.EcsOr);
+    }
+
+    public ObserverBuilder not() {
+        return this.operator(FlecsConstants.EcsNot);
+    }
+
+    public ObserverBuilder optional() {
+        return this.operator(FlecsConstants.EcsOptional);
+    }
+
+    public ObserverBuilder andFrom() {
+        return this.operator(FlecsConstants.EcsAndFrom);
+    }
+
+    public ObserverBuilder orFrom() {
+        return this.operator(FlecsConstants.EcsOrFrom);
+    }
+
+    public ObserverBuilder notFrom() {
+        return this.operator(FlecsConstants.EcsNotFrom);
     }
 
     public ObserverBuilder yieldExisting() {

@@ -48,7 +48,7 @@ public class ObserverExample {
             e3.set(new Velocity(2.0f, 2.0f));
             e3.remove(Velocity.class);
 
-            world.observer().with(Position.class).with(Velocity.class).filter().event(EcsOnAdd).each((entityId) ->
+            world.observer().with(Position.class).with(Velocity.class).inOut().event(EcsOnAdd).each((entityId) ->
                     System.out.println("Position added to entity with Velocity: " + entityId)
             );
 
