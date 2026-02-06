@@ -30,8 +30,8 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.5.2'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.5.2'
+    implementation 'io.github.elebras1:flecs-java:0.5.3'
+    annotationProcessor 'io.github.elebras1:flecs-java:0.5.3'
 
 }
 ```
@@ -78,6 +78,9 @@ public class Example {
             Entity enemy = world.obtainEntity(world.entity("Enemy"));
             enemy.set(new Position(10, 5))
                  .set(new Velocity(-0.5f, 0));
+
+            // Set number of worker threads
+            world.setThreads(4);
             
             // Create a movement system
             world.system("MoveSystem")
