@@ -178,10 +178,11 @@ public class SystemBuilder {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
 
+        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
         ecs_term_t.oper(term, (short) operator);
         return this;
     }
