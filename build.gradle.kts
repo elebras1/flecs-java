@@ -397,3 +397,7 @@ configure<SigningExtension> {
         sign(publishing.publications["maven"])
     }
 }
+
+extra["flecsVersion"] = flecsVersion
+extra["flecsIncludeDir"] = File(flecsSourceDir, "include")
+extra["flecsLibDir"] = File(flecsSourceDir, "distr")

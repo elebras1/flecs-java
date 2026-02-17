@@ -1,0 +1,46 @@
+Machine Configuration
+============================================================
+OS      : Linux 6.14.0-29-generic
+Kernel  : 6.14.0-29-generic
+CPU     : AMD Ryzen 5 5600GT with Radeon Graphics
+Cores   : 12
+RAM     : 15 GB
+JVM     : Eclipse Adoptium 25.0.2
+GCC     : gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
+============================================================
+
+BENCHMARK RESULTS — flecs-java vs flecs C
+Date : 2026-02-17 21:58:51
+
+[ Java / JMH ]
+------------------------------------------------------------
+Benchmark                                                          Mode  Cnt    Score    Error   Units
+EntityCreationBenchmark.create                                     avgt    3    0,014 ±  0,001   us/op
+EntityCreationBenchmark.create:·gc.alloc.rate                      avgt    3    3,686 ±  0,263  MB/sec
+EntityCreationBenchmark.create:·gc.alloc.rate.norm                 avgt    3    0,199 ±  0,001    B/op
+EntityCreationBenchmark.create:·gc.count                           avgt    3      ≈ 0           counts
+EntityCreationBenchmark.createWith2Components                      avgt    3    0,164 ±  0,005   us/op
+EntityCreationBenchmark.createWith2Components:·gc.alloc.rate       avgt    3  295,721 ±  5,628  MB/sec
+EntityCreationBenchmark.createWith2Components:·gc.alloc.rate.norm  avgt    3   64,204 ±  0,001    B/op
+EntityCreationBenchmark.createWith2Components:·gc.count            avgt    3    6,000           counts
+EntityCreationBenchmark.createWith2Components:·gc.time             avgt    3    2,000               ms
+QueryBenchmark.query                                               avgt    3    0,004 ±  0,001   us/op
+QueryBenchmark.query:·gc.alloc.rate                                avgt    3    7,448 ±  4,253  MB/sec
+QueryBenchmark.query:·gc.alloc.rate.norm                           avgt    3    0,029 ±  0,019    B/op
+QueryBenchmark.query:·gc.count                                     avgt    3      ≈ 0           counts
+
+[ C / Native ]
+------------------------------------------------------------
+== Flecs C Benchmark ==
+Benchmark: create                   
+  Mode: AverageTime, Time: us
+  Score: 1639.587 us/batch (100k) | 0.016396 us/op
+---------------------------------------------------
+Benchmark: createWith2Components    
+  Mode: AverageTime, Time: us
+  Score: 11296.630 us/batch (100k) | 0.112966 us/op
+---------------------------------------------------
+Benchmark: query                    
+  Mode: AverageTime, Time: us
+  Score: 117.291 us/batch (100k) | 0.001173 us/op
+---------------------------------------------------

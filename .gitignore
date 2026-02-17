@@ -57,3 +57,5 @@ docs/javadoc/
 flecs-*.tar.gz
 libflecs.*
 
+compile_flags.txt
+
