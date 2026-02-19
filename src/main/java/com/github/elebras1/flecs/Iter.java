@@ -1,33 +1,27 @@
 package com.github.elebras1.flecs;
 
-import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.util.Arrays;
 
 public class Iter {
 
     private MemorySegment nativeIter;
     private final World world;
     private int count;
-    private final MemorySegment[] cachedColumns;
 
     Iter(MemorySegment nativeIter, World world) {
         this.nativeIter = nativeIter;
         this.world = world;
         this.count = -1;
-        this.cachedColumns = new MemorySegment[32];
     }
 
     void setNativeIter(MemorySegment nativeIter) {
         this.nativeIter = nativeIter;
         this.count = -1;
-        Arrays.fill(cachedColumns, null);
     }
 
     public boolean next() {
         this.count = -1;
-        Arrays.fill(cachedColumns, null);
         return flecs_h.ecs_iter_next(this.nativeIter);
     }
 
@@ -71,7 +65,7 @@ public class Iter {
         MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), flecsIndex);
 
         if (columnPtr == null || columnPtr.address() == 0) {
-            return new Field<>(null, this.count(), this.world, componentClass);
+            return null;
         }
 
         return new Field<>(columnPtr, this.count(), this.world, componentClass);

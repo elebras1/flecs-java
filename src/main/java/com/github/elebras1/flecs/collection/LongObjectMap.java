@@ -3,20 +3,23 @@ package com.github.elebras1.flecs.collection;
 import java.util.Arrays;
 
 public final class LongObjectMap<V> {
-    private static final int CAPACITY = 512;
-    private static final int MASK = 511;
     private static final long EMPTY_KEY = -1L;
-
     private final long[] keys;
     private final V[] values;
+    private final int mask;
     private int size;
 
     @SuppressWarnings("unchecked")
-    public LongObjectMap() {
-        this.keys = new long[CAPACITY];
-        this.values = (V[]) new Object[CAPACITY];
-        this.size = 0;
-        Arrays.fill(keys, EMPTY_KEY);
+    public LongObjectMap(int expectedSize) {
+        int capacity = nextPowerOfTwo(Math.max(expectedSize * 2, 16));
+        this.mask = capacity - 1;
+        this.keys = new long[capacity];
+        this.values = (V[]) new Object[capacity];
+        Arrays.fill(this.keys, EMPTY_KEY);
+    }
+
+    private static int nextPowerOfTwo(int n) {
+        return 1 << (32 - Integer.numberOfLeadingZeros(n - 1));
     }
 
     private static int hash(long key) {
@@ -32,42 +35,29 @@ public final class LongObjectMap<V> {
         final long[] keysLocal = this.keys;
         final V[] valuesLocal = this.values;
 
-        int idx = hash(key) & MASK;
+        int idx = hash(key) & this.mask;
         long k = keysLocal[idx];
 
-        if (k == key) {
-            return valuesLocal[idx];
-        }
-        if (k == EMPTY_KEY) {
-            return null;
-        }
+        if (k == key) return valuesLocal[idx];
+        if (k == EMPTY_KEY) return null;
 
-        idx = (idx + 1) & MASK;
+        idx = (idx + 1) & this.mask;
         k = keysLocal[idx];
-        if (k == key) {
-            return valuesLocal[idx];
-        }
-        if (k == EMPTY_KEY) {
-            return null;
-        }
+        if (k == key) return valuesLocal[idx];
+        if (k == EMPTY_KEY) return null;
 
-        idx = (idx + 1) & MASK;
+        idx = (idx + 1) & this.mask;
         k = keysLocal[idx];
-        if (k == key) {
-            return valuesLocal[idx];
-        }
-        if (k == EMPTY_KEY) {
-            return null;
-        }
+        if (k == key) return valuesLocal[idx];
+        if (k == EMPTY_KEY) return null;
 
-        return getSlowPath(key, idx, keysLocal, valuesLocal);
+        return this.getSlowPath(key, idx, keysLocal, valuesLocal);
     }
 
     private V getSlowPath(long key, int idx, long[] keysLocal, V[] valuesLocal) {
         while (true) {
-            idx = (idx + 1) & MASK;
+            idx = (idx + 1) & this.mask;
             long k = keysLocal[idx];
-
             if (k == key) return valuesLocal[idx];
             if (k == EMPTY_KEY) return null;
         }
@@ -77,20 +67,19 @@ public final class LongObjectMap<V> {
         if (value == null) {
             throw new IllegalArgumentException("Null values not allowed");
         }
-
-        if (size >= CAPACITY - 1) {
+        if (this.size == this.mask + 1) {
             throw new IllegalStateException("Map is full");
         }
 
         final long[] keysLocal = this.keys;
-        int idx = hash(key) & MASK;
+        int idx = hash(key) & this.mask;
 
         while (keysLocal[idx] != EMPTY_KEY) {
             if (keysLocal[idx] == key) {
                 this.values[idx] = value;
                 return;
             }
-            idx = (idx + 1) & MASK;
+            idx = (idx + 1) & this.mask;
         }
 
         keysLocal[idx] = key;

@@ -6,9 +6,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.Element;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class ComponentMapGenerator {
@@ -21,10 +19,14 @@ public class ComponentMapGenerator {
     public JavaFile generateComponentMap(List<TypeElement> components) {
         TypeSpec.Builder mapClass = TypeSpec.classBuilder(MAP_COMPONENT_CLASS_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addField(this.createMapField(components.size()))
-                .addField(this.createViewMapField(components.size()))
+                .addField(this.createComponentSizeField(components))
+                .addField(this.createComponentsField())
+                .addField(this.createComponentViewsField())
+                .addField(this.createClassValueField(components))
                 .addStaticBlock(this.createStaticInitializer(components))
                 .addMethod(this.createConstructor())
+                .addMethod(this.createGetIndexMethod())
+                .addMethod(this.createSizeMethod())
                 .addMethod(this.createGetInstanceMethod())
                 .addMethod(this.createGetViewMethod());
 
@@ -34,81 +36,143 @@ public class ComponentMapGenerator {
                 .build();
     }
 
-    private FieldSpec createMapField(int componentsSize) {
-        ParameterizedTypeName mapType = ParameterizedTypeName.get(
-                ClassName.get(Map.class),
-                ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)),
-                ParameterizedTypeName.get(COMPONENT_INTERFACE, WildcardTypeName.subtypeOf(Object.class))
-        );
-
-        return FieldSpec.builder(mapType, "COMPONENT_MAP", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new $T<>($L)", IdentityHashMap.class, componentsSize)
+    private FieldSpec createComponentSizeField(List<TypeElement> components) {
+        return FieldSpec.builder(int.class, "COMPONENT_COUNT",
+                Modifier.PRIVATE,
+                javax.lang.model.element.Modifier.STATIC,
+                javax.lang.model.element.Modifier.FINAL)
+                .initializer("$L", components.size())
                 .build();
     }
 
-    private FieldSpec createViewMapField(int componentsSize) {
-        ParameterizedTypeName supplierType = ParameterizedTypeName.get(ClassName.get(Supplier.class), COMPONENT_VIEW_INTERFACE);
-        ParameterizedTypeName mapType = ParameterizedTypeName.get(
-                ClassName.get(Map.class),
-                ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)),
-                supplierType
-        );
+    private FieldSpec createComponentsField() {
+        return FieldSpec.builder(ArrayTypeName.of(ParameterizedTypeName.get(
+                        COMPONENT_INTERFACE, WildcardTypeName.subtypeOf(Object.class))),
+                "COMPONENTS",
+                javax.lang.model.element.Modifier.PRIVATE,
+                javax.lang.model.element.Modifier.STATIC,
+                javax.lang.model.element.Modifier.FINAL
+        ).build();
+    }
 
-        return FieldSpec.builder(mapType, "VIEW_MAP", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new $T<>($L)", IdentityHashMap.class, componentsSize)
+    private FieldSpec createComponentViewsField() {
+        ParameterizedTypeName supplierType = ParameterizedTypeName.get(ClassName.get(Supplier.class), COMPONENT_VIEW_INTERFACE);
+        return FieldSpec.builder(
+                ArrayTypeName.of(supplierType),
+                "VIEWS",
+                javax.lang.model.element.Modifier.PRIVATE,
+                javax.lang.model.element.Modifier.STATIC,
+                javax.lang.model.element.Modifier.FINAL
+        ).build();
+    }
+
+    private FieldSpec createClassValueField(List<TypeElement> components) {
+        ParameterizedTypeName classValueType = ParameterizedTypeName.get(
+                ClassName.get(ClassValue.class), ClassName.get(Integer.class));
+
+        TypeSpec anonymousClassValue = TypeSpec.anonymousClassBuilder("")
+                .superclass(classValueType)
+                .addMethod(MethodSpec.methodBuilder("computeValue")
+                        .addAnnotation(Override.class)
+                        .addModifiers(javax.lang.model.element.Modifier.PROTECTED)
+                        .returns(ClassName.get(Integer.class))
+                        .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)), "clazz")
+                        .addCode(this.createComputeValueBody(components))
+                        .build())
                 .build();
+
+        return FieldSpec.builder(classValueType, "COMPONENT_INDEX",
+                        javax.lang.model.element.Modifier.PRIVATE,
+                        javax.lang.model.element.Modifier.STATIC,
+                        javax.lang.model.element.Modifier.FINAL)
+                .initializer("$L", anonymousClassValue)
+                .build();
+    }
+
+    private CodeBlock createComputeValueBody(List<TypeElement> components) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+        int index = 0;
+        for (TypeElement component : components) {
+            String packageName = this.getPackageName(component);
+            String recordName = component.getSimpleName().toString();
+            ClassName recordClass = ClassName.get(packageName, recordName);
+            builder.addStatement("if (clazz == $T.class) return $L", recordClass, index++);
+        }
+        builder.addStatement("return -1");
+        return builder.build();
     }
 
     private CodeBlock createStaticInitializer(List<TypeElement> components) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
+        builder.add("COMPONENTS = new $T[] {\n", ParameterizedTypeName.get(COMPONENT_INTERFACE, WildcardTypeName.subtypeOf(Object.class)));
         for (TypeElement component : components) {
             String packageName = this.getPackageName(component);
             String recordName = component.getSimpleName().toString();
-
-            ClassName recordClass = ClassName.get(packageName, recordName);
             ClassName componentClass = ClassName.get(packageName, recordName + "Component");
-            ClassName viewClass = ClassName.get(packageName, recordName + "View");
-
-            builder.addStatement("COMPONENT_MAP.put($T.class, $T.getInstance())", recordClass, componentClass);
-            builder.addStatement("VIEW_MAP.put($T.class, $T::new)", recordClass, viewClass);
+            builder.add("    $T.getInstance(),\n", componentClass);
         }
+        builder.add("};\n\n");
+
+        builder.add("VIEWS = new $T[] {\n", ClassName.get(Supplier.class));
+        for (TypeElement component : components) {
+            String packageName = this.getPackageName(component);
+            String recordName = component.getSimpleName().toString();
+            ClassName viewClass = ClassName.get(packageName, recordName + "View");
+            builder.add("    $T::new,\n", viewClass);
+        }
+        builder.add("};\n");
 
         return builder.build();
     }
 
     private MethodSpec createConstructor() {
         return MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
-                .addComment("Private constructor to prevent instantiation")
+                .addModifiers(javax.lang.model.element.Modifier.PRIVATE)
+                .build();
+    }
+
+    private MethodSpec createGetIndexMethod() {
+        return MethodSpec.methodBuilder("getIndex")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)), "componentClass")
+                .returns(TypeName.INT)
+                .addStatement("return COMPONENT_INDEX.get(componentClass)")
+                .build();
+    }
+
+    private MethodSpec createSizeMethod() {
+        return MethodSpec.methodBuilder("size")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.INT)
+                .addStatement("return COMPONENT_COUNT")
                 .build();
     }
 
     private MethodSpec createGetInstanceMethod() {
-        MethodSpec.Builder method = MethodSpec.methodBuilder("getInstance")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        return MethodSpec.methodBuilder("getInstance")
+                .addModifiers(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.STATIC)
                 .addTypeVariable(TypeVariableName.get("T"))
                 .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T")), "componentClass")
                 .returns(ParameterizedTypeName.get(COMPONENT_INTERFACE, TypeVariableName.get("T")))
-                .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
-                        .addMember("value", "$S", "unchecked")
-                        .build());
-
-        method.addStatement("return ($T<T>) COMPONENT_MAP.get(componentClass)", COMPONENT_INTERFACE);
-
-        return method.build();
+                .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$S", "unchecked").build())
+                .addStatement("int index = COMPONENT_INDEX.get(componentClass)")
+                .addStatement("return index >= 0 ? ($T<T>) COMPONENTS[index] : null", COMPONENT_INTERFACE)
+                .build();
     }
 
     private MethodSpec createGetViewMethod() {
-        MethodSpec.Builder method = MethodSpec.methodBuilder("getView")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        ParameterizedTypeName supplierType = ParameterizedTypeName.get(ClassName.get(Supplier.class), COMPONENT_VIEW_INTERFACE);
+
+        return MethodSpec.methodBuilder("getView")
+                .addModifiers(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.STATIC)
                 .addTypeVariable(TypeVariableName.get("T"))
                 .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T")), "componentClass")
                 .returns(COMPONENT_VIEW_INTERFACE)
-                .addStatement("$T supplier = VIEW_MAP.get(componentClass)", ParameterizedTypeName.get(ClassName.get(Supplier.class), COMPONENT_VIEW_INTERFACE))
-                .addStatement("return supplier != null ? supplier.get() : null");
-
-        return method.build();
+                .addStatement("int index = COMPONENT_INDEX.get(componentClass)")
+                .addStatement("$T supplier = index >= 0 ? VIEWS[index] : null", supplierType)
+                .addStatement("return supplier != null ? supplier.get() : null")
+                .build();
     }
 
     private String getPackageName(TypeElement element) {

@@ -17,9 +17,9 @@ public class ComponentRegistry {
 
     protected ComponentRegistry(World world) {
         this.world = world;
-        this.componentIds = new ClassLongMap();
-        this.componentClasses = new LongClassMap();
-        this.components = new LongObjectMap<>();
+        this.componentIds = new ClassLongMap(ComponentMap.size());
+        this.componentClasses = new LongClassMap(ComponentMap.size());
+        this.components = new LongObjectMap<>(ComponentMap.size());
     }
 
     protected <T> long register(Class<T> componentClass) {

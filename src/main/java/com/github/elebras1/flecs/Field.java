@@ -15,18 +15,11 @@ public class Field<T> {
         this.componentView = FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
     }
 
-    public boolean isSet() {
-        return this.memorySegment != null && this.memorySegment.address() != 0;
-    }
-
     public int count() {
         return this.count;
     }
 
     public T get(int i) {
-        if (!this.isSet()) {
-            throw new IllegalStateException("Field is not set.");
-        }
         if (i < 0 || i >= this.count) {
             throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
         }
@@ -37,9 +30,6 @@ public class Field<T> {
 
     @SuppressWarnings("unchecked")
     public <V extends ComponentView> V getMutView(int i) {
-        if (!this.isSet()) {
-            throw new IllegalStateException("Field is not set.");
-        }
         if (i < 0 || i >= this.count) {
             throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
         }
@@ -51,9 +41,6 @@ public class Field<T> {
     }
 
     public void set(int i, T componentData) {
-        if (!this.isSet()) {
-            throw new IllegalStateException("Field is not set.");
-        }
         if (i < 0 || i >= this.count) {
             throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
         }

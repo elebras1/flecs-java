@@ -9,14 +9,22 @@ public class FlecsContext {
     public static class ViewCache {
         private static final int BUFFER_SIZE = 16;
         private static final int MASK = BUFFER_SIZE - 1;
-        private final Map<Class<?>, ComponentView[]> componentViewPools;
-        private final Map<Class<?>, int[]> componentViewCursors;
+        private final ComponentViewPool[] componentViewPools;
         private final EntityView[] entityViewPool;
         private int entityViewCursor;
 
+        private static class ComponentViewPool {
+            final ComponentView[] pool;
+            int cursor;
+
+            ComponentViewPool(ComponentView[] pool, int cursor) {
+                this.pool = pool;
+                this.cursor = cursor;
+            }
+        }
+
         public ViewCache(World world) {
-            this.componentViewPools = new IdentityHashMap<>();
-            this.componentViewCursors = new IdentityHashMap<>();
+            this.componentViewPools = new ComponentViewPool[ComponentMap.size()];
             this.entityViewPool = new EntityView[BUFFER_SIZE];
             for (int i = 0; i < BUFFER_SIZE; i++) {
                 this.entityViewPool[i] = new EntityView(world, 0);
@@ -32,23 +40,21 @@ public class FlecsContext {
         }
 
         public ComponentView getComponentView(Class<?> componentClass) {
-            ComponentView[] pool = this.componentViewPools.get(componentClass);
+            int index = ComponentMap.getIndex(componentClass);
+            ComponentViewPool viewPool = this.componentViewPools[index];
 
-            if (pool == null) {
-                pool = new ComponentView[BUFFER_SIZE];
+            if (viewPool == null) {
+                ComponentView[] pool = new ComponentView[BUFFER_SIZE];
                 for (int i = 0; i < BUFFER_SIZE; i++) {
                     pool[i] = ComponentMap.getView(componentClass);
                 }
-                this.componentViewPools.put(componentClass, pool);
-                this.componentViewCursors.put(componentClass, new int[]{0});
+                viewPool = new ComponentViewPool(pool, 0);
+                this.componentViewPools[index] = viewPool;
             }
 
-            int[] cursorRef = this.componentViewCursors.get(componentClass);
-            int index = cursorRef[0];
-
-            ComponentView view = pool[index];
-            cursorRef[0] = (index + 1) & MASK;
-
+            int cursor = viewPool.cursor;
+            ComponentView view = viewPool.pool[cursor];
+            viewPool.cursor = (cursor + 1) & MASK;
             return view;
         }
     }

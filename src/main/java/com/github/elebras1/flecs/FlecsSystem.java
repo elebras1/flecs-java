@@ -2,7 +2,6 @@ package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.util.FlecsConstants;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
 public class FlecsSystem {
