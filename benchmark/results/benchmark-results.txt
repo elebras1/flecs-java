@@ -9,38 +9,52 @@ JVM     : Eclipse Adoptium 25.0.2
 GCC     : gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
 ============================================================
 
-BENCHMARK RESULTS — flecs-java vs flecs C
-Date : 2026-02-17 21:58:51
+BENCHMARK RESULTS — flecs-java vs flecs C vs Artemis-odb
+Date : 2026-02-21 10:00:11
 
 [ Java / JMH ]
 ------------------------------------------------------------
-Benchmark                                                          Mode  Cnt    Score    Error   Units
-EntityCreationBenchmark.create                                     avgt    3    0,014 ±  0,001   us/op
-EntityCreationBenchmark.create:·gc.alloc.rate                      avgt    3    3,686 ±  0,263  MB/sec
-EntityCreationBenchmark.create:·gc.alloc.rate.norm                 avgt    3    0,199 ±  0,001    B/op
-EntityCreationBenchmark.create:·gc.count                           avgt    3      ≈ 0           counts
-EntityCreationBenchmark.createWith2Components                      avgt    3    0,164 ±  0,005   us/op
-EntityCreationBenchmark.createWith2Components:·gc.alloc.rate       avgt    3  295,721 ±  5,628  MB/sec
-EntityCreationBenchmark.createWith2Components:·gc.alloc.rate.norm  avgt    3   64,204 ±  0,001    B/op
-EntityCreationBenchmark.createWith2Components:·gc.count            avgt    3    6,000           counts
-EntityCreationBenchmark.createWith2Components:·gc.time             avgt    3    2,000               ms
-QueryBenchmark.query                                               avgt    3    0,004 ±  0,001   us/op
-QueryBenchmark.query:·gc.alloc.rate                                avgt    3    7,448 ±  4,253  MB/sec
-QueryBenchmark.query:·gc.alloc.rate.norm                           avgt    3    0,029 ±  0,019    B/op
-QueryBenchmark.query:·gc.count                                     avgt    3      ≈ 0           counts
+Benchmark                                                                               Mode  Cnt     Score     Error   Units
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create                                     avgt    3     0,011 ±   0,001   us/op
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.alloc.rate                      avgt    3  4915,775 ± 359,349  MB/sec
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.alloc.rate.norm                 avgt    3    54,273 ±   0,001    B/op
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.count                           avgt    3    45,000            counts
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.time                            avgt    3    39,000                ms
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components                      avgt    3     0,071 ±   0,003   us/op
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate       avgt    3  2154,753 ±  76,936  MB/sec
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate.norm  avgt    3   160,403 ±   0,001    B/op
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.count            avgt    3    20,000            counts
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.time             avgt    3    56,000                ms
+c.g.e.f.b.artemisodb.QueryBenchmark.query                                               avgt    3     0,002 ±   0,001   us/op
+c.g.e.f.b.artemisodb.QueryBenchmark.query:·gc.alloc.rate                                avgt    3    ≈ 10⁻³            MB/sec
+c.g.e.f.b.artemisodb.QueryBenchmark.query:·gc.alloc.rate.norm                           avgt    3    ≈ 10⁻⁶              B/op
+c.g.e.f.b.artemisodb.QueryBenchmark.query:·gc.count                                     avgt    3       ≈ 0            counts
+c.g.e.f.b.flecs.EntityCreationBenchmark.create                                          avgt    3     0,014 ±   0,001   us/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.alloc.rate                           avgt    3     0,376 ±   0,246  MB/sec
+c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.alloc.rate.norm                      avgt    3     0,021 ±   0,001    B/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.count                                avgt    3       ≈ 0            counts
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components                           avgt    3     0,154 ±   0,002   us/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate            avgt    3   314,138 ±   6,065  MB/sec
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate.norm       avgt    3    64,026 ±   0,001    B/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.count                 avgt    3     6,000            counts
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.time                  avgt    3     3,000                ms
+c.g.e.f.b.flecs.QueryBenchmark.query                                                    avgt    3     0,004 ±   0,001   us/op
+c.g.e.f.b.flecs.QueryBenchmark.query:·gc.alloc.rate                                     avgt    3     5,530 ±   4,302  MB/sec
+c.g.e.f.b.flecs.QueryBenchmark.query:·gc.alloc.rate.norm                                avgt    3     0,022 ±   0,019    B/op
+c.g.e.f.b.flecs.QueryBenchmark.query:·gc.count                                          avgt    3       ≈ 0            counts
 
 [ C / Native ]
 ------------------------------------------------------------
-== Flecs C Benchmark ==
+  Runs       : 0  |  Warmup: 491343104  |  Iterations: 0
 Benchmark: create                   
   Mode: AverageTime, Time: us
-  Score: 1639.587 us/batch (100k) | 0.016396 us/op
+  Score: 0.054947 ± 0.001595 us/op  (batch avg: 5494.688 us, stddev: 342.616 us)
 ---------------------------------------------------
 Benchmark: createWith2Components    
   Mode: AverageTime, Time: us
-  Score: 11296.630 us/batch (100k) | 0.112966 us/op
+  Score: 0.150527 ± 0.002036 us/op  (batch avg: 15052.714 us, stddev: 437.551 us)
 ---------------------------------------------------
 Benchmark: query                    
   Mode: AverageTime, Time: us
-  Score: 117.291 us/batch (100k) | 0.001173 us/op
+  Score: 0.000845 ± 0.000023 us/op  (batch avg: 84.524 us, stddev: 4.944 us)
 ---------------------------------------------------

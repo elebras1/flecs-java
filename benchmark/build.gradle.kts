@@ -15,6 +15,7 @@ dependencies {
     annotationProcessor(project(":"))
     implementation("org.openjdk.jmh:jmh-core:1.37")
     annotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+    implementation("net.onedaybeard.artemis:artemis-odb:2.3.0")
 }
 
 java {
@@ -27,7 +28,8 @@ val flecsVersion: String by rootProject.extra
 val flecsIncludeDir: File by rootProject.extra
 val flecsLibDir: File by rootProject.extra
 
-val benchmarkBinary = layout.buildDirectory.file("bench_native/bench").get().asFile
+val benchBuildDir = layout.buildDirectory.dir("bench_native").get().asFile
+val benchmarkBinary = benchBuildDir.resolve("bench")
 val jmhResultFile = layout.buildDirectory.file("results/jmh/results.txt").get().asFile
 val cResultFile = layout.buildDirectory.file("results/c/results.txt").get().asFile
 val reportFile = file("results/benchmark-results.txt")
@@ -45,24 +47,62 @@ jmh {
     resultsFile.set(jmhResultFile)
 }
 
-val compileCBenchmark by tasks.registering(Exec::class) {
+val cSrcDir = file("src/jmh/c")
+
+val cSources = listOf(
+    "main.c",
+    "benchmark_utils.c",
+    "entity_creation_benchmark.c",
+    "query_benchmark.c"
+)
+
+val compileObjects by tasks.registering {
     group = "benchmark"
     dependsOn(rootProject.tasks.getByPath(":compileFlecsNative"))
 
-    val sourceFile = file("src/jmh/c/benchmark.c")
-    inputs.file(sourceFile)
+    inputs.dir(cSrcDir)
     inputs.dir(flecsIncludeDir)
-    inputs.dir(flecsLibDir)
+    outputs.dir(benchBuildDir)
+
+    doFirst { benchBuildDir.mkdirs() }
+
+    doLast {
+        cSources.forEach { src ->
+            val srcFile = cSrcDir.resolve(src)
+            val objFile = benchBuildDir.resolve(src.replace(".c", ".o"))
+            val cmd = listOf(
+                "gcc",
+                "-c", srcFile.absolutePath,
+                "-o", objFile.absolutePath,
+                "-I", cSrcDir.absolutePath,
+                "-I", flecsIncludeDir.absolutePath,
+                "-O2", "-march=native", "-std=c11"
+            )
+            val result = ProcessBuilder(cmd)
+                .inheritIO()
+                .start()
+                .waitFor()
+            check(result == 0) { "gcc failed for $src (exit code $result)" }
+        }
+    }
+}
+
+val compileCBenchmark by tasks.registering(Exec::class) {
+    group = "benchmark"
+    dependsOn(compileObjects)
+
+    val objFiles = cSources.map { benchBuildDir.resolve(it.replace(".c", ".o")) }
+    inputs.files(objFiles)
     outputs.file(benchmarkBinary)
 
-    doFirst { benchmarkBinary.parentFile.mkdirs() }
-
     commandLine(
-        "gcc", sourceFile.absolutePath,
-        "-o", benchmarkBinary.absolutePath,
-        "-I", flecsIncludeDir.absolutePath,
-        "-L", flecsLibDir.absolutePath,
-        "-lflecs", "-O3", "-march=native", "-lm", "-lpthread"
+        buildList {
+            add("gcc")
+            addAll(objFiles.map { it.absolutePath })
+            add("-o"); add(benchmarkBinary.absolutePath)
+            add("-L"); add(flecsLibDir.absolutePath)
+            add("-lflecs"); add("-lm"); add("-lpthread")
+        }
     )
 }
 
@@ -117,7 +157,7 @@ val mergeBenchmarkResults by tasks.registering {
 
         sb.appendLine(machineInfo())
         sb.appendLine()
-        sb.appendLine("BENCHMARK RESULTS — flecs-java vs flecs C")
+        sb.appendLine("BENCHMARK RESULTS — flecs-java vs flecs C vs Artemis-odb")
         sb.appendLine("Date : ${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}")
         sb.appendLine()
 
