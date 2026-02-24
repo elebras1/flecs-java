@@ -1,3 +1,4 @@
+import org.gradle.internal.os.OperatingSystem
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -24,12 +25,14 @@ java {
     }
 }
 
+val os: OperatingSystem = OperatingSystem.current()
+
 val flecsVersion: String by rootProject.extra
 val flecsIncludeDir: File by rootProject.extra
 val flecsLibDir: File by rootProject.extra
 
 val benchBuildDir = layout.buildDirectory.dir("bench_native").get().asFile
-val benchmarkBinary = benchBuildDir.resolve("bench")
+val benchmarkBinary = benchBuildDir.resolve("bench${if (os.isWindows) ".exe" else ""}")
 val jmhResultFile = layout.buildDirectory.file("results/jmh/results.txt").get().asFile
 val cResultFile = layout.buildDirectory.file("results/c/results.txt").get().asFile
 val reportFile = file("results/benchmark-results.txt")
@@ -56,9 +59,26 @@ val cSources = listOf(
     "query_benchmark.c"
 )
 
-val compileObjects by tasks.registering {
+val generateClangd by tasks.registering {
     group = "benchmark"
     dependsOn(rootProject.tasks.getByPath(":compileFlecsNative"))
+
+    val clangdFile = file(".clangd")
+    outputs.file(clangdFile)
+
+    doLast {
+        clangdFile.writeText("""
+            CompileFlags:
+              Add:
+                - -I${cSrcDir.absolutePath}
+                - -I${flecsIncludeDir.absolutePath}
+                - -std=c11
+        """.trimIndent())
+    }
+}
+
+val compileObjects by tasks.registering {
+    dependsOn(rootProject.tasks.getByPath(":compileFlecsNative"), generateClangd)
 
     inputs.dir(cSrcDir)
     inputs.dir(flecsIncludeDir)
@@ -70,7 +90,14 @@ val compileObjects by tasks.registering {
         cSources.forEach { src ->
             val srcFile = cSrcDir.resolve(src)
             val objFile = benchBuildDir.resolve(src.replace(".c", ".o"))
-            val cmd = listOf(
+            val cmd = if (os.isWindows) listOf(
+                "gcc",
+                "-c", srcFile.absolutePath,
+                "-o", objFile.absolutePath,
+                "-I", cSrcDir.absolutePath,
+                "-I", flecsIncludeDir.absolutePath,
+                "-O2", "-std=c11"
+            ) else listOf(
                 "gcc",
                 "-c", srcFile.absolutePath,
                 "-o", objFile.absolutePath,
@@ -95,22 +122,31 @@ val compileCBenchmark by tasks.registering(Exec::class) {
     inputs.files(objFiles)
     outputs.file(benchmarkBinary)
 
-    commandLine(
-        buildList {
-            add("gcc")
-            addAll(objFiles.map { it.absolutePath })
-            add("-o"); add(benchmarkBinary.absolutePath)
-            add("-L"); add(flecsLibDir.absolutePath)
-            add("-lflecs"); add("-lm"); add("-lpthread")
+    commandLine(buildList {
+        add("gcc")
+        addAll(objFiles.map { it.absolutePath })
+        add("-o"); add(benchmarkBinary.absolutePath)
+        add("-L"); add(flecsLibDir.absolutePath)
+        add("-lflecs")
+        if (os.isWindows) {
+            add("-lws2_32")
+            add("-ldbghelp")
+        } else {
+            add("-lm")
+            add("-lpthread")
         }
-    )
+    })
 }
 
 val runCBenchmark by tasks.registering(Exec::class) {
     group = "benchmark"
     dependsOn(compileCBenchmark)
     executable = benchmarkBinary.absolutePath
-    environment("LD_LIBRARY_PATH", flecsLibDir.absolutePath)
+    if (os.isWindows) {
+        environment("PATH", "${flecsLibDir.absolutePath};${System.getenv("PATH")}")
+    } else {
+        environment("LD_LIBRARY_PATH", flecsLibDir.absolutePath)
+    }
     outputs.upToDateWhen { false }
 
     doFirst {
@@ -124,19 +160,42 @@ fun machineInfo(): String {
         ProcessBuilder(*args).start().inputStream.bufferedReader().readText().trim()
     }.getOrDefault("unknown")
 
-    val cpu   = cmd("sh", "-c", "grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2").trim()
+    val cpu = if (os.isWindows)
+        cmd("powershell", "-Command", "(Get-CimInstance Win32_Processor).Name")
+    else
+        cmd("sh", "-c", "grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2").trim()
+
     val cores = Runtime.getRuntime().availableProcessors()
-    val ramKb = cmd("sh", "-c", "grep MemTotal /proc/meminfo | awk '{print \$2}'").toLongOrNull() ?: 0
-    val ramGb = ramKb / 1024 / 1024
-    val os    = cmd("sh", "-c", "uname -sr")
-    val kernel= cmd("sh", "-c", "uname -r")
-    val jvm   = "${System.getProperty("java.vendor")} ${System.getProperty("java.version")}"
-    val gcc   = cmd("sh", "-c", "gcc --version | head -1")
+
+    val ramGb = if (os.isWindows) {
+        val bytes = cmd("powershell", "-Command", "(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory")
+            .toLongOrNull() ?: 0L
+        bytes / 1024 / 1024 / 1024
+    } else {
+        val kb = cmd("sh", "-c", "grep MemTotal /proc/meminfo | awk '{print \$2}'").toLongOrNull() ?: 0L
+        kb / 1024 / 1024
+    }
+
+    val osStr = if (os.isWindows)
+        cmd("powershell", "-Command", "(Get-CimInstance Win32_OperatingSystem).Caption")
+    else
+        cmd("sh", "-c", "uname -sr")
+
+    val kernel = if (os.isWindows)
+        cmd("powershell", "-Command", "(Get-CimInstance Win32_OperatingSystem).Version")
+    else
+        cmd("sh", "-c", "uname -r")
+
+    val jvm = "${System.getProperty("java.vendor")} ${System.getProperty("java.version")}"
+    val gcc = if (os.isWindows)
+        cmd("gcc", "--version")
+    else
+        cmd("sh", "-c", "gcc --version | head -1")
 
     return """
         |Machine Configuration
         |${"=".repeat(60)}
-        |OS      : $os
+        |OS      : $osStr
         |Kernel  : $kernel
         |CPU     : $cpu
         |Cores   : $cores

@@ -22,6 +22,9 @@ int main(void) {
     benchmark_create_with_2_components(&result);
     benchmark_print(&result);
 
+    benchmark_create_with_2_components_from_prefab(&result);
+    benchmark_print(&result);
+
     benchmark_query(&result);
     benchmark_print(&result);
 

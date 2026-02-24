@@ -5,5 +5,6 @@
 
 void benchmark_create(BenchmarkResult *out);
 void benchmark_create_with_2_components(BenchmarkResult *out);
+void benchmark_create_with_2_components_from_prefab(BenchmarkResult *out);
 
 #endif
