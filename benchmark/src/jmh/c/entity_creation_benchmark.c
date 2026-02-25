@@ -15,18 +15,11 @@ static void entity_teardown(void *ctx) {
     ecs_fini(c->world);
 }
 
-static void entity_reset(void *ctx) {
-    EntityCtx *c = ctx;
-    ecs_fini(c->world);
-    c->world = benchmark_world_new();
-}
-
 static void create(void *ctx) {
     EntityCtx *c = ctx;
     for (int i = 0; i < BENCH_ITERATIONS; i++) {
         ecs_new(c->world);
     }
-    entity_reset(ctx);
 }
 
 static void create_with_2_components(void *ctx) {
@@ -36,7 +29,6 @@ static void create_with_2_components(void *ctx) {
         ecs_set(c->world, e, Health, { 100 });
         ecs_set(c->world, e, Ideology, { 0xFF0000, 10, 50 });
     }
-    entity_reset(ctx);
 }
 
 static void create_with_2_components_from_prefab(void *ctx) {
@@ -54,8 +46,6 @@ static void create_with_2_components_from_prefab(void *ctx) {
     for (int i = 0; i < BENCH_ITERATIONS; i++) {
         ecs_new_w_pair(c->world, EcsIsA, prefab);
     }
-
-    entity_reset(ctx);
 }
 
 void benchmark_create(BenchmarkResult *out) {
