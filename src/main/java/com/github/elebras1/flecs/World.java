@@ -20,7 +20,7 @@ public class World implements AutoCloseable {
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
     private final FlecsBuffers defaultBuffers;
-    private FlecsContext.ViewCache contextCache;
+    private FlecsContext contextCache;
     private final boolean owned;
     private boolean closed;
 
@@ -148,14 +148,9 @@ public class World implements AutoCloseable {
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.defaultBuffers = new FlecsBuffers();
-        this.contextCache = new FlecsContext.ViewCache(this);
+        this.contextCache = new FlecsContext(this);
         this.closed = false;
         this.owned = true;
-    }
-
-    MemorySegment nativeWorld() {
-        this.checkClosed();
-        return this.nativeWorld;
     }
 
     private World(MemorySegment stagePtr, ComponentRegistry componentRegistry) {
@@ -165,7 +160,7 @@ public class World implements AutoCloseable {
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.defaultBuffers = null;
-        this.contextCache = new FlecsContext.ViewCache(this);
+        this.contextCache = new FlecsContext(this);
         this.closed = false;
         this.owned = false;
     }
@@ -594,7 +589,7 @@ public class World implements AutoCloseable {
         }
     }
 
-    FlecsContext.ViewCache viewCache() {
+    FlecsContext viewCache() {
         return this.contextCache;
     }
 
