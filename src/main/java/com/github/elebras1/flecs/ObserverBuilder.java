@@ -13,6 +13,7 @@ public class ObserverBuilder {
     private final World world;
     private final Arena arena;
     private final MemorySegment desc;
+    private final Iter iter;
     private int termCount;
     private int eventCount;
     private Query.IterCallback iterCallback;
@@ -25,6 +26,7 @@ public class ObserverBuilder {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_observer_desc_t.allocate(this.arena);
+        this.iter = new Iter(MemorySegment.NULL, this.world);
         this.termCount = 0;
         this.eventCount = 0;
     }
@@ -214,12 +216,10 @@ public class ObserverBuilder {
     public FlecsObserver iter(Query.IterCallback callback) {
         this.iterCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            var cache = new FlecsContext.ViewCache(this.world);
-            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
-                Iter iter = new Iter(it, this.world);
-                callback.accept(iter);
-            });
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
+            this.iter.setNativeIter(iterSegment);
+            this.world.viewCache().resetCursors();
+            callback.accept(iter);
         }, this.world.arena());
 
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -230,10 +230,10 @@ public class ObserverBuilder {
     public FlecsObserver run(Query.RunCallback callback) {
         this.runCallback = callback;
 
-        MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            Iter iter = new Iter(it, this.world);
-            var cache = new FlecsContext.ViewCache(this.world);
-            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> callback.accept(iter));
+        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
+            this.iter.setNativeIter(iterSegment);
+            this.world.viewCache().resetCursors();
+            callback.accept(this.iter);
         }, this.world.arena());
 
         ecs_observer_desc_t.run(this.desc, callbackStub);
@@ -247,13 +247,10 @@ public class ObserverBuilder {
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
             int count = ecs_iter_t.count(it);
             MemorySegment entities = ecs_iter_t.entities(it);
-            var cache = new FlecsContext.ViewCache(this.world);
-            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
-                for (int i = 0; i < count; i++) {
-                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    callback.accept(entityId);
-                }
-            });
+            for (int i = 0; i < count; i++) {
+                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                callback.accept(entityId);
+            }
         }, this.world.arena());
 
         ecs_observer_desc_t.callback(this.desc, callbackStub);

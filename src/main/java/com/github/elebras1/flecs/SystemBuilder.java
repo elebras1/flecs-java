@@ -13,6 +13,7 @@ public class SystemBuilder {
     private final World world;
     private final MemorySegment desc;
     private final Arena arena;
+    private final Iter[] iters;
     private int termCount = 0;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private Query.IterCallback iterCallback;
@@ -24,6 +25,11 @@ public class SystemBuilder {
         this.world = world;
         this.arena = Arena.ofConfined();
         this.desc = ecs_system_desc_t.allocate(this.arena);
+        this.iters = new Iter[world.getStageCount()];
+        for(int i = 0; i < this.iters.length; i++) {
+            World worldStage = world.getStage(i);
+            this.iters[i] = new Iter(MemorySegment.NULL, worldStage);
+        }
     }
 
     public SystemBuilder(World world, String name) {
@@ -228,12 +234,13 @@ public class SystemBuilder {
     public FlecsSystem iter(Query.IterCallback callback) {
         this.iterCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            Iter iter = new Iter(it, this.world);
-            var cache = new FlecsContext.ViewCache(this.world);
-            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
-                callback.accept(iter);
-            });
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
+            MemorySegment stageWorld = ecs_iter_t.world(iterSegment);
+            int stageId = flecs_h.ecs_stage_get_id(stageWorld);
+            Iter iter = this.iters[stageId];
+            iter.setNativeIter(iterSegment);
+            iter.world().viewCache().resetCursors();
+            callback.accept(iter);
         }, this.world.arena());
 
         ecs_system_desc_t.callback(this.desc, callbackStub);
@@ -244,12 +251,13 @@ public class SystemBuilder {
     public FlecsSystem run(Query.RunCallback callback) {
         this.runCallback = callback;
 
-        MemorySegment callbackStub = ecs_run_action_t.allocate(it -> {
-            Iter iter = new Iter(it, this.world);
-            var cache = new FlecsContext.ViewCache(this.world);
-            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
-                callback.accept(iter);
-            });
+        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
+            MemorySegment stageWorld = ecs_iter_t.world(iterSegment);
+            int stageId = flecs_h.ecs_stage_get_id(stageWorld);
+            Iter iter = this.iters[stageId];
+            iter.setNativeIter(iterSegment);
+            iter.world().viewCache().resetCursors();
+            callback.accept(this.iters[stageId]);
         }, this.world.arena());
 
         ecs_system_desc_t.run(this.desc, callbackStub);
@@ -260,17 +268,14 @@ public class SystemBuilder {
     public FlecsSystem each(Query.EntityCallback callback) {
         this.entityCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            var cache = new FlecsContext.ViewCache(this.world);
-            ScopedValue.where(FlecsContext.CURRENT_CACHE, cache).run(() -> {
-                int count = ecs_iter_t.count(it);
-                MemorySegment entities = ecs_iter_t.entities(it);
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
+            int count = ecs_iter_t.count(iterSegment);
+            MemorySegment entities = ecs_iter_t.entities(iterSegment);
 
-                for (int i = 0; i < count; i++) {
-                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    callback.accept(entityId);
-                }
-            });
+            for (int i = 0; i < count; i++) {
+                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                callback.accept(entityId);
+            }
         }, this.world.arena());
 
         ecs_system_desc_t.callback(this.desc, callbackStub);

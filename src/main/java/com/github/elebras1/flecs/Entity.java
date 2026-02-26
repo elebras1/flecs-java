@@ -164,7 +164,7 @@ public class Entity {
         flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, componentId);
         MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 
-        T view = (T) FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
+        T view = (T) this.world.viewCache().getComponentView(componentClass);
         view.setResource(ptr.address(), 0);
         consumer.accept(view);
 
@@ -195,7 +195,7 @@ public class Entity {
         flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, pairId);
         MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 
-        T view = (T) FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
+        T view = (T) this.world.viewCache().getComponentView(componentClass);
         view.setResource(ptr.address(), 0);
         consumer.accept(view);
 
@@ -239,7 +239,7 @@ public class Entity {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T getMutView(Class<?> componentClass) {
-        ComponentView view = FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
+        ComponentView view = this.world.viewCache().getComponentView(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 
         long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
@@ -255,7 +255,7 @@ public class Entity {
 
     @SuppressWarnings("unchecked")
     public <T> T getMutView(Class<?> componentClass, long target) {
-        ComponentView view = FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
+        ComponentView view = this.world.viewCache().getComponentView(componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 

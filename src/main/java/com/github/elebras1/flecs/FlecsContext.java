@@ -1,11 +1,6 @@
 package com.github.elebras1.flecs;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 public class FlecsContext {
-    public static final ScopedValue<ViewCache> CURRENT_CACHE = ScopedValue.newInstance();
-
     public static class ViewCache {
         private static final int BUFFER_SIZE = 16;
         private static final int MASK = BUFFER_SIZE - 1;
@@ -56,6 +51,13 @@ public class FlecsContext {
             ComponentView view = viewPool.pool[cursor];
             viewPool.cursor = (cursor + 1) & MASK;
             return view;
+        }
+
+        public void resetCursors() {
+            for (ComponentViewPool pool : this.componentViewPools) {
+                if (pool != null) pool.cursor = 0;
+            }
+            this.entityViewCursor = 0;
         }
     }
 }

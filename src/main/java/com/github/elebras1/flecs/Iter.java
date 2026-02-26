@@ -20,6 +20,10 @@ public class Iter {
         this.count = -1;
     }
 
+    World world() {
+        return this.world;
+    }
+
     public boolean next() {
         this.count = -1;
         return flecs_h.ecs_iter_next(this.nativeIter);

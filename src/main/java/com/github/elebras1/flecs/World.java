@@ -20,6 +20,7 @@ public class World implements AutoCloseable {
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
     private final FlecsBuffers defaultBuffers;
+    private FlecsContext.ViewCache contextCache;
     private final boolean owned;
     private boolean closed;
 
@@ -147,17 +148,24 @@ public class World implements AutoCloseable {
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.defaultBuffers = new FlecsBuffers();
+        this.contextCache = new FlecsContext.ViewCache(this);
         this.closed = false;
         this.owned = true;
     }
 
-    private World(MemorySegment stagePtr, ComponentRegistry sharedRegistry) {
+    MemorySegment nativeWorld() {
+        this.checkClosed();
+        return this.nativeWorld;
+    }
+
+    private World(MemorySegment stagePtr, ComponentRegistry componentRegistry) {
         this.arena = Arena.ofConfined();
         this.nativeWorld = stagePtr;
-        this.componentRegistry = sharedRegistry;
+        this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.defaultBuffers = null;
+        this.contextCache = new FlecsContext.ViewCache(this);
         this.closed = false;
         this.owned = false;
     }
@@ -190,7 +198,7 @@ public class World implements AutoCloseable {
             throw new IllegalArgumentException("Invalid entity ID: " + entityId);
         }
 
-        return FlecsContext.CURRENT_CACHE.get().getEntityView(entityId);
+        return this.contextCache.getEntityView(entityId);
     }
 
     MemorySegment getComponentBuffer(long size) {
@@ -586,6 +594,10 @@ public class World implements AutoCloseable {
         }
     }
 
+    FlecsContext.ViewCache viewCache() {
+        return this.contextCache;
+    }
+
     public void setStageCount(int stages) {
         this.checkClosed();
         flecs_h.ecs_set_stage_count(this.nativeWorld, stages);
@@ -775,10 +787,6 @@ public class World implements AutoCloseable {
 
             flecs_h.ecs_remove_id(this.nativeWorld, restCompId, restCompId);
         }
-    }
-
-    public void scope(Runnable action) {
-        ScopedValue.where(FlecsContext.CURRENT_CACHE, new FlecsContext.ViewCache(this)).run(action);
     }
 
     @Override
