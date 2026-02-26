@@ -7,25 +7,23 @@ import java.lang.foreign.MemorySegment;
 public class FlecsSystem {
 
     private final World world;
-    private final long entityId;
     private final Entity entity;
 
     FlecsSystem(World world, long entityId) {
         this.world = world;
-        this.entityId = entityId;
         this.entity = world.obtainEntity(entityId);
     }
 
     public void run() {
-        flecs_h.ecs_run(this.world.nativeHandle(), this.entityId, 0.0f, MemorySegment.NULL);
+        flecs_h.ecs_run(this.world.nativeHandle(), this.entity.id(), 0.0f, MemorySegment.NULL);
     }
 
     public void run(float deltaTime) {
-        flecs_h.ecs_run(this.world.nativeHandle(), this.entityId, deltaTime, MemorySegment.NULL);
+        flecs_h.ecs_run(this.world.nativeHandle(), this.entity.id(), deltaTime, MemorySegment.NULL);
     }
 
     public long id() {
-        return this.entityId;
+        return this.entity.id();
     }
 
     public Entity entity() {
