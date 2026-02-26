@@ -3,8 +3,8 @@ package com.github.elebras1.flecs;
 import java.lang.foreign.MemorySegment;
 
 public class Field<T> {
-    private final MemorySegment memorySegment;
-    private final int count;
+    private MemorySegment memorySegment;
+    private int count;
     private final Component<T> component;
     private final ComponentView componentView;
 
@@ -13,6 +13,11 @@ public class Field<T> {
         this.count = count;
         this.component = world.componentRegistry().getComponent(componentClass);
         this.componentView = world.viewCache().getComponentView(componentClass);
+    }
+
+    public void reset(MemorySegment memorySegment, int count) {
+        this.memorySegment = memorySegment;
+        this.count = count;
     }
 
     public int count() {

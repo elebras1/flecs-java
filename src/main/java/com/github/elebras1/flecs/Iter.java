@@ -7,11 +7,13 @@ public class Iter {
 
     private MemorySegment nativeIter;
     private final World world;
+    private final Field<?>[] fields;
     private int count;
 
     Iter(MemorySegment nativeIter, World world) {
         this.nativeIter = nativeIter;
         this.world = world;
+        this.fields = new Field[32];
         this.count = -1;
     }
 
@@ -59,6 +61,7 @@ public class Iter {
         return ecs_iter_t.delta_system_time(this.nativeIter);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> Field<T> field(Class<T> componentClass, int index) {
         if (index < 0 || index > 127) {
             throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
@@ -72,7 +75,14 @@ public class Iter {
             return null;
         }
 
-        return new Field<>(columnPtr, this.count(), this.world, componentClass);
+        Field<T> field = (Field<T>) this.fields[index];
+        if (field == null) {
+            field = new Field<>(columnPtr, this.count(), this.world, componentClass);
+            this.fields[index] = field;
+        } else {
+            field.reset(columnPtr, this.count());
+        }
+        return field;
     }
 
     public boolean isFieldSet(int index) {
