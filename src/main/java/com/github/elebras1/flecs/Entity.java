@@ -159,6 +159,20 @@ public class Entity {
     }
 
     @SuppressWarnings("unchecked")
+    public <T extends ComponentView> Entity set(Class<?> componentClass, Consumer<T> consumer) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, componentId);
+        MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
+
+        T view = (T) FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
+        view.setResource(ptr.address(), 0);
+        consumer.accept(view);
+
+        flecs_h.ecs_modified_id(this.world.nativeHandle(), this.id, componentId);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> Entity set(T data, long target) {
         Class<T> componentClass = (Class<T>) data.getClass();
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
@@ -171,6 +185,21 @@ public class Entity {
 
         flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, pairId, component.size(), dataSegment);
 
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ComponentView> Entity set(Class<?> componentClass, long target, Consumer<T> consumer) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long pairId = flecs_h.ecs_make_pair(componentId, target);
+        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, pairId);
+        MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
+
+        T view = (T) FlecsContext.CURRENT_CACHE.get().getComponentView(componentClass);
+        view.setResource(ptr.address(), 0);
+        consumer.accept(view);
+
+        flecs_h.ecs_modified_id(this.world.nativeHandle(), this.id, pairId);
         return this;
     }
 

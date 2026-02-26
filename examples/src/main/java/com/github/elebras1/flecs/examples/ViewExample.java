@@ -17,13 +17,16 @@ public class ViewExample {
                 for (int i = 0; i < 10; i++) {
                     long entityId = world.entity("Entity_" + i);
                     EntityView entityView = world.obtainEntityView(entityId);
-                    entityView.set(new Position(i * 10.0f, i * 5.0f));
-                    entityView.set(new Velocity(1.0f, 0.5f));
-                    int[] elements = new int[10];
-                    for(int j = 0; j < elements.length; j++) {
-                        elements[j] = j;
-                    }
-                    entityView.set(new Inventory(elements));
+                    int finalI = i;
+                    entityView.set(Position.class, (PositionView positionView) ->
+                            positionView.x(finalI * 10.0f).y(finalI * 5.0f));
+                    entityView.set(Velocity.class, (VelocityView velocityView) ->
+                            velocityView.dx(1.0f).dy(0.5f));
+                    entityView.set(Inventory.class, (InventoryView inventoryView) -> {
+                        for(int j = 0; j < inventoryView.elementsLength(); j++) {
+                            inventoryView.elements(j, j);
+                        }
+                    });
                 }
             });
 
@@ -36,7 +39,9 @@ public class ViewExample {
 
                 posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
 
+                System.out.println(posView.x() + " " + posView.y());
                 for(int i = 0; i < invView.elementsLength(); i++) {
+                    System.out.println(invView.elements(i));
                     invView.elements(i, invView.elements(i) + 1);
                 }
             });

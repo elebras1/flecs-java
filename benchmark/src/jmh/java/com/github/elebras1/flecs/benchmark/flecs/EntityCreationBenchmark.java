@@ -57,6 +57,20 @@ public class EntityCreationBenchmark {
 
     @Benchmark
     @OperationsPerInvocation(100_000)
+    public void createWith2ComponentsNoAlloc(Blackhole bh) {
+        this.ecsWorld.scope(() -> {
+            for (int i = 0; i < 100_000; i++) {
+                long entityId = this.ecsWorld.entity();
+                EntityView entity = this.ecsWorld.obtainEntityView(entityId);
+                entity.set(Health.class, (HealthView healthView) -> healthView.value(100));
+                entity.set(Ideology.class, (IdeologyView ideologyView) -> ideologyView.color(0xFF0000).factionDriftingSpeed(10).stabilityIndex(50));
+                bh.consume(entity);
+            }
+        });
+    }
+
+    @Benchmark
+    @OperationsPerInvocation(100_000)
     public void createWith2ComponentsFromPrefab(Blackhole bh) {
         this.ecsWorld.scope(() -> {
             for (int i = 0; i < 100_000; i++) {
