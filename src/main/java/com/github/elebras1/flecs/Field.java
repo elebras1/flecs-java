@@ -5,6 +5,7 @@ import java.lang.foreign.MemorySegment;
 public class Field<T> {
     private MemorySegment memorySegment;
     private int count;
+    private final long componentSize;
     private final Component<T> component;
     private final ComponentView componentView;
 
@@ -12,6 +13,7 @@ public class Field<T> {
         this.memorySegment = memorySegment;
         this.count = count;
         this.component = world.componentRegistry().getComponent(componentClass);
+        this.componentSize = this.component.size();
         this.componentView = world.viewCache().getComponentView(componentClass);
     }
 
@@ -25,9 +27,7 @@ public class Field<T> {
     }
 
     public T get(int i) {
-        if (i < 0 || i >= this.count) {
-            throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
-        }
+        assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
 
         long elementOffset = i * this.component.size();
         return this.component.read(this.memorySegment, elementOffset);
@@ -35,22 +35,18 @@ public class Field<T> {
 
     @SuppressWarnings("unchecked")
     public <V extends ComponentView> V getMutView(int i) {
-        if (i < 0 || i >= this.count) {
-            throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
-        }
+        assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
 
-        long elementOffset = i * this.component.size();
+        long elementOffset = i * this.componentSize;
         this.componentView.setResource(this.memorySegment.address(), elementOffset);
 
         return (V) this.componentView;
     }
 
     public void set(int i, T componentData) {
-        if (i < 0 || i >= this.count) {
-            throw new IndexOutOfBoundsException("Index " + i + " out of bounds for count " + this.count);
-        }
+        assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
 
-        long elementOffset = i * this.component.size();
+        long elementOffset = i * this.componentSize;
         this.component.write(this.memorySegment, elementOffset, componentData);
     }
 }
