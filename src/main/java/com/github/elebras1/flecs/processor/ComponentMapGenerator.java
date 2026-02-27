@@ -18,6 +18,7 @@ public class ComponentMapGenerator {
 
     public JavaFile generateComponentMap(List<TypeElement> components) {
         TypeSpec.Builder mapClass = TypeSpec.classBuilder(MAP_COMPONENT_CLASS_NAME)
+                .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$S", "unchecked").build())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(this.createComponentSizeField(components))
                 .addField(this.createComponentsField())
@@ -39,8 +40,8 @@ public class ComponentMapGenerator {
     private FieldSpec createComponentSizeField(List<TypeElement> components) {
         return FieldSpec.builder(int.class, "COMPONENT_COUNT",
                 Modifier.PRIVATE,
-                javax.lang.model.element.Modifier.STATIC,
-                javax.lang.model.element.Modifier.FINAL)
+                Modifier.STATIC,
+                Modifier.FINAL)
                 .initializer("$L", components.size())
                 .build();
     }
@@ -49,9 +50,9 @@ public class ComponentMapGenerator {
         return FieldSpec.builder(ArrayTypeName.of(ParameterizedTypeName.get(
                         COMPONENT_INTERFACE, WildcardTypeName.subtypeOf(Object.class))),
                 "COMPONENTS",
-                javax.lang.model.element.Modifier.PRIVATE,
-                javax.lang.model.element.Modifier.STATIC,
-                javax.lang.model.element.Modifier.FINAL
+                Modifier.PRIVATE,
+                Modifier.STATIC,
+                Modifier.FINAL
         ).build();
     }
 
@@ -60,9 +61,9 @@ public class ComponentMapGenerator {
         return FieldSpec.builder(
                 ArrayTypeName.of(supplierType),
                 "VIEWS",
-                javax.lang.model.element.Modifier.PRIVATE,
-                javax.lang.model.element.Modifier.STATIC,
-                javax.lang.model.element.Modifier.FINAL
+                Modifier.PRIVATE,
+                Modifier.STATIC,
+                Modifier.FINAL
         ).build();
     }
 
@@ -74,7 +75,7 @@ public class ComponentMapGenerator {
                 .superclass(classValueType)
                 .addMethod(MethodSpec.methodBuilder("computeValue")
                         .addAnnotation(Override.class)
-                        .addModifiers(javax.lang.model.element.Modifier.PROTECTED)
+                        .addModifiers(Modifier.PROTECTED)
                         .returns(ClassName.get(Integer.class))
                         .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)), "clazz")
                         .addCode(this.createComputeValueBody(components))
@@ -82,9 +83,9 @@ public class ComponentMapGenerator {
                 .build();
 
         return FieldSpec.builder(classValueType, "COMPONENT_INDEX",
-                        javax.lang.model.element.Modifier.PRIVATE,
-                        javax.lang.model.element.Modifier.STATIC,
-                        javax.lang.model.element.Modifier.FINAL)
+                        Modifier.PRIVATE,
+                        Modifier.STATIC,
+                        Modifier.FINAL)
                 .initializer("$L", anonymousClassValue)
                 .build();
     }
@@ -128,7 +129,7 @@ public class ComponentMapGenerator {
 
     private MethodSpec createConstructor() {
         return MethodSpec.constructorBuilder()
-                .addModifiers(javax.lang.model.element.Modifier.PRIVATE)
+                .addModifiers(Modifier.PRIVATE)
                 .build();
     }
 
@@ -151,11 +152,10 @@ public class ComponentMapGenerator {
 
     private MethodSpec createGetInstanceMethod() {
         return MethodSpec.methodBuilder("getInstance")
-                .addModifiers(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariable(TypeVariableName.get("T"))
                 .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T")), "componentClass")
                 .returns(ParameterizedTypeName.get(COMPONENT_INTERFACE, TypeVariableName.get("T")))
-                .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$S", "unchecked").build())
                 .addStatement("int index = COMPONENT_INDEX.get(componentClass)")
                 .addStatement("return index >= 0 ? ($T<T>) COMPONENTS[index] : null", COMPONENT_INTERFACE)
                 .build();
@@ -165,7 +165,7 @@ public class ComponentMapGenerator {
         ParameterizedTypeName supplierType = ParameterizedTypeName.get(ClassName.get(Supplier.class), COMPONENT_VIEW_INTERFACE);
 
         return MethodSpec.methodBuilder("getView")
-                .addModifiers(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariable(TypeVariableName.get("T"))
                 .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T")), "componentClass")
                 .returns(COMPONENT_VIEW_INTERFACE)
