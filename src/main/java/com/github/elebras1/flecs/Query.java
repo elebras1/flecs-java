@@ -64,9 +64,9 @@ public class Query implements AutoCloseable {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
 
+            this.world.viewCache().resetCursors();
             while (flecs_h.ecs_iter_next(iterSegment)) {
                 this.iter.setNativeIter(iterSegment);
-                this.world.viewCache().resetCursors();
                 callback.accept(this.iter);
             }
         }

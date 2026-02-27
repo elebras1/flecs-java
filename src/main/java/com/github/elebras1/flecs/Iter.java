@@ -19,7 +19,7 @@ public class Iter {
 
     void setNativeIter(MemorySegment nativeIter) {
         this.nativeIter = nativeIter;
-        this.count = -1;
+        this.count = ecs_iter_t.count(nativeIter);
     }
 
     World world() {
@@ -27,21 +27,18 @@ public class Iter {
     }
 
     public boolean next() {
-        this.count = -1;
-        return flecs_h.ecs_iter_next(this.nativeIter);
+        boolean hasNext = flecs_h.ecs_iter_next(this.nativeIter);
+        this.count = hasNext ? ecs_iter_t.count(this.nativeIter) : 0;
+        return hasNext;
     }
 
     public int count() {
-        if (this.count < 0) {
-            this.count = ecs_iter_t.count(this.nativeIter);
-        }
         return this.count;
     }
 
     public long entityId(int index) {
-        if (index < 0 || index >= this.count()) {
-            throw new IndexOutOfBoundsException("Index " + index + " out of bounds for count " + this.count());
-        }
+        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+
         MemorySegment entities = ecs_iter_t.entities(this.nativeIter);
         if (entities == null || entities.address() == 0) {
             throw new IllegalStateException("Entities array is null");
@@ -63,41 +60,32 @@ public class Iter {
 
     @SuppressWarnings("unchecked")
     public <T> Field<T> field(Class<T> componentClass, int index) {
-        if (index < 0 || index > 127) {
-            throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
-        }
-
-        byte flecsIndex = (byte) index;
-        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), flecsIndex);
-
-        if (columnPtr == null || columnPtr.address() == 0) {
-            return null;
-        }
+        assert (index >= 0 && index < 32) : "The field index must be between 0 and 31.";
 
         Field<T> field = (Field<T>) this.fields[index];
+
         if (field == null) {
+            Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+            MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
             field = new Field<>(columnPtr, this.count(), this.world, componentClass);
             this.fields[index] = field;
         } else {
+            MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, field.componentSize(), (byte) index);
             field.reset(columnPtr, this.count());
         }
+
         return field;
     }
 
     public boolean isFieldSet(int index) {
-        if (index < 0 || index > 31) {
-            throw new IndexOutOfBoundsException("The field index must be between 0 and 31.");
-        }
+        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         int setFields = ecs_iter_t.set_fields(this.nativeIter);
         return (setFields & (1 << index)) != 0;
     }
 
     public long termId(int index) {
-        if (index < 0 || index > 127) {
-            throw new IndexOutOfBoundsException("The term index must be between 0 and 127.");
-        }
+        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment ids = ecs_iter_t.ids(this.nativeIter);
         if (ids == null || ids.address() == 0) {
@@ -108,9 +96,7 @@ public class Iter {
     }
 
     public int fieldSize(int index) {
-        if (index < 0 || index > 127) {
-            throw new IndexOutOfBoundsException("The field index must be between 0 and 127.");
-        }
+        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment sizes = ecs_iter_t.sizes(this.nativeIter);
         if (sizes == null || sizes.address() == 0) {

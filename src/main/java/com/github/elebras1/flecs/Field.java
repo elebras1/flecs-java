@@ -17,6 +17,10 @@ public class Field<T> {
         this.componentView = world.viewCache().getComponentView(componentClass);
     }
 
+    long componentSize() {
+        return this.componentSize;
+    }
+
     public void reset(MemorySegment memorySegment, int count) {
         this.memorySegment = memorySegment;
         this.count = count;
