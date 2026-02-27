@@ -29,7 +29,7 @@ public class Field<T> {
     public T get(int i) {
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
 
-        long elementOffset = i * this.component.size();
+        long elementOffset = i * this.componentSize;
         return this.component.read(this.memorySegment, elementOffset);
     }
 
@@ -38,7 +38,7 @@ public class Field<T> {
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
 
         long elementOffset = i * this.componentSize;
-        this.componentView.setResource(this.memorySegment.address(), elementOffset);
+        this.componentView.setBaseAddress(this.memorySegment.address() + elementOffset);
 
         return (V) this.componentView;
     }

@@ -165,7 +165,7 @@ public class Entity {
         MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setResource(ptr.address(), 0);
+        view.setBaseAddress(ptr.address());
         consumer.accept(view);
 
         flecs_h.ecs_modified_id(this.world.nativeHandle(), this.id, componentId);
@@ -196,7 +196,7 @@ public class Entity {
         MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setResource(ptr.address(), 0);
+        view.setBaseAddress(ptr.address());
         consumer.accept(view);
 
         flecs_h.ecs_modified_id(this.world.nativeHandle(), this.id, pairId);
@@ -248,7 +248,7 @@ public class Entity {
             return null;
         }
 
-        view.setResource(address, 0);
+        view.setBaseAddress(address);
 
         return (T) view;
     }
@@ -267,7 +267,7 @@ public class Entity {
             return null;
         }
 
-        view.setResource(address, 0);
+        view.setBaseAddress(address);
 
         return (T) view;
     }

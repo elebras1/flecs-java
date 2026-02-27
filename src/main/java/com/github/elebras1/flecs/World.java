@@ -6,6 +6,7 @@ import com.github.elebras1.flecs.util.internal.FlecsLoader;
 
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,7 +21,8 @@ public class World implements AutoCloseable {
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
     private final FlecsBuffers defaultBuffers;
-    private FlecsContext contextCache;
+    private final FlecsContext contextCache;
+    private World[] stages;
     private final boolean owned;
     private boolean closed;
 
@@ -139,16 +141,15 @@ public class World implements AutoCloseable {
     public World() {
         this.arena = Arena.ofConfined();
         this.nativeWorld = flecs_h.ecs_init();
-
         if (this.nativeWorld == null || this.nativeWorld.address() == 0) {
             throw new IllegalStateException("Flecs world initialization failed");
         }
-
         this.componentRegistry = new ComponentRegistry(this);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.defaultBuffers = new FlecsBuffers();
         this.contextCache = new FlecsContext(this);
+        this.stages = new World[] { this };
         this.closed = false;
         this.owned = true;
     }
@@ -407,6 +408,8 @@ public class World implements AutoCloseable {
     public void setThreads(int threads) {
         this.checkClosed();
         flecs_h.ecs_set_threads(this.nativeWorld, threads);
+
+        this.resetStages();
     }
 
     public void setPipeline(long pipelineId) {
@@ -593,9 +596,23 @@ public class World implements AutoCloseable {
         return this.contextCache;
     }
 
-    public void setStageCount(int stages) {
+    public void setStageCount(int count) {
         this.checkClosed();
-        flecs_h.ecs_set_stage_count(this.nativeWorld, stages);
+        flecs_h.ecs_set_stage_count(this.nativeWorld, count);
+
+        this.resetStages();
+    }
+
+    private void resetStages() {
+        int stageCount = flecs_h.ecs_get_stage_count(this.nativeWorld);
+        World[] newStages = new World[stageCount];
+        newStages[0] = this;
+        for (int i = 1; i < this.stages.length; i++) {
+            if (this.stages[i] != null) {
+                this.stages[i].arena.close();
+            }
+        }
+        this.stages = newStages;
     }
 
     public int getStageCount() {
@@ -605,8 +622,17 @@ public class World implements AutoCloseable {
 
     public World getStage(int stageId) {
         this.checkClosed();
-        MemorySegment stagePtr = flecs_h.ecs_get_stage(this.nativeWorld, stageId);
-        return new World(stagePtr, this.componentRegistry);
+        if( stageId < 0 || stageId >= this.getStageCount()) {
+            throw new IllegalArgumentException("Invalid stage ID: " + stageId);
+        }
+
+        World stage = this.stages[stageId];
+        if(stage == null) {
+            MemorySegment stagePtr = flecs_h.ecs_get_stage(this.nativeWorld, stageId);
+            stage = new World(stagePtr, this.componentRegistry);
+            this.stages[stageId] = stage;
+        }
+        return stage;
     }
 
     public int getStageId() {

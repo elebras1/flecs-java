@@ -27,8 +27,8 @@ public class ComponentViewGenerator extends AbstractGenerator {
         TypeSpec componentClass = TypeSpec.classBuilder(componentViewClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(ClassName.bestGuess(COMPONENT_VIEW_INTERFACE))
-                .addFields(this.createFields())
-                .addMethod(this.createSetterResource())
+                .addField(FieldSpec.builder(long.class, "baseAddress", Modifier.PRIVATE).build())
+                .addMethod(this.createSetterBaseAddress())
                 .addMethods(this.createGetterSetterFields(fields, componentReference, viewType))
                 .build();
 
@@ -38,22 +38,13 @@ public class ComponentViewGenerator extends AbstractGenerator {
                 .build();
     }
 
-    private List<FieldSpec> createFields() {
-        return List.of(
-                FieldSpec.builder(long.class, "address", Modifier.PRIVATE).build(),
-                FieldSpec.builder(long.class, "offset", Modifier.PRIVATE).build()
-        );
-    }
-
-    private MethodSpec createSetterResource() {
-        return MethodSpec.methodBuilder("setResource")
+    private MethodSpec createSetterBaseAddress() {
+        return MethodSpec.methodBuilder("setBaseAddress")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(long.class, "address")
-                .addParameter(long.class, "offset")
+                .addParameter(long.class, "baseAddress")
                 .addJavadoc("Internal API - Do not use.\n")
-                .addStatement("this.address = address")
-                .addStatement("this.offset = offset")
+                .addStatement("this.baseAddress = baseAddress")
                 .build();
     }
 
@@ -88,7 +79,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(int.class, "index")
                     .returns(elementType)
-                    .addStatement("return $T.$L($T.WHOLE_MEMORY, address + offset + $L.$L, index)", MEMORY_ACCESS_CLASS, methodAtIndex, WORLD_CLASS, componentReference, offsetName)
+                    .addStatement("return $T.$L($T.WHOLE_MEMORY, baseAddress + $L.$L, index)", MEMORY_ACCESS_CLASS, methodAtIndex, WORLD_CLASS, componentReference, offsetName)
                     .build());
 
             methods.add(MethodSpec.methodBuilder(fieldName)
@@ -96,7 +87,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                     .addParameter(int.class, "index")
                     .addParameter(elementType, "value")
                     .returns(viewType)
-                    .addStatement("$T.$L($T.WHOLE_MEMORY, address + offset + $L.$L, index, value)", MEMORY_ACCESS_CLASS, setterAtIndex, WORLD_CLASS, componentReference, offsetName)
+                    .addStatement("$T.$L($T.WHOLE_MEMORY, baseAddress + $L.$L, index, value)", MEMORY_ACCESS_CLASS, setterAtIndex, WORLD_CLASS, componentReference, offsetName)
                     .addStatement("return this")
                     .build());
 
@@ -105,18 +96,18 @@ public class ComponentViewGenerator extends AbstractGenerator {
             String getterHelper = this.getGetterMethod(typeName);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                getter.addStatement("return $T.$L($T.WHOLE_MEMORY, address + offset + $L.$L, $L)", MEMORY_ACCESS_CLASS, getterHelper, WORLD_CLASS, componentReference, offsetName, size);
+                getter.addStatement("return $T.$L($T.WHOLE_MEMORY, baseAddress + $L.$L, $L)", MEMORY_ACCESS_CLASS, getterHelper, WORLD_CLASS, componentReference, offsetName, size);
             } else {
-                getter.addStatement("return $T.$L($T.WHOLE_MEMORY, address + offset + $L.$L)", MEMORY_ACCESS_CLASS, getterHelper, WORLD_CLASS, componentReference, offsetName);
+                getter.addStatement("return $T.$L($T.WHOLE_MEMORY, baseAddress + $L.$L)", MEMORY_ACCESS_CLASS, getterHelper, WORLD_CLASS, componentReference, offsetName);
             }
             methods.add(getter.build());
 
             MethodSpec.Builder setter = MethodSpec.methodBuilder(fieldName).addModifiers(Modifier.PUBLIC).addParameter(TypeName.get(field.asType()), "value").returns(viewType);
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
-                setter.addStatement("$T.set($T.WHOLE_MEMORY, address + offset + $L.$L, value, $L)", MEMORY_ACCESS_CLASS, WORLD_CLASS, componentReference, offsetName, size);
+                setter.addStatement("$T.set($T.WHOLE_MEMORY, baseAddress + $L.$L, value, $L)", MEMORY_ACCESS_CLASS, WORLD_CLASS, componentReference, offsetName, size);
             } else {
-                setter.addStatement("$T.set($T.WHOLE_MEMORY, address + offset + $L.$L, value)", MEMORY_ACCESS_CLASS, WORLD_CLASS, componentReference, offsetName);
+                setter.addStatement("$T.set($T.WHOLE_MEMORY, baseAddress + $L.$L, value)", MEMORY_ACCESS_CLASS, WORLD_CLASS, componentReference, offsetName);
             }
             setter.addStatement("return this");
             methods.add(setter.build());
