@@ -31,28 +31,36 @@ void benchmark_world_populate(ecs_world_t *world, int count) {
 
 void benchmark_run(
     const char  *name,
-    void       (*setup)   (void *ctx),
-    void       (*teardown)(void *ctx),
-    void       (*fn)      (void *ctx),
-    void        *ctx,
+    void (*setup)(void *ctx),
+    void (*teardown)(void *ctx),
+    void (*fn)(void *ctx),
+    void *ctx,
     BenchmarkResult *out
 ) {
-    if (setup) setup(ctx);
-
     for (int i = 0; i < BENCH_WARMUP_RUNS; i++) {
+        if (setup) {
+            setup(ctx);
+        }
         fn(ctx);
+        if (teardown) {
+            teardown(ctx);
+        }
     }
 
     double *samples = malloc(sizeof(double) * BENCH_RUNS);
 
     for (int run = 0; run < BENCH_RUNS; run++) {
+        if (setup) {
+            setup(ctx);
+        }
         double start = benchmark_time_us();
         fn(ctx);
-        double end   = benchmark_time_us();
+        double end = benchmark_time_us();
+        if (teardown) {
+            teardown(ctx);
+        }
         samples[run] = end - start;
     }
-
-    if (teardown) teardown(ctx);
 
     double sum = 0.0;
     for (int i = 0; i < BENCH_RUNS; i++) sum += samples[i];
@@ -70,13 +78,13 @@ void benchmark_run(
 
     free(samples);
 
-    out->name        = name;
-    out->avg_us      = avg;
-    out->per_op_us   = avg / BENCH_ITERATIONS;
-    out->stddev_us   = stddev;
-    out->error_us    = error;
-    out->runs        = BENCH_RUNS;
-    out->iterations  = BENCH_ITERATIONS;
+    out->name = name;
+    out->avg_us  = avg;
+    out->per_op_us = avg / BENCH_ITERATIONS;
+    out->stddev_us = stddev;
+    out->error_us = error;
+    out->runs = BENCH_RUNS;
+    out->iterations = BENCH_ITERATIONS;
 }
 
 
