@@ -815,6 +815,11 @@ public class World implements AutoCloseable {
         if (!this.closed) {
             if (this.owned && this.nativeWorld != null && this.nativeWorld.address() != 0) {
                 flecs_h.ecs_fini(this.nativeWorld);
+                for(World stage : this.stages) {
+                    if (stage != null && stage != this) {
+                        stage.arena.close();
+                    }
+                }
             }
 
             if (this.arena != null) {
