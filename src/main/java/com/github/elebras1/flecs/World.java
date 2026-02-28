@@ -412,6 +412,13 @@ public class World implements AutoCloseable {
         this.resetStages();
     }
 
+    public void setTaskThreads(int taskThreads) {
+        this.checkClosed();
+        flecs_h.ecs_set_task_threads(this.nativeWorld, taskThreads);
+
+        this.resetStages();
+    }
+
     public void setPipeline(long pipelineId) {
         this.checkClosed();
         flecs_h.ecs_set_pipeline(this.nativeWorld, pipelineId);
