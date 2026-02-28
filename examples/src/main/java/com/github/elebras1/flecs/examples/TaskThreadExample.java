@@ -1,7 +1,9 @@
-package com.github.elebras1.flecs.examples.components;
+package com.github.elebras1.flecs.examples;
 
 
 import com.github.elebras1.flecs.*;
+import com.github.elebras1.flecs.examples.components.Health;
+import com.github.elebras1.flecs.examples.components.HealthView;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.util.Map;
