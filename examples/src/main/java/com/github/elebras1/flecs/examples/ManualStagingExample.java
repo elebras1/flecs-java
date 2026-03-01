@@ -1,19 +1,15 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.Query;
 import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.Health;
 
-import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import static jdk.internal.jrtfs.JrtFileAttributeView.AttrID.size;
 
 public class ManualStagingExample {
     private static final int THREADS = 4;

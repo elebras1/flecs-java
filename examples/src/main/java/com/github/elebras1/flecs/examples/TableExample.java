@@ -23,7 +23,6 @@ public class TableExample {
 
                     System.out.println("Table: " + table.str());
                     System.out.println("Entities: " + table.count());
-                    System.out.println("Columns: " + table.columnCount());
 
                     LongList typeIds = table.type();
                     for (int i = 0; i < typeIds.size(); i++) {
@@ -46,8 +45,7 @@ public class TableExample {
 
                         LongList entities = table.entities();
                         Entity e = world.obtainEntity(entities.get(row));
-                        System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n",
-                                e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
+                        System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
                     }
                 });
             }
