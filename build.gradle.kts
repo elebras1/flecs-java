@@ -224,7 +224,24 @@ val validateGeneratedBindings by tasks.registering {
     }
 }
 
+val generatorSourcesDir = file("src/generator/java")
+
+val generateEachBase by tasks.registering(JavaExec::class) {
+    description = "Generate QueryBase, SystemBuilderBase, ObserverBuilderBase and all typed each callback interfaces"
+    group = "flecs"
+    classpath = sourceSets["generator"].runtimeClasspath
+    mainClass.set("com.github.elebras1.flecs.EachBaseGenerator")
+    args(generatedSourcesDir.absolutePath)
+    outputs.dir(generatedSourcesDir)
+    doFirst {
+        generatedSourcesDir.mkdirs()
+    }
+}
+
 sourceSets {
+    create("generator") {
+        java.srcDir(generatorSourcesDir)
+    }
     main {
         java {
             srcDir(generatedSourcesDir)
@@ -235,6 +252,9 @@ sourceSets {
         }
     }
 }
+
+configurations["generatorCompileClasspath"].extendsFrom(configurations["compileClasspath"])
+configurations["generatorRuntimeClasspath"].extendsFrom(configurations["runtimeClasspath"])
 
 tasks.named("processResources") {
     dependsOn(copyFlecsNative)

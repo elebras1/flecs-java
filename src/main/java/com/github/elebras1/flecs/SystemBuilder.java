@@ -8,11 +8,11 @@ import java.lang.foreign.ValueLayout;
 
 import static com.github.elebras1.flecs.util.FlecsConstants.*;
 
-public class SystemBuilder {
+public class SystemBuilder extends SystemBuilderBase {
 
-    private final World world;
-    private final MemorySegment desc;
-    private final Arena arena;
+    protected final World world;
+    protected final MemorySegment desc;
+    protected final Arena arena;
     private final Iter[] iters;
     private int termCount = 0;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
@@ -283,7 +283,8 @@ public class SystemBuilder {
         return build();
     }
 
-    private FlecsSystem build() {
+    @Override
+    protected FlecsSystem build() {
         long systemId = flecs_h.ecs_system_init(this.world.nativeHandle(), this.desc);
 
         if (systemId == 0) {

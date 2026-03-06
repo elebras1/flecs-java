@@ -8,11 +8,11 @@ import java.lang.foreign.ValueLayout;
 
 import static com.github.elebras1.flecs.util.FlecsConstants.*;
 
-public class ObserverBuilder {
+public class ObserverBuilder extends ObserverBuilderBase {
 
-    private final World world;
-    private final Arena arena;
-    private final MemorySegment desc;
+    protected final World world;
+    protected final Arena arena;
+    protected final MemorySegment desc;
     private final Iter iter;
     private int termCount;
     private int eventCount;
@@ -258,7 +258,8 @@ public class ObserverBuilder {
         return build();
     }
 
-    private FlecsObserver build() {
+    @Override
+    protected FlecsObserver build() {
         long observerId = flecs_h.ecs_observer_init(this.world.nativeHandle(), this.desc);
 
         if (observerId == 0) {

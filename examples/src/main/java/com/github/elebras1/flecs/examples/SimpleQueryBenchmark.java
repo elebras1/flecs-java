@@ -39,11 +39,11 @@ public class SimpleQueryBenchmark {
                 System.out.println("Query matches " + query.count() + " entities");
                 System.out.println();
 
-                System.out.println("--- Benchmark 1: each() + entity.get(Component.class) ---");
-                runBenchmark("each+get", () -> benchmarkEachGet(world, query));
+                System.out.println("--- Benchmark 1: each(Component.class, Component.class, ...) ---");
+                runBenchmark("each+get", () -> benchmarkEach(query));
 
-                System.out.println("--- Benchmark 2: each() + entity.getMutView(Component.class) ---");
-                runBenchmark("each+getMutView", () -> benchmarkEachGetMutView(world, query));
+                System.out.println("--- Benchmark 2: eachView(Component.class, Component.class, ...) ---");
+                runBenchmark("each+getMutView", () -> benchmarkEachMutView(query));
 
                 System.out.println("--- Benchmark 3: iter() + Field<T>.get(i) ---");
                 runBenchmark("iter+Field+get", () -> benchmarkIterFieldGet(query));
@@ -57,28 +57,20 @@ public class SimpleQueryBenchmark {
         }
     }
 
-    private static float benchmarkEachGet(World world, Query query) {
+    private static float benchmarkEach(Query query) {
         final float[] sum = {0.0f};
 
-        query.each(entityId -> {
-            Entity entity = world.obtainEntity(entityId);
-            Position pos = entity.get(Position.class);
-            Velocity vel = entity.get(Velocity.class);
-            sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy();
-        });
+        query.each(Position.class, Velocity.class, (pos, vel)
+                -> sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy());
 
         return sum[0];
     }
 
-    private static float benchmarkEachGetMutView(World world, Query query) {
+    private static float benchmarkEachMutView(Query query) {
         final float[] sum = {0.0f};
 
-        query.each(entityId -> {
-            Entity entity = world.obtainEntity(entityId);
-            PositionView pos = entity.getMutView(Position.class);
-            VelocityView vel = entity.getMutView(Velocity.class);
-            sum[0] += pos.x() + pos.y() + vel.dx() + vel.dy();
-        });
+        query.eachView(Position.class, Velocity.class, (PositionView posView, VelocityView velView)
+                -> sum[0] += posView.x() + posView.y() + velView.dx() + velView.dy());
 
         return sum[0];
     }

@@ -5,10 +5,8 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-public class Query implements AutoCloseable {
+public class Query extends QueryBase implements AutoCloseable {
 
-    private final World world;
-    private final MemorySegment nativeQuery;
     private final Arena arena;
     private final Iter iter;
     private boolean closed;
@@ -107,7 +105,8 @@ public class Query implements AutoCloseable {
         return result;
     }
 
-    private void checkClosed() {
+    @Override
+    protected void checkClosed() {
         if (this.closed) {
             throw new IllegalStateException("The query has already been closed.");
         }
@@ -132,4 +131,3 @@ public class Query implements AutoCloseable {
         }
     }
 }
-
