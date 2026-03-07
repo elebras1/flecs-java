@@ -44,26 +44,19 @@ public class QueryBenchmark {
     @Benchmark
     @OperationsPerInvocation(100_000)
     public void query(Blackhole bh) {
-        this.query.iter(iter -> {
-            Field<Health> healthField = iter.field(Health.class, 0);
-            Field<Ideology> ideologyField = iter.field(Ideology.class, 1);
-            for(int i = 0; i < iter.count(); i++) {
-                HealthView healthView = healthField.getMutView(i);
-                IdeologyView ideologyView = ideologyField.getMutView(i);
+        this.query.eachView(Health.class, Ideology.class, (HealthView healthView, IdeologyView ideologyView) -> {
+            int v1 = healthView.value() + 1;
+            healthView.value(v1);
 
-                int v1 = healthView.value() + 1;
-                healthView.value(v1);
+            int v2 = ideologyView.color() + 1;
+            ideologyView.color(v2);
 
-                int v2 = ideologyView.color() + 1;
-                ideologyView.color(v2);
+            int v3 = ideologyView.factionDriftingSpeed() + 1;
+            ideologyView.factionDriftingSpeed(v3);
 
-                int v3 = ideologyView.factionDriftingSpeed() + 1;
-                ideologyView.factionDriftingSpeed(v3);
-
-                bh.consume(v1);
-                bh.consume(v2);
-                bh.consume(v3);
-            }
+            bh.consume(v1);
+            bh.consume(v2);
+            bh.consume(v3);
         });
     }
 }

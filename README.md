@@ -2,7 +2,7 @@
 
 ![Flecs](https://raw.githubusercontent.com/SanderMertens/flecs/master/docs/img/logo.png)
 
-Java bindings for [Flecs](https://github.com/SanderMertens/flecs) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
+Java bindings for [Flecs](https://github.com/SanderMertens/flecs) (v4.1.4) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
 
 ## What is Flecs?
 
@@ -30,8 +30,8 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.5.3'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.5.3'
+    implementation 'io.github.elebras1:flecs-java:0.6.0'
+    annotationProcessor 'io.github.elebras1:flecs-java:0.6.0'
 
 }
 ```
@@ -109,9 +109,8 @@ public class Example {
             
             // Query entities
             try (Query query = world.query().with(Position.class).build()) {
-                query.each(entityId -> {
+                query.each(Position.class, (entityId, pos) -> {
                     Entity e = world.obtainEntity(entityId);
-                    Position pos = e.get(Position.class);
                     System.out.printf("%s: (%.2f, %.2f)%n", e.getName(), pos.x(), pos.y());
                 });
             }

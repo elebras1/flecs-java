@@ -28,12 +28,12 @@ public class ViewExample {
                 });
             }
 
-            world.system("MovementSystem").kind(FlecsConstants.EcsOnUpdate).with(Position.class).with(Velocity.class).multiThreaded().each(entityId -> {
-                EntityView entityView = world.obtainEntityView(entityId);
-
-                PositionView posView = entityView.getMutView(Position.class);
-                VelocityView velView = entityView.getMutView(Velocity.class);
-                InventoryView invView = entityView.getMutView(Inventory.class);
+            world.system("MovementSystem")
+                    .kind(FlecsConstants.EcsOnUpdate)
+                    .with(Position.class)
+                    .with(Velocity.class)
+                    .multiThreaded()
+                    .eachView(Position.class, Velocity.class, Inventory.class, (long entityId, PositionView posView, VelocityView  velView, InventoryView invView)-> {
 
                 posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
 

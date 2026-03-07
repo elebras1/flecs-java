@@ -21,13 +21,8 @@ public class ObserverExample {
             Entity e1 = world.obtainEntity(world.entity("Entity1"));
             e1.set(new Position(10.0f, 20.0f));
 
-            world.observer(Position.class).event(EcsOnSet).iter((it) -> {
-                for (int i = 0; i < it.count(); i++) {
-                    long entityId = it.entityId(i);
-                    Position pos = world.obtainEntity(entityId).get(Position.class);
-                    System.out.println("Position set to (" + pos.x() + ", " + pos.y() + ")");
-                }
-            });
+            world.observer(Position.class).event(EcsOnSet).each(Position.class, (entityId, pos) ->
+                    System.out.println("Position set to (" + pos.x() + ", " + pos.y() + ") " + "for entity " + entityId));
 
             e1.set(new Position(30.0f, 40.0f));
 

@@ -45,9 +45,8 @@ public class SystemExample {
             FlecsSystem debugSystem = world.system("DebugSystem")
                 .with(posId)
                 .kind(FlecsConstants.EcsPostUpdate)
-                .each(entityId -> {
+                .each(Position.class, (entityId, pos) -> {
                     Entity entity = world.obtainEntity(entityId);
-                    Position pos = entity.get(Position.class);
                     System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.getName(), pos.x(), pos.y());
                 });
 
