@@ -56,7 +56,8 @@ val cSources = listOf(
     "main.c",
     "benchmark_utils.c",
     "entity_creation_benchmark.c",
-    "query_benchmark.c"
+    "query_benchmark.c",
+    "entity_remove_benchmark.c",
 )
 
 val generateClangd by tasks.registering {

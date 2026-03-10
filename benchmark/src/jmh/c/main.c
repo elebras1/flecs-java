@@ -1,6 +1,7 @@
 #include "benchmark.h"
 #include "entity_creation_benchmark.h"
 #include "query_benchmark.h"
+#include "entity_remove_benchmark.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -26,6 +27,15 @@ int main(void) {
     benchmark_print(&result);
 
     benchmark_query(&result);
+    benchmark_print(&result);
+
+    benchmark_destruct_with_2_components(&result);
+    benchmark_print(&result);
+
+    benchmark_remove_1_components(&result);
+    benchmark_print(&result);
+
+    benchmark_remove_2_components(&result);
     benchmark_print(&result);
 
     return 0;

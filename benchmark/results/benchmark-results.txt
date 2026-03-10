@@ -10,68 +10,110 @@ GCC     : gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
 ============================================================
 
 BENCHMARK RESULTS — flecs-java vs flecs C vs Artemis-odb
-Date : 2026-03-06 23:34:01
+Date : 2026-03-10 23:14:23
 
 [ Java / JMH ]
 ------------------------------------------------------------
 Benchmark                                                                                         Mode  Cnt     Score     Error   Units
 c.g.e.f.b.artemisodb.EntityCreationBenchmark.create                                               avgt    3     0,012 ±   0,001   us/op
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.alloc.rate                                avgt    3  5814,955 ± 454,737  MB/sec
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.alloc.rate                                avgt    3  5836,017 ±  22,293  MB/sec
 c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.alloc.rate.norm                           avgt    3    75,435 ±   0,001    B/op
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.count                                     avgt    3    26,000            counts
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.time                                      avgt    3    25,000                ms
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components                                avgt    3     0,070 ±   0,002   us/op
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate                 avgt    3  2182,385 ±  70,828  MB/sec
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.count                                     avgt    3    54,000            counts
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.create:·gc.time                                      avgt    3    41,000                ms
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components                                avgt    3     0,071 ±   0,003   us/op
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate                 avgt    3  2153,106 ±  95,011  MB/sec
 c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate.norm            avgt    3   160,409 ±   0,001    B/op
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.count                      avgt    3    19,000            counts
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.time                       avgt    3    24,000                ms
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.count                      avgt    3    24,000            counts
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2Components:·gc.time                       avgt    3    41,000                ms
 c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab                      avgt    3     0,037 ±   0,001   us/op
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.alloc.rate       avgt    3  2969,313 ±   6,766  MB/sec
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.alloc.rate       avgt    3  2954,149 ± 109,600  MB/sec
 c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.alloc.rate.norm  avgt    3   115,435 ±   0,001    B/op
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.count            avgt    3    29,000            counts
-c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.time             avgt    3    39,000                ms
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.count            avgt    3    24,000            counts
+c.g.e.f.b.artemisodb.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.time             avgt    3    49,000                ms
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.destructWith2Components                                avgt    3     0,024 ±   0,001   us/op
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.destructWith2Components:·gc.alloc.rate                 avgt    3  1917,561 ±  43,982  MB/sec
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.destructWith2Components:·gc.alloc.rate.norm            avgt    3   191,713 ±   0,001    B/op
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.destructWith2Components:·gc.count                      avgt    3    26,000            counts
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.destructWith2Components:·gc.time                       avgt    3    34,000                ms
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove1Component                                       avgt    3     0,033 ±   0,002   us/op
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove1Component:·gc.alloc.rate                        avgt    3  1488,608 ±  95,132  MB/sec
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove1Component:·gc.alloc.rate.norm                   avgt    3   164,417 ±   0,001    B/op
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove1Component:·gc.count                             avgt    3    16,000            counts
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove1Component:·gc.time                              avgt    3    43,000                ms
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove2Components                                      avgt    3     0,052 ±   0,003   us/op
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove2Components:·gc.alloc.rate                       avgt    3  1266,140 ±  26,975  MB/sec
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove2Components:·gc.alloc.rate.norm                  avgt    3   164,426 ±   0,033    B/op
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove2Components:·gc.count                            avgt    3    17,000            counts
+c.g.e.f.b.artemisodb.EntityRemoveBenchmark.remove2Components:·gc.time                             avgt    3    19,000                ms
 c.g.e.f.b.artemisodb.QueryBenchmark.query                                                         avgt    3     0,002 ±   0,001   us/op
 c.g.e.f.b.artemisodb.QueryBenchmark.query:·gc.alloc.rate                                          avgt    3    ≈ 10⁻³            MB/sec
 c.g.e.f.b.artemisodb.QueryBenchmark.query:·gc.alloc.rate.norm                                     avgt    3    ≈ 10⁻⁶              B/op
 c.g.e.f.b.artemisodb.QueryBenchmark.query:·gc.count                                               avgt    3       ≈ 0            counts
-c.g.e.f.b.flecs.EntityCreationBenchmark.create                                                    avgt    3     0,014 ±   0,001   us/op
-c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.alloc.rate                                     avgt    3     0,511 ±   0,021  MB/sec
+c.g.e.f.b.flecs.EntityCreationBenchmark.create                                                    avgt    3     0,014 ±   0,002   us/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.alloc.rate                                     avgt    3     0,504 ±   0,029  MB/sec
 c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.alloc.rate.norm                                avgt    3     0,027 ±   0,001    B/op
 c.g.e.f.b.flecs.EntityCreationBenchmark.create:·gc.count                                          avgt    3       ≈ 0            counts
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components                                     avgt    3     0,166 ±   0,010   us/op
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate                      avgt    3   294,063 ±  24,549  MB/sec
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components                                     avgt    3     0,159 ±   0,004   us/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate                      avgt    3   304,580 ±   7,148  MB/sec
 c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.alloc.rate.norm                 avgt    3    64,032 ±   0,001    B/op
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.count                           avgt    3     6,000            counts
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.time                            avgt    3     3,000                ms
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsFromPrefab                           avgt    3     0,193 ±   0,015   us/op
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.alloc.rate            avgt    3     0,134 ±   0,027  MB/sec
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.count                           avgt    3     7,000            counts
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2Components:·gc.time                            avgt    3     4,000                ms
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsFromPrefab                           avgt    3     0,194 ±   0,003   us/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.alloc.rate            avgt    3     0,133 ±   0,008  MB/sec
 c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.alloc.rate.norm       avgt    3     0,033 ±   0,001    B/op
 c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsFromPrefab:·gc.count                 avgt    3       ≈ 0            counts
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsNoAlloc                              avgt    3     0,148 ±   0,012   us/op
-c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsNoAlloc:·gc.alloc.rate               avgt    3     0,218 ±   0,018  MB/sec
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsNoAlloc                              avgt    3     0,149 ±   0,004   us/op
+c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsNoAlloc:·gc.alloc.rate               avgt    3     0,216 ±   0,006  MB/sec
 c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsNoAlloc:·gc.alloc.rate.norm          avgt    3     0,043 ±   0,001    B/op
 c.g.e.f.b.flecs.EntityCreationBenchmark.createWith2ComponentsNoAlloc:·gc.count                    avgt    3       ≈ 0            counts
+c.g.e.f.b.flecs.EntityRemoveBenchmark.destructWith2Component                                      avgt    3     0,028 ±   0,001   us/op
+c.g.e.f.b.flecs.EntityRemoveBenchmark.destructWith2Component:·gc.alloc.rate                       avgt    3   215,120 ±  21,365  MB/sec
+c.g.e.f.b.flecs.EntityRemoveBenchmark.destructWith2Component:·gc.alloc.rate.norm                  avgt    3    48,032 ±   0,001    B/op
+c.g.e.f.b.flecs.EntityRemoveBenchmark.destructWith2Component:·gc.count                            avgt    3     4,000            counts
+c.g.e.f.b.flecs.EntityRemoveBenchmark.destructWith2Component:·gc.time                             avgt    3     2,000                ms
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove1Component                                            avgt    3     0,065 ±   0,010   us/op
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove1Component:·gc.alloc.rate                             avgt    3   174,244 ±  14,150  MB/sec
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove1Component:·gc.alloc.rate.norm                        avgt    3    48,032 ±   0,001    B/op
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove1Component:·gc.count                                  avgt    3     3,000            counts
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove1Component:·gc.time                                   avgt    3     2,000                ms
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove2Components                                           avgt    3     0,090 ±   0,012   us/op
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove2Components:·gc.alloc.rate                            avgt    3   152,967 ±   0,267  MB/sec
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove2Components:·gc.alloc.rate.norm                       avgt    3    48,032 ±   0,001    B/op
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove2Components:·gc.count                                 avgt    3     4,000            counts
+c.g.e.f.b.flecs.EntityRemoveBenchmark.remove2Components:·gc.time                                  avgt    3     2,000                ms
 c.g.e.f.b.flecs.QueryBenchmark.query                                                              avgt    3     0,001 ±   0,001   us/op
-c.g.e.f.b.flecs.QueryBenchmark.query:·gc.alloc.rate                                               avgt    3     1,761 ±   4,447  MB/sec
+c.g.e.f.b.flecs.QueryBenchmark.query:·gc.alloc.rate                                               avgt    3     1,822 ±   4,335  MB/sec
 c.g.e.f.b.flecs.QueryBenchmark.query:·gc.alloc.rate.norm                                          avgt    3     0,002 ±   0,005    B/op
 c.g.e.f.b.flecs.QueryBenchmark.query:·gc.count                                                    avgt    3       ≈ 0            counts
 
 [ C / Native ]
 ------------------------------------------------------------
-  Runs       : 0  |  Warmup: 1864256696  |  Iterations: 0
+  Runs       : 0  |  Warmup: 1836281016  |  Iterations: 0
 Benchmark: create                   
   Mode: AverageTime, Time: us
-  Score: 0.017170 ± 0.000897 us/op  (batch avg: 1716.961 us, stddev: 192.673 us)
+  Score: 0.016843 ± 0.000663 us/op  (batch avg: 1684.266 us, stddev: 142.521 us)
 ---------------------------------------------------
 Benchmark: createWith2Components    
   Mode: AverageTime, Time: us
-  Score: 0.113909 ± 0.000906 us/op  (batch avg: 11390.868 us, stddev: 194.649 us)
+  Score: 0.125800 ± 0.001453 us/op  (batch avg: 12580.016 us, stddev: 312.094 us)
 ---------------------------------------------------
 Benchmark: createWith2ComponentsFromPrefab
   Mode: AverageTime, Time: us
-  Score: 0.109141 ± 0.000259 us/op  (batch avg: 10914.146 us, stddev: 55.735 us)
+  Score: 0.106742 ± 0.000297 us/op  (batch avg: 10674.234 us, stddev: 63.821 us)
 ---------------------------------------------------
 Benchmark: query                    
   Mode: AverageTime, Time: us
-  Score: 0.000848 ± 0.000013 us/op  (batch avg: 84.831 us, stddev: 2.877 us)
+  Score: 0.000878 ± 0.000035 us/op  (batch avg: 87.758 us, stddev: 7.529 us)
+---------------------------------------------------
+Benchmark: destruct_with_2_components
+  Mode: AverageTime, Time: us
+  Score: 0.020114 ± 0.000200 us/op  (batch avg: 2011.428 us, stddev: 42.963 us)
+---------------------------------------------------
+Benchmark: remove_1_components      
+  Mode: AverageTime, Time: us
+  Score: 0.048501 ± 0.000576 us/op  (batch avg: 4850.058 us, stddev: 123.712 us)
+---------------------------------------------------
+Benchmark: remove_2_components      
+  Mode: AverageTime, Time: us
+  Score: 0.069876 ± 0.000756 us/op  (batch avg: 6987.644 us, stddev: 162.417 us)
 ---------------------------------------------------
