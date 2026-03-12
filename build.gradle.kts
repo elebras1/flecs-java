@@ -19,6 +19,9 @@ repositories {
 
 dependencies {
     implementation("com.palantir.javapoet:javapoet:0.9.0")
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
@@ -335,6 +338,26 @@ val cleanFlecs by tasks.registering(Delete::class) {
 
 tasks.clean {
     dependsOn(cleanFlecs)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+tasks.compileTestJava {
+    dependsOn(compileProcessor)
+    val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
+    classpath = files(processorOutput) + classpath
+
+    options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
+
+    options.compilerArgs.addAll(listOf(
+        "-s", annotationGeneratedDir.absolutePath
+    ))
+
+    doFirst {
+        annotationGeneratedDir.mkdirs()
+    }
 }
 
 tasks.withType<JavaExec> {

@@ -270,9 +270,14 @@ public class World implements AutoCloseable {
         return entityId;
     }
 
-    public void setVersion(int entityId) {
+    public void setVersion(long entityId) {
         this.checkClosed();
         flecs_h.ecs_set_version(this.nativeWorld, entityId);
+    }
+
+    public int getVersion(long entityId) {
+        this.checkClosed();
+        return flecs_h.ecs_get_version(entityId);
     }
 
     public void setEntityRange(long idStart, long idEnd) {
