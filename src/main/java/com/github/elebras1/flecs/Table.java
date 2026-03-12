@@ -1,7 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.collection.LongList;
-
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
@@ -27,19 +25,17 @@ public class Table {
         return str;
     }
 
-    public LongList type() {
+    public long[] type() {
         MemorySegment nativeType = flecs_h.ecs_table_get_type(this.nativeTable);
         if (nativeType == null || nativeType.address() == 0) {
-            return new LongList();
+            return new long[0];
         }
         MemorySegment nativeArray = ecs_type_t.array(nativeType);
         int count = ecs_type_t.count(nativeType);
         if (nativeArray == null || nativeArray.address() == 0 || count == 0) {
-            return new LongList();
+            return new long[0];
         }
-        LongList ids = new LongList(count);
-        ids.addAll(nativeArray.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG));
-        return ids;
+        return nativeArray.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
     }
 
     public int count() {
@@ -50,18 +46,16 @@ public class Table {
         return flecs_h.ecs_table_size(this.nativeTable);
     }
 
-    public LongList entities() {
+    public long[] entities() {
         int count = this.count();
         if (count == 0) {
-            return new LongList();
+            return new long[0];
         }
         MemorySegment nativeEntities = flecs_h.ecs_table_entities(this.nativeTable);
         if (nativeEntities == null || nativeEntities.address() == 0) {
-            return new LongList();
+            return new long[0];
         }
-        LongList entities = new LongList(count);
-        entities.addAll(nativeEntities.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG));
-        return entities;
+        return nativeEntities.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
     }
 
     public void clearEntities() {

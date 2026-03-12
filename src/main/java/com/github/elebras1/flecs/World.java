@@ -1,12 +1,10 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.collection.LongList;
 import com.github.elebras1.flecs.util.FlecsConstants;
 import com.github.elebras1.flecs.util.internal.FlecsLoader;
 
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -201,7 +199,7 @@ public class World implements AutoCloseable {
         return this.defaultBuffers.componentBuffer().ensure(size);
     }
 
-    public LongList entityBulk(int count) {
+    public long[] entityBulk(int count) {
         this.checkClosed();
         try(Arena tempArena = Arena.ofConfined()) {
             MemorySegment desc = ecs_bulk_desc_t.allocate(tempArena);
@@ -210,13 +208,11 @@ public class World implements AutoCloseable {
 
             MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.nativeWorld, desc);
 
-            LongList ids = new LongList(count);
-            ids.addAll(idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG));
-            return ids;
+            return idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
     }
 
-    public final LongList entityBulk(int count, Class<?>... componentClasses) {
+    public final long[] entityBulk(int count, Class<?>... componentClasses) {
         this.checkClosed();
 
         if (count <= 0) {
@@ -257,10 +253,7 @@ public class World implements AutoCloseable {
 
             MemorySegment entitiesPtr = flecs_h.ecs_bulk_init(this.nativeWorld, desc);
 
-            LongList entities = new LongList(count);
-            entities.addAll(entitiesPtr.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG));
-
-            return entities;
+            return entitiesPtr.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
     }
 
@@ -434,17 +427,17 @@ public class World implements AutoCloseable {
         return flecs_h.ecs_get_max_id(this.nativeWorld);
     }
 
-    public LongList getEntities() {
+    public long[] getEntities() {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entitiesStruct = flecs_h.ecs_get_entities(tempArena, this.nativeWorld);
             MemorySegment idsPointer = entitiesStruct.get(ValueLayout.ADDRESS, 0);
             int count = entitiesStruct.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
 
-            LongList entities = new LongList(count);
+            long[] entities = new long[count];
             if (count > 0 && !idsPointer.equals(MemorySegment.NULL)) {
                 MemorySegment idsArray = idsPointer.reinterpret((long) count * Long.BYTES);
-                entities.addAll(idsArray.toArray(ValueLayout.JAVA_LONG));
+                entities = idsArray.toArray(ValueLayout.JAVA_LONG);
             }
 
             return entities;

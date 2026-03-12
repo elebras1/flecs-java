@@ -1,6 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.collection.LongList;
 import com.github.elebras1.flecs.component.Health;
 import com.github.elebras1.flecs.component.Ideology;
 import org.junit.jupiter.api.AfterEach;
@@ -50,14 +49,14 @@ class WorldTest {
 
     @Test
     void entityBulkTest() {
-        LongList entityIds = this.world.entityBulk(10);
-        assertEquals(10, entityIds.size());
+        long[] entityIds = this.world.entityBulk(10);
+        assertEquals(10, entityIds.length);
     }
 
     @Test
     void entityBulkWithComponentClassesTest() {
-        LongList entityIds = this.world.entityBulk(10, Health.class, Ideology.class);
-        assertEquals(10, entityIds.size());
+        long[] entityIds = this.world.entityBulk(10, Health.class, Ideology.class);
+        assertEquals(10, entityIds.length);
         for(long entityId : entityIds) {
             EntityView entityView = this.world.obtainEntityView(entityId);
             assertTrue(entityView.has(Health.class));

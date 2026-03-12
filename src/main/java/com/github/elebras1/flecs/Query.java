@@ -1,6 +1,5 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.collection.LongList;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -98,10 +97,20 @@ public class Query extends QueryBase implements AutoCloseable {
         }
     }
 
-    public LongList entities() {
+    public long[] entities() {
         this.checkClosed();
-        LongList result = new LongList();
-        this.each(result::add);
+        int[] index = {0};
+        long[] result = new long[this.count()];
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            while (flecs_h.ecs_iter_next(iter)) {
+                int count = ecs_iter_t.count(iter);
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                for (int i = 0; i < count; i++) {
+                    result[index[0]++] = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                }
+            }
+        }
         return result;
     }
 
