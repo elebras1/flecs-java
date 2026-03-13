@@ -40,7 +40,8 @@ val flecsHeaderFile = File(flecsSourceDir, "distr/flecs.h")
 val flecsCFile = File(flecsSourceDir, "distr/flecs.c")
 
 val generatedSourcesDir = file("src/main/generated")
-val annotationGeneratedDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main").get().asFile
+val annotationGeneratedMainDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main").get().asFile
+val annotationGeneratedTestDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test").get().asFile
 
 val os : OperatingSystem = OperatingSystem.current()
 val userHome : String = System.getProperty("user.home")
@@ -248,10 +249,15 @@ sourceSets {
     main {
         java {
             srcDir(generatedSourcesDir)
-            srcDir(annotationGeneratedDir)
+            srcDir(annotationGeneratedMainDir)
         }
         resources {
             srcDir(layout.buildDirectory.dir("natives"))
+        }
+    }
+    test {
+        java {
+            srcDir(annotationGeneratedTestDir)
         }
     }
 }
@@ -294,11 +300,12 @@ tasks.compileJava {
     options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
 
     options.compilerArgs.addAll(listOf(
-        "-s", annotationGeneratedDir.absolutePath
+        "-s", annotationGeneratedMainDir.absolutePath
     ))
 
     doFirst {
-        annotationGeneratedDir.mkdirs()
+        annotationGeneratedMainDir.deleteRecursively()
+        annotationGeneratedMainDir.mkdirs()
     }
 }
 
@@ -352,11 +359,12 @@ tasks.compileTestJava {
     options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
 
     options.compilerArgs.addAll(listOf(
-        "-s", annotationGeneratedDir.absolutePath
+        "-s", annotationGeneratedTestDir.absolutePath
     ))
 
     doFirst {
-        annotationGeneratedDir.mkdirs()
+        annotationGeneratedTestDir.deleteRecursively()
+        annotationGeneratedTestDir.mkdirs()
     }
 }
 
