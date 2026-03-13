@@ -117,8 +117,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
     dependsOn(extractFlecs)
 
     workingDir(flecsSourceDir)
-    inputs.file(flecsCFile)
-    val outputNativeFile = File(flecsSourceDir, "distr/$nativeLibName")
+    val outputNativeFile = layout.buildDirectory.dir("resources/main/natives/$nativeArch/$nativeLibName").get().asFile
     outputs.file(outputNativeFile)
 
     val compileCommand = when {
@@ -133,7 +132,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-fomit-frame-pointer",
             "-funroll-loops",
             "-std=c99",
-            "-DFLECS_SHARED",
+            "-Dflecs_EXPORTS",
             "-DNDEBUG",
             "-lws2_32",
             "-ldbghelp"
@@ -149,7 +148,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-fomit-frame-pointer",
             "-funroll-loops",
             "-std=c99",
-            "-DFLECS_SHARED",
+            "-Dflecs_EXPORTS",
             "-DNDEBUG",
             "-framework", "CoreFoundation"
         )
@@ -167,7 +166,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
             "-fno-semantic-interposition",
             "-fno-plt",
             "-std=c99",
-            "-DFLECS_SHARED",
+            "-Dflecs_EXPORTS",
             "-DNDEBUG",
             "-D_POSIX_C_SOURCE=200809L",
             "-D_DEFAULT_SOURCE",
@@ -209,16 +208,6 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
     }
 }
 
-val copyFlecsNative by tasks.registering(Copy::class) {
-    description = "Copy compiled Flecs native library to natives folder"
-    group = "flecs"
-    dependsOn(compileFlecsNative)
-    from(File(flecsSourceDir, "distr")) {
-        include(nativeLibName)
-    }
-    into(layout.buildDirectory.dir("natives/$nativeArch"))
-}
-
 val validateGeneratedBindings by tasks.registering {
     group = "verification"
     doLast {
@@ -251,9 +240,6 @@ sourceSets {
             srcDir(generatedSourcesDir)
             srcDir(annotationGeneratedMainDir)
         }
-        resources {
-            srcDir(layout.buildDirectory.dir("natives"))
-        }
     }
     test {
         java {
@@ -266,7 +252,7 @@ configurations["generatorCompileClasspath"].extendsFrom(configurations["compileC
 configurations["generatorRuntimeClasspath"].extendsFrom(configurations["runtimeClasspath"])
 
 tasks.named("processResources") {
-    dependsOn(copyFlecsNative)
+    dependsOn(compileFlecsNative)
 }
 
 val compileProcessor by tasks.registering(JavaCompile::class) {
@@ -287,7 +273,7 @@ val copyProcessorResources by tasks.registering(Copy::class) {
 }
 
 tasks.compileJava {
-    dependsOn(validateGeneratedBindings, copyFlecsNative, copyProcessorResources, compileProcessor)
+    dependsOn(validateGeneratedBindings, copyProcessorResources, compileProcessor)
 
     exclude("**/processor/**")
     exclude("**/annotation/**")
@@ -310,7 +296,7 @@ tasks.compileJava {
 }
 
 tasks.jar {
-    dependsOn(compileProcessor, copyProcessorResources, copyFlecsNative)
+    dependsOn(compileProcessor, copyProcessorResources)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(compileProcessor.get().destinationDirectory)
@@ -322,10 +308,6 @@ tasks.jar {
     })
 
     exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-
-    from(layout.buildDirectory.dir("natives")) {
-        into("natives")
-    }
 
     manifest {
         attributes(
@@ -340,7 +322,6 @@ val cleanFlecs by tasks.registering(Delete::class) {
     group = "flecs"
 
     delete(flecsDir)
-    delete(layout.buildDirectory.dir("natives"))
 }
 
 tasks.clean {
@@ -373,7 +354,7 @@ tasks.withType<JavaExec> {
 }
 
 tasks.named("sourcesJar") {
-    dependsOn(copyFlecsNative, tasks.compileJava)
+    dependsOn(tasks.compileJava)
 }
 
 tasks.withType<Javadoc>().configureEach {
