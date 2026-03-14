@@ -257,10 +257,9 @@ public class World implements AutoCloseable {
         }
     }
 
-    public long makeAlive(long entityId) {
+    public void makeAlive(long entityId) {
         this.checkClosed();
         flecs_h.ecs_make_alive(this.nativeWorld, entityId);
-        return entityId;
     }
 
     public void setVersion(long entityId) {
@@ -278,9 +277,9 @@ public class World implements AutoCloseable {
         flecs_h.ecs_set_entity_range(this.nativeWorld, idStart, idEnd);
     }
 
-    public void enableRangeCheck(boolean enable) {
+    public boolean enableRangeCheck(boolean enable) {
         this.checkClosed();
-        flecs_h.ecs_enable_range_check(this.nativeWorld, enable);
+        return flecs_h.ecs_enable_range_check(this.nativeWorld, enable);
     }
 
     public long prefab() {
@@ -328,6 +327,11 @@ public class World implements AutoCloseable {
         configuration.accept(hooks);
         hooks.install(this.nativeWorld, id);
         return id;
+    }
+
+    public long getComponentId(Class<?> componentClass) {
+        this.checkClosed();
+        return this.componentRegistry.getComponentId(componentClass);
     }
 
     public void deleteWith(Class<?> componentClass) {

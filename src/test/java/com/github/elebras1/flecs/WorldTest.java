@@ -67,26 +67,34 @@ class WorldTest {
     @Test
     void makeAliveTest() {
         long entityId = 1000;
-        long entityIdAlive = this.world.makeAlive(entityId);
-        assertEquals(entityId, entityIdAlive);
+        this.world.makeAlive(entityId);
+        assertTrue(this.world.obtainEntity(entityId).isAlive());
         Entity entity = this.world.obtainEntity(entityId);
         assertTrue(entity.isAlive());
     }
 
     @Test
     void setVersionTest() {
-        long entityId = this.world.makeAlive(500);
-
-        this.world.setVersion(entityId);
-
-        assertTrue(this.world.obtainEntityView(entityId).isAlive());
+        this.world.makeAlive(500);
+        this.world.setVersion(500);
+        assertTrue(this.world.getVersion(500) >= 0);
     }
 
     @Test
     void getVersionTest() {
-        long entityId = this.world.makeAlive(500);
+        long entityId = 500;
+        this.world.makeAlive(entityId);
         int version = this.world.getVersion(entityId);
         assertTrue(version >= 0);
+    }
+
+    @Test
+    void setEntityRangeTest() {
+        this.world.setEntityRange(1000, 1050);
+        for(long entityIdExpected = 1000; entityIdExpected < 1050; entityIdExpected++) {
+            long entityId = this.world.entity();
+            assertEquals(entityIdExpected, entityId);
+        }
     }
 
     @AfterEach
