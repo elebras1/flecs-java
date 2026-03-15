@@ -655,6 +655,13 @@ public class World implements AutoCloseable {
         return new World(stagePtr, this.componentRegistry);
     }
 
+    public World asyncStage() {
+        this.checkClosed();
+        MemorySegment stagePtr = flecs_h.ecs_stage_new(this.nativeWorld);
+        flecs_h.flecs_poly_release_(stagePtr);
+        return new World(stagePtr, this.componentRegistry);
+    }
+
     public void freeStage() {
         if (this.nativeWorld != null && this.nativeWorld.address() != 0) {
             flecs_h.ecs_stage_free(this.nativeWorld);
