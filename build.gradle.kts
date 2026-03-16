@@ -32,7 +32,7 @@ java {
     withJavadocJar()
 }
 
-val flecsVersion = "4.1.4"
+val flecsVersion = "4.1.5"
 val flecsDir = layout.buildDirectory.dir("flecs").get().asFile
 val flecsSourceDir = File(flecsDir, "flecs-$flecsVersion")
 
@@ -47,8 +47,8 @@ val os : OperatingSystem = OperatingSystem.current()
 val userHome : String = System.getProperty("user.home")
 
 val jextractExecutable = when {
-    os.isWindows -> "$userHome/.local/jextract/jextract-25/bin/jextract.exe"
-    else -> "$userHome/.local/jextract/jextract-25/bin/jextract"
+    os.isWindows -> "$userHome/.local/jextract-25/bin/jextract.exe"
+    else -> "$userHome/.local/jextract-25/bin/jextract"
 }
 
 val nativeLibName = when {
