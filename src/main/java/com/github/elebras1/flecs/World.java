@@ -23,6 +23,7 @@ public class World implements AutoCloseable {
     private World[] stages;
     private final boolean owned;
     private boolean closed;
+    private Object ctx;
 
     static {
         FlecsLoader.load();
@@ -245,7 +246,7 @@ public class World implements AutoCloseable {
 
             MemorySegment idsArray = ecs_bulk_desc_t.ids(desc);
             for (int i = 0; i < componentIds.length; i++) {
-                idsArray.setAtIndex(ValueLayout.JAVA_LONG, i, componentIds[i]);
+                idsArray.setAtIndex(JAVA_LONG, i, componentIds[i]);
             }
 
             ecs_bulk_desc_t.data(desc, MemorySegment.NULL);
@@ -435,13 +436,13 @@ public class World implements AutoCloseable {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entitiesStruct = flecs_h.ecs_get_entities(tempArena, this.nativeWorld);
-            MemorySegment idsPointer = entitiesStruct.get(ValueLayout.ADDRESS, 0);
-            int count = entitiesStruct.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
+            MemorySegment idsPointer = entitiesStruct.get(ADDRESS, 0);
+            int count = entitiesStruct.get(JAVA_INT, ADDRESS.byteSize());
 
             long[] entities = new long[count];
             if (count > 0 && !idsPointer.equals(MemorySegment.NULL)) {
                 MemorySegment idsArray = idsPointer.reinterpret((long) count * Long.BYTES);
-                entities = idsArray.toArray(ValueLayout.JAVA_LONG);
+                entities = idsArray.toArray(JAVA_LONG);
             }
 
             return entities;
@@ -692,6 +693,14 @@ public class World implements AutoCloseable {
         return flecs_h.ecs_stage_is_readonly(this.nativeWorld);
     }
 
+    public void setCtx(Object ctx) {
+        this.ctx = ctx;
+    }
+
+    public Object getCtx() {
+        return this.ctx;
+    }
+
     public boolean isDeferred() {
         this.checkClosed();
         return flecs_h.ecs_is_deferred(this.nativeWorld);
@@ -705,6 +714,36 @@ public class World implements AutoCloseable {
     public long getScope() {
         this.checkClosed();
         return flecs_h.ecs_get_scope(this.nativeWorld);
+    }
+
+    public long[] setLookupPath(long[] searchPath) {
+        this.checkClosed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment pathNative = tempArena.allocate(JAVA_LONG, searchPath.length + 1);
+            MemorySegment.copy(searchPath, 0, pathNative, JAVA_LONG, 0, searchPath.length);
+            MemorySegment oldPathNative = flecs_h.ecs_set_lookup_path(this.nativeWorld, pathNative);
+            if (oldPathNative == null || oldPathNative.equals(MemorySegment.NULL)) {
+                return new long[0];
+            }
+            int len = 0;
+            while (oldPathNative.getAtIndex(JAVA_LONG, len) != 0L) {
+                len++;
+            }
+
+            long[] oldPath = new long[len];
+            MemorySegment.copy(oldPathNative, JAVA_LONG, 0, oldPath, 0, len);
+            return oldPath;
+        }
+    }
+
+    public long lookup(String name, String sep, String rootSep, boolean recursive) {
+        this.checkClosed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment nameNative = tempArena.allocateFrom(name);
+            MemorySegment sepNative = tempArena.allocateFrom(sep);
+            MemorySegment rootSepNative = tempArena.allocateFrom(rootSep);
+            return flecs_h.ecs_lookup_path_w_sep(this.nativeWorld, 0, nameNative, sepNative, rootSepNative, recursive);
+        }
     }
 
     public PipelineBuilder pipeline() {
@@ -777,7 +816,7 @@ public class World implements AutoCloseable {
             byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
             MemorySegment jsonSegment = tempArena.allocate(jsonBytes.length + 1);
             jsonSegment.asSlice(0, jsonBytes.length).copyFrom(MemorySegment.ofArray(jsonBytes));
-            jsonSegment.set(ValueLayout.JAVA_BYTE, jsonBytes.length, (byte)0);
+            jsonSegment.set(JAVA_BYTE, jsonBytes.length, (byte)0);
 
             MemorySegment ptrSegment = flecs_h.ecs_world_from_json(this.nativeWorld, jsonSegment, MemorySegment.NULL);
         }
@@ -805,7 +844,7 @@ public class World implements AutoCloseable {
             }
 
             MemorySegment restData = arena.allocate(32);
-            restData.set(ValueLayout.JAVA_SHORT, 0, port);
+            restData.set(JAVA_SHORT, 0, port);
 
             flecs_h.ecs_set_id(this.nativeWorld, restCompId, restCompId, 32, restData);
         }
