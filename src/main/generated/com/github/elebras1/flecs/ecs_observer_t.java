@@ -217,7 +217,7 @@ public class ecs_observer_t {
      * }
      */
     public static long events(MemorySegment struct, long index0) {
-        return (long)events$ELEM_HANDLE.get(struct, 0L, index0);
+        return (long)events$ELEM_HANDLE.get(struct, events$OFFSET, index0);
     }
 
     /**
@@ -227,7 +227,7 @@ public class ecs_observer_t {
      * }
      */
     public static void events(MemorySegment struct, long index0, long fieldValue) {
-        events$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        events$ELEM_HANDLE.set(struct, events$OFFSET, index0, fieldValue);
     }
 
     private static final OfInt event_count$LAYOUT = (OfInt)$LAYOUT.select(groupElement("event_count"));

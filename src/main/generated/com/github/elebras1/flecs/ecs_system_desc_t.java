@@ -18,6 +18,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     int32_t _canary;
  *     ecs_entity_t entity;
  *     ecs_query_desc_t query;
+ *     ecs_entity_t phase;
  *     ecs_iter_action_t callback;
  *     ecs_run_action_t run;
  *     void *ctx;
@@ -45,6 +46,7 @@ public class ecs_system_desc_t {
         MemoryLayout.paddingLayout(4),
         flecs_h.C_LONG.withName("entity"),
         ecs_query_desc_t.layout().withName("query"),
+        flecs_h.C_LONG.withName("phase"),
         flecs_h.C_POINTER.withName("callback"),
         flecs_h.C_POINTER.withName("run"),
         flecs_h.C_POINTER.withName("ctx"),
@@ -198,6 +200,50 @@ public class ecs_system_desc_t {
      */
     public static void query(MemorySegment struct, MemorySegment fieldValue) {
         MemorySegment.copy(fieldValue, 0L, struct, query$OFFSET, query$LAYOUT.byteSize());
+    }
+
+    private static final OfLong phase$LAYOUT = (OfLong)$LAYOUT.select(groupElement("phase"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_entity_t phase
+     * }
+     */
+    public static final OfLong phase$layout() {
+        return phase$LAYOUT;
+    }
+
+    private static final long phase$OFFSET = $LAYOUT.byteOffset(groupElement("phase"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_entity_t phase
+     * }
+     */
+    public static final long phase$offset() {
+        return phase$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t phase
+     * }
+     */
+    public static long phase(MemorySegment struct) {
+        return struct.get(phase$LAYOUT, phase$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t phase
+     * }
+     */
+    public static void phase(MemorySegment struct, long fieldValue) {
+        struct.set(phase$LAYOUT, phase$OFFSET, fieldValue);
     }
 
     private static final AddressLayout callback$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("callback"));

@@ -14,22 +14,20 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
- * struct {
- *     EcsStatsHeader hdr;
- *     ecs_world_stats_t *stats;
+ * struct EcsParent {
+ *     ecs_entity_t value;
  * }
  * }
  */
-public class EcsWorldStats {
+public class EcsParent {
 
-    EcsWorldStats() {
+    EcsParent() {
         // Should not be called directly
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        EcsStatsHeader.layout().withName("hdr"),
-        flecs_h.C_POINTER.withName("stats")
-    ).withName("$anon$15237:9");
+        flecs_h.C_LONG.withName("value")
+    ).withName("EcsParent");
 
     /**
      * The layout of this struct
@@ -38,92 +36,48 @@ public class EcsWorldStats {
         return $LAYOUT;
     }
 
-    private static final GroupLayout hdr$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("hdr"));
+    private static final OfLong value$LAYOUT = (OfLong)$LAYOUT.select(groupElement("value"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_entity_t value
      * }
      */
-    public static final GroupLayout hdr$layout() {
-        return hdr$LAYOUT;
+    public static final OfLong value$layout() {
+        return value$LAYOUT;
     }
 
-    private static final long hdr$OFFSET = $LAYOUT.byteOffset(groupElement("hdr"));
+    private static final long value$OFFSET = $LAYOUT.byteOffset(groupElement("value"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_entity_t value
      * }
      */
-    public static final long hdr$offset() {
-        return hdr$OFFSET;
+    public static final long value$offset() {
+        return value$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_entity_t value
      * }
      */
-    public static MemorySegment hdr(MemorySegment struct) {
-        return struct.asSlice(hdr$OFFSET, hdr$LAYOUT.byteSize());
+    public static long value(MemorySegment struct) {
+        return struct.get(value$LAYOUT, value$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_entity_t value
      * }
      */
-    public static void hdr(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, hdr$OFFSET, hdr$LAYOUT.byteSize());
-    }
-
-    private static final AddressLayout stats$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("stats"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static final AddressLayout stats$layout() {
-        return stats$LAYOUT;
-    }
-
-    private static final long stats$OFFSET = $LAYOUT.byteOffset(groupElement("stats"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static final long stats$offset() {
-        return stats$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static MemorySegment stats(MemorySegment struct) {
-        return struct.get(stats$LAYOUT, stats$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static void stats(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(stats$LAYOUT, stats$OFFSET, fieldValue);
+    public static void value(MemorySegment struct, long fieldValue) {
+        struct.set(value$LAYOUT, value$OFFSET, fieldValue);
     }
 
     /**

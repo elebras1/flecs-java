@@ -12,7 +12,6 @@ public final class FlecsConstants {
     public static final long EcsFlecsCore = flecs_h.EcsFlecsCore();
     public static final long EcsWorld = flecs_h.EcsWorld();
 
-    public static final long EcsPrivate = flecs_h.EcsPrivate();
     public static final long EcsPrefab = flecs_h.EcsPrefab();
     public static final long EcsSlotOf = flecs_h.EcsSlotOf();
     public static final long EcsDisabled = flecs_h.EcsDisabled();

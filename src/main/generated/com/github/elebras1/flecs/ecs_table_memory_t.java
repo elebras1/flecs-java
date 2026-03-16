@@ -22,8 +22,6 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_size_t bytes_type;
  *     ecs_size_t bytes_entities;
  *     ecs_size_t bytes_overrides;
- *     ecs_size_t bytes_columns;
- *     ecs_size_t bytes_table_records;
  *     ecs_size_t bytes_column_map;
  *     ecs_size_t bytes_component_map;
  *     ecs_size_t bytes_dirty_state;
@@ -45,13 +43,11 @@ public class ecs_table_memory_t {
         flecs_h.C_INT.withName("bytes_type"),
         flecs_h.C_INT.withName("bytes_entities"),
         flecs_h.C_INT.withName("bytes_overrides"),
-        flecs_h.C_INT.withName("bytes_columns"),
-        flecs_h.C_INT.withName("bytes_table_records"),
         flecs_h.C_INT.withName("bytes_column_map"),
         flecs_h.C_INT.withName("bytes_component_map"),
         flecs_h.C_INT.withName("bytes_dirty_state"),
         flecs_h.C_INT.withName("bytes_edges")
-    ).withName("$anon$13700:9");
+    ).withName("$anon$15345:9");
 
     /**
      * The layout of this struct
@@ -366,94 +362,6 @@ public class ecs_table_memory_t {
      */
     public static void bytes_overrides(MemorySegment struct, int fieldValue) {
         struct.set(bytes_overrides$LAYOUT, bytes_overrides$OFFSET, fieldValue);
-    }
-
-    private static final OfInt bytes_columns$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_columns"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_columns
-     * }
-     */
-    public static final OfInt bytes_columns$layout() {
-        return bytes_columns$LAYOUT;
-    }
-
-    private static final long bytes_columns$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_columns"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_columns
-     * }
-     */
-    public static final long bytes_columns$offset() {
-        return bytes_columns$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_columns
-     * }
-     */
-    public static int bytes_columns(MemorySegment struct) {
-        return struct.get(bytes_columns$LAYOUT, bytes_columns$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_columns
-     * }
-     */
-    public static void bytes_columns(MemorySegment struct, int fieldValue) {
-        struct.set(bytes_columns$LAYOUT, bytes_columns$OFFSET, fieldValue);
-    }
-
-    private static final OfInt bytes_table_records$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_table_records"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_records
-     * }
-     */
-    public static final OfInt bytes_table_records$layout() {
-        return bytes_table_records$LAYOUT;
-    }
-
-    private static final long bytes_table_records$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_table_records"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_records
-     * }
-     */
-    public static final long bytes_table_records$offset() {
-        return bytes_table_records$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_records
-     * }
-     */
-    public static int bytes_table_records(MemorySegment struct) {
-        return struct.get(bytes_table_records$LAYOUT, bytes_table_records$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_records
-     * }
-     */
-    public static void bytes_table_records(MemorySegment struct, int fieldValue) {
-        struct.set(bytes_table_records$LAYOUT, bytes_table_records$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_column_map$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_column_map"));

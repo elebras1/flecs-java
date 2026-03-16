@@ -19,6 +19,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_run_action_t run;
  *     ecs_iter_action_t action;
  *     ecs_query_t *query;
+ *     uint64_t group_id;
+ *     _Bool group_id_set;
  *     ecs_entity_t tick_source;
  *     _Bool multi_threaded;
  *     _Bool immediate;
@@ -47,6 +49,9 @@ public class ecs_system_t {
         flecs_h.C_POINTER.withName("run"),
         flecs_h.C_POINTER.withName("action"),
         flecs_h.C_POINTER.withName("query"),
+        flecs_h.C_LONG.withName("group_id"),
+        flecs_h.C_BOOL.withName("group_id_set"),
+        MemoryLayout.paddingLayout(7),
         flecs_h.C_LONG.withName("tick_source"),
         flecs_h.C_BOOL.withName("multi_threaded"),
         flecs_h.C_BOOL.withName("immediate"),
@@ -245,6 +250,94 @@ public class ecs_system_t {
      */
     public static void query(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(query$LAYOUT, query$OFFSET, fieldValue);
+    }
+
+    private static final OfLong group_id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("group_id"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint64_t group_id
+     * }
+     */
+    public static final OfLong group_id$layout() {
+        return group_id$LAYOUT;
+    }
+
+    private static final long group_id$OFFSET = $LAYOUT.byteOffset(groupElement("group_id"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint64_t group_id
+     * }
+     */
+    public static final long group_id$offset() {
+        return group_id$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint64_t group_id
+     * }
+     */
+    public static long group_id(MemorySegment struct) {
+        return struct.get(group_id$LAYOUT, group_id$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint64_t group_id
+     * }
+     */
+    public static void group_id(MemorySegment struct, long fieldValue) {
+        struct.set(group_id$LAYOUT, group_id$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean group_id_set$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("group_id_set"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool group_id_set
+     * }
+     */
+    public static final OfBoolean group_id_set$layout() {
+        return group_id_set$LAYOUT;
+    }
+
+    private static final long group_id_set$OFFSET = $LAYOUT.byteOffset(groupElement("group_id_set"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool group_id_set
+     * }
+     */
+    public static final long group_id_set$offset() {
+        return group_id_set$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool group_id_set
+     * }
+     */
+    public static boolean group_id_set(MemorySegment struct) {
+        return struct.get(group_id_set$LAYOUT, group_id_set$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool group_id_set
+     * }
+     */
+    public static void group_id_set(MemorySegment struct, boolean fieldValue) {
+        struct.set(group_id_set$LAYOUT, group_id_set$OFFSET, fieldValue);
     }
 
     private static final OfLong tick_source$LAYOUT = (OfLong)$LAYOUT.select(groupElement("tick_source"));

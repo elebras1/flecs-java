@@ -519,7 +519,7 @@ public class __pthread_rwlock_arch_t {
      * }
      */
     public static byte __pad1(MemorySegment struct, long index0) {
-        return (byte)__pad1$ELEM_HANDLE.get(struct, 0L, index0);
+        return (byte)__pad1$ELEM_HANDLE.get(struct, __pad1$OFFSET, index0);
     }
 
     /**
@@ -529,7 +529,7 @@ public class __pthread_rwlock_arch_t {
      * }
      */
     public static void __pad1(MemorySegment struct, long index0, byte fieldValue) {
-        __pad1$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __pad1$ELEM_HANDLE.set(struct, __pad1$OFFSET, index0, fieldValue);
     }
 
     private static final OfLong __pad2$LAYOUT = (OfLong)$LAYOUT.select(groupElement("__pad2"));

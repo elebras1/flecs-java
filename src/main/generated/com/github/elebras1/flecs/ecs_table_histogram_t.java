@@ -27,7 +27,7 @@ public class ecs_table_histogram_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         MemoryLayout.sequenceLayout(14, flecs_h.C_INT).withName("entity_counts")
-    ).withName("$anon$13717:9");
+    ).withName("$anon$15360:9");
 
     /**
      * The layout of this struct
@@ -100,7 +100,7 @@ public class ecs_table_histogram_t {
      * }
      */
     public static int entity_counts(MemorySegment struct, long index0) {
-        return (int)entity_counts$ELEM_HANDLE.get(struct, 0L, index0);
+        return (int)entity_counts$ELEM_HANDLE.get(struct, entity_counts$OFFSET, index0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ecs_table_histogram_t {
      * }
      */
     public static void entity_counts(MemorySegment struct, long index0, int fieldValue) {
-        entity_counts$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        entity_counts$ELEM_HANDLE.set(struct, entity_counts$OFFSET, index0, fieldValue);
     }
 
     /**

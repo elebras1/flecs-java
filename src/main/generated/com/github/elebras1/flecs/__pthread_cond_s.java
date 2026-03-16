@@ -200,7 +200,7 @@ public class __pthread_cond_s {
      * }
      */
     public static int __g_refs(MemorySegment struct, long index0) {
-        return (int)__g_refs$ELEM_HANDLE.get(struct, 0L, index0);
+        return (int)__g_refs$ELEM_HANDLE.get(struct, __g_refs$OFFSET, index0);
     }
 
     /**
@@ -210,7 +210,7 @@ public class __pthread_cond_s {
      * }
      */
     public static void __g_refs(MemorySegment struct, long index0, int fieldValue) {
-        __g_refs$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __g_refs$ELEM_HANDLE.set(struct, __g_refs$OFFSET, index0, fieldValue);
     }
 
     private static final SequenceLayout __g_size$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("__g_size"));
@@ -277,7 +277,7 @@ public class __pthread_cond_s {
      * }
      */
     public static int __g_size(MemorySegment struct, long index0) {
-        return (int)__g_size$ELEM_HANDLE.get(struct, 0L, index0);
+        return (int)__g_size$ELEM_HANDLE.get(struct, __g_size$OFFSET, index0);
     }
 
     /**
@@ -287,7 +287,7 @@ public class __pthread_cond_s {
      * }
      */
     public static void __g_size(MemorySegment struct, long index0, int fieldValue) {
-        __g_size$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __g_size$ELEM_HANDLE.set(struct, __g_size$OFFSET, index0, fieldValue);
     }
 
     private static final OfInt __g1_orig_size$LAYOUT = (OfInt)$LAYOUT.select(groupElement("__g1_orig_size"));
@@ -442,7 +442,7 @@ public class __pthread_cond_s {
      * }
      */
     public static int __g_signals(MemorySegment struct, long index0) {
-        return (int)__g_signals$ELEM_HANDLE.get(struct, 0L, index0);
+        return (int)__g_signals$ELEM_HANDLE.get(struct, __g_signals$OFFSET, index0);
     }
 
     /**
@@ -452,7 +452,7 @@ public class __pthread_cond_s {
      * }
      */
     public static void __g_signals(MemorySegment struct, long index0, int fieldValue) {
-        __g_signals$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __g_signals$ELEM_HANDLE.set(struct, __g_signals$OFFSET, index0, fieldValue);
     }
 
     /**

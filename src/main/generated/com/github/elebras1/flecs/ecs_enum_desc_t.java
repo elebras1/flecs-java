@@ -149,7 +149,7 @@ public class ecs_enum_desc_t {
      */
     public static MemorySegment constants(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)constants$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)constants$ELEM_HANDLE.invokeExact(struct, constants$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {

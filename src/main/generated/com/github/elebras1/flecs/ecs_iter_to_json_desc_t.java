@@ -32,6 +32,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     _Bool serialize_alerts;
  *     ecs_entity_t serialize_refs;
  *     _Bool serialize_matches;
+ *     _Bool serialize_parents_before_children;
  *     _Bool (*component_filter)(const ecs_world_t *, ecs_entity_t);
  *     ecs_poly_t *query;
  * }
@@ -62,7 +63,8 @@ public class ecs_iter_to_json_desc_t {
         MemoryLayout.paddingLayout(1),
         flecs_h.C_LONG.withName("serialize_refs"),
         flecs_h.C_BOOL.withName("serialize_matches"),
-        MemoryLayout.paddingLayout(7),
+        flecs_h.C_BOOL.withName("serialize_parents_before_children"),
+        MemoryLayout.paddingLayout(6),
         flecs_h.C_POINTER.withName("component_filter"),
         flecs_h.C_POINTER.withName("query")
     ).withName("ecs_iter_to_json_desc_t");
@@ -820,6 +822,50 @@ public class ecs_iter_to_json_desc_t {
      */
     public static void serialize_matches(MemorySegment struct, boolean fieldValue) {
         struct.set(serialize_matches$LAYOUT, serialize_matches$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean serialize_parents_before_children$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("serialize_parents_before_children"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool serialize_parents_before_children
+     * }
+     */
+    public static final OfBoolean serialize_parents_before_children$layout() {
+        return serialize_parents_before_children$LAYOUT;
+    }
+
+    private static final long serialize_parents_before_children$OFFSET = $LAYOUT.byteOffset(groupElement("serialize_parents_before_children"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool serialize_parents_before_children
+     * }
+     */
+    public static final long serialize_parents_before_children$offset() {
+        return serialize_parents_before_children$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool serialize_parents_before_children
+     * }
+     */
+    public static boolean serialize_parents_before_children(MemorySegment struct) {
+        return struct.get(serialize_parents_before_children$LAYOUT, serialize_parents_before_children$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool serialize_parents_before_children
+     * }
+     */
+    public static void serialize_parents_before_children(MemorySegment struct, boolean fieldValue) {
+        struct.set(serialize_parents_before_children$LAYOUT, serialize_parents_before_children$OFFSET, fieldValue);
     }
 
     /**

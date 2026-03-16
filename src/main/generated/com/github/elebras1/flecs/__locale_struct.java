@@ -108,7 +108,7 @@ public class __locale_struct {
      * }
      */
     public static MemorySegment __locales(MemorySegment struct, long index0) {
-        return (MemorySegment)__locales$ELEM_HANDLE.get(struct, 0L, index0);
+        return (MemorySegment)__locales$ELEM_HANDLE.get(struct, __locales$OFFSET, index0);
     }
 
     /**
@@ -118,7 +118,7 @@ public class __locale_struct {
      * }
      */
     public static void __locales(MemorySegment struct, long index0, MemorySegment fieldValue) {
-        __locales$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __locales$ELEM_HANDLE.set(struct, __locales$OFFSET, index0, fieldValue);
     }
 
     private static final AddressLayout __ctype_b$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("__ctype_b"));
@@ -317,7 +317,7 @@ public class __locale_struct {
      * }
      */
     public static MemorySegment __names(MemorySegment struct, long index0) {
-        return (MemorySegment)__names$ELEM_HANDLE.get(struct, 0L, index0);
+        return (MemorySegment)__names$ELEM_HANDLE.get(struct, __names$OFFSET, index0);
     }
 
     /**
@@ -327,7 +327,7 @@ public class __locale_struct {
      * }
      */
     public static void __names(MemorySegment struct, long index0, MemorySegment fieldValue) {
-        __names$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __names$ELEM_HANDLE.set(struct, __names$OFFSET, index0, fieldValue);
     }
 
     /**

@@ -14,22 +14,20 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
- * struct {
- *     EcsStatsHeader hdr;
- *     ecs_world_stats_t *stats;
+ * struct EcsTreeSpawner {
+ *     ecs_tree_spawner_t data[6];
  * }
  * }
  */
-public class EcsWorldStats {
+public class EcsTreeSpawner {
 
-    EcsWorldStats() {
+    EcsTreeSpawner() {
         // Should not be called directly
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        EcsStatsHeader.layout().withName("hdr"),
-        flecs_h.C_POINTER.withName("stats")
-    ).withName("$anon$15237:9");
+        MemoryLayout.sequenceLayout(6, ecs_tree_spawner_t.layout()).withName("data")
+    ).withName("EcsTreeSpawner");
 
     /**
      * The layout of this struct
@@ -38,92 +36,87 @@ public class EcsWorldStats {
         return $LAYOUT;
     }
 
-    private static final GroupLayout hdr$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("hdr"));
+    private static final SequenceLayout data$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("data"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static final GroupLayout hdr$layout() {
-        return hdr$LAYOUT;
+    public static final SequenceLayout data$layout() {
+        return data$LAYOUT;
     }
 
-    private static final long hdr$OFFSET = $LAYOUT.byteOffset(groupElement("hdr"));
+    private static final long data$OFFSET = $LAYOUT.byteOffset(groupElement("data"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static final long hdr$offset() {
-        return hdr$OFFSET;
+    public static final long data$offset() {
+        return data$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static MemorySegment hdr(MemorySegment struct) {
-        return struct.asSlice(hdr$OFFSET, hdr$LAYOUT.byteSize());
+    public static MemorySegment data(MemorySegment struct) {
+        return struct.asSlice(data$OFFSET, data$LAYOUT.byteSize());
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static void hdr(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, hdr$OFFSET, hdr$LAYOUT.byteSize());
+    public static void data(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, data$OFFSET, data$LAYOUT.byteSize());
     }
 
-    private static final AddressLayout stats$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("stats"));
+    private static long[] data$DIMS = { 6 };
 
     /**
-     * Layout for field:
+     * Dimensions for array field:
      * {@snippet lang=c :
-     * ecs_world_stats_t *stats
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static final AddressLayout stats$layout() {
-        return stats$LAYOUT;
+    public static long[] data$dimensions() {
+        return data$DIMS;
     }
-
-    private static final long stats$OFFSET = $LAYOUT.byteOffset(groupElement("stats"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static final long stats$offset() {
-        return stats$OFFSET;
-    }
+    private static final MethodHandle data$ELEM_HANDLE = data$LAYOUT.sliceHandle(sequenceElement());
 
     /**
-     * Getter for field:
+     * Indexed getter for field:
      * {@snippet lang=c :
-     * ecs_world_stats_t *stats
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static MemorySegment stats(MemorySegment struct) {
-        return struct.get(stats$LAYOUT, stats$OFFSET);
+    public static MemorySegment data(MemorySegment struct, long index0) {
+        try {
+            return (MemorySegment)data$ELEM_HANDLE.invokeExact(struct, data$OFFSET, index0);
+        } catch (Error | RuntimeException ex) {
+            throw ex;
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
     }
 
     /**
-     * Setter for field:
+     * Indexed setter for field:
      * {@snippet lang=c :
-     * ecs_world_stats_t *stats
+     * ecs_tree_spawner_t data[6]
      * }
      */
-    public static void stats(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(stats$LAYOUT, stats$OFFSET, fieldValue);
+    public static void data(MemorySegment struct, long index0, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, data(struct, index0), 0L, ecs_tree_spawner_t.layout().byteSize());
     }
 
     /**

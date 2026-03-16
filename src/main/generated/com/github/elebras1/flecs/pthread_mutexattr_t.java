@@ -102,7 +102,7 @@ public class pthread_mutexattr_t {
      * }
      */
     public static byte __size(MemorySegment union, long index0) {
-        return (byte)__size$ELEM_HANDLE.get(union, 0L, index0);
+        return (byte)__size$ELEM_HANDLE.get(union, __size$OFFSET, index0);
     }
 
     /**
@@ -112,7 +112,7 @@ public class pthread_mutexattr_t {
      * }
      */
     public static void __size(MemorySegment union, long index0, byte fieldValue) {
-        __size$ELEM_HANDLE.set(union, 0L, index0, fieldValue);
+        __size$ELEM_HANDLE.set(union, __size$OFFSET, index0, fieldValue);
     }
 
     private static final OfInt __align$LAYOUT = (OfInt)$LAYOUT.select(groupElement("__align"));

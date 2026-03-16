@@ -244,7 +244,7 @@ public class ecs_bulk_desc_t {
      * }
      */
     public static long ids(MemorySegment struct, long index0) {
-        return (long)ids$ELEM_HANDLE.get(struct, 0L, index0);
+        return (long)ids$ELEM_HANDLE.get(struct, ids$OFFSET, index0);
     }
 
     /**
@@ -254,7 +254,7 @@ public class ecs_bulk_desc_t {
      * }
      */
     public static void ids(MemorySegment struct, long index0, long fieldValue) {
-        ids$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        ids$ELEM_HANDLE.set(struct, ids$OFFSET, index0, fieldValue);
     }
 
     private static final AddressLayout data$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("data"));

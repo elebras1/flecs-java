@@ -382,7 +382,7 @@ public class ecs_suspend_readonly_state_t {
      */
     public static MemorySegment cmd_stack(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)cmd_stack$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)cmd_stack$ELEM_HANDLE.invokeExact(struct, cmd_stack$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {

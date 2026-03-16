@@ -15,21 +15,19 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 /**
  * {@snippet lang=c :
  * struct {
- *     EcsStatsHeader hdr;
- *     ecs_world_stats_t *stats;
+ *     ecs_vec_t children;
  * }
  * }
  */
-public class EcsWorldStats {
+public class ecs_tree_spawner_t {
 
-    EcsWorldStats() {
+    ecs_tree_spawner_t() {
         // Should not be called directly
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        EcsStatsHeader.layout().withName("hdr"),
-        flecs_h.C_POINTER.withName("stats")
-    ).withName("$anon$15237:9");
+        ecs_vec_t.layout().withName("children")
+    ).withName("$anon$6569:9");
 
     /**
      * The layout of this struct
@@ -38,92 +36,48 @@ public class EcsWorldStats {
         return $LAYOUT;
     }
 
-    private static final GroupLayout hdr$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("hdr"));
+    private static final GroupLayout children$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("children"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_vec_t children
      * }
      */
-    public static final GroupLayout hdr$layout() {
-        return hdr$LAYOUT;
+    public static final GroupLayout children$layout() {
+        return children$LAYOUT;
     }
 
-    private static final long hdr$OFFSET = $LAYOUT.byteOffset(groupElement("hdr"));
+    private static final long children$OFFSET = $LAYOUT.byteOffset(groupElement("children"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_vec_t children
      * }
      */
-    public static final long hdr$offset() {
-        return hdr$OFFSET;
+    public static final long children$offset() {
+        return children$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_vec_t children
      * }
      */
-    public static MemorySegment hdr(MemorySegment struct) {
-        return struct.asSlice(hdr$OFFSET, hdr$LAYOUT.byteSize());
+    public static MemorySegment children(MemorySegment struct) {
+        return struct.asSlice(children$OFFSET, children$LAYOUT.byteSize());
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * EcsStatsHeader hdr
+     * ecs_vec_t children
      * }
      */
-    public static void hdr(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, hdr$OFFSET, hdr$LAYOUT.byteSize());
-    }
-
-    private static final AddressLayout stats$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("stats"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static final AddressLayout stats$layout() {
-        return stats$LAYOUT;
-    }
-
-    private static final long stats$OFFSET = $LAYOUT.byteOffset(groupElement("stats"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static final long stats$offset() {
-        return stats$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static MemorySegment stats(MemorySegment struct) {
-        return struct.get(stats$LAYOUT, stats$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_world_stats_t *stats
-     * }
-     */
-    public static void stats(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(stats$LAYOUT, stats$OFFSET, fieldValue);
+    public static void children(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, children$OFFSET, children$LAYOUT.byteSize());
     }
 
     /**

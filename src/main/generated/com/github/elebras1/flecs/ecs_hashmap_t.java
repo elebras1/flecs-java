@@ -35,7 +35,7 @@ public class ecs_hashmap_t {
         flecs_h.C_INT.withName("key_size"),
         flecs_h.C_INT.withName("value_size"),
         ecs_map_t.layout().withName("impl")
-    ).withName("$anon$4293:9");
+    ).withName("$anon$5370:9");
 
     /**
      * The layout of this struct

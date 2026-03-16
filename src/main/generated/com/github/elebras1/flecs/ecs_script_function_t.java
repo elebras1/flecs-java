@@ -14,209 +14,34 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
- * struct ecs_function_desc_t {
- *     const char *name;
- *     ecs_entity_t parent;
- *     ecs_script_parameter_t params[16];
+ * struct ecs_script_function_t {
  *     ecs_entity_t return_type;
+ *     ecs_vec_t params;
  *     ecs_function_callback_t callback;
  *     ecs_vector_function_callback_t vector_callbacks[18];
  *     void *ctx;
  * }
  * }
  */
-public class ecs_function_desc_t {
+public class ecs_script_function_t {
 
-    ecs_function_desc_t() {
+    ecs_script_function_t() {
         // Should not be called directly
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        flecs_h.C_POINTER.withName("name"),
-        flecs_h.C_LONG.withName("parent"),
-        MemoryLayout.sequenceLayout(16, ecs_script_parameter_t.layout()).withName("params"),
         flecs_h.C_LONG.withName("return_type"),
+        ecs_vec_t.layout().withName("params"),
         flecs_h.C_POINTER.withName("callback"),
         MemoryLayout.sequenceLayout(18, flecs_h.C_POINTER).withName("vector_callbacks"),
         flecs_h.C_POINTER.withName("ctx")
-    ).withName("ecs_function_desc_t");
+    ).withName("ecs_script_function_t");
 
     /**
      * The layout of this struct
      */
     public static final GroupLayout layout() {
         return $LAYOUT;
-    }
-
-    private static final AddressLayout name$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("name"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * const char *name
-     * }
-     */
-    public static final AddressLayout name$layout() {
-        return name$LAYOUT;
-    }
-
-    private static final long name$OFFSET = $LAYOUT.byteOffset(groupElement("name"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * const char *name
-     * }
-     */
-    public static final long name$offset() {
-        return name$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * const char *name
-     * }
-     */
-    public static MemorySegment name(MemorySegment struct) {
-        return struct.get(name$LAYOUT, name$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * const char *name
-     * }
-     */
-    public static void name(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(name$LAYOUT, name$OFFSET, fieldValue);
-    }
-
-    private static final OfLong parent$LAYOUT = (OfLong)$LAYOUT.select(groupElement("parent"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_entity_t parent
-     * }
-     */
-    public static final OfLong parent$layout() {
-        return parent$LAYOUT;
-    }
-
-    private static final long parent$OFFSET = $LAYOUT.byteOffset(groupElement("parent"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_entity_t parent
-     * }
-     */
-    public static final long parent$offset() {
-        return parent$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t parent
-     * }
-     */
-    public static long parent(MemorySegment struct) {
-        return struct.get(parent$LAYOUT, parent$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t parent
-     * }
-     */
-    public static void parent(MemorySegment struct, long fieldValue) {
-        struct.set(parent$LAYOUT, parent$OFFSET, fieldValue);
-    }
-
-    private static final SequenceLayout params$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("params"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static final SequenceLayout params$layout() {
-        return params$LAYOUT;
-    }
-
-    private static final long params$OFFSET = $LAYOUT.byteOffset(groupElement("params"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static final long params$offset() {
-        return params$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static MemorySegment params(MemorySegment struct) {
-        return struct.asSlice(params$OFFSET, params$LAYOUT.byteSize());
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static void params(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, params$OFFSET, params$LAYOUT.byteSize());
-    }
-
-    private static long[] params$DIMS = { 16 };
-
-    /**
-     * Dimensions for array field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static long[] params$dimensions() {
-        return params$DIMS;
-    }
-    private static final MethodHandle params$ELEM_HANDLE = params$LAYOUT.sliceHandle(sequenceElement());
-
-    /**
-     * Indexed getter for field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static MemorySegment params(MemorySegment struct, long index0) {
-        try {
-            return (MemorySegment)params$ELEM_HANDLE.invokeExact(struct, params$OFFSET, index0);
-        } catch (Error | RuntimeException ex) {
-            throw ex;
-        } catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
-        }
-    }
-
-    /**
-     * Indexed setter for field:
-     * {@snippet lang=c :
-     * ecs_script_parameter_t params[16]
-     * }
-     */
-    public static void params(MemorySegment struct, long index0, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, params(struct, index0), 0L, ecs_script_parameter_t.layout().byteSize());
     }
 
     private static final OfLong return_type$LAYOUT = (OfLong)$LAYOUT.select(groupElement("return_type"));
@@ -261,6 +86,50 @@ public class ecs_function_desc_t {
      */
     public static void return_type(MemorySegment struct, long fieldValue) {
         struct.set(return_type$LAYOUT, return_type$OFFSET, fieldValue);
+    }
+
+    private static final GroupLayout params$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("params"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_vec_t params
+     * }
+     */
+    public static final GroupLayout params$layout() {
+        return params$LAYOUT;
+    }
+
+    private static final long params$OFFSET = $LAYOUT.byteOffset(groupElement("params"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_vec_t params
+     * }
+     */
+    public static final long params$offset() {
+        return params$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t params
+     * }
+     */
+    public static MemorySegment params(MemorySegment struct) {
+        return struct.asSlice(params$OFFSET, params$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t params
+     * }
+     */
+    public static void params(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, params$OFFSET, params$LAYOUT.byteSize());
     }
 
     private static final AddressLayout callback$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("callback"));

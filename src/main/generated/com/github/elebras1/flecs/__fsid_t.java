@@ -100,7 +100,7 @@ public class __fsid_t {
      * }
      */
     public static int __val(MemorySegment struct, long index0) {
-        return (int)__val$ELEM_HANDLE.get(struct, 0L, index0);
+        return (int)__val$ELEM_HANDLE.get(struct, __val$OFFSET, index0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class __fsid_t {
      * }
      */
     public static void __val(MemorySegment struct, long index0, int fieldValue) {
-        __val$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __val$ELEM_HANDLE.set(struct, __val$OFFSET, index0, fieldValue);
     }
 
     /**

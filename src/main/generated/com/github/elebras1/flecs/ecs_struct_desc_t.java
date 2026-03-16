@@ -17,6 +17,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * struct ecs_struct_desc_t {
  *     ecs_entity_t entity;
  *     ecs_member_t members[32];
+ *     _Bool create_member_entities;
  * }
  * }
  */
@@ -28,7 +29,9 @@ public class ecs_struct_desc_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_LONG.withName("entity"),
-        MemoryLayout.sequenceLayout(32, ecs_member_t.layout()).withName("members")
+        MemoryLayout.sequenceLayout(32, ecs_member_t.layout()).withName("members"),
+        flecs_h.C_BOOL.withName("create_member_entities"),
+        MemoryLayout.paddingLayout(7)
     ).withName("ecs_struct_desc_t");
 
     /**
@@ -147,7 +150,7 @@ public class ecs_struct_desc_t {
      */
     public static MemorySegment members(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)members$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)members$ELEM_HANDLE.invokeExact(struct, members$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {
@@ -163,6 +166,50 @@ public class ecs_struct_desc_t {
      */
     public static void members(MemorySegment struct, long index0, MemorySegment fieldValue) {
         MemorySegment.copy(fieldValue, 0L, members(struct, index0), 0L, ecs_member_t.layout().byteSize());
+    }
+
+    private static final OfBoolean create_member_entities$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("create_member_entities"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool create_member_entities
+     * }
+     */
+    public static final OfBoolean create_member_entities$layout() {
+        return create_member_entities$LAYOUT;
+    }
+
+    private static final long create_member_entities$OFFSET = $LAYOUT.byteOffset(groupElement("create_member_entities"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool create_member_entities
+     * }
+     */
+    public static final long create_member_entities$offset() {
+        return create_member_entities$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool create_member_entities
+     * }
+     */
+    public static boolean create_member_entities(MemorySegment struct) {
+        return struct.get(create_member_entities$LAYOUT, create_member_entities$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool create_member_entities
+     * }
+     */
+    public static void create_member_entities(MemorySegment struct, boolean fieldValue) {
+        struct.set(create_member_entities$LAYOUT, create_member_entities$OFFSET, fieldValue);
     }
 
     /**

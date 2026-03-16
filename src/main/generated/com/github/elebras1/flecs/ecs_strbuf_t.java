@@ -244,7 +244,7 @@ public class ecs_strbuf_t {
      */
     public static MemorySegment list_stack(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)list_stack$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)list_stack$ELEM_HANDLE.invokeExact(struct, list_stack$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {
@@ -370,7 +370,7 @@ public class ecs_strbuf_t {
      * }
      */
     public static byte small_string(MemorySegment struct, long index0) {
-        return (byte)small_string$ELEM_HANDLE.get(struct, 0L, index0);
+        return (byte)small_string$ELEM_HANDLE.get(struct, small_string$OFFSET, index0);
     }
 
     /**
@@ -380,7 +380,7 @@ public class ecs_strbuf_t {
      * }
      */
     public static void small_string(MemorySegment struct, long index0, byte fieldValue) {
-        small_string$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        small_string$ELEM_HANDLE.set(struct, small_string$OFFSET, index0, fieldValue);
     }
 
     /**

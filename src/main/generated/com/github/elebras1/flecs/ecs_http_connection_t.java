@@ -33,7 +33,7 @@ public class ecs_http_connection_t {
         flecs_h.C_POINTER.withName("server"),
         MemoryLayout.sequenceLayout(128, flecs_h.C_CHAR).withName("host"),
         MemoryLayout.sequenceLayout(16, flecs_h.C_CHAR).withName("port")
-    ).withName("$anon$11943:9");
+    ).withName("$anon$13545:9");
 
     /**
      * The layout of this struct
@@ -194,7 +194,7 @@ public class ecs_http_connection_t {
      * }
      */
     public static byte host(MemorySegment struct, long index0) {
-        return (byte)host$ELEM_HANDLE.get(struct, 0L, index0);
+        return (byte)host$ELEM_HANDLE.get(struct, host$OFFSET, index0);
     }
 
     /**
@@ -204,7 +204,7 @@ public class ecs_http_connection_t {
      * }
      */
     public static void host(MemorySegment struct, long index0, byte fieldValue) {
-        host$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        host$ELEM_HANDLE.set(struct, host$OFFSET, index0, fieldValue);
     }
 
     private static final SequenceLayout port$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("port"));
@@ -271,7 +271,7 @@ public class ecs_http_connection_t {
      * }
      */
     public static byte port(MemorySegment struct, long index0) {
-        return (byte)port$ELEM_HANDLE.get(struct, 0L, index0);
+        return (byte)port$ELEM_HANDLE.get(struct, port$OFFSET, index0);
     }
 
     /**
@@ -281,7 +281,7 @@ public class ecs_http_connection_t {
      * }
      */
     public static void port(MemorySegment struct, long index0, byte fieldValue) {
-        port$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        port$ELEM_HANDLE.set(struct, port$OFFSET, index0, fieldValue);
     }
 
     /**

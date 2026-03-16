@@ -146,7 +146,7 @@ public class ecs_counter_t {
      * }
      */
     public static double value(MemorySegment struct, long index0) {
-        return (double)value$ELEM_HANDLE.get(struct, 0L, index0);
+        return (double)value$ELEM_HANDLE.get(struct, value$OFFSET, index0);
     }
 
     /**
@@ -156,7 +156,7 @@ public class ecs_counter_t {
      * }
      */
     public static void value(MemorySegment struct, long index0, double fieldValue) {
-        value$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        value$ELEM_HANDLE.set(struct, value$OFFSET, index0, fieldValue);
     }
 
     /**

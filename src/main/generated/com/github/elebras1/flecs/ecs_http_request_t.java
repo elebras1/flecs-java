@@ -44,7 +44,7 @@ public class ecs_http_request_t {
         flecs_h.C_INT.withName("header_count"),
         flecs_h.C_INT.withName("param_count"),
         flecs_h.C_POINTER.withName("conn")
-    ).withName("$anon$11968:9");
+    ).withName("$anon$13570:9");
 
     /**
      * The layout of this struct
@@ -294,7 +294,7 @@ public class ecs_http_request_t {
      */
     public static MemorySegment headers(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)headers$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)headers$ELEM_HANDLE.invokeExact(struct, headers$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {
@@ -377,7 +377,7 @@ public class ecs_http_request_t {
      */
     public static MemorySegment params(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)params$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)params$ELEM_HANDLE.invokeExact(struct, params$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {

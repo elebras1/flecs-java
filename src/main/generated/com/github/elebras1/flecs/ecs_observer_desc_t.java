@@ -20,6 +20,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_query_desc_t query;
  *     ecs_entity_t events[8];
  *     _Bool yield_existing;
+ *     _Bool global_observer;
  *     ecs_iter_action_t callback;
  *     ecs_run_action_t run;
  *     void *ctx;
@@ -47,7 +48,8 @@ public class ecs_observer_desc_t {
         ecs_query_desc_t.layout().withName("query"),
         MemoryLayout.sequenceLayout(8, flecs_h.C_LONG).withName("events"),
         flecs_h.C_BOOL.withName("yield_existing"),
-        MemoryLayout.paddingLayout(7),
+        flecs_h.C_BOOL.withName("global_observer"),
+        MemoryLayout.paddingLayout(6),
         flecs_h.C_POINTER.withName("callback"),
         flecs_h.C_POINTER.withName("run"),
         flecs_h.C_POINTER.withName("ctx"),
@@ -265,7 +267,7 @@ public class ecs_observer_desc_t {
      * }
      */
     public static long events(MemorySegment struct, long index0) {
-        return (long)events$ELEM_HANDLE.get(struct, 0L, index0);
+        return (long)events$ELEM_HANDLE.get(struct, events$OFFSET, index0);
     }
 
     /**
@@ -275,7 +277,7 @@ public class ecs_observer_desc_t {
      * }
      */
     public static void events(MemorySegment struct, long index0, long fieldValue) {
-        events$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        events$ELEM_HANDLE.set(struct, events$OFFSET, index0, fieldValue);
     }
 
     private static final OfBoolean yield_existing$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("yield_existing"));
@@ -320,6 +322,50 @@ public class ecs_observer_desc_t {
      */
     public static void yield_existing(MemorySegment struct, boolean fieldValue) {
         struct.set(yield_existing$LAYOUT, yield_existing$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean global_observer$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("global_observer"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool global_observer
+     * }
+     */
+    public static final OfBoolean global_observer$layout() {
+        return global_observer$LAYOUT;
+    }
+
+    private static final long global_observer$OFFSET = $LAYOUT.byteOffset(groupElement("global_observer"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool global_observer
+     * }
+     */
+    public static final long global_observer$offset() {
+        return global_observer$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool global_observer
+     * }
+     */
+    public static boolean global_observer(MemorySegment struct) {
+        return struct.get(global_observer$LAYOUT, global_observer$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool global_observer
+     * }
+     */
+    public static void global_observer(MemorySegment struct, boolean fieldValue) {
+        struct.set(global_observer$LAYOUT, global_observer$OFFSET, fieldValue);
     }
 
     private static final AddressLayout callback$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("callback"));

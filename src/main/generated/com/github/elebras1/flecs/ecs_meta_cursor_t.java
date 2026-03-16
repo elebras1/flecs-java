@@ -158,7 +158,7 @@ public class ecs_meta_cursor_t {
      */
     public static MemorySegment scope(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)scope$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)scope$ELEM_HANDLE.invokeExact(struct, scope$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {

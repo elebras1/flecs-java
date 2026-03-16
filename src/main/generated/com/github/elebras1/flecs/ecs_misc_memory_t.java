@@ -27,6 +27,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_size_t bytes_rematch_monitor;
  *     ecs_size_t bytes_component_ids;
  *     ecs_size_t bytes_reflection;
+ *     ecs_size_t bytes_tree_spawner;
+ *     ecs_size_t bytes_prefab_child_indices;
  *     ecs_size_t bytes_stats;
  *     ecs_size_t bytes_rest;
  * }
@@ -51,9 +53,11 @@ public class ecs_misc_memory_t {
         flecs_h.C_INT.withName("bytes_rematch_monitor"),
         flecs_h.C_INT.withName("bytes_component_ids"),
         flecs_h.C_INT.withName("bytes_reflection"),
+        flecs_h.C_INT.withName("bytes_tree_spawner"),
+        flecs_h.C_INT.withName("bytes_prefab_child_indices"),
         flecs_h.C_INT.withName("bytes_stats"),
         flecs_h.C_INT.withName("bytes_rest")
-    ).withName("$anon$13722:9");
+    ).withName("$anon$15365:9");
 
     /**
      * The layout of this struct
@@ -588,6 +592,94 @@ public class ecs_misc_memory_t {
      */
     public static void bytes_reflection(MemorySegment struct, int fieldValue) {
         struct.set(bytes_reflection$LAYOUT, bytes_reflection$OFFSET, fieldValue);
+    }
+
+    private static final OfInt bytes_tree_spawner$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_tree_spawner"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_tree_spawner
+     * }
+     */
+    public static final OfInt bytes_tree_spawner$layout() {
+        return bytes_tree_spawner$LAYOUT;
+    }
+
+    private static final long bytes_tree_spawner$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_tree_spawner"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_tree_spawner
+     * }
+     */
+    public static final long bytes_tree_spawner$offset() {
+        return bytes_tree_spawner$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_tree_spawner
+     * }
+     */
+    public static int bytes_tree_spawner(MemorySegment struct) {
+        return struct.get(bytes_tree_spawner$LAYOUT, bytes_tree_spawner$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_tree_spawner
+     * }
+     */
+    public static void bytes_tree_spawner(MemorySegment struct, int fieldValue) {
+        struct.set(bytes_tree_spawner$LAYOUT, bytes_tree_spawner$OFFSET, fieldValue);
+    }
+
+    private static final OfInt bytes_prefab_child_indices$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_prefab_child_indices"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_prefab_child_indices
+     * }
+     */
+    public static final OfInt bytes_prefab_child_indices$layout() {
+        return bytes_prefab_child_indices$LAYOUT;
+    }
+
+    private static final long bytes_prefab_child_indices$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_prefab_child_indices"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_prefab_child_indices
+     * }
+     */
+    public static final long bytes_prefab_child_indices$offset() {
+        return bytes_prefab_child_indices$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_prefab_child_indices
+     * }
+     */
+    public static int bytes_prefab_child_indices(MemorySegment struct) {
+        return struct.get(bytes_prefab_child_indices$LAYOUT, bytes_prefab_child_indices$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_prefab_child_indices
+     * }
+     */
+    public static void bytes_prefab_child_indices(MemorySegment struct, int fieldValue) {
+        struct.set(bytes_prefab_child_indices$LAYOUT, bytes_prefab_child_indices$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_stats$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_stats"));

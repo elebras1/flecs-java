@@ -20,6 +20,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_event_record_t on_set;
  *     ecs_event_record_t on_wildcard;
  *     ecs_sparse_t events;
+ *     ecs_vec_t global_observers;
  *     uint64_t last_observer_id;
  * }
  * }
@@ -36,6 +37,7 @@ public class ecs_observable_t {
         ecs_event_record_t.layout().withName("on_set"),
         ecs_event_record_t.layout().withName("on_wildcard"),
         ecs_sparse_t.layout().withName("events"),
+        ecs_vec_t.layout().withName("global_observers"),
         flecs_h.C_LONG.withName("last_observer_id")
     ).withName("ecs_observable_t");
 
@@ -264,6 +266,50 @@ public class ecs_observable_t {
      */
     public static void events(MemorySegment struct, MemorySegment fieldValue) {
         MemorySegment.copy(fieldValue, 0L, struct, events$OFFSET, events$LAYOUT.byteSize());
+    }
+
+    private static final GroupLayout global_observers$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("global_observers"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_vec_t global_observers
+     * }
+     */
+    public static final GroupLayout global_observers$layout() {
+        return global_observers$LAYOUT;
+    }
+
+    private static final long global_observers$OFFSET = $LAYOUT.byteOffset(groupElement("global_observers"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_vec_t global_observers
+     * }
+     */
+    public static final long global_observers$offset() {
+        return global_observers$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t global_observers
+     * }
+     */
+    public static MemorySegment global_observers(MemorySegment struct) {
+        return struct.asSlice(global_observers$OFFSET, global_observers$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t global_observers
+     * }
+     */
+    public static void global_observers(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, global_observers$OFFSET, global_observers$LAYOUT.byteSize());
     }
 
     private static final OfLong last_observer_id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("last_observer_id"));

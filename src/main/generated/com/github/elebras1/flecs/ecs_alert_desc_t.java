@@ -433,7 +433,7 @@ public class ecs_alert_desc_t {
      */
     public static MemorySegment severity_filters(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)severity_filters$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)severity_filters$ELEM_HANDLE.invokeExact(struct, severity_filters$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {

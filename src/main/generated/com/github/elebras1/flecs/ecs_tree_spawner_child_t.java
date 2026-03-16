@@ -14,27 +14,26 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
- * struct ecs_cpp_get_mut_t {
- *     ecs_world_t *world;
- *     ecs_stage_t *stage;
- *     void *ptr;
- *     _Bool call_modified;
+ * struct {
+ *     const char *child_name;
+ *     ecs_table_t *table;
+ *     uint32_t child;
+ *     int32_t parent_index;
  * }
  * }
  */
-public class ecs_cpp_get_mut_t {
+public class ecs_tree_spawner_child_t {
 
-    ecs_cpp_get_mut_t() {
+    ecs_tree_spawner_child_t() {
         // Should not be called directly
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        flecs_h.C_POINTER.withName("world"),
-        flecs_h.C_POINTER.withName("stage"),
-        flecs_h.C_POINTER.withName("ptr"),
-        flecs_h.C_BOOL.withName("call_modified"),
-        MemoryLayout.paddingLayout(7)
-    ).withName("ecs_cpp_get_mut_t");
+        flecs_h.C_POINTER.withName("child_name"),
+        flecs_h.C_POINTER.withName("table"),
+        flecs_h.C_INT.withName("child"),
+        flecs_h.C_INT.withName("parent_index")
+    ).withName("$anon$6561:9");
 
     /**
      * The layout of this struct
@@ -43,180 +42,180 @@ public class ecs_cpp_get_mut_t {
         return $LAYOUT;
     }
 
-    private static final AddressLayout world$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("world"));
+    private static final AddressLayout child_name$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("child_name"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * ecs_world_t *world
+     * const char *child_name
      * }
      */
-    public static final AddressLayout world$layout() {
-        return world$LAYOUT;
+    public static final AddressLayout child_name$layout() {
+        return child_name$LAYOUT;
     }
 
-    private static final long world$OFFSET = $LAYOUT.byteOffset(groupElement("world"));
+    private static final long child_name$OFFSET = $LAYOUT.byteOffset(groupElement("child_name"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * ecs_world_t *world
+     * const char *child_name
      * }
      */
-    public static final long world$offset() {
-        return world$OFFSET;
+    public static final long child_name$offset() {
+        return child_name$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * ecs_world_t *world
+     * const char *child_name
      * }
      */
-    public static MemorySegment world(MemorySegment struct) {
-        return struct.get(world$LAYOUT, world$OFFSET);
+    public static MemorySegment child_name(MemorySegment struct) {
+        return struct.get(child_name$LAYOUT, child_name$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * ecs_world_t *world
+     * const char *child_name
      * }
      */
-    public static void world(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(world$LAYOUT, world$OFFSET, fieldValue);
+    public static void child_name(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(child_name$LAYOUT, child_name$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout stage$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("stage"));
+    private static final AddressLayout table$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("table"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * ecs_stage_t *stage
+     * ecs_table_t *table
      * }
      */
-    public static final AddressLayout stage$layout() {
-        return stage$LAYOUT;
+    public static final AddressLayout table$layout() {
+        return table$LAYOUT;
     }
 
-    private static final long stage$OFFSET = $LAYOUT.byteOffset(groupElement("stage"));
+    private static final long table$OFFSET = $LAYOUT.byteOffset(groupElement("table"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * ecs_stage_t *stage
+     * ecs_table_t *table
      * }
      */
-    public static final long stage$offset() {
-        return stage$OFFSET;
+    public static final long table$offset() {
+        return table$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * ecs_stage_t *stage
+     * ecs_table_t *table
      * }
      */
-    public static MemorySegment stage(MemorySegment struct) {
-        return struct.get(stage$LAYOUT, stage$OFFSET);
+    public static MemorySegment table(MemorySegment struct) {
+        return struct.get(table$LAYOUT, table$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * ecs_stage_t *stage
+     * ecs_table_t *table
      * }
      */
-    public static void stage(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(stage$LAYOUT, stage$OFFSET, fieldValue);
+    public static void table(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(table$LAYOUT, table$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout ptr$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("ptr"));
+    private static final OfInt child$LAYOUT = (OfInt)$LAYOUT.select(groupElement("child"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * void *ptr
+     * uint32_t child
      * }
      */
-    public static final AddressLayout ptr$layout() {
-        return ptr$LAYOUT;
+    public static final OfInt child$layout() {
+        return child$LAYOUT;
     }
 
-    private static final long ptr$OFFSET = $LAYOUT.byteOffset(groupElement("ptr"));
+    private static final long child$OFFSET = $LAYOUT.byteOffset(groupElement("child"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * void *ptr
+     * uint32_t child
      * }
      */
-    public static final long ptr$offset() {
-        return ptr$OFFSET;
+    public static final long child$offset() {
+        return child$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * void *ptr
+     * uint32_t child
      * }
      */
-    public static MemorySegment ptr(MemorySegment struct) {
-        return struct.get(ptr$LAYOUT, ptr$OFFSET);
+    public static int child(MemorySegment struct) {
+        return struct.get(child$LAYOUT, child$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * void *ptr
+     * uint32_t child
      * }
      */
-    public static void ptr(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(ptr$LAYOUT, ptr$OFFSET, fieldValue);
+    public static void child(MemorySegment struct, int fieldValue) {
+        struct.set(child$LAYOUT, child$OFFSET, fieldValue);
     }
 
-    private static final OfBoolean call_modified$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("call_modified"));
+    private static final OfInt parent_index$LAYOUT = (OfInt)$LAYOUT.select(groupElement("parent_index"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * _Bool call_modified
+     * int32_t parent_index
      * }
      */
-    public static final OfBoolean call_modified$layout() {
-        return call_modified$LAYOUT;
+    public static final OfInt parent_index$layout() {
+        return parent_index$LAYOUT;
     }
 
-    private static final long call_modified$OFFSET = $LAYOUT.byteOffset(groupElement("call_modified"));
+    private static final long parent_index$OFFSET = $LAYOUT.byteOffset(groupElement("parent_index"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * _Bool call_modified
+     * int32_t parent_index
      * }
      */
-    public static final long call_modified$offset() {
-        return call_modified$OFFSET;
+    public static final long parent_index$offset() {
+        return parent_index$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * _Bool call_modified
+     * int32_t parent_index
      * }
      */
-    public static boolean call_modified(MemorySegment struct) {
-        return struct.get(call_modified$LAYOUT, call_modified$OFFSET);
+    public static int parent_index(MemorySegment struct) {
+        return struct.get(parent_index$LAYOUT, parent_index$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * _Bool call_modified
+     * int32_t parent_index
      * }
      */
-    public static void call_modified(MemorySegment struct, boolean fieldValue) {
-        struct.set(call_modified$LAYOUT, call_modified$OFFSET, fieldValue);
+    public static void parent_index(MemorySegment struct, int fieldValue) {
+        struct.set(parent_index$LAYOUT, parent_index$OFFSET, fieldValue);
     }
 
     /**

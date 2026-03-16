@@ -182,7 +182,7 @@ public class ecs_query_desc_t {
      */
     public static MemorySegment terms(MemorySegment struct, long index0) {
         try {
-            return (MemorySegment)terms$ELEM_HANDLE.invokeExact(struct, 0L, index0);
+            return (MemorySegment)terms$ELEM_HANDLE.invokeExact(struct, terms$OFFSET, index0);
         } catch (Error | RuntimeException ex) {
             throw ex;
         } catch (Throwable ex$) {

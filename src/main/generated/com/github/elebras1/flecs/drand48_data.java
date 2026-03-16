@@ -108,7 +108,7 @@ public class drand48_data {
      * }
      */
     public static short __x(MemorySegment struct, long index0) {
-        return (short)__x$ELEM_HANDLE.get(struct, 0L, index0);
+        return (short)__x$ELEM_HANDLE.get(struct, __x$OFFSET, index0);
     }
 
     /**
@@ -118,7 +118,7 @@ public class drand48_data {
      * }
      */
     public static void __x(MemorySegment struct, long index0, short fieldValue) {
-        __x$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __x$ELEM_HANDLE.set(struct, __x$OFFSET, index0, fieldValue);
     }
 
     private static final SequenceLayout __old_x$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("__old_x"));
@@ -185,7 +185,7 @@ public class drand48_data {
      * }
      */
     public static short __old_x(MemorySegment struct, long index0) {
-        return (short)__old_x$ELEM_HANDLE.get(struct, 0L, index0);
+        return (short)__old_x$ELEM_HANDLE.get(struct, __old_x$OFFSET, index0);
     }
 
     /**
@@ -195,7 +195,7 @@ public class drand48_data {
      * }
      */
     public static void __old_x(MemorySegment struct, long index0, short fieldValue) {
-        __old_x$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __old_x$ELEM_HANDLE.set(struct, __old_x$OFFSET, index0, fieldValue);
     }
 
     private static final OfShort __c$LAYOUT = (OfShort)$LAYOUT.select(groupElement("__c"));

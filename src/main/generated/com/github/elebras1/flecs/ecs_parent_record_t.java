@@ -14,25 +14,22 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
- * struct {
- *     ecs_map_iter_t it;
- *     ecs_hm_bucket_t *bucket;
- *     int32_t index;
+ * struct ecs_parent_record_t {
+ *     uint32_t entity;
+ *     int32_t count;
  * }
  * }
  */
-public class flecs_hashmap_iter_t {
+public class ecs_parent_record_t {
 
-    flecs_hashmap_iter_t() {
+    ecs_parent_record_t() {
         // Should not be called directly
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        ecs_map_iter_t.layout().withName("it"),
-        flecs_h.C_POINTER.withName("bucket"),
-        flecs_h.C_INT.withName("index"),
-        MemoryLayout.paddingLayout(4)
-    ).withName("$anon$5379:9");
+        flecs_h.C_INT.withName("entity"),
+        flecs_h.C_INT.withName("count")
+    ).withName("ecs_parent_record_t");
 
     /**
      * The layout of this struct
@@ -41,136 +38,92 @@ public class flecs_hashmap_iter_t {
         return $LAYOUT;
     }
 
-    private static final GroupLayout it$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("it"));
+    private static final OfInt entity$LAYOUT = (OfInt)$LAYOUT.select(groupElement("entity"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * ecs_map_iter_t it
+     * uint32_t entity
      * }
      */
-    public static final GroupLayout it$layout() {
-        return it$LAYOUT;
+    public static final OfInt entity$layout() {
+        return entity$LAYOUT;
     }
 
-    private static final long it$OFFSET = $LAYOUT.byteOffset(groupElement("it"));
+    private static final long entity$OFFSET = $LAYOUT.byteOffset(groupElement("entity"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * ecs_map_iter_t it
+     * uint32_t entity
      * }
      */
-    public static final long it$offset() {
-        return it$OFFSET;
+    public static final long entity$offset() {
+        return entity$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * ecs_map_iter_t it
+     * uint32_t entity
      * }
      */
-    public static MemorySegment it(MemorySegment struct) {
-        return struct.asSlice(it$OFFSET, it$LAYOUT.byteSize());
+    public static int entity(MemorySegment struct) {
+        return struct.get(entity$LAYOUT, entity$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * ecs_map_iter_t it
+     * uint32_t entity
      * }
      */
-    public static void it(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, it$OFFSET, it$LAYOUT.byteSize());
+    public static void entity(MemorySegment struct, int fieldValue) {
+        struct.set(entity$LAYOUT, entity$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout bucket$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("bucket"));
+    private static final OfInt count$LAYOUT = (OfInt)$LAYOUT.select(groupElement("count"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * ecs_hm_bucket_t *bucket
+     * int32_t count
      * }
      */
-    public static final AddressLayout bucket$layout() {
-        return bucket$LAYOUT;
+    public static final OfInt count$layout() {
+        return count$LAYOUT;
     }
 
-    private static final long bucket$OFFSET = $LAYOUT.byteOffset(groupElement("bucket"));
+    private static final long count$OFFSET = $LAYOUT.byteOffset(groupElement("count"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * ecs_hm_bucket_t *bucket
+     * int32_t count
      * }
      */
-    public static final long bucket$offset() {
-        return bucket$OFFSET;
+    public static final long count$offset() {
+        return count$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * ecs_hm_bucket_t *bucket
+     * int32_t count
      * }
      */
-    public static MemorySegment bucket(MemorySegment struct) {
-        return struct.get(bucket$LAYOUT, bucket$OFFSET);
+    public static int count(MemorySegment struct) {
+        return struct.get(count$LAYOUT, count$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * ecs_hm_bucket_t *bucket
+     * int32_t count
      * }
      */
-    public static void bucket(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(bucket$LAYOUT, bucket$OFFSET, fieldValue);
-    }
-
-    private static final OfInt index$LAYOUT = (OfInt)$LAYOUT.select(groupElement("index"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * int32_t index
-     * }
-     */
-    public static final OfInt index$layout() {
-        return index$LAYOUT;
-    }
-
-    private static final long index$OFFSET = $LAYOUT.byteOffset(groupElement("index"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * int32_t index
-     * }
-     */
-    public static final long index$offset() {
-        return index$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * int32_t index
-     * }
-     */
-    public static int index(MemorySegment struct) {
-        return struct.get(index$LAYOUT, index$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * int32_t index
-     * }
-     */
-    public static void index(MemorySegment struct, int fieldValue) {
-        struct.set(index$LAYOUT, index$OFFSET, fieldValue);
+    public static void count(MemorySegment struct, int fieldValue) {
+        struct.set(count$LAYOUT, count$OFFSET, fieldValue);
     }
 
     /**

@@ -104,7 +104,7 @@ public class ecs_gauge_t {
      * }
      */
     public static float avg(MemorySegment struct, long index0) {
-        return (float)avg$ELEM_HANDLE.get(struct, 0L, index0);
+        return (float)avg$ELEM_HANDLE.get(struct, avg$OFFSET, index0);
     }
 
     /**
@@ -114,7 +114,7 @@ public class ecs_gauge_t {
      * }
      */
     public static void avg(MemorySegment struct, long index0, float fieldValue) {
-        avg$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        avg$ELEM_HANDLE.set(struct, avg$OFFSET, index0, fieldValue);
     }
 
     private static final SequenceLayout min$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("min"));
@@ -181,7 +181,7 @@ public class ecs_gauge_t {
      * }
      */
     public static float min(MemorySegment struct, long index0) {
-        return (float)min$ELEM_HANDLE.get(struct, 0L, index0);
+        return (float)min$ELEM_HANDLE.get(struct, min$OFFSET, index0);
     }
 
     /**
@@ -191,7 +191,7 @@ public class ecs_gauge_t {
      * }
      */
     public static void min(MemorySegment struct, long index0, float fieldValue) {
-        min$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        min$ELEM_HANDLE.set(struct, min$OFFSET, index0, fieldValue);
     }
 
     private static final SequenceLayout max$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("max"));
@@ -258,7 +258,7 @@ public class ecs_gauge_t {
      * }
      */
     public static float max(MemorySegment struct, long index0) {
-        return (float)max$ELEM_HANDLE.get(struct, 0L, index0);
+        return (float)max$ELEM_HANDLE.get(struct, max$OFFSET, index0);
     }
 
     /**
@@ -268,7 +268,7 @@ public class ecs_gauge_t {
      * }
      */
     public static void max(MemorySegment struct, long index0, float fieldValue) {
-        max$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        max$ELEM_HANDLE.set(struct, max$OFFSET, index0, fieldValue);
     }
 
     /**

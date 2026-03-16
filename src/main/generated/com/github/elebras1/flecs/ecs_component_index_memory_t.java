@@ -20,6 +20,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_size_t bytes_table_cache;
  *     ecs_size_t bytes_name_index;
  *     ecs_size_t bytes_ordered_children;
+ *     ecs_size_t bytes_children_table_map;
  *     ecs_size_t bytes_reachable_cache;
  * }
  * }
@@ -36,8 +37,9 @@ public class ecs_component_index_memory_t {
         flecs_h.C_INT.withName("bytes_table_cache"),
         flecs_h.C_INT.withName("bytes_name_index"),
         flecs_h.C_INT.withName("bytes_ordered_children"),
+        flecs_h.C_INT.withName("bytes_children_table_map"),
         flecs_h.C_INT.withName("bytes_reachable_cache")
-    ).withName("$anon$13673:9");
+    ).withName("$anon$15317:9");
 
     /**
      * The layout of this struct
@@ -264,6 +266,50 @@ public class ecs_component_index_memory_t {
      */
     public static void bytes_ordered_children(MemorySegment struct, int fieldValue) {
         struct.set(bytes_ordered_children$LAYOUT, bytes_ordered_children$OFFSET, fieldValue);
+    }
+
+    private static final OfInt bytes_children_table_map$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_children_table_map"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_children_table_map
+     * }
+     */
+    public static final OfInt bytes_children_table_map$layout() {
+        return bytes_children_table_map$LAYOUT;
+    }
+
+    private static final long bytes_children_table_map$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_children_table_map"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_children_table_map
+     * }
+     */
+    public static final long bytes_children_table_map$offset() {
+        return bytes_children_table_map$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_children_table_map
+     * }
+     */
+    public static int bytes_children_table_map(MemorySegment struct) {
+        return struct.get(bytes_children_table_map$LAYOUT, bytes_children_table_map$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bytes_children_table_map
+     * }
+     */
+    public static void bytes_children_table_map(MemorySegment struct, int fieldValue) {
+        struct.set(bytes_children_table_map$LAYOUT, bytes_children_table_map$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_reachable_cache$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_reachable_cache"));

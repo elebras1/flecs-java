@@ -100,7 +100,7 @@ public class ecs_query_op_profile_t {
      * }
      */
     public static int count(MemorySegment struct, long index0) {
-        return (int)count$ELEM_HANDLE.get(struct, 0L, index0);
+        return (int)count$ELEM_HANDLE.get(struct, count$OFFSET, index0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ecs_query_op_profile_t {
      * }
      */
     public static void count(MemorySegment struct, long index0, int fieldValue) {
-        count$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        count$ELEM_HANDLE.set(struct, count$OFFSET, index0, fieldValue);
     }
 
     /**

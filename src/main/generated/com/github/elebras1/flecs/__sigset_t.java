@@ -100,7 +100,7 @@ public class __sigset_t {
      * }
      */
     public static long __val(MemorySegment struct, long index0) {
-        return (long)__val$ELEM_HANDLE.get(struct, 0L, index0);
+        return (long)__val$ELEM_HANDLE.get(struct, __val$OFFSET, index0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class __sigset_t {
      * }
      */
     public static void __val(MemorySegment struct, long index0, long fieldValue) {
-        __val$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        __val$ELEM_HANDLE.set(struct, __val$OFFSET, index0, fieldValue);
     }
 
     /**
