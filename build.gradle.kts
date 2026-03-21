@@ -432,4 +432,4 @@ configure<SigningExtension> {
 
 extra["flecsVersion"] = flecsVersion
 extra["flecsIncludeDir"] = File(flecsSourceDir, "include")
-extra["flecsLibDir"] = File(flecsSourceDir, "distr")
+extra["flecsLibDir"] = layout.buildDirectory.dir("resources/main/natives/$nativeArch").get().asFile
