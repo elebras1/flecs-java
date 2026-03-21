@@ -10,59 +10,102 @@ public class RelationsExample {
         try (World world = new World()) {
             world.component(Position.class);
 
-            Entity root = world.obtainEntity(world.entity("Root"));
-            root.set(new Position(0, 0));
-
-            Entity child1 = world.obtainEntity(world.entity("Child1"));
-            child1.set(new Position(10, 10));
-            child1.childOf(root);
-
-            Entity child2 = world.obtainEntity(world.entity("Child2"));
-            child2.set(new Position(20, 20));
-            child2.childOf(root);
-
-            Entity grandchild = world.obtainEntity(world.entity("Grandchild"));
-            grandchild.set(new Position(15, 15));
-            grandchild.childOf(child1);
-
-            System.out.println("Child1 parent: " + world.obtainEntity(child1.parent()).getName());
-            System.out.println("Grandchild parent: " + world.obtainEntity(grandchild.parent()).getName());
-
-            System.out.println("\nRoot children:");
-            root.children(child -> System.out.println("  - " + world.obtainEntity(child).getName()));
-
-            System.out.println("\nChild1 children:");
-            child1.children(child -> System.out.println("  - " + world.obtainEntity(child).getName()));
-
-            long likesRelation = world.entity("Likes");
-            long eatsRelation = world.entity("Eats");
-
-            Entity alice = world.obtainEntity(world.entity("Alice"));
-            Entity bob = world.obtainEntity(world.entity("Bob"));
-            Entity apple = world.obtainEntity(world.entity("Apple"));
-
-            alice.addRelation(likesRelation, bob.id());
-            alice.addRelation(eatsRelation, apple.id());
-            bob.addRelation(likesRelation, alice.id());
-
-            System.out.println("\nAlice likes Bob: " + alice.hasRelation(likesRelation, bob.id()));
-            System.out.println("Alice eats Apple: " + alice.hasRelation(eatsRelation, apple.id()));
-            System.out.println("Bob likes Alice: " + bob.hasRelation(likesRelation, alice.id()));
-
-            long vehicleId = world.entity("Vehicle");
-            long carId = world.entity("Car");
-
-            Entity myCar = world.obtainEntity(world.entity("MyCar"));
-            myCar.isA(carId);
-
-            Entity car = world.obtainEntity(carId);
-            car.isA(vehicleId);
-
-            System.out.println("\nMyCar is a Car: " + myCar.hasRelation(world.lookup("IsA"), carId));
-
-            alice.removeRelation(likesRelation, bob.id());
-            System.out.println("\nAlice likes Bob after remove: " + alice.hasRelation(likesRelation, bob.id()));
+            childOfHierarchy(world);
+            parentHierarchy(world);
+            customRelationships(world);
+            isaInheritance(world);
         }
     }
-}
 
+    private static void childOfHierarchy(World world) {
+        System.out.println("=== ChildOf Hierarchy ===");
+
+        Entity scene = world.obtainEntity(world.entity("Scene"));
+        scene.set(new Position(0, 0));
+
+        Entity child1 = world.obtainEntity(world.entity("Child1"));
+        child1.set(new Position(10, 10));
+        child1.childOf(scene);
+
+        Entity child2 = world.obtainEntity(world.entity("Child2"));
+        child2.set(new Position(20, 20));
+        child2.childOf(scene);
+
+        Entity grandchild = world.obtainEntity(world.entity("Grandchild"));
+        grandchild.set(new Position(15, 15));
+        grandchild.childOf(child1);
+
+        System.out.println("Child1 parent: " + world.obtainEntity(child1.parent()).getName());
+        System.out.println("Grandchild parent: " + world.obtainEntity(grandchild.parent()).getName());
+
+        System.out.println("Scene children:");
+        scene.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+
+        System.out.println("Child1 children:");
+        child1.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+    }
+
+    private static void parentHierarchy(World world) {
+        System.out.println("\n=== Parent Hierarchy ===");
+
+        Entity spaceship = world.obtainEntity(world.entity("Spaceship"));
+        spaceship.set(new Position(100, 200));
+
+        Entity cockpit = world.obtainEntity(world.entity(spaceship.id(), "Cockpit"));
+        cockpit.set(new Position(105, 210));
+
+        Entity engine = world.obtainEntity(world.entity(spaceship.id(), "Engine"));
+        engine.set(new Position(95, 190));
+
+        Entity fuelTank = world.obtainEntity(world.entity(engine.id(), "FuelTank"));
+        fuelTank.set(new Position(93, 188));
+
+        System.out.println("Cockpit parent: " + world.obtainEntity(cockpit.parent()).getName());
+        System.out.println("FuelTank parent: " + world.obtainEntity(fuelTank.parent()).getName());
+
+        System.out.println("Spaceship children:");
+        spaceship.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+
+        System.out.println("Engine children:");
+        engine.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+    }
+
+    private static void customRelationships(World world) {
+        System.out.println("\n=== Custom Relationships ===");
+
+        long likes = world.entity("Likes");
+        long eats = world.entity("Eats");
+
+        Entity alice = world.obtainEntity(world.entity("Alice"));
+        Entity bob = world.obtainEntity(world.entity("Bob"));
+        Entity apple = world.obtainEntity(world.entity("Apple"));
+
+        alice.addRelation(likes, bob.id());
+        alice.addRelation(eats, apple.id());
+        bob.addRelation(likes, alice.id());
+
+        System.out.println("Alice likes Bob: " + alice.hasRelation(likes, bob.id()));
+        System.out.println("Alice eats Apple: " + alice.hasRelation(eats, apple.id()));
+        System.out.println("Bob likes Alice: " + bob.hasRelation(likes, alice.id()));
+
+        alice.removeRelation(likes, bob.id());
+        System.out.println("Alice likes Bob after remove: " + alice.hasRelation(likes, bob.id()));
+    }
+
+    private static void isaInheritance(World world) {
+        System.out.println("\n=== IsA Inheritance ===");
+
+        long vehicleId = world.entity("Vehicle");
+        long carId = world.entity("Car");
+
+        Entity car = world.obtainEntity(carId);
+        car.isA(vehicleId);
+
+        Entity myCar = world.obtainEntity(world.entity("MyCar"));
+        myCar.isA(carId);
+
+        long isA = world.lookup("IsA");
+        System.out.println("MyCar isA Car: " + myCar.hasRelation(isA, carId));
+        System.out.println("Car isA Vehicle: " + car.hasRelation(isA, vehicleId));
+    }
+}

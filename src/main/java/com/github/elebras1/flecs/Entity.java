@@ -402,7 +402,18 @@ public class Entity {
     }
 
     public void children(EntityCallback callback) {
-        this.children(FlecsConstants.EcsChildOf, callback);
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_children(tempArena, this.world.nativeHandle(), this.id);
+
+            while (flecs_h.ecs_children_next(iter)) {
+                int count = ecs_iter_t.count(iter);
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                for (int i = 0; i < count; i++) {
+                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    callback.accept(entityId);
+                }
+            }
+        }
     }
 
     public void children(long relationId, EntityCallback callback) {
