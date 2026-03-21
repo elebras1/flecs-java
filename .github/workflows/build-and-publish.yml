@@ -119,22 +119,17 @@ jobs:
 
       - name: Organize natives
         run: |
-          mkdir -p build/resources/main/natives
+          mkdir -p src/main/resources/natives
 
           for artifact_dir in downloaded-natives/natives-*/; do
             platform_arch=$(basename "$artifact_dir" | sed 's/^natives-//')
-
             echo "Processing $platform_arch..."
-            mkdir -p "build/resources/main/natives/$platform_arch"
-
-            cp "$artifact_dir"/* "build/resources/main/natives/$platform_arch/" 2>/dev/null || {
-              echo "Warning: No files found in $artifact_dir"
-            }
+            mkdir -p "src/main/resources/natives/$platform_arch"
+            cp "$artifact_dir"/* "src/main/resources/natives/$platform_arch/"
           done
 
-          echo ""
           echo "Final native libraries structure:"
-          find build/resources/main/natives -type f
+          find src/main/resources/natives -type f
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
