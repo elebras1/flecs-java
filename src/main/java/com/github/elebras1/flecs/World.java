@@ -295,8 +295,7 @@ public class World implements AutoCloseable {
 
     public long prefab() {
         this.checkClosed();
-        long entityId = flecs_h.ecs_new_w_id(this.nativeWorld, FlecsConstants.EcsPrefab);
-        return entityId;
+        return flecs_h.ecs_new_w_id(this.nativeWorld, FlecsConstants.EcsPrefab);
     }
 
     public boolean progress(float deltaTime) {

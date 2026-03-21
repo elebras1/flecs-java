@@ -1,5 +1,10 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.CopyMoveCallback;
+import com.github.elebras1.flecs.callback.IterHookCallback;
+import com.github.elebras1.flecs.callback.ReplaceHookCallback;
+import com.github.elebras1.flecs.callback.XtorCallback;
+
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -26,26 +31,6 @@ public class ComponentHooks<T> {
         this.linker = Linker.nativeLinker();
         this.world = world;
         this.component = component;
-    }
-
-    @FunctionalInterface
-    public interface IterHookCallback<T> {
-        void invoke(T[] components);
-    }
-
-    @FunctionalInterface
-    public interface ReplaceHookCallback<T> {
-        void invoke(T[] oldComponents, T[] newComponents);
-    }
-
-    @FunctionalInterface
-    public interface XtorCallback<T> {
-        void invoke(T[] components, int count);
-    }
-
-    @FunctionalInterface
-    public interface CopyMoveCallback<T> {
-        void invoke(T[] dst, T[] src, int count);
     }
 
     public ComponentHooks<T> onAdd(IterHookCallback<T> callback) {
