@@ -54,12 +54,12 @@ public class QueryBuilder {
         return this.with(componentId);
     }
 
-    public QueryBuilder with(long relationId, long objectId) {
+    public QueryBuilder with(long relationId, long componentId) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(relationId, objectId);
+        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);
@@ -73,10 +73,9 @@ public class QueryBuilder {
         return this;
     }
 
-    public <T> QueryBuilder with(Class<T> relationClass, Class<T> objectClass) {
-        long relationId = this.world.componentRegistry().getComponentId(relationClass);
-        long objectId = this.world.componentRegistry().getComponentId(objectClass);
-        return this.with(relationId, objectId);
+    public <T> QueryBuilder with(long relationId, Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.with(relationId, componentId);
     }
 
     public QueryBuilder cached() {
@@ -87,6 +86,24 @@ public class QueryBuilder {
     public QueryBuilder queryFlag(int flag) {
         ecs_query_desc_t.flags(this.desc, flag);
         return this;
+    }
+
+    public QueryBuilder groupBy(long componentId) {
+        ecs_query_desc_t.group_by(this.desc, componentId);
+        return this;
+    }
+
+    public <T> QueryBuilder groupBy(Class<T> componentClass) {
+        return this.groupBy(this.world.componentRegistry().getComponentId(componentClass));
+    }
+
+    public QueryBuilder orderBy(long componentId) {
+        ecs_query_desc_t.order_by(this.desc, componentId);
+        return this;
+    }
+
+    public <T> QueryBuilder orderBy(Class<T> componentClass) {
+        return this.orderBy(this.world.componentRegistry().getComponentId(componentClass));
     }
 
     public QueryBuilder in() {
@@ -201,7 +218,7 @@ public class QueryBuilder {
         try {
             MemorySegment queryPtr = flecs_h.ecs_query_init(this.world.nativeHandle(), this.desc);
 
-            if (queryPtr == null || queryPtr.address() == 0) {
+            if (queryPtr.address() == 0) {
                 String errorMsg = "Query creation failed. Structural alignment/size problem (TERM_SIZE=" + TERM_SIZE + ").";
                 throw new IllegalStateException(errorMsg);
             }

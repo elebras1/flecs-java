@@ -135,7 +135,7 @@ public class World implements AutoCloseable {
     public World() {
         this.arena = Arena.ofConfined();
         this.nativeWorld = flecs_h.ecs_init();
-        if (this.nativeWorld == null || this.nativeWorld.address() == 0) {
+        if (this.nativeWorld.address() == 0) {
             throw new IllegalStateException("Flecs world initialization failed");
         }
         this.componentRegistry = new ComponentRegistry(this);
@@ -732,7 +732,7 @@ public class World implements AutoCloseable {
             MemorySegment pathNative = tempArena.allocate(JAVA_LONG, searchPath.length + 1);
             MemorySegment.copy(searchPath, 0, pathNative, JAVA_LONG, 0, searchPath.length);
             MemorySegment oldPathNative = flecs_h.ecs_set_lookup_path(this.nativeWorld, pathNative);
-            if (oldPathNative == null || oldPathNative.equals(MemorySegment.NULL)) {
+            if (oldPathNative.address() == 0) {
                 return new long[0];
             }
             int len = 0;
@@ -804,7 +804,7 @@ public class World implements AutoCloseable {
             ecs_world_to_json_desc_t.serialize_modules(options, serializeModules);
 
             MemorySegment jsonSegment = flecs_h.ecs_world_to_json(this.nativeWorld, options);
-            if (jsonSegment == null || jsonSegment.address() == 0) {
+            if (jsonSegment.address() == 0) {
                 return null;
             }
 

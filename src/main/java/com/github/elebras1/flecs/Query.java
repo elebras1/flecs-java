@@ -16,87 +16,77 @@ public class Query extends QueryBase implements AutoCloseable {
 
     Query(World world, MemorySegment nativeQuery) {
         super(world, nativeQuery);
-        this.arena = Arena.ofConfined();
+        this.arena = Arena.ofShared();
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.closed = false;
     }
 
     public void each(EntityCallback callback) {
         this.checkClosed();
-        try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
-                throw new IllegalStateException("ecs_query_iter returned a null iterator");
-            }
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        if (iter.address() == 0) {
+            throw new IllegalStateException("ecs_query_iter returned a null iterator");
+        }
 
-            while (flecs_h.ecs_iter_next(iter)) {
-                int count = ecs_iter_t.count(iter);
-                MemorySegment entities = ecs_iter_t.entities(iter);
+        while (flecs_h.ecs_iter_next(iter)) {
+            int count = ecs_iter_t.count(iter);
+            MemorySegment entities = ecs_iter_t.entities(iter);
 
-                for (int i = 0; i < count; i++) {
-                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    callback.accept(entityId);
-                }
+            for (int i = 0; i < count; i++) {
+                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                callback.accept(entityId);
             }
         }
     }
 
     public void iter(IterCallback callback) {
         this.checkClosed();
-        try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iterSegment = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iterSegment == null || iterSegment.address() == 0) {
-                throw new IllegalStateException("ecs_query_iter returned a null iterator");
-            }
+        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        if (iterSegment.address() == 0) {
+            throw new IllegalStateException("ecs_query_iter returned a null iterator");
+        }
 
-            this.world.viewCache().resetCursors();
-            while (flecs_h.ecs_iter_next(iterSegment)) {
-                this.iter.setNativeIter(iterSegment);
-                callback.accept(this.iter);
-            }
+        this.world.viewCache().resetCursors();
+        while (flecs_h.ecs_iter_next(iterSegment)) {
+            this.iter.setNativeIter(iterSegment);
+            callback.accept(this.iter);
         }
     }
 
     public void run(RunCallback callback) {
         this.checkClosed();
-        try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iterSegment = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
 
-            if (iterSegment == null || iterSegment.address() == 0) {
-                throw new IllegalStateException("ecs_query_iter returned a null iterator");
-            }
-            this.iter.setNativeIter(iterSegment);
-            this.world.viewCache().resetCursors();
-            callback.accept(this.iter);
+        if (iterSegment.address() == 0) {
+            throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
+        this.iter.setNativeIter(iterSegment);
+        this.world.viewCache().resetCursors();
+        callback.accept(this.iter);
     }
 
     public int count() {
         this.checkClosed();
-        try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
 
-            int total = 0;
-            while (flecs_h.ecs_iter_next(iter)) {
-                total += ecs_iter_t.count(iter);
-            }
-
-            return total;
+        int total = 0;
+        while (flecs_h.ecs_iter_next(iter)) {
+            total += ecs_iter_t.count(iter);
         }
+
+        return total;
     }
 
     public long[] entities() {
         this.checkClosed();
         int[] index = {0};
         long[] result = new long[this.count()];
-        try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            while (flecs_h.ecs_iter_next(iter)) {
-                int count = ecs_iter_t.count(iter);
-                MemorySegment entities = ecs_iter_t.entities(iter);
-                for (int i = 0; i < count; i++) {
-                    result[index[0]++] = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                }
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        while (flecs_h.ecs_iter_next(iter)) {
+            int count = ecs_iter_t.count(iter);
+            MemorySegment entities = ecs_iter_t.entities(iter);
+            for (int i = 0; i < count; i++) {
+                result[index[0]++] = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
             }
         }
         return result;

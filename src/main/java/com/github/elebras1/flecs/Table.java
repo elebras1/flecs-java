@@ -27,12 +27,12 @@ public class Table {
 
     public long[] type() {
         MemorySegment nativeType = flecs_h.ecs_table_get_type(this.nativeTable);
-        if (nativeType == null || nativeType.address() == 0) {
+        if (nativeType.address() == 0) {
             return new long[0];
         }
         MemorySegment nativeArray = ecs_type_t.array(nativeType);
         int count = ecs_type_t.count(nativeType);
-        if (nativeArray == null || nativeArray.address() == 0 || count == 0) {
+        if (nativeArray.address() == 0 || count == 0) {
             return new long[0];
         }
         return nativeArray.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
@@ -52,7 +52,7 @@ public class Table {
             return new long[0];
         }
         MemorySegment nativeEntities = flecs_h.ecs_table_entities(this.nativeTable);
-        if (nativeEntities == null || nativeEntities.address() == 0) {
+        if (nativeEntities.address() == 0) {
             return new long[0];
         }
         return nativeEntities.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
@@ -193,7 +193,7 @@ public class Table {
         }
         Component<?> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment columnPtr = this.getRawColumn(col);
-        if (columnPtr == null || columnPtr.address() == 0) {
+        if (columnPtr.address() == 0) {
             return null;
         }
         V view = (V) this.world.viewCache().getComponentView(componentClass);
@@ -209,7 +209,7 @@ public class Table {
         }
         Component<?> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment columnPtr = this.getRawColumn(col);
-        if (columnPtr == null || columnPtr.address() == 0) {
+        if (columnPtr.address() == 0) {
             return;
         }
         V view = (V) this.world.viewCache().getComponentView(componentClass);
@@ -261,7 +261,7 @@ public class Table {
     private <T> T readAt(Class<T> componentClass, int columnIndex, int row) {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment columnPtr = this.getRawColumn(columnIndex);
-        if (columnPtr == null || columnPtr.address() == 0) {
+        if (columnPtr.address() == 0) {
             return null;
         }
         long size = component.size();
@@ -274,7 +274,7 @@ public class Table {
     private <V extends ComponentView> V readViewAt(Class<?> componentClass, int columnIndex, int row) {
         Component<?> component = this.world.componentRegistry().getComponent(componentClass);
         MemorySegment columnPtr = this.getRawColumn(columnIndex);
-        if (columnPtr == null || columnPtr.address() == 0) {
+        if (columnPtr.address() == 0) {
             return null;
         }
         long size = component.size();

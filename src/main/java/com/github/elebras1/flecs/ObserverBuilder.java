@@ -13,7 +13,6 @@ import static com.github.elebras1.flecs.util.FlecsConstants.*;
 
 public class ObserverBuilder extends ObserverBuilderBase {
 
-    protected final Arena arena;
     private final Iter iter;
     private int termCount;
     private int eventCount;
@@ -23,27 +22,25 @@ public class ObserverBuilder extends ObserverBuilderBase {
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private static final int MAX_EVENTS = 8;
 
-    public ObserverBuilder(World world) {
-        this(world, Arena.ofConfined());
-    }
-
     private ObserverBuilder(World world, Arena arena) {
         super(world, ecs_observer_desc_t.allocate(arena));
-        this.arena = arena;
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.termCount = 0;
         this.eventCount = 0;
     }
 
-    public ObserverBuilder(World world, String name) {
-        this(world);
-        MemorySegment nameSegment = this.arena.allocateFrom(name);
+    public ObserverBuilder(World world) {
+        this(world, Arena.ofConfined());
+    }
 
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(tempArena);
-            ecs_entity_desc_t.name(entityDescTemp, nameSegment);
-            ecs_observer_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
-        }
+    public ObserverBuilder(World world, String name) {
+        Arena arena = Arena.ofConfined();
+        this(world, arena);
+        MemorySegment nameSegment = arena.allocateFrom(name);
+
+        MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(arena);
+        ecs_entity_desc_t.name(entityDescTemp, nameSegment);
+        ecs_observer_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
     }
 
     public ObserverBuilder event(long eventId) {
@@ -89,12 +86,12 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this.with(componentId);
     }
 
-    public ObserverBuilder with(long relationId, long objectId) {
+    public ObserverBuilder with(long relationId, long componentId) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(relationId, objectId);
+        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
         MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
@@ -109,12 +106,17 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this;
     }
 
+    public <T> ObserverBuilder with(long relationId, Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.with(relationId, componentId);
+    }
+
     public ObserverBuilder in() {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'in' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
@@ -131,7 +133,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("No term to apply 'out' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
@@ -148,7 +150,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 

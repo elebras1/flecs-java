@@ -109,12 +109,12 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.with(componentId);
     }
 
-    public SystemBuilder with(long relationId, long objectId) {
+    public SystemBuilder with(long relationId, long componentId) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(relationId, objectId);
+        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
         MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
@@ -127,6 +127,11 @@ public class SystemBuilder extends SystemBuilderBase {
 
         this.termCount++;
         return this;
+    }
+
+    public <T> SystemBuilder with(long relationId, Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.with(relationId, componentId);
     }
 
     public SystemBuilder in() {

@@ -81,7 +81,7 @@ public class Entity {
 
     public String getName() {
         MemorySegment nameSegment = flecs_h.ecs_get_name(this.world.nativeHandle(), this.id);
-        if (nameSegment == null || nameSegment.address() == 0) {
+        if (nameSegment.address() == 0) {
             return null;
         }
         return nameSegment.getString(0);
@@ -434,11 +434,11 @@ public class Entity {
     }
 
     public Table table() {
-        MemorySegment tablePtr = flecs_h.ecs_get_table(this.world.nativeHandle(), this.id);
-        if (tablePtr == null || tablePtr.address() == 0) {
+        MemorySegment tableNative = flecs_h.ecs_get_table(this.world.nativeHandle(), this.id);
+        if (tableNative.address() == 0) {
             return null;
         }
-        return new Table(this.world, tablePtr);
+        return new Table(this.world, tableNative);
     }
 
     @Override

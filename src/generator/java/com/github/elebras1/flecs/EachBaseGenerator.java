@@ -189,7 +189,7 @@ public class EachBaseGenerator {
         mb.beginControlFlow("try ($T tmpArena = $T.ofConfined())", ARENA, ARENA);
         mb.addStatement("$T iter = $T.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery)",
                 MEMORY_SEGMENT, FLECS_H);
-        mb.beginControlFlow("if (iter == null || iter.address() == 0)");
+        mb.beginControlFlow("if (iter.address() == 0)");
         mb.addStatement("throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         mb.endControlFlow();
 

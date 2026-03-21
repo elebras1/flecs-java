@@ -22,7 +22,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -42,7 +42,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -66,7 +66,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -90,7 +90,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -115,7 +115,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -140,7 +140,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -169,7 +169,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -199,7 +199,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -229,7 +229,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -258,7 +258,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -291,7 +291,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -326,7 +326,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -362,7 +362,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -396,7 +396,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -433,7 +433,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -473,7 +473,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -514,7 +514,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -552,7 +552,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -594,7 +594,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -640,7 +640,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -686,7 +686,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -728,7 +728,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -774,7 +774,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -825,7 +825,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -877,7 +877,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -924,7 +924,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -974,7 +974,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1031,7 +1031,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1088,7 +1088,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1139,7 +1139,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1194,7 +1194,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1256,7 +1256,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1318,7 +1318,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1374,7 +1374,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1433,7 +1433,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1500,7 +1500,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1568,7 +1568,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1628,7 +1628,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1692,7 +1692,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1765,7 +1765,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1839,7 +1839,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1904,7 +1904,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -1972,7 +1972,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2050,7 +2050,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2129,7 +2129,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2198,7 +2198,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2270,7 +2270,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2353,7 +2353,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2437,7 +2437,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2510,7 +2510,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2587,7 +2587,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2676,7 +2676,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2766,7 +2766,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2844,7 +2844,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -2925,7 +2925,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3019,7 +3019,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3114,7 +3114,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3196,7 +3196,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3281,7 +3281,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3380,7 +3380,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3480,7 +3480,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3566,7 +3566,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3656,7 +3656,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3761,7 +3761,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3867,7 +3867,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -3958,7 +3958,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4052,7 +4052,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4162,7 +4162,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4273,7 +4273,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4368,7 +4368,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4466,7 +4466,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4581,7 +4581,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4698,7 +4698,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4798,7 +4798,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -4901,7 +4901,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5022,7 +5022,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5144,7 +5144,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5248,7 +5248,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5355,7 +5355,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5481,7 +5481,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5608,7 +5608,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5716,7 +5716,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5827,7 +5827,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -5958,7 +5958,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6091,7 +6091,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6204,7 +6204,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6320,7 +6320,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6457,7 +6457,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6595,7 +6595,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6712,7 +6712,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6832,7 +6832,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -6974,7 +6974,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7117,7 +7117,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7238,7 +7238,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7362,7 +7362,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7509,7 +7509,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7658,7 +7658,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7784,7 +7784,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -7913,7 +7913,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8066,7 +8066,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8220,7 +8220,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8350,7 +8350,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8483,7 +8483,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8641,7 +8641,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8800,7 +8800,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -8934,7 +8934,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -9071,7 +9071,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -9234,7 +9234,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -9399,7 +9399,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -9538,7 +9538,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -9680,7 +9680,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -9849,7 +9849,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10019,7 +10019,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10162,7 +10162,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10308,7 +10308,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10482,7 +10482,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10657,7 +10657,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10804,7 +10804,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -10954,7 +10954,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -11133,7 +11133,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -11314,7 +11314,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -11466,7 +11466,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -11621,7 +11621,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -11806,7 +11806,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -11992,7 +11992,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -12148,7 +12148,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -12307,7 +12307,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
@@ -12497,7 +12497,7 @@ public abstract class QueryBase {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
-            if (iter == null || iter.address() == 0) {
+            if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
             Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);

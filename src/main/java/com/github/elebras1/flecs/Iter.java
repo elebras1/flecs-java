@@ -3,6 +3,8 @@ package com.github.elebras1.flecs;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
+import static com.github.elebras1.flecs.flecs_h.EcsIterIsValid;
+
 public class Iter {
 
     private MemorySegment nativeIter;
@@ -40,7 +42,7 @@ public class Iter {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment entities = ecs_iter_t.entities(this.nativeIter);
-        if (entities == null || entities.address() == 0) {
+        if (entities.address() == 0) {
             throw new IllegalStateException("Entities array is null");
         }
         return entities.getAtIndex(ValueLayout.JAVA_LONG, index);
@@ -66,12 +68,12 @@ public class Iter {
 
         if (field == null) {
             Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-            MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
-            field = new Field<>(columnPtr, this.count(), this.world, componentClass);
+            MemorySegment columnNative = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
+            field = new Field<>(columnNative, this.count(), this.world, componentClass);
             this.fields[index] = field;
         } else {
-            MemorySegment columnPtr = flecs_h.ecs_field_w_size(this.nativeIter, field.componentSize(), (byte) index);
-            field.reset(columnPtr, this.count());
+            MemorySegment columnNative = flecs_h.ecs_field_w_size(this.nativeIter, field.componentSize(), (byte) index);
+            field.reset(columnNative, this.count());
         }
 
         return field;
@@ -88,7 +90,7 @@ public class Iter {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment ids = ecs_iter_t.ids(this.nativeIter);
-        if (ids == null || ids.address() == 0) {
+        if (ids.address() == 0) {
             return 0;
         }
 
@@ -99,7 +101,7 @@ public class Iter {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment sizes = ecs_iter_t.sizes(this.nativeIter);
-        if (sizes == null || sizes.address() == 0) {
+        if (sizes.address() == 0) {
             return 0;
         }
 
@@ -115,10 +117,19 @@ public class Iter {
     }
 
     public Table table() {
-        MemorySegment tablePtr = ecs_iter_t.table(this.nativeIter);
-        if (tablePtr == null || tablePtr.address() == 0) {
+        MemorySegment tableNative = ecs_iter_t.table(this.nativeIter);
+        if (tableNative.address() == 0) {
             return null;
         }
-        return new Table(this.world, tablePtr);
+        return new Table(this.world, tableNative);
+    }
+
+    public void fini() {
+        int flags = ecs_iter_t.flags(this.nativeIter);
+        MemorySegment tableNative = ecs_iter_t.table(this.nativeIter);
+        if((flags & flecs_h.EcsIterIsValid()) != 0 && tableNative.address() != 0) {
+            flecs_h.ecs_table_unlock(this.world.nativeHandle(), tableNative);
+        }
+        flecs_h.ecs_iter_fini(this.nativeIter);
     }
 }

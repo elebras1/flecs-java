@@ -170,7 +170,9 @@ public class ComponentHooks<T> {
 
             MemorySegment fieldPtr = flecs_h.ecs_field_w_size(iter, component.size(), (byte) 0);
 
-            if (fieldPtr == null || fieldPtr.address() == 0) return;
+            if (fieldPtr.address() == 0) {
+                return;
+            }
 
             T[] components = this.readComponentArray(fieldPtr, count);
 
@@ -192,8 +194,6 @@ public class ComponentHooks<T> {
             MemorySegment oldPtr = flecs_h.ecs_field_w_size(iter, component.size(), (byte) 0);
             MemorySegment newPtr = flecs_h.ecs_field_w_size(iter, component.size(), (byte) 1);
 
-            if (oldPtr == null || newPtr == null) return;
-
             T[] oldComponents = this.readComponentArray(oldPtr, count);
             T[] newComponents = this.readComponentArray(newPtr, count);
 
@@ -207,7 +207,7 @@ public class ComponentHooks<T> {
 
     private void invokeXtorHook(XtorCallback<T> callback, MemorySegment ptr, int count, MemorySegment typeInfo) {
         try {
-            if (ptr == null || ptr.address() == 0 || count == 0) {
+            if (ptr.address() == 0 || count == 0) {
                 return;
             }
 
