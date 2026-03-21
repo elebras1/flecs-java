@@ -32,15 +32,15 @@ public class ViewExample {
                     .kind(FlecsConstants.EcsOnUpdate)
                     .with(Position.class)
                     .with(Velocity.class)
+                    .with(Inventory.class)
                     .multiThreaded()
                     .eachView(Position.class, Velocity.class, Inventory.class, (long entityId, PositionView posView, VelocityView  velView, InventoryView invView)-> {
+                        posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
 
-                posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
-
-                for(int i = 0; i < invView.elementsLength(); i++) {
-                    invView.elements(i, invView.elements(i) + 1);
-                }
-            });
+                        for(int i = 0; i < invView.elementsLength(); i++) {
+                            invView.elements(i, invView.elements(i) + 1);
+                        }
+                    });
 
             world.progress(0.016f);
             world.progress(0.016f);
