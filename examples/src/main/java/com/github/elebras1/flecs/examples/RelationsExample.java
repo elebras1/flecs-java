@@ -25,14 +25,14 @@ public class RelationsExample {
             grandchild.set(new Position(15, 15));
             grandchild.childOf(child1);
 
-            System.out.println("Child1 parent: " + child1.parent().getName());
-            System.out.println("Grandchild parent: " + grandchild.parent().getName());
+            System.out.println("Child1 parent: " + world.obtainEntity(child1.parent()).getName());
+            System.out.println("Grandchild parent: " + world.obtainEntity(grandchild.parent()).getName());
 
             System.out.println("\nRoot children:");
-            root.children(child -> System.out.println("  - " + child.getName()));
+            root.children(child -> System.out.println("  - " + world.obtainEntity(child).getName()));
 
             System.out.println("\nChild1 children:");
-            child1.children(child -> System.out.println("  - " + child.getName()));
+            child1.children(child -> System.out.println("  - " + world.obtainEntity(child).getName()));
 
             long likesRelation = world.entity("Likes");
             long eatsRelation = world.entity("Eats");

@@ -7,9 +7,14 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public abstract class QueryBase {
-    protected World world;
+    protected final World world;
 
-    protected MemorySegment nativeQuery;
+    protected final MemorySegment nativeQuery;
+
+    protected QueryBase(World world, MemorySegment nativeQuery) {
+        this.world = world;
+        this.nativeQuery = nativeQuery;
+    }
 
     protected abstract void checkClosed();
 

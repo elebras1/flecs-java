@@ -6,9 +6,14 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public abstract class ObserverBuilderBase {
-    protected World world;
+    protected final World world;
 
-    protected MemorySegment desc;
+    protected final MemorySegment desc;
+
+    protected ObserverBuilderBase(World world, MemorySegment desc) {
+        this.world = world;
+        this.desc = desc;
+    }
 
     protected abstract FlecsObserver build();
 

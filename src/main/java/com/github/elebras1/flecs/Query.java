@@ -1,5 +1,9 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.EntityCallback;
+import com.github.elebras1.flecs.callback.IterCallback;
+import com.github.elebras1.flecs.callback.RunCallback;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -11,26 +15,10 @@ public class Query extends QueryBase implements AutoCloseable {
     private boolean closed;
 
     Query(World world, MemorySegment nativeQuery) {
-        this.world = world;
-        this.nativeQuery = nativeQuery;
+        super(world, nativeQuery);
         this.arena = Arena.ofConfined();
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.closed = false;
-    }
-
-    @FunctionalInterface
-    public interface EntityCallback {
-        void accept(long entityId);
-    }
-
-    @FunctionalInterface
-    public interface IterCallback {
-        void accept(Iter iter);
-    }
-
-    @FunctionalInterface
-    public interface RunCallback {
-        void accept(Iter iter);
     }
 
     public void each(EntityCallback callback) {

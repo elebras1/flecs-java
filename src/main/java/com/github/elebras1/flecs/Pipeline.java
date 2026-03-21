@@ -2,20 +2,14 @@ package com.github.elebras1.flecs;
 
 public class Pipeline {
 
-    private final World world;
     private final long id;
 
-    Pipeline(World world, long id) {
-        this.world = world;
+    Pipeline(long id) {
         this.id = id;
     }
 
     public long id() {
         return this.id;
-    }
-
-    public Entity entity() {
-        return new Entity(this.world, this.id);
     }
 
     @Override

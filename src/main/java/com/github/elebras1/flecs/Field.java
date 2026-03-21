@@ -21,7 +21,7 @@ public class Field<T> {
         return this.componentSize;
     }
 
-    public void reset(MemorySegment memorySegment, int count) {
+    void reset(MemorySegment memorySegment, int count) {
         this.memorySegment = memorySegment;
         this.count = count;
     }

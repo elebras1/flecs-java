@@ -1,5 +1,6 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.*;
 import com.github.elebras1.flecs.util.FlecsConstants;
 import com.github.elebras1.flecs.util.internal.FlecsLoader;
 
@@ -27,12 +28,6 @@ public class World implements AutoCloseable {
 
     static {
         FlecsLoader.load();
-    }
-
-    private record SystemCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
-    }
-
-    private record ObserverCallbacks(Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
     }
 
     public record FlecsBuffers(NameBuffer nameBuffer, ComponentBuffer componentBuffer, EntityDescBuffer entityDescBuffer) implements AutoCloseable {
@@ -167,8 +162,15 @@ public class World implements AutoCloseable {
 
     public long entity() {
         this.checkClosed();
-        long entityId = flecs_h.ecs_new(this.nativeWorld);
-        return entityId;
+        return flecs_h.ecs_new(this.nativeWorld);
+    }
+
+    public long entity(long parentId) {
+        long id = flecs_h.ecs_new(this.nativeWorld);
+        MemorySegment dataSegment = this.getComponentBuffer(EcsParent.sizeof());
+        EcsParent.value(dataSegment, parentId);
+        flecs_h.ecs_set_id(this.nativeWorld, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
+        return id;
     }
 
     public long entity(String name) {
@@ -179,6 +181,14 @@ public class World implements AutoCloseable {
         ecs_entity_desc_t.name(desc, nameSegment);
 
         return flecs_h.ecs_entity_init(this.nativeWorld, desc);
+    }
+
+    public long entity(long parentId, String name) {
+        long id = this.entity(name);
+        MemorySegment dataSegment = this.getComponentBuffer(EcsParent.sizeof());
+        EcsParent.value(dataSegment, parentId);
+        flecs_h.ecs_set_id(this.nativeWorld, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
+        return id;
     }
 
     public Entity obtainEntity(long entityId) {
@@ -590,13 +600,13 @@ public class World implements AutoCloseable {
         return namePrefixPtr.reinterpret(Long.MAX_VALUE).getString(0);
     }
 
-    void registerSystemCallbacks(long systemId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+    void registerSystemCallbacks(long systemId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
         if (iterCallback != null || runCallback != null || entityCallback != null) {
             this.systemCallbacks.put(systemId, new SystemCallbacks(iterCallback, runCallback, entityCallback));
         }
     }
 
-    void registerObserverCallbacks(long observerId, Query.IterCallback iterCallback, Query.RunCallback runCallback, Query.EntityCallback entityCallback) {
+    void registerObserverCallbacks(long observerId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
         if (iterCallback != null || runCallback != null || entityCallback != null) {
             this.observerCallbacks.put(observerId, new ObserverCallbacks(iterCallback, runCallback, entityCallback));
         }

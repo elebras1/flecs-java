@@ -1,5 +1,6 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.EntityCallback;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.foreign.Arena;
@@ -115,12 +116,8 @@ public class Entity {
         return this.childOf(parent.id());
     }
 
-    public Entity parent() {
-        long parentId = this.target(FlecsConstants.EcsChildOf, 0);
-        if (parentId != 0) {
-            return new Entity(this.world, parentId);
-        }
-        return null;
+    public long parent() {
+        return this.target(FlecsConstants.EcsChildOf, 0);
     }
 
     public Entity isA(long entityId) {
@@ -393,37 +390,33 @@ public class Entity {
         return this.disable(componentId);
     }
 
-    public Entity clone(boolean cloneValues) {
-        long cloneId = flecs_h.ecs_clone(this.world.nativeHandle(), 0, this.id, cloneValues);
-        return new Entity(this.world, cloneId);
+    public long clone(boolean cloneValues) {
+        return flecs_h.ecs_clone(this.world.nativeHandle(), 0, this.id, cloneValues);
     }
 
-    public Entity lookup(String path) {
+    public long lookup(String path) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment pathSegment = tempArena.allocateFrom(path);
-            long childId = flecs_h.ecs_lookup_child(this.world.nativeHandle(), this.id, pathSegment);
-            if (childId == 0) {
-                return null;
-            }
-            return new Entity(this.world, childId);
+            return flecs_h.ecs_lookup_child(this.world.nativeHandle(), this.id, pathSegment);
         }
     }
 
-    public void children(Consumer<Entity> callback) {
+    public void children(EntityCallback callback) {
         this.children(FlecsConstants.EcsChildOf, callback);
     }
 
-    public void children(long relationId, Consumer<Entity> callback) {
+    public void children(long relationId, EntityCallback callback) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_children(tempArena, this.world.nativeHandle(), this.id);
+            long pair = flecs_h.ecs_make_pair(relationId, this.id);
+            MemorySegment iter = flecs_h.ecs_each_id(tempArena, this.world.nativeHandle(), pair);
 
-            while (flecs_h.ecs_children_next(iter)) {
+            while (flecs_h.ecs_each_next(iter)) {
                 int count = ecs_iter_t.count(iter);
                 MemorySegment entities = ecs_iter_t.entities(iter);
 
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    callback.accept(new Entity(this.world, entityId));
+                    callback.accept(entityId);
                 }
             }
         }

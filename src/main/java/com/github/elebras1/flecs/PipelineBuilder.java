@@ -73,7 +73,7 @@ public class PipelineBuilder {
         }
 
         this.arena.close();
-        return new Pipeline(this.world, pipelineId);
+        return new Pipeline(pipelineId);
     }
 }
 

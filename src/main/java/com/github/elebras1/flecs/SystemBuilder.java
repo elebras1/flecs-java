@@ -1,5 +1,8 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.EntityCallback;
+import com.github.elebras1.flecs.callback.IterCallback;
+import com.github.elebras1.flecs.callback.RunCallback;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.foreign.Arena;
@@ -10,21 +13,19 @@ import static com.github.elebras1.flecs.util.FlecsConstants.*;
 
 public class SystemBuilder extends SystemBuilderBase {
 
-    protected final World world;
-    protected final MemorySegment desc;
     protected final Arena arena;
     private final Iter[] iters;
     private int termCount = 0;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
-    private Query.IterCallback iterCallback;
-    private Query.RunCallback runCallback;
-    private Query.EntityCallback entityCallback;
+    private IterCallback iterCallback;
+    private RunCallback runCallback;
+    private EntityCallback entityCallback;
     private long phase = 0;
 
     public SystemBuilder(World world) {
-        this.world = world;
-        this.arena = Arena.ofConfined();
-        this.desc = ecs_system_desc_t.allocate(this.arena);
+        Arena arena = Arena.ofConfined();
+        super(world, ecs_system_desc_t.allocate(arena));
+        this.arena = arena;
         this.iters = new Iter[world.getStageCount()];
         for(int i = 0; i < this.iters.length; i++) {
             World worldStage = world.getStage(i);
@@ -85,7 +86,7 @@ public class SystemBuilder extends SystemBuilderBase {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
-        
+
         MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);
@@ -231,7 +232,7 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.with(componentId).in();
     }
 
-    public FlecsSystem iter(Query.IterCallback callback) {
+    public FlecsSystem iter(IterCallback callback) {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
@@ -248,7 +249,7 @@ public class SystemBuilder extends SystemBuilderBase {
         return build();
     }
 
-    public FlecsSystem run(Query.RunCallback callback) {
+    public FlecsSystem run(RunCallback callback) {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
@@ -265,7 +266,7 @@ public class SystemBuilder extends SystemBuilderBase {
         return build();
     }
 
-    public FlecsSystem each(Query.EntityCallback callback) {
+    public FlecsSystem each(EntityCallback callback) {
         this.entityCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {

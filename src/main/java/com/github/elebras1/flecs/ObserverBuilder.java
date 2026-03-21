@@ -1,5 +1,8 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.EntityCallback;
+import com.github.elebras1.flecs.callback.IterCallback;
+import com.github.elebras1.flecs.callback.RunCallback;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.foreign.Arena;
@@ -10,22 +13,23 @@ import static com.github.elebras1.flecs.util.FlecsConstants.*;
 
 public class ObserverBuilder extends ObserverBuilderBase {
 
-    protected final World world;
     protected final Arena arena;
-    protected final MemorySegment desc;
     private final Iter iter;
     private int termCount;
     private int eventCount;
-    private Query.IterCallback iterCallback;
-    private Query.RunCallback runCallback;
-    private Query.EntityCallback entityCallback;
+    private IterCallback iterCallback;
+    private RunCallback runCallback;
+    private EntityCallback entityCallback;
     private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private static final int MAX_EVENTS = 8;
 
     public ObserverBuilder(World world) {
-        this.world = world;
-        this.arena = Arena.ofConfined();
-        this.desc = ecs_observer_desc_t.allocate(this.arena);
+        this(world, Arena.ofConfined());
+    }
+
+    private ObserverBuilder(World world, Arena arena) {
+        super(world, ecs_observer_desc_t.allocate(arena));
+        this.arena = arena;
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.termCount = 0;
         this.eventCount = 0;
@@ -213,7 +217,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this;
     }
 
-    public FlecsObserver iter(Query.IterCallback callback) {
+    public FlecsObserver iter(IterCallback callback) {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
@@ -227,7 +231,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return build();
     }
 
-    public FlecsObserver run(Query.RunCallback callback) {
+    public FlecsObserver run(RunCallback callback) {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
@@ -241,7 +245,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return build();
     }
 
-    public FlecsObserver each(Query.EntityCallback callback) {
+    public FlecsObserver each(EntityCallback callback) {
         this.entityCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
@@ -271,4 +275,3 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return new FlecsObserver(this.world, observerId);
     }
 }
-
