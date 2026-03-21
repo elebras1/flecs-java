@@ -58,30 +58,29 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build natives
-        run: ./gradlew copyFlecsNative -PNATIVE_ARCH=${{ matrix.platform }}-${{ matrix.arch }}
+        run: ./gradlew compileFlecsNative -PNATIVE_ARCH=${{ matrix.platform }}-${{ matrix.arch }}
         shell: bash
 
       - name: Verify native library was built
         run: |
-          FILE_PATH="build/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}"
+          FILE_PATH="build/resources/main/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}"
           echo "Checking for native library at $FILE_PATH..."
-          
+
           if [ ! -f "$FILE_PATH" ]; then
             echo "Error: Native library not found!"
             exit 1
           fi
-          
-          # Vérification de la taille (102400 octets = 100ko)
+
           FILE_SIZE=$(wc -c < "$FILE_PATH")
           MIN_SIZE=102400
-          
+
           echo "File size: $FILE_SIZE bytes"
-          
+
           if [ "$FILE_SIZE" -lt "$MIN_SIZE" ]; then
             echo "Error: File size is too small ($FILE_SIZE bytes). Expected at least $MIN_SIZE bytes."
             exit 1
           fi
-          
+
           echo "✓ File exists and size is valid."
           ls -la "$FILE_PATH"
         shell: bash
@@ -90,7 +89,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: natives-${{ matrix.platform }}-${{ matrix.arch }}
-          path: build/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}
+          path: build/resources/main/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}
           retention-days: 1
 
   publish:
@@ -120,31 +119,28 @@ jobs:
 
       - name: Organize natives
         run: |
-          mkdir -p build/natives
-          
-          # Copy each artifact to the correct structure
+          mkdir -p build/resources/main/natives
+
           for artifact_dir in downloaded-natives/natives-*/; do
-            # Extract platform-arch from folder name (e.g. natives-linux-x64 -> linux-x64)
             platform_arch=$(basename "$artifact_dir" | sed 's/^natives-//')
-          
+
             echo "Processing $platform_arch..."
-            mkdir -p "build/natives/$platform_arch"
-          
-            # Copy library file from artifact
-            cp "$artifact_dir"/* "build/natives/$platform_arch/" 2>/dev/null || {
+            mkdir -p "build/resources/main/natives/$platform_arch"
+
+            cp "$artifact_dir"/* "build/resources/main/natives/$platform_arch/" 2>/dev/null || {
               echo "Warning: No files found in $artifact_dir"
             }
           done
-          
+
           echo ""
           echo "Final native libraries structure:"
-          find build/natives -type f
+          find build/resources/main/natives -type f
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build final JAR with all natives
-        run: ./gradlew jar -x compileFlecsNative -x copyFlecsNative
+        run: ./gradlew jar -x compileFlecsNative
 
       - name: Verify JAR contents
         run: |
@@ -154,11 +150,10 @@ jobs:
           echo "All natives in JAR:"
           jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/" | sort
           echo ""
-          
-          # Check each platform
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/linux-x64/libflecs.so" && echo "✓ Linux x64" || echo "✗ Linux x64 MISSING"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/windows-x64/flecs.dll" && echo "✓ Windows x64" || echo "✗ Windows x64 MISSING"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-x64/libflecs.dylib" && echo "✓ macOS x64" || echo "✗ macOS x64 MISSING"
+
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/linux-x64/libflecs.so"    && echo "✓ Linux x64"   || echo "✗ Linux x64 MISSING"
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/windows-x64/flecs.dll"    && echo "✓ Windows x64" || echo "✗ Windows x64 MISSING"
+          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-x64/libflecs.dylib" && echo "✓ macOS x64"   || echo "✗ macOS x64 MISSING"
           jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-aarch64/libflecs.dylib" && echo "✓ macOS ARM64" || echo "✗ macOS ARM64 MISSING"
 
       - name: Publish to Maven Central
