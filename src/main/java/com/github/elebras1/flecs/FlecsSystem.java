@@ -15,11 +15,11 @@ public class FlecsSystem {
     }
 
     public void run() {
-        flecs_h.ecs_run(this.world.nativeHandle(), this.entity.id(), 0.0f, MemorySegment.NULL);
+        flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), 0.0f, MemorySegment.NULL);
     }
 
     public void run(float deltaTime) {
-        flecs_h.ecs_run(this.world.nativeHandle(), this.entity.id(), deltaTime, MemorySegment.NULL);
+        flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), deltaTime, MemorySegment.NULL);
     }
 
     public long id() {

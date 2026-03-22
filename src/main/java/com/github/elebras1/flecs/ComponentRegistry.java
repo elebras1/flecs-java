@@ -39,7 +39,7 @@ public class ComponentRegistry {
                 MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
                 ecs_entity_desc_t.name(entityDesc, nameSegment);
 
-                long entityId = flecs_h.ecs_entity_init(this.world.nativeHandle(), entityDesc);
+                long entityId = flecs_h.ecs_entity_init(this.world.worldSeg(), entityDesc);
 
                 MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
                 ecs_component_desc_t.entity(componentDesc, entityId);
@@ -48,7 +48,7 @@ public class ComponentRegistry {
                 ecs_type_info_t.size(typeInfo, (int) component.size());
                 ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
 
-                componentId = flecs_h.ecs_component_init(world.nativeHandle(), componentDesc);
+                componentId = flecs_h.ecs_component_init(world.worldSeg(), componentDesc);
 
                 if (componentId == 0) {
                     throw new IllegalStateException("Failed to register component: " + componentName);

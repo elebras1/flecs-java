@@ -274,8 +274,8 @@ public class QueryBuilder {
     }
 
     public QueryBuilder groupBy(long groupId, GroupByCallback groupByCallback) {
-        MemorySegment callbackStub = ecs_group_by_action_t.allocate((_, nativeTable, id, _) -> {
-            Table table = nativeTable.address() == 0 ? null : new Table(this.world, nativeTable);
+        MemorySegment callbackStub = ecs_group_by_action_t.allocate((_, tableSeg, id, _) -> {
+            Table table = tableSeg.address() == 0 ? null : new Table(this.world, tableSeg);
             return groupByCallback.accept(this.world, table, id);
         }, this.world.arena());
 
@@ -303,14 +303,14 @@ public class QueryBuilder {
 
     public Query build() {
         try {
-            MemorySegment queryPtr = flecs_h.ecs_query_init(this.world.nativeHandle(), this.desc);
+            MemorySegment querySeg = flecs_h.ecs_query_init(this.world.worldSeg(), this.desc);
 
-            if (queryPtr.address() == 0) {
+            if (querySeg.address() == 0) {
                 String errorMsg = "Query creation failed. Structural alignment/size problem (TERM_SIZE=" + TERM_SIZE + ").";
                 throw new IllegalStateException(errorMsg);
             }
 
-            return new Query(this.world, queryPtr);
+            return new Query(this.world, querySeg);
         } finally {
             this.close();
         }

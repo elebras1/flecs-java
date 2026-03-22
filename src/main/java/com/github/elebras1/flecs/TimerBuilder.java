@@ -28,7 +28,7 @@ public class TimerBuilder {
     }
 
     public Entity build() {
-        long timerId = flecs_h.ecs_system_init(this.world.nativeHandle(), this.desc);
+        long timerId = flecs_h.ecs_system_init(this.world.worldSeg(), this.desc);
         
         if (timerId == 0) {
             throw new IllegalStateException("Failed to create timer");

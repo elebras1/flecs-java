@@ -9,11 +9,11 @@ import java.lang.foreign.ValueLayout;
 public abstract class QueryBase {
     protected final World world;
 
-    protected final MemorySegment nativeQuery;
+    protected final MemorySegment querySeg;
 
-    protected QueryBase(World world, MemorySegment nativeQuery) {
+    protected QueryBase(World world, MemorySegment querySeg) {
         this.world = world;
-        this.nativeQuery = nativeQuery;
+        this.querySeg = querySeg;
     }
 
     protected abstract void checkClosed();
@@ -21,7 +21,7 @@ public abstract class QueryBase {
     public <A> void each(Class<A> componentClassA, Component1Callback<A> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -41,7 +41,7 @@ public abstract class QueryBase {
     public <A> void each(Class<A> componentClassA, Component1WithEntityCallback<A> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -65,7 +65,7 @@ public abstract class QueryBase {
             ComponentView1Callback<VA> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -89,7 +89,7 @@ public abstract class QueryBase {
             ComponentView1WithEntityCallback<VA> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -114,7 +114,7 @@ public abstract class QueryBase {
             Component2Callback<A, B> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -139,7 +139,7 @@ public abstract class QueryBase {
             Component2WithEntityCallback<A, B> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -168,7 +168,7 @@ public abstract class QueryBase {
             ComponentView2Callback<VA, VB> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -198,7 +198,7 @@ public abstract class QueryBase {
             ComponentView2WithEntityCallback<VA, VB> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -228,7 +228,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Component3Callback<A, B, C> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -257,7 +257,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Component3WithEntityCallback<A, B, C> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -290,7 +290,7 @@ public abstract class QueryBase {
             ComponentView3Callback<VA, VB, VC> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -325,7 +325,7 @@ public abstract class QueryBase {
             ComponentView3WithEntityCallback<VA, VB, VC> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -361,7 +361,7 @@ public abstract class QueryBase {
             Component4Callback<A, B, C, D> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -395,7 +395,7 @@ public abstract class QueryBase {
             Component4WithEntityCallback<A, B, C, D> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -432,7 +432,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, ComponentView4Callback<VA, VB, VC, VD> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -472,7 +472,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, ComponentView4WithEntityCallback<VA, VB, VC, VD> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -513,7 +513,7 @@ public abstract class QueryBase {
             Component5Callback<A, B, C, D, E> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -551,7 +551,7 @@ public abstract class QueryBase {
             Component5WithEntityCallback<A, B, C, D, E> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -593,7 +593,7 @@ public abstract class QueryBase {
             ComponentView5Callback<VA, VB, VC, VD, VE> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -639,7 +639,7 @@ public abstract class QueryBase {
             ComponentView5WithEntityCallback<VA, VB, VC, VD, VE> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -685,7 +685,7 @@ public abstract class QueryBase {
             Class<F> componentClassF, Component6Callback<A, B, C, D, E, F> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -727,7 +727,7 @@ public abstract class QueryBase {
             Class<F> componentClassF, Component6WithEntityCallback<A, B, C, D, E, F> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -773,7 +773,7 @@ public abstract class QueryBase {
             ComponentView6Callback<VA, VB, VC, VD, VE, VF> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -824,7 +824,7 @@ public abstract class QueryBase {
             ComponentView6WithEntityCallback<VA, VB, VC, VD, VE, VF> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -876,7 +876,7 @@ public abstract class QueryBase {
             Component7Callback<A, B, C, D, E, F, G> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -923,7 +923,7 @@ public abstract class QueryBase {
             Component7WithEntityCallback<A, B, C, D, E, F, G> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -973,7 +973,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, ComponentView7Callback<VA, VB, VC, VD, VE, VF, VG> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1030,7 +1030,7 @@ public abstract class QueryBase {
             ComponentView7WithEntityCallback<VA, VB, VC, VD, VE, VF, VG> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1087,7 +1087,7 @@ public abstract class QueryBase {
             Component8Callback<A, B, C, D, E, F, G, H> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1138,7 +1138,7 @@ public abstract class QueryBase {
             Component8WithEntityCallback<A, B, C, D, E, F, G, H> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1193,7 +1193,7 @@ public abstract class QueryBase {
             ComponentView8Callback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1255,7 +1255,7 @@ public abstract class QueryBase {
             ComponentView8WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1317,7 +1317,7 @@ public abstract class QueryBase {
             Class<I> componentClassI, Component9Callback<A, B, C, D, E, F, G, H, I> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1373,7 +1373,7 @@ public abstract class QueryBase {
             Component9WithEntityCallback<A, B, C, D, E, F, G, H, I> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1432,7 +1432,7 @@ public abstract class QueryBase {
             ComponentView9Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1499,7 +1499,7 @@ public abstract class QueryBase {
             ComponentView9WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1567,7 +1567,7 @@ public abstract class QueryBase {
             Component10Callback<A, B, C, D, E, F, G, H, I, J> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1627,7 +1627,7 @@ public abstract class QueryBase {
             Component10WithEntityCallback<A, B, C, D, E, F, G, H, I, J> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1691,7 +1691,7 @@ public abstract class QueryBase {
             ComponentView10Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1764,7 +1764,7 @@ public abstract class QueryBase {
             ComponentView10WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1838,7 +1838,7 @@ public abstract class QueryBase {
             Component11Callback<A, B, C, D, E, F, G, H, I, J, K> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1903,7 +1903,7 @@ public abstract class QueryBase {
             Component11WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -1971,7 +1971,7 @@ public abstract class QueryBase {
             ComponentView11Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2049,7 +2049,7 @@ public abstract class QueryBase {
             ComponentView11WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2128,7 +2128,7 @@ public abstract class QueryBase {
             Component12Callback<A, B, C, D, E, F, G, H, I, J, K, L> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2197,7 +2197,7 @@ public abstract class QueryBase {
             Component12WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2269,7 +2269,7 @@ public abstract class QueryBase {
             ComponentView12Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2352,7 +2352,7 @@ public abstract class QueryBase {
             ComponentView12WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2436,7 +2436,7 @@ public abstract class QueryBase {
             Component13Callback<A, B, C, D, E, F, G, H, I, J, K, L, M> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2509,7 +2509,7 @@ public abstract class QueryBase {
             Component13WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2586,7 +2586,7 @@ public abstract class QueryBase {
             ComponentView13Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2675,7 +2675,7 @@ public abstract class QueryBase {
             ComponentView13WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2765,7 +2765,7 @@ public abstract class QueryBase {
             Component14Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2843,7 +2843,7 @@ public abstract class QueryBase {
             Component14WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -2924,7 +2924,7 @@ public abstract class QueryBase {
             ComponentView14Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3018,7 +3018,7 @@ public abstract class QueryBase {
             ComponentView14WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3113,7 +3113,7 @@ public abstract class QueryBase {
             Component15Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3195,7 +3195,7 @@ public abstract class QueryBase {
             Component15WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3280,7 +3280,7 @@ public abstract class QueryBase {
             ComponentView15Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3379,7 +3379,7 @@ public abstract class QueryBase {
             ComponentView15WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3479,7 +3479,7 @@ public abstract class QueryBase {
             Component16Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3565,7 +3565,7 @@ public abstract class QueryBase {
             Component16WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3655,7 +3655,7 @@ public abstract class QueryBase {
             ComponentView16Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3760,7 +3760,7 @@ public abstract class QueryBase {
             ComponentView16WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3866,7 +3866,7 @@ public abstract class QueryBase {
             Component17Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -3957,7 +3957,7 @@ public abstract class QueryBase {
             Component17WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4051,7 +4051,7 @@ public abstract class QueryBase {
             ComponentView17Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4161,7 +4161,7 @@ public abstract class QueryBase {
             ComponentView17WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4272,7 +4272,7 @@ public abstract class QueryBase {
             Component18Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4367,7 +4367,7 @@ public abstract class QueryBase {
             Component18WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4465,7 +4465,7 @@ public abstract class QueryBase {
             ComponentView18Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4580,7 +4580,7 @@ public abstract class QueryBase {
             ComponentView18WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4697,7 +4697,7 @@ public abstract class QueryBase {
             Component19Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4797,7 +4797,7 @@ public abstract class QueryBase {
             Component19WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -4900,7 +4900,7 @@ public abstract class QueryBase {
             ComponentView19Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5021,7 +5021,7 @@ public abstract class QueryBase {
             ComponentView19WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5143,7 +5143,7 @@ public abstract class QueryBase {
             Component20Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5247,7 +5247,7 @@ public abstract class QueryBase {
             Component20WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5354,7 +5354,7 @@ public abstract class QueryBase {
             ComponentView20Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5480,7 +5480,7 @@ public abstract class QueryBase {
             ComponentView20WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5607,7 +5607,7 @@ public abstract class QueryBase {
             Component21Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5715,7 +5715,7 @@ public abstract class QueryBase {
             Component21WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5826,7 +5826,7 @@ public abstract class QueryBase {
             ComponentView21Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -5957,7 +5957,7 @@ public abstract class QueryBase {
             ComponentView21WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6090,7 +6090,7 @@ public abstract class QueryBase {
             Component22Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6203,7 +6203,7 @@ public abstract class QueryBase {
             Component22WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6319,7 +6319,7 @@ public abstract class QueryBase {
             ComponentView22Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6456,7 +6456,7 @@ public abstract class QueryBase {
             ComponentView22WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6594,7 +6594,7 @@ public abstract class QueryBase {
             Component23Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6711,7 +6711,7 @@ public abstract class QueryBase {
             Component23WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6831,7 +6831,7 @@ public abstract class QueryBase {
             ComponentView23Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -6973,7 +6973,7 @@ public abstract class QueryBase {
             ComponentView23WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7116,7 +7116,7 @@ public abstract class QueryBase {
             Component24Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7237,7 +7237,7 @@ public abstract class QueryBase {
             Component24WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7361,7 +7361,7 @@ public abstract class QueryBase {
             ComponentView24Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7508,7 +7508,7 @@ public abstract class QueryBase {
             ComponentView24WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7657,7 +7657,7 @@ public abstract class QueryBase {
             Component25Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7783,7 +7783,7 @@ public abstract class QueryBase {
             Component25WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -7912,7 +7912,7 @@ public abstract class QueryBase {
             ComponentView25Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8065,7 +8065,7 @@ public abstract class QueryBase {
             ComponentView25WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8219,7 +8219,7 @@ public abstract class QueryBase {
             Component26Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8349,7 +8349,7 @@ public abstract class QueryBase {
             Component26WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8482,7 +8482,7 @@ public abstract class QueryBase {
             ComponentView26Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8640,7 +8640,7 @@ public abstract class QueryBase {
             ComponentView26WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8799,7 +8799,7 @@ public abstract class QueryBase {
             Component27Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -8933,7 +8933,7 @@ public abstract class QueryBase {
             Component27WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -9070,7 +9070,7 @@ public abstract class QueryBase {
             ComponentView27Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -9233,7 +9233,7 @@ public abstract class QueryBase {
             ComponentView27WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -9398,7 +9398,7 @@ public abstract class QueryBase {
             Component28Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -9537,7 +9537,7 @@ public abstract class QueryBase {
             Component28WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -9679,7 +9679,7 @@ public abstract class QueryBase {
             ComponentView28Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -9848,7 +9848,7 @@ public abstract class QueryBase {
             ComponentView28WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10018,7 +10018,7 @@ public abstract class QueryBase {
             Component29Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10161,7 +10161,7 @@ public abstract class QueryBase {
             Component29WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10307,7 +10307,7 @@ public abstract class QueryBase {
             ComponentView29Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10481,7 +10481,7 @@ public abstract class QueryBase {
             ComponentView29WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10656,7 +10656,7 @@ public abstract class QueryBase {
             Component30Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10803,7 +10803,7 @@ public abstract class QueryBase {
             Component30WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -10953,7 +10953,7 @@ public abstract class QueryBase {
             ComponentView30Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -11132,7 +11132,7 @@ public abstract class QueryBase {
             ComponentView30WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -11313,7 +11313,7 @@ public abstract class QueryBase {
             Component31Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -11465,7 +11465,7 @@ public abstract class QueryBase {
             Component31WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -11620,7 +11620,7 @@ public abstract class QueryBase {
             ComponentView31Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -11805,7 +11805,7 @@ public abstract class QueryBase {
             ComponentView31WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -11991,7 +11991,7 @@ public abstract class QueryBase {
             Component32Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -12147,7 +12147,7 @@ public abstract class QueryBase {
             Component32WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -12306,7 +12306,7 @@ public abstract class QueryBase {
             ComponentView32Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
@@ -12496,7 +12496,7 @@ public abstract class QueryBase {
             ComponentView32WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
         this.checkClosed();
         try (Arena tmpArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery);
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }

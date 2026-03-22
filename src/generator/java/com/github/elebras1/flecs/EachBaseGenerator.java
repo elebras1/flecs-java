@@ -157,13 +157,13 @@ public class EachBaseGenerator {
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder("QueryBase")
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addField(FieldSpec.builder(WORLD, "world", Modifier.PROTECTED, Modifier.FINAL).build())
-                .addField(FieldSpec.builder(MEMORY_SEGMENT, "nativeQuery", Modifier.PROTECTED, Modifier.FINAL).build())
+                .addField(FieldSpec.builder(MEMORY_SEGMENT, "querySeg", Modifier.PROTECTED, Modifier.FINAL).build())
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PROTECTED)
                         .addParameter(WORLD, "world")
-                        .addParameter(MEMORY_SEGMENT, "nativeQuery")
+                        .addParameter(MEMORY_SEGMENT, "querySeg")
                         .addStatement("this.world = world")
-                        .addStatement("this.nativeQuery = nativeQuery")
+                        .addStatement("this.querySeg = querySeg")
                         .build())
                 .addMethod(MethodSpec.methodBuilder("checkClosed")
                         .addModifiers(Modifier.PROTECTED, Modifier.ABSTRACT)
@@ -187,7 +187,7 @@ public class EachBaseGenerator {
 
         mb.addStatement("this.checkClosed()");
         mb.beginControlFlow("try ($T tmpArena = $T.ofConfined())", ARENA, ARENA);
-        mb.addStatement("$T iter = $T.ecs_query_iter(tmpArena, this.world.nativeHandle(), this.nativeQuery)",
+        mb.addStatement("$T iter = $T.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)",
                 MEMORY_SEGMENT, FLECS_H);
         mb.beginControlFlow("if (iter.address() == 0)");
         mb.addStatement("throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");

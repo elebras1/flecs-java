@@ -3,25 +3,23 @@ package com.github.elebras1.flecs;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static com.github.elebras1.flecs.flecs_h.EcsIterIsValid;
-
 public class Iter {
 
-    private MemorySegment nativeIter;
+    private MemorySegment iterSeg;
     private final World world;
     private final Field<?>[] fields;
     private int count;
 
-    Iter(MemorySegment nativeIter, World world) {
-        this.nativeIter = nativeIter;
+    Iter(MemorySegment iterSeg, World world) {
+        this.iterSeg = iterSeg;
         this.world = world;
         this.fields = new Field[32];
         this.count = -1;
     }
 
-    void setNativeIter(MemorySegment nativeIter) {
-        this.nativeIter = nativeIter;
-        this.count = ecs_iter_t.count(nativeIter);
+    void setIterSeg(MemorySegment iterSeg) {
+        this.iterSeg = iterSeg;
+        this.count = ecs_iter_t.count(iterSeg);
     }
 
     World world() {
@@ -29,8 +27,8 @@ public class Iter {
     }
 
     public boolean next() {
-        boolean hasNext = flecs_h.ecs_iter_next(this.nativeIter);
-        this.count = hasNext ? ecs_iter_t.count(this.nativeIter) : 0;
+        boolean hasNext = flecs_h.ecs_iter_next(this.iterSeg);
+        this.count = hasNext ? ecs_iter_t.count(this.iterSeg) : 0;
         return hasNext;
     }
 
@@ -41,7 +39,7 @@ public class Iter {
     public long entityId(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
-        MemorySegment entities = ecs_iter_t.entities(this.nativeIter);
+        MemorySegment entities = ecs_iter_t.entities(this.iterSeg);
         if (entities.address() == 0) {
             throw new IllegalStateException("Entities array is null");
         }
@@ -53,11 +51,11 @@ public class Iter {
     }
 
     public float deltaTime() {
-        return ecs_iter_t.delta_time(this.nativeIter);
+        return ecs_iter_t.delta_time(this.iterSeg);
     }
 
     public float deltaSystemTime() {
-        return ecs_iter_t.delta_system_time(this.nativeIter);
+        return ecs_iter_t.delta_system_time(this.iterSeg);
     }
 
     @SuppressWarnings("unchecked")
@@ -68,12 +66,12 @@ public class Iter {
 
         if (field == null) {
             Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-            MemorySegment columnNative = flecs_h.ecs_field_w_size(this.nativeIter, component.size(), (byte) index);
-            field = new Field<>(columnNative, this.count(), this.world, componentClass);
+            MemorySegment columnSeg = flecs_h.ecs_field_w_size(this.iterSeg, component.size(), (byte) index);
+            field = new Field<>(columnSeg, this.count(), this.world, componentClass);
             this.fields[index] = field;
         } else {
-            MemorySegment columnNative = flecs_h.ecs_field_w_size(this.nativeIter, field.componentSize(), (byte) index);
-            field.reset(columnNative, this.count());
+            MemorySegment columnSeg = flecs_h.ecs_field_w_size(this.iterSeg, field.componentSize(), (byte) index);
+            field.reset(columnSeg, this.count());
         }
 
         return field;
@@ -82,14 +80,14 @@ public class Iter {
     public boolean isFieldSet(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
-        int setFields = ecs_iter_t.set_fields(this.nativeIter);
+        int setFields = ecs_iter_t.set_fields(this.iterSeg);
         return (setFields & (1 << index)) != 0;
     }
 
     public long termId(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
-        MemorySegment ids = ecs_iter_t.ids(this.nativeIter);
+        MemorySegment ids = ecs_iter_t.ids(this.iterSeg);
         if (ids.address() == 0) {
             return 0;
         }
@@ -100,7 +98,7 @@ public class Iter {
     public int fieldSize(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
-        MemorySegment sizes = ecs_iter_t.sizes(this.nativeIter);
+        MemorySegment sizes = ecs_iter_t.sizes(this.iterSeg);
         if (sizes.address() == 0) {
             return 0;
         }
@@ -109,27 +107,27 @@ public class Iter {
     }
 
     public int fieldCount() {
-        return Byte.toUnsignedInt(ecs_iter_t.field_count(this.nativeIter));
+        return Byte.toUnsignedInt(ecs_iter_t.field_count(this.iterSeg));
     }
 
     public long event() {
-        return ecs_iter_t.event(this.nativeIter);
+        return ecs_iter_t.event(this.iterSeg);
     }
 
     public Table table() {
-        MemorySegment tableNative = ecs_iter_t.table(this.nativeIter);
-        if (tableNative.address() == 0) {
+        MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
+        if (tableSeg.address() == 0) {
             return null;
         }
-        return new Table(this.world, tableNative);
+        return new Table(this.world, tableSeg);
     }
 
     public void fini() {
-        int flags = ecs_iter_t.flags(this.nativeIter);
-        MemorySegment tableNative = ecs_iter_t.table(this.nativeIter);
-        if((flags & flecs_h.EcsIterIsValid()) != 0 && tableNative.address() != 0) {
-            flecs_h.ecs_table_unlock(this.world.nativeHandle(), tableNative);
+        int flags = ecs_iter_t.flags(this.iterSeg);
+        MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
+        if((flags & flecs_h.EcsIterIsValid()) != 0 && tableSeg.address() != 0) {
+            flecs_h.ecs_table_unlock(this.world.worldSeg(), tableSeg);
         }
-        flecs_h.ecs_iter_fini(this.nativeIter);
+        flecs_h.ecs_iter_fini(this.iterSeg);
     }
 }

@@ -15,23 +15,23 @@ public class FlecsObserver {
     }
 
     public void enable() {
-        flecs_h.ecs_enable(this.world.nativeHandle(), this.observerId, true);
+        flecs_h.ecs_enable(this.world.worldSeg(), this.observerId, true);
     }
 
     public void disable() {
-        flecs_h.ecs_enable(this.world.nativeHandle(), this.observerId, false);
+        flecs_h.ecs_enable(this.world.worldSeg(), this.observerId, false);
     }
 
     public void destruct() {
-        flecs_h.ecs_delete(this.world.nativeHandle(), this.observerId);
+        flecs_h.ecs_delete(this.world.worldSeg(), this.observerId);
     }
 
     public boolean isValid() {
-        return flecs_h.ecs_is_valid(this.world.nativeHandle(), this.observerId);
+        return flecs_h.ecs_is_valid(this.world.worldSeg(), this.observerId);
     }
 
     public boolean isAlive() {
-        return flecs_h.ecs_is_alive(this.world.nativeHandle(), this.observerId);
+        return flecs_h.ecs_is_alive(this.world.worldSeg(), this.observerId);
     }
 
     @Override

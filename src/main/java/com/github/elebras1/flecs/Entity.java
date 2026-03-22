@@ -31,7 +31,7 @@ public class Entity {
     }
 
     public Entity add(long entityId) {
-        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, entityId);
+        flecs_h.ecs_add_id(this.world.worldSeg(), this.id, entityId);
         return this;
     }
 
@@ -45,7 +45,7 @@ public class Entity {
     }
 
     public Entity remove(long entityId) {
-        flecs_h.ecs_remove_id(world.nativeHandle(), this.id, entityId);
+        flecs_h.ecs_remove_id(world.worldSeg(), this.id, entityId);
         return this;
     }
 
@@ -59,7 +59,7 @@ public class Entity {
     }
 
     public boolean has(long componentId) {
-        return flecs_h.ecs_has_id(this.world.nativeHandle(), this.id, componentId);
+        return flecs_h.ecs_has_id(this.world.worldSeg(), this.id, componentId);
     }
 
     public boolean has(Class<?> componentClass) {
@@ -74,13 +74,13 @@ public class Entity {
     public Entity setName(String name) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment nameSegment = tempArena.allocateFrom(name);
-            flecs_h.ecs_set_name(this.world.nativeHandle(), this.id, nameSegment);
+            flecs_h.ecs_set_name(this.world.worldSeg(), this.id, nameSegment);
         }
         return this;
     }
 
     public String getName() {
-        MemorySegment nameSegment = flecs_h.ecs_get_name(this.world.nativeHandle(), this.id);
+        MemorySegment nameSegment = flecs_h.ecs_get_name(this.world.worldSeg(), this.id);
         if (nameSegment.address() == 0) {
             return null;
         }
@@ -88,19 +88,19 @@ public class Entity {
     }
 
     public void destruct() {
-        flecs_h.ecs_delete(this.world.nativeHandle(), this.id);
+        flecs_h.ecs_delete(this.world.worldSeg(), this.id);
     }
 
     public boolean isValid() {
-        return flecs_h.ecs_is_valid(this.world.nativeHandle(), this.id);
+        return flecs_h.ecs_is_valid(this.world.worldSeg(), this.id);
     }
 
     public boolean isAlive() {
-        return flecs_h.ecs_is_alive(this.world.nativeHandle(), this.id);
+        return flecs_h.ecs_is_alive(this.world.worldSeg(), this.id);
     }
 
     public void clear() {
-        flecs_h.ecs_clear(this.world.nativeHandle(), this.id);
+        flecs_h.ecs_clear(this.world.worldSeg(), this.id);
     }
 
     public Entity addRelation(long relation, long target) {
@@ -150,7 +150,7 @@ public class Entity {
 
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
         component.write(dataSegment, 0, data);
-        flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, componentId, component.size(), dataSegment);
+        flecs_h.ecs_set_id(this.world.worldSeg(), this.id, componentId, component.size(), dataSegment);
 
         return this;
     }
@@ -158,14 +158,14 @@ public class Entity {
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> Entity set(Class<?> componentClass, Consumer<T> consumer) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, componentId);
-        MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
+        flecs_h.ecs_add_id(this.world.worldSeg(), this.id, componentId);
+        MemorySegment segment = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(ptr.address());
+        view.setBaseAddress(segment.address());
         consumer.accept(view);
 
-        flecs_h.ecs_modified_id(this.world.nativeHandle(), this.id, componentId);
+        flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
         return this;
     }
 
@@ -180,7 +180,7 @@ public class Entity {
         MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
         component.write(dataSegment, 0, data);
 
-        flecs_h.ecs_set_id(this.world.nativeHandle(), this.id, pairId, component.size(), dataSegment);
+        flecs_h.ecs_set_id(this.world.worldSeg(), this.id, pairId, component.size(), dataSegment);
 
         return this;
     }
@@ -189,20 +189,20 @@ public class Entity {
     public <T extends ComponentView> Entity set(Class<?> componentClass, long target, Consumer<T> consumer) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
-        flecs_h.ecs_add_id(this.world.nativeHandle(), this.id, pairId);
-        MemorySegment ptr = flecs_h.ecs_get_mut_id(this.world.nativeHandle(), this.id, componentId);
+        flecs_h.ecs_add_id(this.world.worldSeg(), this.id, pairId);
+        MemorySegment segment = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(ptr.address());
+        view.setBaseAddress(segment.address());
         consumer.accept(view);
 
-        flecs_h.ecs_modified_id(this.world.nativeHandle(), this.id, pairId);
+        flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, pairId);
         return this;
     }
 
     public <T> T get(long componentId) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
-        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
 
         if (address == 0) {
             return null;
@@ -224,7 +224,7 @@ public class Entity {
 
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
-        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
 
         if (address == 0) {
             return null;
@@ -239,7 +239,7 @@ public class Entity {
         ComponentView view = this.world.viewCache().getComponentView(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 
-        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, componentId);
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
 
         if (address == 0) {
             return null;
@@ -258,7 +258,7 @@ public class Entity {
 
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
-        long address = flecs_h.ecs_get_id(this.world.nativeHandle(), this.id, pairId);
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
 
         if (address == 0) {
             return null;
@@ -270,11 +270,11 @@ public class Entity {
     }
 
     public void enable() {
-        flecs_h.ecs_enable(this.world.nativeHandle(), this.id, true);
+        flecs_h.ecs_enable(this.world.worldSeg(), this.id, true);
     }
 
     public void disable() {
-        flecs_h.ecs_enable(this.world.nativeHandle(), this.id, false);
+        flecs_h.ecs_enable(this.world.worldSeg(), this.id, false);
     }
 
     public FlecsObserver observe(long eventId, Runnable callback) {
@@ -312,7 +312,7 @@ public class Entity {
             ecs_event_desc_t.event(eventDesc, eventId);
             ecs_event_desc_t.entity(eventDesc, this.id);
 
-            flecs_h.ecs_emit(this.world.nativeHandle(), eventDesc);
+            flecs_h.ecs_emit(this.world.worldSeg(), eventDesc);
         }
     }
 
@@ -331,7 +331,7 @@ public class Entity {
             ecs_event_desc_t.entity(eventDesc, this.id);
             ecs_event_desc_t.ids(eventDesc, typeSegment);
 
-            flecs_h.ecs_emit(this.world.nativeHandle(), eventDesc);
+            flecs_h.ecs_emit(this.world.worldSeg(), eventDesc);
         }
     }
 
@@ -345,15 +345,15 @@ public class Entity {
     }
 
     public long target(long relationId, int index) {
-        return flecs_h.ecs_get_target(this.world.nativeHandle(), this.id, relationId, index);
+        return flecs_h.ecs_get_target(this.world.worldSeg(), this.id, relationId, index);
     }
 
     public int depth(long relationId) {
-        return flecs_h.ecs_get_depth(this.world.nativeHandle(), this.id, relationId);
+        return flecs_h.ecs_get_depth(this.world.worldSeg(), this.id, relationId);
     }
 
     public boolean owns(long componentId) {
-        return flecs_h.ecs_owns_id(this.world.nativeHandle(), this.id, componentId);
+        return flecs_h.ecs_owns_id(this.world.worldSeg(), this.id, componentId);
     }
 
     public boolean owns(Class<?> componentClass) {
@@ -362,7 +362,7 @@ public class Entity {
     }
 
     public boolean enabled(long componentId) {
-        return flecs_h.ecs_is_enabled_id(this.world.nativeHandle(), this.id, componentId);
+        return flecs_h.ecs_is_enabled_id(this.world.worldSeg(), this.id, componentId);
     }
 
     public <T> boolean enabled(Class<T> componentClass) {
@@ -371,7 +371,7 @@ public class Entity {
     }
 
     public Entity enable(long componentId) {
-        flecs_h.ecs_enable_id(this.world.nativeHandle(), this.id, componentId, true);
+        flecs_h.ecs_enable_id(this.world.worldSeg(), this.id, componentId, true);
         return this;
     }
 
@@ -381,7 +381,7 @@ public class Entity {
     }
 
     public Entity disable(long componentId) {
-        flecs_h.ecs_enable_id(this.world.nativeHandle(), this.id, componentId, false);
+        flecs_h.ecs_enable_id(this.world.worldSeg(), this.id, componentId, false);
         return this;
     }
 
@@ -391,19 +391,19 @@ public class Entity {
     }
 
     public long clone(boolean cloneValues) {
-        return flecs_h.ecs_clone(this.world.nativeHandle(), 0, this.id, cloneValues);
+        return flecs_h.ecs_clone(this.world.worldSeg(), 0, this.id, cloneValues);
     }
 
     public long lookup(String path) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment pathSegment = tempArena.allocateFrom(path);
-            return flecs_h.ecs_lookup_child(this.world.nativeHandle(), this.id, pathSegment);
+            return flecs_h.ecs_lookup_child(this.world.worldSeg(), this.id, pathSegment);
         }
     }
 
     public void children(EntityCallback callback) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_children(tempArena, this.world.nativeHandle(), this.id);
+            MemorySegment iter = flecs_h.ecs_children(tempArena, this.world.worldSeg(), this.id);
 
             while (flecs_h.ecs_children_next(iter)) {
                 int count = ecs_iter_t.count(iter);
@@ -419,7 +419,7 @@ public class Entity {
     public void children(long relationId, EntityCallback callback) {
         try (Arena tempArena = Arena.ofConfined()) {
             long pair = flecs_h.ecs_make_pair(relationId, this.id);
-            MemorySegment iter = flecs_h.ecs_each_id(tempArena, this.world.nativeHandle(), pair);
+            MemorySegment iter = flecs_h.ecs_each_id(tempArena, this.world.worldSeg(), pair);
 
             while (flecs_h.ecs_each_next(iter)) {
                 int count = ecs_iter_t.count(iter);
@@ -434,11 +434,11 @@ public class Entity {
     }
 
     public Table table() {
-        MemorySegment tableNative = flecs_h.ecs_get_table(this.world.nativeHandle(), this.id);
-        if (tableNative.address() == 0) {
+        MemorySegment tableSeg = flecs_h.ecs_get_table(this.world.worldSeg(), this.id);
+        if (tableSeg.address() == 0) {
             return null;
         }
-        return new Table(this.world, tableNative);
+        return new Table(this.world, tableSeg);
     }
 
     @Override

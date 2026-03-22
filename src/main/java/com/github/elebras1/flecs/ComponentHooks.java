@@ -144,82 +144,82 @@ public class ComponentHooks<T> {
         }
     }
 
-    private void invokeIterHook(IterHookCallback<T> callback, MemorySegment iterPtr) {
+    private void invokeIterHook(IterHookCallback<T> callback, MemorySegment iterSeg) {
         try {
-            MemorySegment iter = iterPtr.reinterpret(ecs_iter_t.sizeof());
+            MemorySegment iter = iterSeg.reinterpret(ecs_iter_t.sizeof());
 
             int count = ecs_iter_t.count(iter);
             if (count == 0) {
                 return;
             }
 
-            MemorySegment fieldPtr = flecs_h.ecs_field_w_size(iter, component.size(), (byte) 0);
+            MemorySegment fieldSeg = flecs_h.ecs_field_w_size(iter, this.component.size(), (byte) 0);
 
-            if (fieldPtr.address() == 0) {
+            if (fieldSeg.address() == 0) {
                 return;
             }
 
-            T[] components = this.readComponentArray(fieldPtr, count);
+            T[] components = this.readComponentArray(fieldSeg, count);
 
             callback.invoke(components);
 
-            this.writeComponentArray(fieldPtr, components, count);
+            this.writeComponentArray(fieldSeg, components, count);
 
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void invokeReplaceHook(ReplaceHookCallback<T> callback, MemorySegment iterPtr) {
+    private void invokeReplaceHook(ReplaceHookCallback<T> callback, MemorySegment iterSeg) {
         try {
-            MemorySegment iter = iterPtr.reinterpret(ecs_iter_t.sizeof());
+            MemorySegment iter = iterSeg.reinterpret(ecs_iter_t.sizeof());
             int count = ecs_iter_t.count(iter);
             if (count == 0) return;
 
-            MemorySegment oldPtr = flecs_h.ecs_field_w_size(iter, component.size(), (byte) 0);
-            MemorySegment newPtr = flecs_h.ecs_field_w_size(iter, component.size(), (byte) 1);
+            MemorySegment oldSeg = flecs_h.ecs_field_w_size(iter, this.component.size(), (byte) 0);
+            MemorySegment newSeg = flecs_h.ecs_field_w_size(iter, this.component.size(), (byte) 1);
 
-            T[] oldComponents = this.readComponentArray(oldPtr, count);
-            T[] newComponents = this.readComponentArray(newPtr, count);
+            T[] oldComponents = this.readComponentArray(oldSeg, count);
+            T[] newComponents = this.readComponentArray(newSeg, count);
 
             callback.invoke(oldComponents, newComponents);
 
-            this.writeComponentArray(newPtr, newComponents, count);
+            this.writeComponentArray(newSeg, newComponents, count);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void invokeXtorHook(XtorCallback<T> callback, MemorySegment ptr, int count, MemorySegment typeInfo) {
+    private void invokeXtorHook(XtorCallback<T> callback, MemorySegment segment, int count, MemorySegment typeInfo) {
         try {
-            if (ptr.address() == 0 || count == 0) {
+            if (segment.address() == 0 || count == 0) {
                 return;
             }
 
-            T[] components = this.readComponentArray(ptr, count);
+            T[] components = this.readComponentArray(segment, count);
 
             callback.invoke(components, count);
 
             if (callback == this.ctorCallback) {
-                this.writeComponentArray(ptr, components, count);
+                this.writeComponentArray(segment, components, count);
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void invokeCopyMoveHook(CopyMoveCallback<T> callback, MemorySegment dstPtr, MemorySegment srcPtr, int count, MemorySegment typeInfo) {
+    private void invokeCopyMoveHook(CopyMoveCallback<T> callback, MemorySegment dstSeg, MemorySegment srcSeg, int count, MemorySegment typeInfo) {
         try {
             if (count == 0) {
                 return;
             }
 
-            T[] dst = this.readComponentArray(dstPtr, count);
-            T[] src = this.readComponentArray(srcPtr, count);
+            T[] dst = this.readComponentArray(dstSeg, count);
+            T[] src = this.readComponentArray(srcSeg, count);
 
             callback.invoke(dst, src, count);
 
-            this.writeComponentArray(dstPtr, dst, count);
+            this.writeComponentArray(dstSeg, dst, count);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -227,9 +227,9 @@ public class ComponentHooks<T> {
 
 
     @SuppressWarnings("unchecked")
-    private T[] readComponentArray(MemorySegment ptr, int count) {
+    private T[] readComponentArray(MemorySegment segment, int count) {
         long size = this.component.size();
-        MemorySegment buffer = ptr.reinterpret(size * count);
+        MemorySegment buffer = segment.reinterpret(size * count);
 
         T[] array = this.component.createArray(count);
 
@@ -241,9 +241,9 @@ public class ComponentHooks<T> {
         return array;
     }
 
-    private void writeComponentArray(MemorySegment ptr, T[] components, int count) {
+    private void writeComponentArray(MemorySegment segment, T[] components, int count) {
         long size = this.component.size();
-        MemorySegment buffer = ptr.reinterpret(size * count);
+        MemorySegment buffer = segment.reinterpret(size * count);
 
         for (int i = 0; i < count; i++) {
             if (components[i] != null) {

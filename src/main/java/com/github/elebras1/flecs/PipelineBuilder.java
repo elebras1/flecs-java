@@ -26,7 +26,7 @@ public class PipelineBuilder {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(tempArena);
             ecs_entity_desc_t.name(entityDescTemp, nameSegment);
-            ecs_pipeline_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
+            ecs_pipeline_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.worldSeg(), entityDescTemp));
         }
     }
 
@@ -65,7 +65,7 @@ public class PipelineBuilder {
     }
 
     public Pipeline build() {
-        long pipelineId = flecs_h.ecs_pipeline_init(this.world.nativeHandle(), this.desc);
+        long pipelineId = flecs_h.ecs_pipeline_init(this.world.worldSeg(), this.desc);
 
         if (pipelineId == 0) {
             this.arena.close();

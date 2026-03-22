@@ -5,11 +5,11 @@ import java.lang.foreign.ValueLayout;
 
 public class Table {
     private final World world;
-    private final MemorySegment nativeTable;
+    private final MemorySegment tableSeg;
 
-    Table(World world, MemorySegment nativeTable) {
+    Table(World world, MemorySegment tableSeg) {
         this.world = world;
-        this.nativeTable = nativeTable;
+        this.tableSeg = tableSeg;
     }
 
     @FunctionalInterface
@@ -18,32 +18,32 @@ public class Table {
     }
 
     public String str() {
-        MemorySegment nativeStr = flecs_h.ecs_table_str(this.world.nativeHandle(), this.nativeTable);
-        String str = nativeStr.reinterpret(Long.MAX_VALUE).getString(0);
-        MemorySegment freePtr = ecs_os_api_t.free_(flecs_h.ecs_os_api());
-        ecs_os_api_free_t.invoke(freePtr, nativeStr);
+        MemorySegment strSeg = flecs_h.ecs_table_str(this.world.worldSeg(), this.tableSeg);
+        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        MemorySegment freeSeg = ecs_os_api_t.free_(flecs_h.ecs_os_api());
+        ecs_os_api_free_t.invoke(freeSeg, strSeg);
         return str;
     }
 
     public long[] type() {
-        MemorySegment nativeType = flecs_h.ecs_table_get_type(this.nativeTable);
-        if (nativeType.address() == 0) {
+        MemorySegment typeSeg = flecs_h.ecs_table_get_type(this.tableSeg);
+        if (typeSeg.address() == 0) {
             return new long[0];
         }
-        MemorySegment nativeArray = ecs_type_t.array(nativeType);
-        int count = ecs_type_t.count(nativeType);
-        if (nativeArray.address() == 0 || count == 0) {
+        MemorySegment arraySeg = ecs_type_t.array(typeSeg);
+        int count = ecs_type_t.count(typeSeg);
+        if (arraySeg.address() == 0 || count == 0) {
             return new long[0];
         }
-        return nativeArray.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
+        return arraySeg.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
     }
 
     public int count() {
-        return flecs_h.ecs_table_count(this.nativeTable);
+        return flecs_h.ecs_table_count(this.tableSeg);
     }
 
     public int size() {
-        return flecs_h.ecs_table_size(this.nativeTable);
+        return flecs_h.ecs_table_size(this.tableSeg);
     }
 
     public long[] entities() {
@@ -51,19 +51,19 @@ public class Table {
         if (count == 0) {
             return new long[0];
         }
-        MemorySegment nativeEntities = flecs_h.ecs_table_entities(this.nativeTable);
-        if (nativeEntities.address() == 0) {
+        MemorySegment entitiesSeg = flecs_h.ecs_table_entities(this.tableSeg);
+        if (entitiesSeg.address() == 0) {
             return new long[0];
         }
-        return nativeEntities.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
+        return entitiesSeg.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
     }
 
     public void clearEntities() {
-        flecs_h.ecs_table_clear_entities(this.world.nativeHandle(), this.nativeTable);
+        flecs_h.ecs_table_clear_entities(this.world.worldSeg(), this.tableSeg);
     }
 
     public int typeIndex(long id) {
-        return flecs_h.ecs_table_get_type_index(this.world.nativeHandle(), this.nativeTable, id);
+        return flecs_h.ecs_table_get_type_index(this.world.worldSeg(), this.tableSeg, id);
     }
 
     public int typeIndex(Class<?> componentClass) {
@@ -82,7 +82,7 @@ public class Table {
     }
 
     public int columnIndex(long id) {
-        return flecs_h.ecs_table_get_column_index(this.world.nativeHandle(), this.nativeTable, id);
+        return flecs_h.ecs_table_get_column_index(this.world.worldSeg(), this.tableSeg, id);
     }
 
     public int columnIndex(Class<?> componentClass) {
@@ -101,7 +101,7 @@ public class Table {
     }
 
     public boolean has(long id) {
-        return flecs_h.ecs_table_has_id(this.world.nativeHandle(), this.nativeTable, id);
+        return flecs_h.ecs_table_has_id(this.world.worldSeg(), this.tableSeg, id);
     }
 
     public boolean has(Class<?> componentClass) {
@@ -192,12 +192,12 @@ public class Table {
             return null;
         }
         Component<?> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment columnPtr = this.getRawColumn(col);
-        if (columnPtr.address() == 0) {
+        MemorySegment columnSeg = this.getRawColumn(col);
+        if (columnSeg.address() == 0) {
             return null;
         }
         V view = (V) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(columnPtr.address() + (long) row * component.size());
+        view.setBaseAddress(columnSeg.address() + (long) row * component.size());
         return view;
     }
 
@@ -208,25 +208,25 @@ public class Table {
             return;
         }
         Component<?> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment columnPtr = this.getRawColumn(col);
-        if (columnPtr.address() == 0) {
+        MemorySegment columnSeg = this.getRawColumn(col);
+        if (columnSeg.address() == 0) {
             return;
         }
         V view = (V) this.world.viewCache().getComponentView(componentClass);
         long size  = component.size();
         int  count = this.count();
         for (int i = 0; i < count; i++) {
-            view.setBaseAddress(columnPtr.address() + i * size);
+            view.setBaseAddress(columnSeg.address() + i * size);
             consumer.accept(view, i);
         }
     }
 
     public long columnSize(int columnIndex) {
-        return flecs_h.ecs_table_get_column_size(this.nativeTable, columnIndex);
+        return flecs_h.ecs_table_get_column_size(this.tableSeg, columnIndex);
     }
 
     public int depth(long rel) {
-        return flecs_h.ecs_table_get_depth(this.world.nativeHandle(), this.nativeTable, rel);
+        return flecs_h.ecs_table_get_depth(this.world.worldSeg(), this.tableSeg, rel);
     }
 
     public int depth(Class<?> relClass) {
@@ -235,19 +235,19 @@ public class Table {
     }
 
     public long id() {
-        return flecs_h.flecs_table_id(this.nativeTable);
+        return flecs_h.flecs_table_id(this.tableSeg);
     }
 
     public void lock() {
-        flecs_h.ecs_table_lock(this.world.nativeHandle(), this.nativeTable);
+        flecs_h.ecs_table_lock(this.world.worldSeg(), this.tableSeg);
     }
 
     public void unlock() {
-        flecs_h.ecs_table_unlock(this.world.nativeHandle(), this.nativeTable);
+        flecs_h.ecs_table_unlock(this.world.worldSeg(), this.tableSeg);
     }
 
     public boolean hasFlags(int flags) {
-        return flecs_h.ecs_table_has_flags(this.nativeTable, flags);
+        return flecs_h.ecs_table_has_flags(this.tableSeg, flags);
     }
 
     MemorySegment getRawColumn(int columnIndex) {
@@ -255,31 +255,31 @@ public class Table {
     }
 
     MemorySegment getRawColumn(int columnIndex, int offset) {
-        return flecs_h.ecs_table_get_column(this.nativeTable, columnIndex, offset);
+        return flecs_h.ecs_table_get_column(this.tableSeg, columnIndex, offset);
     }
 
     private <T> T readAt(Class<T> componentClass, int columnIndex, int row) {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment columnPtr = this.getRawColumn(columnIndex);
-        if (columnPtr.address() == 0) {
+        MemorySegment columnSeg = this.getRawColumn(columnIndex);
+        if (columnSeg.address() == 0) {
             return null;
         }
         long size = component.size();
         long elementOffset = (long) row * size;
-        MemorySegment slice = columnPtr.reinterpret(size * this.count()).asSlice(elementOffset, size);
+        MemorySegment slice = columnSeg.reinterpret(size * this.count()).asSlice(elementOffset, size);
         return component.read(slice, 0);
     }
 
     @SuppressWarnings("unchecked")
     private <V extends ComponentView> V readViewAt(Class<?> componentClass, int columnIndex, int row) {
         Component<?> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment columnPtr = this.getRawColumn(columnIndex);
-        if (columnPtr.address() == 0) {
+        MemorySegment columnSeg = this.getRawColumn(columnIndex);
+        if (columnSeg.address() == 0) {
             return null;
         }
         long size = component.size();
         long elementOffset = (long) row * size;
-        MemorySegment slice = columnPtr.reinterpret(size * this.count()).asSlice(elementOffset, size);
+        MemorySegment slice = columnSeg.reinterpret(size * this.count()).asSlice(elementOffset, size);
         V view = (V) this.world.viewCache().getComponentView(componentClass);
         view.setBaseAddress(slice.address());
         return view;

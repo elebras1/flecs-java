@@ -39,7 +39,7 @@ public class SystemBuilder extends SystemBuilderBase {
 
         MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(this.arena);
         ecs_entity_desc_t.name(entityDescTemp, nameSegment);
-        ecs_system_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
+        ecs_system_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.worldSeg(), entityDescTemp));
     }
 
     public SystemBuilder kind(long phase) {
@@ -244,7 +244,7 @@ public class SystemBuilder extends SystemBuilderBase {
             MemorySegment stageWorld = ecs_iter_t.world(iterSegment);
             int stageId = flecs_h.ecs_stage_get_id(stageWorld);
             Iter iter = this.iters[stageId];
-            iter.setNativeIter(iterSegment);
+            iter.setIterSeg(iterSegment);
             iter.world().viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());
@@ -261,7 +261,7 @@ public class SystemBuilder extends SystemBuilderBase {
             MemorySegment stageWorld = ecs_iter_t.world(iterSegment);
             int stageId = flecs_h.ecs_stage_get_id(stageWorld);
             Iter iter = this.iters[stageId];
-            iter.setNativeIter(iterSegment);
+            iter.setIterSeg(iterSegment);
             iter.world().viewCache().resetCursors();
             callback.accept(this.iters[stageId]);
         }, this.world.arena());
@@ -291,17 +291,17 @@ public class SystemBuilder extends SystemBuilderBase {
 
     @Override
     protected FlecsSystem build() {
-        long systemId = flecs_h.ecs_system_init(this.world.nativeHandle(), this.desc);
+        long systemId = flecs_h.ecs_system_init(this.world.worldSeg(), this.desc);
 
         if (systemId == 0) {
             throw new IllegalStateException("Failed to create system");
         }
 
         if (this.phase != 0) {
-            flecs_h.ecs_add_id(this.world.nativeHandle(), systemId, this.phase);
+            flecs_h.ecs_add_id(this.world.worldSeg(), systemId, this.phase);
 
             long dependsOnPair = flecs_h.ecs_make_pair(EcsDependsOn, this.phase);
-            flecs_h.ecs_add_id(this.world.nativeHandle(), systemId, dependsOnPair);
+            flecs_h.ecs_add_id(this.world.worldSeg(), systemId, dependsOnPair);
         }
 
         this.world.registerSystemCallbacks(systemId, this.iterCallback, this.runCallback, this.entityCallback);

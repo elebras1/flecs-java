@@ -46,7 +46,7 @@ public class ScriptBuilder {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment nameSeg = (this.name != null) ? arena.allocateFrom(this.name) : MemorySegment.NULL;
             MemorySegment codeSeg = (this.code != null) ? arena.allocateFrom(this.code) : MemorySegment.NULL;
-            int result = flecs_h.ecs_script_run(this.world.nativeHandle(), nameSeg, codeSeg, MemorySegment.NULL);
+            int result = flecs_h.ecs_script_run(this.world.worldSeg(), nameSeg, codeSeg, MemorySegment.NULL);
             if (result != 0) {
                 throw new RuntimeException("Flecs script execution failed. Check console for parsing errors.");
             }

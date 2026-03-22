@@ -14,7 +14,7 @@ import static java.lang.foreign.ValueLayout.*;
 
 public class World implements AutoCloseable {
     public static final MemorySegment WHOLE_MEMORY = MemorySegment.NULL.reinterpret(Long.MAX_VALUE);
-    private final MemorySegment nativeWorld;
+    private final MemorySegment worldSeg;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
     private final Map<Long, SystemCallbacks> systemCallbacks;
@@ -67,10 +67,10 @@ public class World implements AutoCloseable {
         public MemorySegment set(String value) {
             byte[] utf8 = value.getBytes(StandardCharsets.UTF_8);
             long needed = utf8.length + 1;
-            MemorySegment seg = ensure(needed);
-            MemorySegment.copy(utf8, 0, seg, JAVA_BYTE, 0, utf8.length);
-            seg.set(JAVA_BYTE, utf8.length, (byte) 0);
-            return seg;
+            MemorySegment segment = ensure(needed);
+            MemorySegment.copy(utf8, 0, segment, JAVA_BYTE, 0, utf8.length);
+            segment.set(JAVA_BYTE, utf8.length, (byte) 0);
+            return segment;
         }
 
         @Override
@@ -134,8 +134,8 @@ public class World implements AutoCloseable {
 
     public World() {
         this.arena = Arena.ofConfined();
-        this.nativeWorld = flecs_h.ecs_init();
-        if (this.nativeWorld.address() == 0) {
+        this.worldSeg = flecs_h.ecs_init();
+        if (this.worldSeg.address() == 0) {
             throw new IllegalStateException("Flecs world initialization failed");
         }
         this.componentRegistry = new ComponentRegistry(this);
@@ -148,9 +148,9 @@ public class World implements AutoCloseable {
         this.owned = true;
     }
 
-    private World(MemorySegment stagePtr, ComponentRegistry componentRegistry) {
+    private World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
         this.arena = Arena.ofConfined();
-        this.nativeWorld = stagePtr;
+        this.worldSeg = stageSeg;
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
@@ -162,14 +162,14 @@ public class World implements AutoCloseable {
 
     public long entity() {
         this.checkClosed();
-        return flecs_h.ecs_new(this.nativeWorld);
+        return flecs_h.ecs_new(this.worldSeg);
     }
 
     public long entity(long parentId) {
-        long id = flecs_h.ecs_new(this.nativeWorld);
+        long id = flecs_h.ecs_new(this.worldSeg);
         MemorySegment dataSegment = this.getComponentBuffer(EcsParent.sizeof());
         EcsParent.value(dataSegment, parentId);
-        flecs_h.ecs_set_id(this.nativeWorld, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
+        flecs_h.ecs_set_id(this.worldSeg, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
         return id;
     }
 
@@ -180,14 +180,14 @@ public class World implements AutoCloseable {
         MemorySegment desc = this.defaultBuffers.entityDescBuffer().get();
         ecs_entity_desc_t.name(desc, nameSegment);
 
-        return flecs_h.ecs_entity_init(this.nativeWorld, desc);
+        return flecs_h.ecs_entity_init(this.worldSeg, desc);
     }
 
     public long entity(long parentId, String name) {
         long id = this.entity(name);
         MemorySegment dataSegment = this.getComponentBuffer(EcsParent.sizeof());
         EcsParent.value(dataSegment, parentId);
-        flecs_h.ecs_set_id(this.nativeWorld, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
+        flecs_h.ecs_set_id(this.worldSeg, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
         return id;
     }
 
@@ -217,7 +217,7 @@ public class World implements AutoCloseable {
             ecs_bulk_desc_t.count(desc, count);
             ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
 
-            MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.nativeWorld, desc);
+            MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.worldSeg, desc);
 
             return idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
@@ -262,20 +262,20 @@ public class World implements AutoCloseable {
             ecs_bulk_desc_t.data(desc, MemorySegment.NULL);
             ecs_bulk_desc_t.table(desc, MemorySegment.NULL);
 
-            MemorySegment entitiesPtr = flecs_h.ecs_bulk_init(this.nativeWorld, desc);
+            MemorySegment entitiesSeg = flecs_h.ecs_bulk_init(this.worldSeg, desc);
 
-            return entitiesPtr.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
+            return entitiesSeg.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
     }
 
     public void makeAlive(long entityId) {
         this.checkClosed();
-        flecs_h.ecs_make_alive(this.nativeWorld, entityId);
+        flecs_h.ecs_make_alive(this.worldSeg, entityId);
     }
 
     public void setVersion(long entityId) {
         this.checkClosed();
-        flecs_h.ecs_set_version(this.nativeWorld, entityId);
+        flecs_h.ecs_set_version(this.worldSeg, entityId);
     }
 
     public int getVersion(long entityId) {
@@ -285,22 +285,22 @@ public class World implements AutoCloseable {
 
     public void setEntityRange(long idStart, long idEnd) {
         this.checkClosed();
-        flecs_h.ecs_set_entity_range(this.nativeWorld, idStart, idEnd);
+        flecs_h.ecs_set_entity_range(this.worldSeg, idStart, idEnd);
     }
 
     public boolean enableRangeCheck(boolean enable) {
         this.checkClosed();
-        return flecs_h.ecs_enable_range_check(this.nativeWorld, enable);
+        return flecs_h.ecs_enable_range_check(this.worldSeg, enable);
     }
 
     public long prefab() {
         this.checkClosed();
-        return flecs_h.ecs_new_w_id(this.nativeWorld, FlecsConstants.EcsPrefab);
+        return flecs_h.ecs_new_w_id(this.worldSeg, FlecsConstants.EcsPrefab);
     }
 
     public boolean progress(float deltaTime) {
         this.checkClosed();
-        return flecs_h.ecs_progress(this.nativeWorld, deltaTime);
+        return flecs_h.ecs_progress(this.worldSeg, deltaTime);
     }
 
     public boolean progress() {
@@ -321,7 +321,7 @@ public class World implements AutoCloseable {
         this.checkClosed();
         MemorySegment segment = this.defaultBuffers.nameBuffer().set(name);
 
-        return flecs_h.ecs_lookup(this.nativeWorld, segment);
+        return flecs_h.ecs_lookup(this.worldSeg, segment);
     }
 
     public <T> long component(Class<T> componentClass) {
@@ -335,7 +335,7 @@ public class World implements AutoCloseable {
         Component<T> component = this.componentRegistry.getComponent(componentClass);
         ComponentHooks<T> hooks = new ComponentHooks<>(this, component);
         configuration.accept(hooks);
-        hooks.install(this.nativeWorld, id);
+        hooks.install(this.worldSeg, id);
         return id;
     }
 
@@ -347,7 +347,7 @@ public class World implements AutoCloseable {
     public void deleteWith(Class<?> componentClass) {
         this.checkClosed();
         long componentId = this.componentRegistry.getComponentId(componentClass);
-        flecs_h.ecs_delete_with(this.nativeWorld, componentId);
+        flecs_h.ecs_delete_with(this.worldSeg, componentId);
     }
 
     public int deleteEmptyTables(int limit) {
@@ -358,28 +358,28 @@ public class World implements AutoCloseable {
             desc.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
             desc.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
 
-            return flecs_h.ecs_delete_empty_tables(this.nativeWorld, desc);
+            return flecs_h.ecs_delete_empty_tables(this.worldSeg, desc);
         }
     }
 
     public void deferBegin() {
         this.checkClosed();
-        flecs_h.ecs_defer_begin(this.nativeWorld);
+        flecs_h.ecs_defer_begin(this.worldSeg);
     }
 
     public void deferEnd() {
         this.checkClosed();
-        flecs_h.ecs_defer_end(this.nativeWorld);
+        flecs_h.ecs_defer_end(this.worldSeg);
     }
 
     public void deferSuspend() {
         this.checkClosed();
-        flecs_h.ecs_defer_suspend(this.nativeWorld);
+        flecs_h.ecs_defer_suspend(this.worldSeg);
     }
 
     public void deferResume() {
         this.checkClosed();
-        flecs_h.ecs_defer_resume(this.nativeWorld);
+        flecs_h.ecs_defer_resume(this.worldSeg);
     }
 
     public SystemBuilder system() {
@@ -419,32 +419,32 @@ public class World implements AutoCloseable {
 
     public void setThreads(int threads) {
         this.checkClosed();
-        flecs_h.ecs_set_threads(this.nativeWorld, threads);
+        flecs_h.ecs_set_threads(this.worldSeg, threads);
 
         this.resetStages();
     }
 
     public void setTaskThreads(int taskThreads) {
         this.checkClosed();
-        flecs_h.ecs_set_task_threads(this.nativeWorld, taskThreads);
+        flecs_h.ecs_set_task_threads(this.worldSeg, taskThreads);
 
         this.resetStages();
     }
 
     public void setPipeline(long pipelineId) {
         this.checkClosed();
-        flecs_h.ecs_set_pipeline(this.nativeWorld, pipelineId);
+        flecs_h.ecs_set_pipeline(this.worldSeg, pipelineId);
     }
 
     public long getMaxId() {
         this.checkClosed();
-        return flecs_h.ecs_get_max_id(this.nativeWorld);
+        return flecs_h.ecs_get_max_id(this.worldSeg);
     }
 
     public long[] getEntities() {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment entitiesStruct = flecs_h.ecs_get_entities(tempArena, this.nativeWorld);
+            MemorySegment entitiesStruct = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
             MemorySegment idsPointer = entitiesStruct.get(ADDRESS, 0);
             int count = entitiesStruct.get(JAVA_INT, ADDRESS.byteSize());
 
@@ -462,79 +462,79 @@ public class World implements AutoCloseable {
         this.checkClosed();
 
         if (threadName == null) {
-            flecs_h.ecs_exclusive_access_begin(this.nativeWorld, MemorySegment.NULL);
+            flecs_h.ecs_exclusive_access_begin(this.worldSeg, MemorySegment.NULL);
         } else {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment nameSegment = arena.allocateFrom(threadName);
-                flecs_h.ecs_exclusive_access_begin(this.nativeWorld, nameSegment);
+                flecs_h.ecs_exclusive_access_begin(this.worldSeg, nameSegment);
             }
         }
     }
 
     public void exclusiveAccessBegin() {
         this.checkClosed();
-        flecs_h.ecs_exclusive_access_begin(this.nativeWorld, MemorySegment.NULL);
+        flecs_h.ecs_exclusive_access_begin(this.worldSeg, MemorySegment.NULL);
     }
 
     public void exclusiveAccessEnd(boolean lockWorld) {
         this.checkClosed();
-        flecs_h.ecs_exclusive_access_end(this.nativeWorld, lockWorld);
+        flecs_h.ecs_exclusive_access_end(this.worldSeg, lockWorld);
     }
 
     public void shrink() {
         this.checkClosed();
-        flecs_h.ecs_shrink(this.nativeWorld);
+        flecs_h.ecs_shrink(this.worldSeg);
     }
 
     public void dim(int numberEntities) {
         this.checkClosed();
-        flecs_h.ecs_dim(this.nativeWorld, numberEntities);
+        flecs_h.ecs_dim(this.worldSeg, numberEntities);
     }
 
     public void frameBegin(float deltaTime) {
         this.checkClosed();
-        flecs_h.ecs_frame_begin(this.nativeWorld, deltaTime);
+        flecs_h.ecs_frame_begin(this.worldSeg, deltaTime);
     }
 
     public void frameEnd() {
         this.checkClosed();
-        flecs_h.ecs_frame_end(this.nativeWorld);
+        flecs_h.ecs_frame_end(this.worldSeg);
     }
 
     public void quit() {
         this.checkClosed();
-        flecs_h.ecs_quit(this.nativeWorld);
+        flecs_h.ecs_quit(this.worldSeg);
     }
 
     public void shouldQuit() {
         this.checkClosed();
-        flecs_h.ecs_should_quit(this.nativeWorld);
+        flecs_h.ecs_should_quit(this.worldSeg);
     }
 
     public void measureFrameTime(boolean enable) {
         this.checkClosed();
-        flecs_h.ecs_measure_frame_time(this.nativeWorld, enable);
+        flecs_h.ecs_measure_frame_time(this.worldSeg, enable);
     }
 
     public void measureSystemTime(boolean enable) {
         this.checkClosed();
-        flecs_h.ecs_measure_system_time(this.nativeWorld, enable);
+        flecs_h.ecs_measure_system_time(this.worldSeg, enable);
     }
 
     public void setTargetFps(float fps) {
         this.checkClosed();
-        flecs_h.ecs_set_target_fps(this.nativeWorld, fps);
+        flecs_h.ecs_set_target_fps(this.worldSeg, fps);
     }
 
     public FlecsInfo getInfo() {
         this.checkClosed();
 
-        MemorySegment infoPtr = flecs_h.ecs_get_world_info(this.nativeWorld);
-        if (infoPtr.equals(MemorySegment.NULL)) {
+        MemorySegment infoSeg = flecs_h.ecs_get_world_info(this.worldSeg);
+        if (infoSeg.equals(MemorySegment.NULL)) {
             throw new IllegalStateException("Failed to get world info");
         }
 
-        MemorySegment info = infoPtr.reinterpret(ecs_world_info_t.layout().byteSize());
+        MemorySegment info = infoSeg.reinterpret(ecs_world_info_t.layout().byteSize());
 
         return new FlecsInfo(
                 ecs_world_info_t.last_component_id(info),
@@ -592,11 +592,11 @@ public class World implements AutoCloseable {
     }
 
     private String extractNamePrefix(MemorySegment info) {
-        MemorySegment namePrefixPtr = ecs_world_info_t.name_prefix(info);
-        if (namePrefixPtr.equals(MemorySegment.NULL)) {
+        MemorySegment namePrefixSeg = ecs_world_info_t.name_prefix(info);
+        if (namePrefixSeg.equals(MemorySegment.NULL)) {
             return null;
         }
-        return namePrefixPtr.reinterpret(Long.MAX_VALUE).getString(0);
+        return namePrefixSeg.reinterpret(Long.MAX_VALUE).getString(0);
     }
 
     void registerSystemCallbacks(long systemId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
@@ -617,13 +617,13 @@ public class World implements AutoCloseable {
 
     public void setStageCount(int count) {
         this.checkClosed();
-        flecs_h.ecs_set_stage_count(this.nativeWorld, count);
+        flecs_h.ecs_set_stage_count(this.worldSeg, count);
 
         this.resetStages();
     }
 
     private void resetStages() {
-        int stageCount = flecs_h.ecs_get_stage_count(this.nativeWorld);
+        int stageCount = flecs_h.ecs_get_stage_count(this.worldSeg);
         World[] newStages = new World[stageCount];
         newStages[0] = this;
         for (int i = 1; i < this.stages.length; i++) {
@@ -636,7 +636,7 @@ public class World implements AutoCloseable {
 
     public int getStageCount() {
         this.checkClosed();
-        return flecs_h.ecs_get_stage_count(this.nativeWorld);
+        return flecs_h.ecs_get_stage_count(this.worldSeg);
     }
 
     public World getStage(int stageId) {
@@ -647,8 +647,8 @@ public class World implements AutoCloseable {
 
         World stage = this.stages[stageId];
         if(stage == null) {
-            MemorySegment stagePtr = flecs_h.ecs_get_stage(this.nativeWorld, stageId);
-            stage = new World(stagePtr, this.componentRegistry);
+            MemorySegment stageSeg = flecs_h.ecs_get_stage(this.worldSeg, stageId);
+            stage = new World(stageSeg, this.componentRegistry);
             this.stages[stageId] = stage;
         }
         return stage;
@@ -656,36 +656,36 @@ public class World implements AutoCloseable {
 
     public int getStageId() {
         this.checkClosed();
-        return flecs_h.ecs_stage_get_id(this.nativeWorld);
+        return flecs_h.ecs_stage_get_id(this.worldSeg);
     }
 
     public World stage() {
         this.checkClosed();
-        MemorySegment stagePtr = flecs_h.ecs_stage_new(this.nativeWorld);
-        return new World(stagePtr, this.componentRegistry);
+        MemorySegment stageSeg = flecs_h.ecs_stage_new(this.worldSeg);
+        return new World(stageSeg, this.componentRegistry);
     }
 
     public World asyncStage() {
         this.checkClosed();
-        MemorySegment stagePtr = flecs_h.ecs_stage_new(this.nativeWorld);
-        flecs_h.flecs_poly_release_(stagePtr);
-        return new World(stagePtr, this.componentRegistry);
+        MemorySegment stageSeg = flecs_h.ecs_stage_new(this.worldSeg);
+        flecs_h.flecs_poly_release_(stageSeg);
+        return new World(stageSeg, this.componentRegistry);
     }
 
     public void freeStage() {
-        if (this.nativeWorld != null && this.nativeWorld.address() != 0) {
-            flecs_h.ecs_stage_free(this.nativeWorld);
+        if (this.worldSeg != null && this.worldSeg.address() != 0) {
+            flecs_h.ecs_stage_free(this.worldSeg);
         }
     }
 
     public void merge() {
         this.checkClosed();
-        flecs_h.ecs_merge(this.nativeWorld);
+        flecs_h.ecs_merge(this.worldSeg);
     }
 
     public boolean readonlyBegin(boolean multiThreaded) {
         this.checkClosed();
-        return flecs_h.ecs_readonly_begin(this.nativeWorld, multiThreaded);
+        return flecs_h.ecs_readonly_begin(this.worldSeg, multiThreaded);
     }
 
     public boolean readonlyBegin() {
@@ -694,12 +694,12 @@ public class World implements AutoCloseable {
 
     public void readonlyEnd() {
         this.checkClosed();
-        flecs_h.ecs_readonly_end(this.nativeWorld);
+        flecs_h.ecs_readonly_end(this.worldSeg);
     }
 
     public boolean isReadonly() {
         this.checkClosed();
-        return flecs_h.ecs_stage_is_readonly(this.nativeWorld);
+        return flecs_h.ecs_stage_is_readonly(this.worldSeg);
     }
 
     public void setCtx(Object ctx) {
@@ -712,35 +712,35 @@ public class World implements AutoCloseable {
 
     public boolean isDeferred() {
         this.checkClosed();
-        return flecs_h.ecs_is_deferred(this.nativeWorld);
+        return flecs_h.ecs_is_deferred(this.worldSeg);
     }
 
     public long setScope(long scopeId) {
         this.checkClosed();
-        return flecs_h.ecs_set_scope(this.nativeWorld, scopeId);
+        return flecs_h.ecs_set_scope(this.worldSeg, scopeId);
     }
 
     public long getScope() {
         this.checkClosed();
-        return flecs_h.ecs_get_scope(this.nativeWorld);
+        return flecs_h.ecs_get_scope(this.worldSeg);
     }
 
     public long[] setLookupPath(long[] searchPath) {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment pathNative = tempArena.allocate(JAVA_LONG, searchPath.length + 1);
-            MemorySegment.copy(searchPath, 0, pathNative, JAVA_LONG, 0, searchPath.length);
-            MemorySegment oldPathNative = flecs_h.ecs_set_lookup_path(this.nativeWorld, pathNative);
-            if (oldPathNative.address() == 0) {
+            MemorySegment pathSeg = tempArena.allocate(JAVA_LONG, searchPath.length + 1);
+            MemorySegment.copy(searchPath, 0, pathSeg, JAVA_LONG, 0, searchPath.length);
+            MemorySegment oldPathSeg = flecs_h.ecs_set_lookup_path(this.worldSeg, pathSeg);
+            if (oldPathSeg.address() == 0) {
                 return new long[0];
             }
             int len = 0;
-            while (oldPathNative.getAtIndex(JAVA_LONG, len) != 0L) {
+            while (oldPathSeg.getAtIndex(JAVA_LONG, len) != 0L) {
                 len++;
             }
 
             long[] oldPath = new long[len];
-            MemorySegment.copy(oldPathNative, JAVA_LONG, 0, oldPath, 0, len);
+            MemorySegment.copy(oldPathSeg, JAVA_LONG, 0, oldPath, 0, len);
             return oldPath;
         }
     }
@@ -748,10 +748,10 @@ public class World implements AutoCloseable {
     public long lookup(String name, String sep, String rootSep, boolean recursive) {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment nameNative = tempArena.allocateFrom(name);
-            MemorySegment sepNative = tempArena.allocateFrom(sep);
-            MemorySegment rootSepNative = tempArena.allocateFrom(rootSep);
-            return flecs_h.ecs_lookup_path_w_sep(this.nativeWorld, 0, nameNative, sepNative, rootSepNative, recursive);
+            MemorySegment nameSeg = tempArena.allocateFrom(name);
+            MemorySegment sepSeg = tempArena.allocateFrom(sep);
+            MemorySegment rootSepSeg = tempArena.allocateFrom(rootSep);
+            return flecs_h.ecs_lookup_path_w_sep(this.worldSeg, 0, nameSeg, sepSeg, rootSepSeg, recursive);
         }
     }
 
@@ -767,16 +767,16 @@ public class World implements AutoCloseable {
 
     public void runPipeline(long pipelineId, float deltaTime) {
         this.checkClosed();
-        flecs_h.ecs_run_pipeline(this.nativeWorld, pipelineId, deltaTime);
+        flecs_h.ecs_run_pipeline(this.worldSeg, pipelineId, deltaTime);
     }
 
     public void runPipeline(Pipeline pipeline, float deltaTime) {
         this.runPipeline(pipeline.id(), deltaTime);
     }
 
-    MemorySegment nativeHandle() {
+    MemorySegment worldSeg() {
         this.checkClosed();
-        return this.nativeWorld;
+        return this.worldSeg;
     }
 
     public Arena arena() {
@@ -802,7 +802,7 @@ public class World implements AutoCloseable {
             ecs_world_to_json_desc_t.serialize_builtin(options, serializeBuiltin);
             ecs_world_to_json_desc_t.serialize_modules(options, serializeModules);
 
-            MemorySegment jsonSegment = flecs_h.ecs_world_to_json(this.nativeWorld, options);
+            MemorySegment jsonSegment = flecs_h.ecs_world_to_json(this.worldSeg, options);
             if (jsonSegment.address() == 0) {
                 return null;
             }
@@ -827,7 +827,10 @@ public class World implements AutoCloseable {
             jsonSegment.asSlice(0, jsonBytes.length).copyFrom(MemorySegment.ofArray(jsonBytes));
             jsonSegment.set(JAVA_BYTE, jsonBytes.length, (byte)0);
 
-            MemorySegment ptrSegment = flecs_h.ecs_world_from_json(this.nativeWorld, jsonSegment, MemorySegment.NULL);
+            MemorySegment resultSeg = flecs_h.ecs_world_from_json(this.worldSeg, jsonSegment, MemorySegment.NULL);
+            if (resultSeg.address() == 0) {
+                throw new RuntimeException("Failed to parse JSON into world");
+            }
         }
     }
 
@@ -838,15 +841,15 @@ public class World implements AutoCloseable {
     public void enableRest(short port) {
         this.checkClosed();
 
-        flecs_h.FlecsDocImport(this.nativeWorld);
-        flecs_h.FlecsRestImport(this.nativeWorld);
-        flecs_h.FlecsAlertsImport(this.nativeWorld);
-        flecs_h.FlecsStatsImport(this.nativeWorld);
-        flecs_h.FlecsMetricsImport(this.nativeWorld);
+        flecs_h.FlecsDocImport(this.worldSeg);
+        flecs_h.FlecsRestImport(this.worldSeg);
+        flecs_h.FlecsAlertsImport(this.worldSeg);
+        flecs_h.FlecsStatsImport(this.worldSeg);
+        flecs_h.FlecsMetricsImport(this.worldSeg);
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment restCompName = arena.allocateFrom("flecs.rest.Rest");
-            long restCompId = flecs_h.ecs_lookup(this.nativeWorld, restCompName);
+            long restCompId = flecs_h.ecs_lookup(this.worldSeg, restCompName);
 
             if (restCompId == 0) {
                 throw new IllegalStateException("Failed to find flecs.rest.Rest component.");
@@ -855,7 +858,7 @@ public class World implements AutoCloseable {
             MemorySegment restData = arena.allocate(32);
             restData.set(JAVA_SHORT, 0, port);
 
-            flecs_h.ecs_set_id(this.nativeWorld, restCompId, restCompId, 32, restData);
+            flecs_h.ecs_set_id(this.worldSeg, restCompId, restCompId, 32, restData);
         }
     }
 
@@ -864,21 +867,21 @@ public class World implements AutoCloseable {
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment restCompName = arena.allocateFrom("flecs.rest.Rest");
-            long restCompId = flecs_h.ecs_lookup(this.nativeWorld, restCompName);
+            long restCompId = flecs_h.ecs_lookup(this.worldSeg, restCompName);
 
             if( restCompId == 0) {
                 throw new IllegalStateException("Failed to find flecs.rest.Rest component. Make sure FlecsRest module is imported.");
             }
 
-            flecs_h.ecs_remove_id(this.nativeWorld, restCompId, restCompId);
+            flecs_h.ecs_remove_id(this.worldSeg, restCompId, restCompId);
         }
     }
 
     @Override
     public void close() {
         if (!this.closed) {
-            if (this.owned && this.nativeWorld != null && this.nativeWorld.address() != 0) {
-                flecs_h.ecs_fini(this.nativeWorld);
+            if (this.owned && this.worldSeg != null && this.worldSeg.address() != 0) {
+                flecs_h.ecs_fini(this.worldSeg);
                 for(World stage : this.stages) {
                     if (stage != null && stage != this) {
                         stage.arena.close();
@@ -898,7 +901,7 @@ public class World implements AutoCloseable {
         if (this.closed) {
             return "World[closed]";
         }
-        return String.format("World[0x%x]", this.nativeWorld.address());
+        return String.format("World[0x%x]", this.worldSeg.address());
     }
 }
 

@@ -14,8 +14,8 @@ public class Query extends QueryBase implements AutoCloseable {
     private final Iter iter;
     private boolean closed;
 
-    Query(World world, MemorySegment nativeQuery) {
-        super(world, nativeQuery);
+    Query(World world, MemorySegment querySeg) {
+        super(world, querySeg);
         this.arena = Arena.ofShared();
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.closed = false;
@@ -23,7 +23,7 @@ public class Query extends QueryBase implements AutoCloseable {
 
     public void each(EntityCallback callback) {
         this.checkClosed();
-        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
         if (iter.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
@@ -41,33 +41,33 @@ public class Query extends QueryBase implements AutoCloseable {
 
     public void iter(IterCallback callback) {
         this.checkClosed();
-        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
         if (iterSegment.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
 
         this.world.viewCache().resetCursors();
         while (flecs_h.ecs_iter_next(iterSegment)) {
-            this.iter.setNativeIter(iterSegment);
+            this.iter.setIterSeg(iterSegment);
             callback.accept(this.iter);
         }
     }
 
     public void run(RunCallback callback) {
         this.checkClosed();
-        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
 
         if (iterSegment.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
-        this.iter.setNativeIter(iterSegment);
+        this.iter.setIterSeg(iterSegment);
         this.world.viewCache().resetCursors();
         callback.accept(this.iter);
     }
 
     public int count() {
         this.checkClosed();
-        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
 
         int total = 0;
         while (flecs_h.ecs_iter_next(iter)) {
@@ -81,7 +81,7 @@ public class Query extends QueryBase implements AutoCloseable {
         this.checkClosed();
         int[] index = {0};
         long[] result = new long[this.count()];
-        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.nativeHandle(), this.nativeQuery);
+        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
         while (flecs_h.ecs_iter_next(iter)) {
             int count = ecs_iter_t.count(iter);
             MemorySegment entities = ecs_iter_t.entities(iter);
@@ -100,19 +100,19 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     public String toStringExpr() {
-        MemorySegment strPtr = flecs_h.ecs_query_str(this.nativeQuery);
-        if (strPtr.address() == 0) {
+        MemorySegment strSeg = flecs_h.ecs_query_str(this.querySeg);
+        if (strSeg.address() == 0) {
             return "Invalid/empty query";
         }
-        return strPtr.getString(0);
+        return strSeg.getString(0);
     }
 
     @Override
     public void close() {
         if (!this.closed) {
             this.closed = true;
-            if (this.nativeQuery != null && this.nativeQuery.address() != 0) {
-                flecs_h.ecs_query_fini(this.nativeQuery);
+            if (this.querySeg != null && this.querySeg.address() != 0) {
+                flecs_h.ecs_query_fini(this.querySeg);
             }
             this.arena.close();
         }

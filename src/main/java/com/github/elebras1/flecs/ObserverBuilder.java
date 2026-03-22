@@ -40,7 +40,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
         MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(arena);
         ecs_entity_desc_t.name(entityDescTemp, nameSegment);
-        ecs_observer_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.nativeHandle(), entityDescTemp));
+        ecs_observer_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.worldSeg(), entityDescTemp));
     }
 
     public ObserverBuilder event(long eventId) {
@@ -223,7 +223,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
-            this.iter.setNativeIter(iterSegment);
+            this.iter.setIterSeg(iterSegment);
             this.world.viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());
@@ -237,7 +237,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
-            this.iter.setNativeIter(iterSegment);
+            this.iter.setIterSeg(iterSegment);
             this.world.viewCache().resetCursors();
             callback.accept(this.iter);
         }, this.world.arena());
@@ -266,7 +266,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
     @Override
     protected FlecsObserver build() {
-        long observerId = flecs_h.ecs_observer_init(this.world.nativeHandle(), this.desc);
+        long observerId = flecs_h.ecs_observer_init(this.world.worldSeg(), this.desc);
 
         if (observerId == 0) {
             throw new IllegalStateException("Failed to create observer");
