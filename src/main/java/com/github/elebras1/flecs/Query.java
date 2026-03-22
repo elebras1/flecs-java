@@ -21,16 +21,20 @@ public class Query extends QueryBase implements AutoCloseable {
         this.closed = false;
     }
 
+    private MemorySegment createIterSeg() {
+        return flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
+    }
+
     public void each(EntityCallback callback) {
         this.checkClosed();
-        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
-        if (iter.address() == 0) {
+        MemorySegment iterSeg = this.createIterSeg();
+        if (iterSeg.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
 
-        while (flecs_h.ecs_iter_next(iter)) {
-            int count = ecs_iter_t.count(iter);
-            MemorySegment entities = ecs_iter_t.entities(iter);
+        while (flecs_h.ecs_iter_next(iterSeg)) {
+            int count = ecs_iter_t.count(iterSeg);
+            MemorySegment entities = ecs_iter_t.entities(iterSeg);
 
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
@@ -41,37 +45,37 @@ public class Query extends QueryBase implements AutoCloseable {
 
     public void iter(IterCallback callback) {
         this.checkClosed();
-        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
-        if (iterSegment.address() == 0) {
+        MemorySegment iterSeg = this.createIterSeg();
+        if (iterSeg.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
 
         this.world.viewCache().resetCursors();
-        while (flecs_h.ecs_iter_next(iterSegment)) {
-            this.iter.setIterSeg(iterSegment);
+        while (flecs_h.ecs_iter_next(iterSeg)) {
+            this.iter.setIterSeg(iterSeg);
             callback.accept(this.iter);
         }
     }
 
     public void run(RunCallback callback) {
         this.checkClosed();
-        MemorySegment iterSegment = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
+        MemorySegment iterSeg = this.createIterSeg();
 
-        if (iterSegment.address() == 0) {
+        if (iterSeg.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
         }
-        this.iter.setIterSeg(iterSegment);
+        this.iter.setIterSeg(iterSeg);
         this.world.viewCache().resetCursors();
         callback.accept(this.iter);
     }
 
     public int count() {
         this.checkClosed();
-        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
+        MemorySegment iterSeg = this.createIterSeg();
 
         int total = 0;
-        while (flecs_h.ecs_iter_next(iter)) {
-            total += ecs_iter_t.count(iter);
+        while (flecs_h.ecs_iter_next(iterSeg)) {
+            total += ecs_iter_t.count(iterSeg);
         }
 
         return total;
@@ -81,10 +85,10 @@ public class Query extends QueryBase implements AutoCloseable {
         this.checkClosed();
         int[] index = {0};
         long[] result = new long[this.count()];
-        MemorySegment iter = flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
-        while (flecs_h.ecs_iter_next(iter)) {
-            int count = ecs_iter_t.count(iter);
-            MemorySegment entities = ecs_iter_t.entities(iter);
+        MemorySegment iterSeg = this.createIterSeg();
+        while (flecs_h.ecs_iter_next(iterSeg)) {
+            int count = ecs_iter_t.count(iterSeg);
+            MemorySegment entities = ecs_iter_t.entities(iterSeg);
             for (int i = 0; i < count; i++) {
                 result[index[0]++] = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
             }
