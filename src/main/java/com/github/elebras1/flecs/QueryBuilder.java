@@ -1,5 +1,9 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.ComparatorComponent;
+import com.github.elebras1.flecs.callback.ComparatorComponentView;
+import com.github.elebras1.flecs.callback.ComparatorId;
+import com.github.elebras1.flecs.callback.GroupByCallback;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.foreign.Arena;
@@ -86,24 +90,6 @@ public class QueryBuilder {
     public QueryBuilder queryFlag(int flag) {
         ecs_query_desc_t.flags(this.desc, flag);
         return this;
-    }
-
-    public QueryBuilder groupBy(long componentId) {
-        ecs_query_desc_t.group_by(this.desc, componentId);
-        return this;
-    }
-
-    public <T> QueryBuilder groupBy(Class<T> componentClass) {
-        return this.groupBy(this.world.componentRegistry().getComponentId(componentClass));
-    }
-
-    public QueryBuilder orderBy(long componentId) {
-        ecs_query_desc_t.order_by(this.desc, componentId);
-        return this;
-    }
-
-    public <T> QueryBuilder orderBy(Class<T> componentClass) {
-        return this.orderBy(this.world.componentRegistry().getComponentId(componentClass));
     }
 
     public QueryBuilder in() {
@@ -212,6 +198,107 @@ public class QueryBuilder {
 
     public QueryBuilder src(Entity entity) {
         return this.src(entity.id());
+    }
+
+    public QueryBuilder orderBy(long componentId) {
+        ecs_query_desc_t.order_by(this.desc, componentId);
+        return this;
+    }
+
+    public QueryBuilder orderBy(long componentId, ComparatorId comparator) {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, _, idB, _) ->
+                comparator.compare(idA, idB), this.world.arena());
+
+        ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
+        return this.orderBy(componentId);
+    }
+
+    public QueryBuilder orderBy(long componentId, ComparatorComponent comparator) {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, componentASeg, idB, componentBSeg) -> {
+            Component<?> componentA = this.world.componentRegistry().getComponentById(idA);
+            Component<?> componentB = this.world.componentRegistry().getComponentById(idB);
+            return comparator.compare(componentA.read(componentASeg, 0), componentB.read(componentBSeg, 0));
+        }, this.arena);
+        ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
+        return this.orderBy(componentId);
+    }
+
+    public QueryBuilder orderBy(long componentId, ComparatorComponentView comparator) {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, componentASeg, idB, componentBSeg) -> {
+            Class<?> componentClassA = this.world.componentRegistry().getComponentClassById(idA);
+            Class<?> componentClassB = this.world.componentRegistry().getComponentClassById(idB);
+            ComponentView componentViewA = this.world.viewCache().getComponentView(componentClassA);
+            componentViewA.setBaseAddress(componentASeg.address());
+            ComponentView componentViewB = this.world.viewCache().getComponentView(componentClassB);
+            componentViewB.setBaseAddress(componentBSeg.address());
+            return comparator.compare(componentViewA, componentViewB);
+        }, this.arena);
+        ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
+        return this.orderBy(componentId);
+    }
+
+    public QueryBuilder orderBy(Entity entity) {
+        return this.orderBy(entity.id());
+    }
+
+    public QueryBuilder orderBy(Entity entity, ComparatorId comparator) {
+        return this.orderBy(entity.id(), comparator);
+    }
+
+    public QueryBuilder orderBy(Entity entity, ComparatorComponent comparator) {
+        return this.orderBy(entity.id(), comparator);
+    }
+
+    public QueryBuilder orderBy(Entity entity, ComparatorComponentView comparator) {
+        return this.orderBy(entity.id(), comparator);
+    }
+
+    public QueryBuilder orderBy(Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId);
+    }
+
+    public QueryBuilder orderBy(Class<?> componentClass, ComparatorId comparator) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId, comparator);
+    }
+
+    public QueryBuilder orderBy(Class<?> componentClass, ComparatorComponent comparator) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId, comparator);
+    }
+
+    public QueryBuilder groupBy(long groupId) {
+        ecs_query_desc_t.group_by(this.desc, groupId);
+        return this;
+    }
+
+    public QueryBuilder groupBy(long groupId, GroupByCallback groupByCallback) {
+        MemorySegment callbackStub = ecs_group_by_action_t.allocate((_, nativeTable, id, _) -> {
+            Table table = nativeTable.address() == 0 ? null : new Table(this.world, nativeTable);
+            return groupByCallback.accept(this.world, table, id);
+        }, this.world.arena());
+
+        ecs_query_desc_t.group_by_callback(this.desc, callbackStub);
+        return this.groupBy(groupId);
+    }
+
+    public QueryBuilder groupBy(Class<?> componentClass) {
+        long groupId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.groupBy(groupId);
+    }
+
+    public QueryBuilder groupBy(Class<?> componentClass, GroupByCallback groupByCallback) {
+        long groupId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.groupBy(groupId, groupByCallback);
+    }
+
+    public QueryBuilder groupBy(Entity entity) {
+        return this.groupBy(entity.id());
+    }
+
+    public QueryBuilder groupBy(Entity entity, GroupByCallback groupByCallback) {
+        return this.groupBy(entity.id(), groupByCallback);
     }
 
     public Query build() {

@@ -84,6 +84,14 @@ public class ComponentRegistry {
         return component;
     }
 
+    protected Class<?> getComponentClassById(long componentId) {
+        Class<?> componentClass = this.componentClasses.get(componentId);
+        if(componentClass == null) {
+            throw new IllegalArgumentException("Unknown component ID: " + componentId);
+        }
+        return componentClass;
+    }
+
     @SuppressWarnings("unchecked")
     private <T> Component<T> getAndCacheComponentInstance(long componentId) {
         Class<?> rawClass = this.componentClasses.get(componentId);

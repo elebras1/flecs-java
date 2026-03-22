@@ -1,7 +1,7 @@
 package com.github.elebras1.flecs;
 
 public class FlecsContext {
-    private static final int BUFFER_SIZE = 16;
+    private static final int BUFFER_SIZE = 48;
     private static final int MASK = BUFFER_SIZE - 1;
     private final ComponentViewPool[] componentViewPools;
     private final EntityView[] entityViewPool;
