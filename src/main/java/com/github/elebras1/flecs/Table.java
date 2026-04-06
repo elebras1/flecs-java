@@ -250,6 +250,19 @@ public class Table {
         return flecs_h.ecs_table_has_flags(this.tableSeg, flags);
     }
 
+    public void clearColumn(Class<?> componentClass) {
+        int col = this.columnIndex(componentClass);
+        if (col != -1) {
+            MemorySegment column = this.getRawColumn(col);
+            if (column.address() == 0) {
+                return;
+            }
+
+            Component<?> component = this.world.componentRegistry().getComponent(componentClass);
+            column.reinterpret(component.size() * this.count()).fill((byte) 0);
+        }
+    }
+
     MemorySegment getRawColumn(int columnIndex) {
         return this.getRawColumn(columnIndex, 0);
     }

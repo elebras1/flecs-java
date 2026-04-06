@@ -53,4 +53,8 @@ public class Field<T> {
         long elementOffset = i * this.componentSize;
         this.component.write(this.memorySegment, elementOffset, componentData);
     }
+
+    public void clear() {
+        this.memorySegment.reinterpret(this.count() * this.componentSize).fill((byte) 0);
+    }
 }
