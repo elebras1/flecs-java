@@ -82,6 +82,28 @@ public class QueryBuilder {
         return this.with(relationId, componentId);
     }
 
+    public QueryBuilder without(long componentId) {
+        return this.with(componentId).not();
+    }
+
+    public <T> QueryBuilder without(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.without(componentId);
+    }
+
+    public QueryBuilder without(long relationId, long componentId) {
+        return this.with(relationId, componentId).not();
+    }
+
+    public QueryBuilder without(long relationId, Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.without(relationId, componentId);
+    }
+
+    public QueryBuilder without(Entity tagEntity) {
+        return this.without(tagEntity.id());
+    }
+
     public QueryBuilder cached() {
         ecs_query_desc_t.cache_kind(this.desc, EcsQueryCacheAuto);
         return this;

@@ -134,6 +134,28 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.with(relationId, componentId);
     }
 
+    public SystemBuilder without(long componentId) {
+        return this.with(componentId).not();
+    }
+
+    public <T> SystemBuilder without(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.without(componentId);
+    }
+
+    public SystemBuilder without(long relationId, long componentId) {
+        return this.with(relationId, componentId).not();
+    }
+
+    public SystemBuilder without(long relationId, Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.without(relationId, componentId);
+    }
+
+    public SystemBuilder without(Entity tagEntity) {
+        return this.without(tagEntity.id());
+    }
+
     public SystemBuilder in() {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'in' modifier to");
