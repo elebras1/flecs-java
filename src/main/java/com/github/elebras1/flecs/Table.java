@@ -250,7 +250,7 @@ public class Table {
         return flecs_h.ecs_table_has_flags(this.tableSeg, flags);
     }
 
-    public void clearColumn(Class<?> componentClass) {
+    public void resetColumn(Class<?> componentClass) {
         int col = this.columnIndex(componentClass);
         if (col != -1) {
             MemorySegment column = this.getRawColumn(col);

@@ -54,7 +54,7 @@ public class Field<T> {
         this.component.write(this.memorySegment, elementOffset, componentData);
     }
 
-    public void clear() {
+    public void reset() {
         this.memorySegment.reinterpret(this.count() * this.componentSize).fill((byte) 0);
     }
 }
