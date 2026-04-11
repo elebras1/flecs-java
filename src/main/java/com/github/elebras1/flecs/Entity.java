@@ -73,18 +73,18 @@ public class Entity {
 
     public Entity setName(String name) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment nameSegment = tempArena.allocateFrom(name);
-            flecs_h.ecs_set_name(this.world.worldSeg(), this.id, nameSegment);
+            MemorySegment nameSeg = tempArena.allocateFrom(name);
+            flecs_h.ecs_set_name(this.world.worldSeg(), this.id, nameSeg);
         }
         return this;
     }
 
     public String getName() {
-        MemorySegment nameSegment = flecs_h.ecs_get_name(this.world.worldSeg(), this.id);
-        if (nameSegment.address() == 0) {
+        MemorySegment nameSeg = flecs_h.ecs_get_name(this.world.worldSeg(), this.id);
+        if (nameSeg.address() == 0) {
             return null;
         }
-        return nameSegment.getString(0);
+        return nameSeg.getString(0);
     }
 
     public void destruct() {
@@ -148,9 +148,9 @@ public class Entity {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
 
-        MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, 0, data);
-        flecs_h.ecs_set_id(this.world.worldSeg(), this.id, componentId, component.size(), dataSegment);
+        MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
+        component.write(dataSeg, 0, data);
+        flecs_h.ecs_set_id(this.world.worldSeg(), this.id, componentId, component.size(), dataSeg);
 
         return this;
     }
@@ -177,10 +177,10 @@ public class Entity {
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        MemorySegment dataSegment = this.world.getComponentBuffer(component.size());
-        component.write(dataSegment, 0, data);
+        MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
+        component.write(dataSeg, 0, data);
 
-        flecs_h.ecs_set_id(this.world.worldSeg(), this.id, pairId, component.size(), dataSegment);
+        flecs_h.ecs_set_id(this.world.worldSeg(), this.id, pairId, component.size(), dataSeg);
 
         return this;
     }
@@ -208,9 +208,9 @@ public class Entity {
             return null;
         }
 
-        MemorySegment dataSegment = MemorySegment.ofAddress(address).reinterpret(component.size());
+        MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
 
-        return component.read(dataSegment, 0);
+        return component.read(dataSeg, 0);
     }
 
     public <T> T get(Class<T> componentClass) {
@@ -230,8 +230,8 @@ public class Entity {
             return null;
         }
 
-        MemorySegment dataSegment = MemorySegment.ofAddress(address).reinterpret(component.size());
-        return component.read(dataSegment, 0);
+        MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
+        return component.read(dataSeg, 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -307,31 +307,31 @@ public class Entity {
 
     public void emit(long eventId) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
+            MemorySegment eventDescSeg = ecs_event_desc_t.allocate(tempArena);
 
-            ecs_event_desc_t.event(eventDesc, eventId);
-            ecs_event_desc_t.entity(eventDesc, this.id);
+            ecs_event_desc_t.event(eventDescSeg, eventId);
+            ecs_event_desc_t.entity(eventDescSeg, this.id);
 
-            flecs_h.ecs_emit(this.world.worldSeg(), eventDesc);
+            flecs_h.ecs_emit(this.world.worldSeg(), eventDescSeg);
         }
     }
 
     public void emit(long eventId, long componentId) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment eventDesc = ecs_event_desc_t.allocate(tempArena);
+            MemorySegment eventDescSeg = ecs_event_desc_t.allocate(tempArena);
 
-            MemorySegment typeSegment = ecs_type_t.allocate(tempArena);
-            MemorySegment idsArray = tempArena.allocate(ValueLayout.JAVA_LONG);
-            idsArray.set(ValueLayout.JAVA_LONG, 0, componentId);
+            MemorySegment typeSeg = ecs_type_t.allocate(tempArena);
+            MemorySegment idsArraySeg = tempArena.allocate(ValueLayout.JAVA_LONG);
+            idsArraySeg.set(ValueLayout.JAVA_LONG, 0, componentId);
 
-            ecs_type_t.array(typeSegment, idsArray);
-            ecs_type_t.count(typeSegment, 1);
+            ecs_type_t.array(typeSeg, idsArraySeg);
+            ecs_type_t.count(typeSeg, 1);
 
-            ecs_event_desc_t.event(eventDesc, eventId);
-            ecs_event_desc_t.entity(eventDesc, this.id);
-            ecs_event_desc_t.ids(eventDesc, typeSegment);
+            ecs_event_desc_t.event(eventDescSeg, eventId);
+            ecs_event_desc_t.entity(eventDescSeg, this.id);
+            ecs_event_desc_t.ids(eventDescSeg, typeSeg);
 
-            flecs_h.ecs_emit(this.world.worldSeg(), eventDesc);
+            flecs_h.ecs_emit(this.world.worldSeg(), eventDescSeg);
         }
     }
 
@@ -396,20 +396,20 @@ public class Entity {
 
     public long lookup(String path) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment pathSegment = tempArena.allocateFrom(path);
-            return flecs_h.ecs_lookup_child(this.world.worldSeg(), this.id, pathSegment);
+            MemorySegment pathSeg = tempArena.allocateFrom(path);
+            return flecs_h.ecs_lookup_child(this.world.worldSeg(), this.id, pathSeg);
         }
     }
 
     public void children(EntityCallback callback) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment iter = flecs_h.ecs_children(tempArena, this.world.worldSeg(), this.id);
+            MemorySegment iterSeg = flecs_h.ecs_children(tempArena, this.world.worldSeg(), this.id);
 
-            while (flecs_h.ecs_children_next(iter)) {
-                int count = ecs_iter_t.count(iter);
-                MemorySegment entities = ecs_iter_t.entities(iter);
+            while (flecs_h.ecs_children_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                MemorySegment entitiesSeg = ecs_iter_t.entities(iterSeg);
                 for (int i = 0; i < count; i++) {
-                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    long entityId = entitiesSeg.getAtIndex(ValueLayout.JAVA_LONG, i);
                     callback.accept(entityId);
                 }
             }
@@ -419,14 +419,14 @@ public class Entity {
     public void children(long relationId, EntityCallback callback) {
         try (Arena tempArena = Arena.ofConfined()) {
             long pair = flecs_h.ecs_make_pair(relationId, this.id);
-            MemorySegment iter = flecs_h.ecs_each_id(tempArena, this.world.worldSeg(), pair);
+            MemorySegment iterSeg = flecs_h.ecs_each_id(tempArena, this.world.worldSeg(), pair);
 
-            while (flecs_h.ecs_each_next(iter)) {
-                int count = ecs_iter_t.count(iter);
-                MemorySegment entities = ecs_iter_t.entities(iter);
+            while (flecs_h.ecs_each_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                MemorySegment entitiesSeg = ecs_iter_t.entities(iterSeg);
 
                 for (int i = 0; i < count; i++) {
-                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    long entityId = entitiesSeg.getAtIndex(ValueLayout.JAVA_LONG, i);
                     callback.accept(entityId);
                 }
             }

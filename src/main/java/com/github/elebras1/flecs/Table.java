@@ -1,5 +1,7 @@
 package com.github.elebras1.flecs;
 
+import com.github.elebras1.flecs.callback.RowCallback;
+
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
@@ -10,11 +12,6 @@ public class Table {
     Table(World world, MemorySegment tableSeg) {
         this.world = world;
         this.tableSeg = tableSeg;
-    }
-
-    @FunctionalInterface
-    public interface RowConsumer<V extends ComponentView> {
-        void accept(V view, int row);
     }
 
     public String str() {
@@ -202,7 +199,7 @@ public class Table {
     }
 
     @SuppressWarnings("unchecked")
-    public <V extends ComponentView> void forEachRow(Class<?> componentClass, RowConsumer<V> consumer) {
+    public <V extends ComponentView> void forEachRow(Class<?> componentClass, RowCallback<V> callback) {
         int col = this.columnIndex(componentClass);
         if (col == -1) {
             return;
@@ -217,7 +214,7 @@ public class Table {
         int  count = this.count();
         for (int i = 0; i < count; i++) {
             view.setBaseAddress(columnSeg.address() + i * size);
-            consumer.accept(view, i);
+            callback.accept(view, i);
         }
     }
 
