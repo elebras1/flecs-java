@@ -44,7 +44,7 @@ public abstract class AbstractGenerator implements Generator {
     protected int getStringSize(VariableElement field) {
         FixedString annotation = field.getAnnotation(FixedString.class);
         if (annotation != null) {
-            int size = annotation.size();
+            int size = annotation.length();
             if ((size & (size - 1)) != 0) {
                 throw new IllegalArgumentException("Field '" + field.getSimpleName() + "': @FixedString size must be a power of 2. Got: " + size);
             }
