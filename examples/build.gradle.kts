@@ -18,14 +18,10 @@ java {
 }
 
 tasks.withType<JavaExec> {
-    jvmArgs("--enable-native-access=ALL-UNNAMED", "--add-modules", "jdk.incubator.vector")
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
 
 tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf(
-        "--add-modules", "jdk.incubator.vector"
-    ))
-
     val processorOutput = rootProject.layout.buildDirectory.dir("classes/java/processor").get().asFile
     options.annotationProcessorPath = files(processorOutput) + rootProject.configurations.runtimeClasspath.get()
 }
