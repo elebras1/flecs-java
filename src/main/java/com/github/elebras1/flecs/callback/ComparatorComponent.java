@@ -1,6 +1,6 @@
 package com.github.elebras1.flecs.callback;
 
 @FunctionalInterface
-public interface ComparatorComponent {
-    <CA, CB> int compare(CA componentA, CB componentB);
+public interface ComparatorComponent<T> {
+    int compare(T componentA, T componentB);
 }

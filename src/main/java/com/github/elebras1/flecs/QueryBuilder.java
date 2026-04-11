@@ -28,8 +28,8 @@ public class QueryBuilder {
     }
 
     public QueryBuilder expr(String expr) {
-        MemorySegment exprSegment = this.arena.allocateFrom(expr);
-        ecs_query_desc_t.expr(this.desc, exprSegment);
+        MemorySegment exprSeg = this.arena.allocateFrom(expr);
+        ecs_query_desc_t.expr(this.desc, exprSeg);
         return this;
     }
 
@@ -40,10 +40,10 @@ public class QueryBuilder {
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);
 
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment termSeg = this.desc.asSlice(termOffset, TERM_SIZE);
         long idOffset = ecs_term_t.id$offset();
 
-        term.set(ValueLayout.JAVA_LONG, idOffset, componentId);
+        termSeg.set(ValueLayout.JAVA_LONG, idOffset, componentId);
 
         this.termCount++;
         return this;
@@ -211,10 +211,10 @@ public class QueryBuilder {
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        MemorySegment src = ecs_term_t.src(term);
+        MemorySegment termSeg = this.desc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment srcSeg = ecs_term_t.src(termSeg);
 
-        src.set(ValueLayout.JAVA_LONG, 0, entityId);
+        srcSeg.set(ValueLayout.JAVA_LONG, 0, entityId);
         return this;
     }
 
@@ -235,26 +235,24 @@ public class QueryBuilder {
         return this.orderBy(componentId);
     }
 
-    public QueryBuilder orderBy(long componentId, ComparatorComponent comparator) {
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, componentASeg, idB, componentBSeg) -> {
-            Component<?> componentA = this.world.componentRegistry().getComponentById(idA);
-            Component<?> componentB = this.world.componentRegistry().getComponentById(idB);
-            return comparator.compare(componentA.read(componentASeg, 0), componentB.read(componentBSeg, 0));
-        }, this.arena);
+    public <T> QueryBuilder orderBy(long componentId, ComparatorComponent<T> comparator) {
+        Component<T> component = this.world.componentRegistry().getComponentById(componentId);
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentASeg, _, componentBSeg) ->
+                comparator.compare(component.read(componentASeg, 0), component.read(componentBSeg, 0)), this.world.arena());
         ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
         return this.orderBy(componentId);
     }
 
-    public QueryBuilder orderBy(long componentId, ComparatorComponentView comparator) {
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, componentASeg, idB, componentBSeg) -> {
-            Class<?> componentClassA = this.world.componentRegistry().getComponentClassById(idA);
-            Class<?> componentClassB = this.world.componentRegistry().getComponentClassById(idB);
-            ComponentView componentViewA = this.world.viewCache().getComponentView(componentClassA);
+    @SuppressWarnings("unchecked")
+    public <V extends ComponentView> QueryBuilder orderBy(long componentId, ComparatorComponentView<V> comparator) {
+        Class<?> componentClass = this.world.componentRegistry().getComponentClassById(componentId);
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentASeg, _, componentBSeg) -> {
+            V componentViewA = (V) this.world.viewCache().getComponentView(componentClass);
             componentViewA.setBaseAddress(componentASeg.address());
-            ComponentView componentViewB = this.world.viewCache().getComponentView(componentClassB);
+            V componentViewB = (V) this.world.viewCache().getComponentView(componentClass);
             componentViewB.setBaseAddress(componentBSeg.address());
             return comparator.compare(componentViewA, componentViewB);
-        }, this.arena);
+        }, this.world.arena());
         ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
         return this.orderBy(componentId);
     }
@@ -267,11 +265,11 @@ public class QueryBuilder {
         return this.orderBy(entity.id(), comparator);
     }
 
-    public QueryBuilder orderBy(Entity entity, ComparatorComponent comparator) {
+    public <T> QueryBuilder orderBy(Entity entity, ComparatorComponent<T> comparator) {
         return this.orderBy(entity.id(), comparator);
     }
 
-    public QueryBuilder orderBy(Entity entity, ComparatorComponentView comparator) {
+    public <V extends ComponentView> QueryBuilder orderBy(Entity entity, ComparatorComponentView<V> comparator) {
         return this.orderBy(entity.id(), comparator);
     }
 
@@ -285,7 +283,12 @@ public class QueryBuilder {
         return this.orderBy(componentId, comparator);
     }
 
-    public QueryBuilder orderBy(Class<?> componentClass, ComparatorComponent comparator) {
+    public <T> QueryBuilder orderBy(Class<T> componentClass, ComparatorComponent<T> comparator) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId, comparator);
+    }
+
+    public <V extends ComponentView> QueryBuilder orderBy(Class<?> componentClass, ComparatorComponentView<V> comparator) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.orderBy(componentId, comparator);
     }
