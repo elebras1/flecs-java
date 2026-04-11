@@ -1,8 +1,6 @@
 package com.github.elebras1.flecs;
 
-import com.github.elebras1.flecs.callback.EntityCallback;
-import com.github.elebras1.flecs.callback.IterCallback;
-import com.github.elebras1.flecs.callback.RunCallback;
+import com.github.elebras1.flecs.callback.*;
 import com.github.elebras1.flecs.util.FlecsConstants;
 
 import java.lang.foreign.Arena;
@@ -87,11 +85,11 @@ public class SystemBuilder extends SystemBuilderBase {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment term = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long idOffset = ecs_term_t.id$offset();
 
         term.set(ValueLayout.JAVA_LONG, idOffset, componentId);
@@ -116,14 +114,14 @@ public class SystemBuilder extends SystemBuilderBase {
 
         long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long idOffset = ecs_term_t.id$offset();
 
-        term.set(ValueLayout.JAVA_LONG, idOffset, pairId);
+        termSeg.set(ValueLayout.JAVA_LONG, idOffset, pairId);
 
         this.termCount++;
         return this;
@@ -161,14 +159,14 @@ public class SystemBuilder extends SystemBuilderBase {
             throw new IllegalStateException("No term to apply 'in' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsIn);
+        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, EcsIn);
 
         return this;
     }
@@ -178,14 +176,14 @@ public class SystemBuilder extends SystemBuilderBase {
             throw new IllegalStateException("No term to apply 'out' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsOut);
+        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, EcsOut);
 
         return this;
     }
@@ -195,14 +193,14 @@ public class SystemBuilder extends SystemBuilderBase {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
+        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsInOut);
+        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, EcsInOut);
 
         return this;
     }
@@ -212,12 +210,12 @@ public class SystemBuilder extends SystemBuilderBase {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_system_desc_t.query(this.desc);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         long termsOffset = ecs_query_desc_t.terms$offset();
         long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        ecs_term_t.oper(term, (short) operator);
+        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
+        ecs_term_t.oper(termSeg, (short) operator);
         return this;
     }
 
@@ -259,12 +257,124 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.with(componentId).in();
     }
 
+    public SystemBuilder orderBy(long componentId) {
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.order_by(queryDescSeg, componentId);
+        return this;
+    }
+
+    public SystemBuilder orderBy(long componentId, ComparatorId comparator) {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, _, idB, _) ->
+                comparator.compare(idA, idB), this.world.arena());
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.order_by_callback(queryDescSeg, callbackStub);
+
+        return this.orderBy(componentId);
+    }
+
+    public SystemBuilder orderBy(long componentId, ComparatorComponent comparator) {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, componentASeg, idB, componentBSeg) -> {
+            Component<?> componentA = this.world.componentRegistry().getComponentById(idA);
+            Component<?> componentB = this.world.componentRegistry().getComponentById(idB);
+            return comparator.compare(componentA.read(componentASeg, 0), componentB.read(componentBSeg, 0));
+        }, this.arena);
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.order_by_callback(queryDescSeg, callbackStub);
+
+        return this.orderBy(componentId);
+    }
+
+    public SystemBuilder orderBy(long componentId, ComparatorComponentView comparator) {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, componentASeg, idB, componentBSeg) -> {
+            Class<?> componentClassA = this.world.componentRegistry().getComponentClassById(idA);
+            Class<?> componentClassB = this.world.componentRegistry().getComponentClassById(idB);
+            ComponentView componentViewA = this.world.viewCache().getComponentView(componentClassA);
+            componentViewA.setBaseAddress(componentASeg.address());
+            ComponentView componentViewB = this.world.viewCache().getComponentView(componentClassB);
+            componentViewB.setBaseAddress(componentBSeg.address());
+            return comparator.compare(componentViewA, componentViewB);
+        }, this.arena);
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.order_by_callback(queryDescSeg, callbackStub);
+
+        return this.orderBy(componentId);
+    }
+
+    public SystemBuilder orderBy(Entity entity) {
+        return this.orderBy(entity.id());
+    }
+
+    public SystemBuilder orderBy(Entity entity, ComparatorId comparator) {
+        return this.orderBy(entity.id(), comparator);
+    }
+
+    public SystemBuilder orderBy(Entity entity, ComparatorComponent comparator) {
+        return this.orderBy(entity.id(), comparator);
+    }
+
+    public SystemBuilder orderBy(Entity entity, ComparatorComponentView comparator) {
+        return this.orderBy(entity.id(), comparator);
+    }
+
+    public SystemBuilder orderBy(Class<?> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId);
+    }
+
+    public SystemBuilder orderBy(Class<?> componentClass, ComparatorId comparator) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId, comparator);
+    }
+
+    public SystemBuilder orderBy(Class<?> componentClass, ComparatorComponent comparator) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.orderBy(componentId, comparator);
+    }
+
+    public SystemBuilder groupBy(long groupId) {
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.group_by(queryDescSeg, groupId);
+        return this;
+    }
+
+    public SystemBuilder groupBy(long groupId, GroupByCallback groupByCallback) {
+        MemorySegment callbackStub = ecs_group_by_action_t.allocate((_, tableSeg, id, _) -> {
+            Table table = tableSeg.address() == 0 ? null : new Table(this.world, tableSeg);
+            return groupByCallback.accept(this.world, table, id);
+        }, this.world.arena());
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.group_by_callback(queryDescSeg, callbackStub);
+        return this.groupBy(groupId);
+    }
+
+    public SystemBuilder groupBy(Class<?> componentClass) {
+        long groupId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.groupBy(groupId);
+    }
+
+    public SystemBuilder groupBy(Class<?> componentClass, GroupByCallback groupByCallback) {
+        long groupId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.groupBy(groupId, groupByCallback);
+    }
+
+    public SystemBuilder groupBy(Entity entity) {
+        return this.groupBy(entity.id());
+    }
+
+    public SystemBuilder groupBy(Entity entity, GroupByCallback groupByCallback) {
+        return this.groupBy(entity.id(), groupByCallback);
+    }
+
     public FlecsSystem iter(IterCallback callback) {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
-            MemorySegment stageWorld = ecs_iter_t.world(iterSegment);
-            int stageId = flecs_h.ecs_stage_get_id(stageWorld);
+            MemorySegment stageSeg = ecs_iter_t.world(iterSegment);
+            int stageId = flecs_h.ecs_stage_get_id(stageSeg);
             Iter iter = this.iters[stageId];
             iter.setIterSeg(iterSegment);
             iter.world().viewCache().resetCursors();
@@ -280,8 +390,8 @@ public class SystemBuilder extends SystemBuilderBase {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
-            MemorySegment stageWorld = ecs_iter_t.world(iterSegment);
-            int stageId = flecs_h.ecs_stage_get_id(stageWorld);
+            MemorySegment stageSeg = ecs_iter_t.world(iterSegment);
+            int stageId = flecs_h.ecs_stage_get_id(stageSeg);
             Iter iter = this.iters[stageId];
             iter.setIterSeg(iterSegment);
             iter.world().viewCache().resetCursors();
@@ -298,10 +408,10 @@ public class SystemBuilder extends SystemBuilderBase {
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
             int count = ecs_iter_t.count(iterSegment);
-            MemorySegment entities = ecs_iter_t.entities(iterSegment);
+            MemorySegment entitiesSeg = ecs_iter_t.entities(iterSegment);
 
             for (int i = 0; i < count; i++) {
-                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                long entityId = entitiesSeg.getAtIndex(ValueLayout.JAVA_LONG, i);
                 callback.accept(entityId);
             }
         }, this.world.arena());
