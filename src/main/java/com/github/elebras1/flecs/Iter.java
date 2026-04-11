@@ -8,12 +8,14 @@ public class Iter {
     private MemorySegment iterSeg;
     private final World world;
     private final Field<?>[] fields;
+    private final Table table;
     private int count;
 
     Iter(MemorySegment iterSeg, World world) {
         this.iterSeg = iterSeg;
         this.world = world;
         this.fields = new Field[32];
+        this.table = new Table(world, MemorySegment.NULL);
         this.count = -1;
     }
 
@@ -119,7 +121,8 @@ public class Iter {
         if (tableSeg.address() == 0) {
             return null;
         }
-        return new Table(this.world, tableSeg);
+        this.table.reset(tableSeg);
+        return this.table;
     }
 
     public void fini() {

@@ -15,6 +15,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
     private static final ClassName MEMORY_ACCESS_CLASS = ClassName.get("com.github.elebras1.flecs.util.internal", "MemoryAccess");
     private static final ClassName WORLD_CLASS = ClassName.get("com.github.elebras1.flecs", "World");
 
+    @Override
     public JavaFile generate(TypeElement recordElement, List<VariableElement> fields)  {
         String packageName = this.getPackageName(recordElement);
         String recordName = recordElement.getSimpleName().toString();

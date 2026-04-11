@@ -7,7 +7,7 @@ import java.lang.foreign.ValueLayout;
 
 public class Table {
     private final World world;
-    private final MemorySegment tableSeg;
+    private MemorySegment tableSeg;
 
     Table(World world, MemorySegment tableSeg) {
         this.world = world;
@@ -20,6 +20,10 @@ public class Table {
         MemorySegment freeSeg = ecs_os_api_t.free_(flecs_h.ecs_os_api());
         ecs_os_api_free_t.invoke(freeSeg, strSeg);
         return str;
+    }
+
+    void reset(MemorySegment tableSeg) {
+        this.tableSeg = tableSeg;
     }
 
     public long[] type() {
@@ -260,11 +264,26 @@ public class Table {
         }
     }
 
-    MemorySegment getRawColumn(int columnIndex) {
+    public ComponentRowView getRowView(Class<?> componentClass) {
+        int col = this.columnIndex(componentClass);
+        if (col == -1) {
+            return null;
+        }
+        MemorySegment columnSeg = this.getRawColumn(col);
+        if (columnSeg.address() == 0) {
+            return null;
+        }
+        ComponentRowView view = this.world.viewCache().getComponentRowView(componentClass);
+        view.setSegment(columnSeg);
+        view.setCount(this.count());
+        return view;
+    }
+
+    private MemorySegment getRawColumn(int columnIndex) {
         return this.getRawColumn(columnIndex, 0);
     }
 
-    MemorySegment getRawColumn(int columnIndex, int offset) {
+    private MemorySegment getRawColumn(int columnIndex, int offset) {
         return flecs_h.ecs_table_get_column(this.tableSeg, columnIndex, offset);
     }
 

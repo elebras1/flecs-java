@@ -13,8 +13,6 @@ public interface Component<T> {
 
     T[] createArray(int size);
 
-    long offsetOf(String fieldName);
-
     default long size() {
         return layout().byteSize();
     }
