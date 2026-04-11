@@ -264,7 +264,8 @@ public class Table {
         }
     }
 
-    public ComponentRowView getRowView(Class<?> componentClass) {
+    @SuppressWarnings("unchecked")
+    public <V extends ComponentRowView> V getRowView(Class<?> componentClass) {
         int col = this.columnIndex(componentClass);
         if (col == -1) {
             return null;
@@ -273,7 +274,7 @@ public class Table {
         if (columnSeg.address() == 0) {
             return null;
         }
-        ComponentRowView view = this.world.viewCache().getComponentRowView(componentClass);
+        V view = (V) this.world.viewCache().getComponentRowView(componentClass);
         view.setSegment(columnSeg);
         view.setCount(this.count());
         return view;
