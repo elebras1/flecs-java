@@ -177,31 +177,27 @@ public class World implements AutoCloseable {
         this.checkClosed();
         MemorySegment nameSegment = this.defaultBuffers.nameBuffer().set(name);
 
-        MemorySegment desc = this.defaultBuffers.entityDescBuffer().get();
-        ecs_entity_desc_t.name(desc, nameSegment);
+        MemorySegment descSeg = this.defaultBuffers.entityDescBuffer().get();
+        ecs_entity_desc_t.name(descSeg, nameSegment);
 
-        return flecs_h.ecs_entity_init(this.worldSeg, desc);
+        return flecs_h.ecs_entity_init(this.worldSeg, descSeg);
     }
 
     public long entity(long parentId, String name) {
         long id = this.entity(name);
-        MemorySegment dataSegment = this.getComponentBuffer(EcsParent.sizeof());
-        EcsParent.value(dataSegment, parentId);
-        flecs_h.ecs_set_id(this.worldSeg, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
+        MemorySegment dataSeg = this.getComponentBuffer(EcsParent.sizeof());
+        EcsParent.value(dataSeg, parentId);
+        flecs_h.ecs_set_id(this.worldSeg, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSeg);
         return id;
     }
 
     public Entity obtainEntity(long entityId) {
-        if(entityId <= 0) {
-            throw new IllegalArgumentException("Invalid entity ID: " + entityId);
-        }
+        assert entityId >= 0 : "Invalid entity ID: " + entityId;
         return new Entity(this, entityId);
     }
 
     public EntityView obtainEntityView(long entityId) {
-        if(entityId <= 0) {
-            throw new IllegalArgumentException("Invalid entity ID: " + entityId);
-        }
+        assert entityId >= 0 : "Invalid entity ID: " + entityId;
 
         return this.contextCache.getEntityView(entityId);
     }
@@ -213,11 +209,11 @@ public class World implements AutoCloseable {
     public long[] entityBulk(int count) {
         this.checkClosed();
         try(Arena tempArena = Arena.ofConfined()) {
-            MemorySegment desc = ecs_bulk_desc_t.allocate(tempArena);
-            ecs_bulk_desc_t.count(desc, count);
-            ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
+            MemorySegment descSeg = ecs_bulk_desc_t.allocate(tempArena);
+            ecs_bulk_desc_t.count(descSeg, count);
+            ecs_bulk_desc_t.entities(descSeg, MemorySegment.NULL);
 
-            MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.worldSeg, desc);
+            MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.worldSeg, descSeg);
 
             return idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
@@ -248,21 +244,21 @@ public class World implements AutoCloseable {
                 componentIds[i] = componentId;
             }
 
-            MemorySegment desc = ecs_bulk_desc_t.allocate(tempArena);
+            MemorySegment descSeg = ecs_bulk_desc_t.allocate(tempArena);
 
-            ecs_bulk_desc_t._canary(desc, 0);
-            ecs_bulk_desc_t.entities(desc, MemorySegment.NULL);
-            ecs_bulk_desc_t.count(desc, count);
+            ecs_bulk_desc_t._canary(descSeg, 0);
+            ecs_bulk_desc_t.entities(descSeg, MemorySegment.NULL);
+            ecs_bulk_desc_t.count(descSeg, count);
 
-            MemorySegment idsArray = ecs_bulk_desc_t.ids(desc);
+            MemorySegment idsArray = ecs_bulk_desc_t.ids(descSeg);
             for (int i = 0; i < componentIds.length; i++) {
                 idsArray.setAtIndex(JAVA_LONG, i, componentIds[i]);
             }
 
-            ecs_bulk_desc_t.data(desc, MemorySegment.NULL);
-            ecs_bulk_desc_t.table(desc, MemorySegment.NULL);
+            ecs_bulk_desc_t.data(descSeg, MemorySegment.NULL);
+            ecs_bulk_desc_t.table(descSeg, MemorySegment.NULL);
 
-            MemorySegment entitiesSeg = flecs_h.ecs_bulk_init(this.worldSeg, desc);
+            MemorySegment entitiesSeg = flecs_h.ecs_bulk_init(this.worldSeg, descSeg);
 
             return entitiesSeg.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
@@ -444,14 +440,12 @@ public class World implements AutoCloseable {
     public long[] getEntities() {
         this.checkClosed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment entitiesStruct = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
-            MemorySegment idsPointer = entitiesStruct.get(ADDRESS, 0);
-            int count = entitiesStruct.get(JAVA_INT, ADDRESS.byteSize());
+            MemorySegment entitiesSeg = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
+            int count = entitiesSeg.get(JAVA_INT, ADDRESS.byteSize());
 
-            long[] entities = new long[count];
-            if (count > 0 && !idsPointer.equals(MemorySegment.NULL)) {
-                MemorySegment idsArray = idsPointer.reinterpret((long) count * Long.BYTES);
-                entities = idsArray.toArray(JAVA_LONG);
+            long[] entities = new long[0];
+            if (count > 0) {
+                return ecs_entities_t.ids(entitiesSeg).reinterpret((long) count * Long.BYTES).toArray(JAVA_LONG);
             }
 
             return entities;
@@ -534,60 +528,60 @@ public class World implements AutoCloseable {
             throw new IllegalStateException("Failed to get world info");
         }
 
-        MemorySegment info = infoSeg.reinterpret(ecs_world_info_t.layout().byteSize());
+        infoSeg = infoSeg.reinterpret(ecs_world_info_t.layout().byteSize());
 
         return new FlecsInfo(
-                ecs_world_info_t.last_component_id(info),
-                ecs_world_info_t.min_id(info),
-                ecs_world_info_t.max_id(info),
-                ecs_world_info_t.delta_time_raw(info),
-                ecs_world_info_t.delta_time(info),
-                ecs_world_info_t.time_scale(info),
-                ecs_world_info_t.target_fps(info),
-                ecs_world_info_t.frame_time_total(info),
-                ecs_world_info_t.system_time_total(info),
-                ecs_world_info_t.emit_time_total(info),
-                ecs_world_info_t.merge_time_total(info),
-                ecs_world_info_t.rematch_time_total(info),
-                ecs_world_info_t.world_time_total(info),
-                ecs_world_info_t.world_time_total_raw(info),
-                ecs_world_info_t.frame_count_total(info),
-                ecs_world_info_t.merge_count_total(info),
-                ecs_world_info_t.eval_comp_monitors_total(info),
-                ecs_world_info_t.rematch_count_total(info),
-                ecs_world_info_t.id_create_total(info),
-                ecs_world_info_t.id_delete_total(info),
-                ecs_world_info_t.table_create_total(info),
-                ecs_world_info_t.table_delete_total(info),
-                ecs_world_info_t.pipeline_build_count_total(info),
-                ecs_world_info_t.systems_ran_total(info),
-                ecs_world_info_t.observers_ran_total(info),
-                ecs_world_info_t.queries_ran_total(info),
-                ecs_world_info_t.tag_id_count(info),
-                ecs_world_info_t.component_id_count(info),
-                ecs_world_info_t.pair_id_count(info),
-                ecs_world_info_t.table_count(info),
-                ecs_world_info_t.creation_time(info),
-                extractCommandStats(info),
-                extractNamePrefix(info)
+                ecs_world_info_t.last_component_id(infoSeg),
+                ecs_world_info_t.min_id(infoSeg),
+                ecs_world_info_t.max_id(infoSeg),
+                ecs_world_info_t.delta_time_raw(infoSeg),
+                ecs_world_info_t.delta_time(infoSeg),
+                ecs_world_info_t.time_scale(infoSeg),
+                ecs_world_info_t.target_fps(infoSeg),
+                ecs_world_info_t.frame_time_total(infoSeg),
+                ecs_world_info_t.system_time_total(infoSeg),
+                ecs_world_info_t.emit_time_total(infoSeg),
+                ecs_world_info_t.merge_time_total(infoSeg),
+                ecs_world_info_t.rematch_time_total(infoSeg),
+                ecs_world_info_t.world_time_total(infoSeg),
+                ecs_world_info_t.world_time_total_raw(infoSeg),
+                ecs_world_info_t.frame_count_total(infoSeg),
+                ecs_world_info_t.merge_count_total(infoSeg),
+                ecs_world_info_t.eval_comp_monitors_total(infoSeg),
+                ecs_world_info_t.rematch_count_total(infoSeg),
+                ecs_world_info_t.id_create_total(infoSeg),
+                ecs_world_info_t.id_delete_total(infoSeg),
+                ecs_world_info_t.table_create_total(infoSeg),
+                ecs_world_info_t.table_delete_total(infoSeg),
+                ecs_world_info_t.pipeline_build_count_total(infoSeg),
+                ecs_world_info_t.systems_ran_total(infoSeg),
+                ecs_world_info_t.observers_ran_total(infoSeg),
+                ecs_world_info_t.queries_ran_total(infoSeg),
+                ecs_world_info_t.tag_id_count(infoSeg),
+                ecs_world_info_t.component_id_count(infoSeg),
+                ecs_world_info_t.pair_id_count(infoSeg),
+                ecs_world_info_t.table_count(infoSeg),
+                ecs_world_info_t.creation_time(infoSeg),
+                extractCommandStats(infoSeg),
+                extractNamePrefix(infoSeg)
         );
     }
 
     private FlecsInfo.CommandStats extractCommandStats(MemorySegment info) {
-        MemorySegment cmd = ecs_world_info_t.cmd(info);
+        MemorySegment commandSeg = ecs_world_info_t.cmd(info);
         return new FlecsInfo.CommandStats(
-                ecs_world_info_t.cmd.add_count(cmd),
-                ecs_world_info_t.cmd.remove_count(cmd),
-                ecs_world_info_t.cmd.delete_count(cmd),
-                ecs_world_info_t.cmd.clear_count(cmd),
-                ecs_world_info_t.cmd.set_count(cmd),
-                ecs_world_info_t.cmd.ensure_count(cmd),
-                ecs_world_info_t.cmd.modified_count(cmd),
-                ecs_world_info_t.cmd.discard_count(cmd),
-                ecs_world_info_t.cmd.event_count(cmd),
-                ecs_world_info_t.cmd.other_count(cmd),
-                ecs_world_info_t.cmd.batched_entity_count(cmd),
-                ecs_world_info_t.cmd.batched_command_count(cmd)
+                ecs_world_info_t.cmd.add_count(commandSeg),
+                ecs_world_info_t.cmd.remove_count(commandSeg),
+                ecs_world_info_t.cmd.delete_count(commandSeg),
+                ecs_world_info_t.cmd.clear_count(commandSeg),
+                ecs_world_info_t.cmd.set_count(commandSeg),
+                ecs_world_info_t.cmd.ensure_count(commandSeg),
+                ecs_world_info_t.cmd.modified_count(commandSeg),
+                ecs_world_info_t.cmd.discard_count(commandSeg),
+                ecs_world_info_t.cmd.event_count(commandSeg),
+                ecs_world_info_t.cmd.other_count(commandSeg),
+                ecs_world_info_t.cmd.batched_entity_count(commandSeg),
+                ecs_world_info_t.cmd.batched_command_count(commandSeg)
         );
     }
 
@@ -802,12 +796,12 @@ public class World implements AutoCloseable {
             ecs_world_to_json_desc_t.serialize_builtin(options, serializeBuiltin);
             ecs_world_to_json_desc_t.serialize_modules(options, serializeModules);
 
-            MemorySegment jsonSegment = flecs_h.ecs_world_to_json(this.worldSeg, options);
-            if (jsonSegment.address() == 0) {
+            MemorySegment jsonSeg = flecs_h.ecs_world_to_json(this.worldSeg, options);
+            if (jsonSeg.address() == 0) {
                 return null;
             }
 
-            return jsonSegment.getString(0);
+            return jsonSeg.getString(0);
         }
     }
 
@@ -823,11 +817,11 @@ public class World implements AutoCloseable {
 
         try (Arena tempArena = Arena.ofConfined()) {
             byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
-            MemorySegment jsonSegment = tempArena.allocate(jsonBytes.length + 1);
-            jsonSegment.asSlice(0, jsonBytes.length).copyFrom(MemorySegment.ofArray(jsonBytes));
-            jsonSegment.set(JAVA_BYTE, jsonBytes.length, (byte)0);
+            MemorySegment jsonSeg = tempArena.allocate(jsonBytes.length + 1);
+            jsonSeg.asSlice(0, jsonBytes.length).copyFrom(MemorySegment.ofArray(jsonBytes));
+            jsonSeg.set(JAVA_BYTE, jsonBytes.length, (byte)0);
 
-            MemorySegment resultSeg = flecs_h.ecs_world_from_json(this.worldSeg, jsonSegment, MemorySegment.NULL);
+            MemorySegment resultSeg = flecs_h.ecs_world_from_json(this.worldSeg, jsonSeg, MemorySegment.NULL);
             if (resultSeg.address() == 0) {
                 throw new RuntimeException("Failed to parse JSON into world");
             }
@@ -855,10 +849,10 @@ public class World implements AutoCloseable {
                 throw new IllegalStateException("Failed to find flecs.rest.Rest component.");
             }
 
-            MemorySegment restData = arena.allocate(32);
-            restData.set(JAVA_SHORT, 0, port);
+            MemorySegment restDataSeg = arena.allocate(32);
+            restDataSeg.set(JAVA_SHORT, 0, port);
 
-            flecs_h.ecs_set_id(this.worldSeg, restCompId, restCompId, 32, restData);
+            flecs_h.ecs_set_id(this.worldSeg, restCompId, restCompId, 32, restDataSeg);
         }
     }
 
@@ -866,8 +860,8 @@ public class World implements AutoCloseable {
         this.checkClosed();
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment restCompName = arena.allocateFrom("flecs.rest.Rest");
-            long restCompId = flecs_h.ecs_lookup(this.worldSeg, restCompName);
+            MemorySegment restCompNameSeg = arena.allocateFrom("flecs.rest.Rest");
+            long restCompId = flecs_h.ecs_lookup(this.worldSeg, restCompNameSeg);
 
             if( restCompId == 0) {
                 throw new IllegalStateException("Failed to find flecs.rest.Rest component. Make sure FlecsRest module is imported.");
