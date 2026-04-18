@@ -24,7 +24,7 @@ public class Iter {
         this.count = ecs_iter_t.count(iterSeg);
     }
 
-    World world() {
+    public World world() {
         return this.world;
     }
 
