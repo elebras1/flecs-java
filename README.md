@@ -2,7 +2,7 @@
 
 ![Flecs](https://raw.githubusercontent.com/SanderMertens/flecs/master/docs/img/logo.png)
 
-Java bindings for [Flecs](https://github.com/SanderMertens/flecs) (v4.1.4) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
+Java bindings for [Flecs](https://github.com/SanderMertens/flecs) (v4.1.5) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
 
 ## What is Flecs?
 
@@ -30,8 +30,8 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.8.2'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.8.2'
+    implementation 'io.github.elebras1:flecs-java:0.9.0'
+    annotationProcessor 'io.github.elebras1:flecs-java:0.9.0'
 
 }
 ```
@@ -65,56 +65,58 @@ record Velocity(float dx, float dy) {}
 
 public class Example {
     public static void main(String[] args) {
-        try (World world = new World()) {
-            // Register components
-            world.component(Position.class);
-            world.component(Velocity.class);
-            
-            // Create entities
-            Entity player = world.obtainEntity(world.entity("Player"));
-            player.set(new Position(0, 0))
-                  .set(new Velocity(1, 0));
-            
-            Entity enemy = world.obtainEntity(world.entity("Enemy"));
-            enemy.set(new Position(10, 5))
-                 .set(new Velocity(-0.5f, 0));
+        World world = new World();
+        // Register components
+        world.component(Position.class);
+        world.component(Velocity.class);
+        
+        // Create entities
+        Entity player = world.obtainEntity(world.entity("Player"));
+        player.set(new Position(0, 0))
+              .set(new Velocity(1, 0));
+        
+        Entity enemy = world.obtainEntity(world.entity("Enemy"));
+        enemy.set(new Position(10, 5))
+             .set(new Velocity(-0.5f, 0));
 
-            // Set number of worker threads
-            world.setThreads(4);
-            
-            // Create a movement system
-            world.system("MoveSystem")
-                .kind(FlecsConstants.EcsOnUpdate)
-                .with(Position.class)
-                .with(Velocity.class)
-                .multithreaded()
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    Field<Velocity> velocities = it.field(Velocity.class, 1);
+        // Set number of worker threads
+        world.setThreads(4);
+        
+        // Create a movement system
+        world.system("MoveSystem")
+            .kind(FlecsConstants.EcsOnUpdate)
+            .with(Position.class)
+            .with(Velocity.class)
+            .multithreaded()
+            .iter(it -> {
+                Field<Position> positions = it.field(Position.class, 0);
+                Field<Velocity> velocities = it.field(Velocity.class, 1);
+                
+                for (int i = 0; i < it.count(); i++) {
+                    PositionView positionView = positions.getMutView(i);
+                    VelocityView velocityView = velocities.getMutView(i);
                     
-                    for (int i = 0; i < it.count(); i++) {
-                        PositionView positionView = positions.getMutView(i);
-                        VelocityView velocityView = velocities.getMutView(i);
-                        
-                        // Update position
-                        positionView.x(positionView.x() + velocityView.dx() * it.deltaTime());
-                        positionView.y(positionView.y() + velocityView.dy() * it.deltaTime());
-                    }
-                });
-            
-            // Run simulation
-            for (int i = 0; i < 10; i++) {
-                world.progress(0.016f); // 60 FPS
-            }
-            
-            // Query entities
-            try (Query query = world.query().with(Position.class).build()) {
-                query.each(Position.class, (entityId, pos) -> {
-                    Entity e = world.obtainEntity(entityId);
-                    System.out.printf("%s: (%.2f, %.2f)%n", e.getName(), pos.x(), pos.y());
-                });
-            }
+                    // Update position
+                    positionView.x(positionView.x() + velocityView.dx() * it.deltaTime());
+                    positionView.y(positionView.y() + velocityView.dy() * it.deltaTime());
+                }
+            });
+        
+        // Run simulation
+        for (int i = 0; i < 10; i++) {
+            world.progress(0.016f); // 60 FPS
         }
+        
+        // Query entities
+        Query query = world.query().with(Position.class).build();
+        query.each(Position.class, (entityId, pos) -> {
+            Entity e = world.obtainEntity(entityId);
+            System.out.printf("%s: (%.2f, %.2f)%n", e.getName(), pos.x(), pos.y());
+        });
+        
+        query.destroy();
+        
+        world.destroy();
     }
 }
 ```
