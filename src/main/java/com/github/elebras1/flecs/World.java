@@ -2,6 +2,7 @@ package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.callback.*;
 import com.github.elebras1.flecs.util.FlecsConstants;
+import com.github.elebras1.flecs.util.internal.FlecsAllocator;
 import com.github.elebras1.flecs.util.internal.FlecsLoader;
 
 import java.lang.foreign.*;
@@ -44,91 +45,81 @@ public class World {
     }
 
     private static final class NameBuffer implements AutoCloseable {
-        private Arena arena;
         private MemorySegment segment;
         private long capacity;
 
         NameBuffer(long initialCapacity) {
             this.capacity = initialCapacity;
-            this.arena = Arena.ofConfined();
-            this.segment = this.arena.allocate(initialCapacity);
+            this.segment = FlecsAllocator.malloc(initialCapacity);
         }
 
         private MemorySegment ensure(long needed) {
-            if (needed > capacity) {
-                this.arena.close();
-                this.arena = Arena.ofConfined();
-                this.capacity = Math.max(needed, capacity * 2);
-                this.segment = this.arena.allocate(this.capacity);
+            if (needed > this.capacity) {
+                this.capacity = Math.max(needed, this.capacity * 2);
+                FlecsAllocator.free(this.segment);
+                this.segment = FlecsAllocator.malloc(this.capacity);
             }
             return segment;
         }
 
-        public MemorySegment set(String value) {
-            byte[] utf8 = value.getBytes(StandardCharsets.UTF_8);
-            long needed = utf8.length + 1;
-            MemorySegment segment = ensure(needed);
-            MemorySegment.copy(utf8, 0, segment, JAVA_BYTE, 0, utf8.length);
-            segment.set(JAVA_BYTE, utf8.length, (byte) 0);
-            return segment;
+        public MemorySegment set(String name) {
+            byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
+            long needed = nameBytes.length + 1;
+            MemorySegment nameSeg = ensure(needed);
+            nameSeg.fill((byte) 0);
+            nameSeg.setString(0, name);
+            return nameSeg;
         }
 
         @Override
         public void close() {
-            if (this.arena != null) {
-                this.arena.close();
-                this.arena = null;
+            if (this.segment != null && this.segment.address() != 0) {
+                FlecsAllocator.free(this.segment);
             }
         }
     }
 
     private static final class ComponentBuffer implements AutoCloseable {
-        private Arena arena;
         private MemorySegment segment;
         private long capacity;
 
         ComponentBuffer(long initialCapacity) {
             this.capacity = initialCapacity;
-            this.arena = Arena.ofConfined();
-            this.segment = this.arena.allocate(initialCapacity);
+            this.segment = FlecsAllocator.malloc(initialCapacity);
         }
 
         MemorySegment ensure(long needed) {
-            if (needed > capacity) {
-                long newCapacity = Math.max(needed, capacity * 2);
-                this.arena.close();
-                this.arena = Arena.ofConfined();
-                this.segment = this.arena.allocate(newCapacity);
-                this.capacity = newCapacity;
+            if (needed > this.capacity) {
+                this.capacity = Math.max(needed, this.capacity * 2);
+                FlecsAllocator.free(segment);
+                this.segment = FlecsAllocator.malloc(this.capacity);
             }
-            return segment.asSlice(0, needed);
+            return this.segment.fill((byte) 0);
         }
 
         @Override
         public void close() {
-            if (this.arena != null) {
-                this.arena.close();
-                this.arena = null;
+            if (this.segment != null && this.segment.address() != 0) {
+                FlecsAllocator.free(this.segment);
             }
         }
     }
 
     private static final class EntityDescBuffer implements AutoCloseable {
-        private final Arena arena;
         private final MemorySegment segment;
 
         EntityDescBuffer() {
-            this.arena = Arena.ofConfined();
-            this.segment = ecs_entity_desc_t.allocate(this.arena);
+            this.segment = FlecsAllocator.malloc(ecs_entity_desc_t.sizeof());
         }
 
         MemorySegment get() {
+            this.segment.fill((byte) 0);
             return this.segment;
         }
 
         @Override
         public void close() {
-            this.arena.close();
+            FlecsAllocator.free(this.segment);
         }
     }
 
@@ -154,7 +145,7 @@ public class World {
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.defaultBuffers = null;
+        this.defaultBuffers = new FlecsBuffers();
         this.contextCache = new FlecsContext(this);
         this.destroyed = false;
         this.owned = false;
@@ -881,6 +872,8 @@ public class World {
                     }
                 }
             }
+
+            this.defaultBuffers.close();
 
             if (this.arena != null) {
                 this.arena.close();

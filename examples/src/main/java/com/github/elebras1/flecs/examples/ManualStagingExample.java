@@ -1,8 +1,10 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
+import com.github.elebras1.flecs.EntityView;
 import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.Health;
+import com.github.elebras1.flecs.examples.components.HealthView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +29,16 @@ public class ManualStagingExample {
             entity.set(new Health(i));
         }
 
+        world.readonlyBegin();
         for (int i = 0; i < THREADS; i++) {
             final int stageId = i;
             futures.add(executor.submit(() -> {
                 World stage = world.getStage(stageId);
                 for(int j = stageId * 250; j < (stageId + 1) * 250; j++) {
-                    long entityId = world.lookup("entity_" + j);
-                    Entity entity = stage.obtainEntity(entityId);
-                    entity.set(new Health(j));
+                    long entityId = stage.lookup("entity_" + j);
+                    EntityView entity = stage.obtainEntityView(entityId);
+                    HealthView health = entity.getMutView(Health.class);
+                    health.value(health.value() + 1);
                 }
             }));
         }
@@ -47,7 +51,8 @@ public class ManualStagingExample {
             e.printStackTrace();
         }
 
-        world.merge();
+        world.readonlyEnd();
+
         executor.shutdown();
 
         world.destroy();

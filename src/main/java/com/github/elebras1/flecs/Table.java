@@ -1,6 +1,7 @@
 package com.github.elebras1.flecs;
 
 import com.github.elebras1.flecs.callback.RowCallback;
+import com.github.elebras1.flecs.util.internal.FlecsAllocator;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -17,8 +18,7 @@ public class Table {
     public String str() {
         MemorySegment strSeg = flecs_h.ecs_table_str(this.world.worldSeg(), this.tableSeg);
         String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
-        MemorySegment freeSeg = ecs_os_api_t.free_(flecs_h.ecs_os_api());
-        ecs_os_api_free_t.invoke(freeSeg, strSeg);
+        FlecsAllocator.free(strSeg);
         return str;
     }
 
