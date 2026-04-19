@@ -140,7 +140,7 @@ public class World {
     }
 
     private World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
-        this.arena = Arena.ofConfined();
+        this.arena = Arena.ofShared();
         this.worldSeg = stageSeg;
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
