@@ -18,36 +18,38 @@ public class ManualStagingExample {
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
         List<Future<?>> futures = new ArrayList<>();
 
-        try (World world = new World()) {
-            world.setStageCount(THREADS);
-            world.component(Health.class);
+        World world = new World();
+        world.setStageCount(THREADS);
+        world.component(Health.class);
 
-            for (int i = 0; i < 1000; i++) {
-                Entity entity = world.obtainEntity(world.entity("entity_" + i));
-                entity.set(new Health(i));
-            }
+        for (int i = 0; i < 1000; i++) {
+            Entity entity = world.obtainEntity(world.entity("entity_" + i));
+            entity.set(new Health(i));
+        }
 
-            for (int i = 0; i < THREADS; i++) {
-                final int stageId = i;
-                futures.add(executor.submit(() -> {
-                    World stage = world.getStage(stageId);
-                    for(int j = stageId * 250; j < (stageId + 1) * 250; j++) {
-                        long entityId = world.lookup("entity_" + j);
-                        Entity entity = stage.obtainEntity(entityId);
-                        entity.set(new Health(j));
-                    }
-                }));
-            }
+        for (int i = 0; i < THREADS; i++) {
+            final int stageId = i;
+            futures.add(executor.submit(() -> {
+                World stage = world.getStage(stageId);
+                for(int j = stageId * 250; j < (stageId + 1) * 250; j++) {
+                    long entityId = world.lookup("entity_" + j);
+                    Entity entity = stage.obtainEntity(entityId);
+                    entity.set(new Health(j));
+                }
+            }));
+        }
 
+        try {
             for (Future<?> f : futures) {
                 f.get();
             }
-
-            world.merge();
-            executor.shutdown();
-
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
+
+        world.merge();
+        executor.shutdown();
+
+        world.destroy();
     }
 }

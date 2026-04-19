@@ -34,10 +34,10 @@ public class QueryBenchmark {
     @TearDown(Level.Trial)
     public void tearDown() {
         if (this.query != null) {
-            this.query.close();
+            this.query.destroy();
         }
         if (this.ecsWorld != null) {
-            this.ecsWorld.close();
+            this.ecsWorld.destroy();
         }
     }
 

@@ -7,14 +7,15 @@ import com.github.elebras1.flecs.examples.components.Position;
 public class RelationsExample {
 
     public static void main(String[] args) {
-        try (World world = new World()) {
-            world.component(Position.class);
+        World world = new World();
+        world.component(Position.class);
 
-            childOfHierarchy(world);
-            parentHierarchy(world);
-            customRelationships(world);
-            isaInheritance(world);
-        }
+        childOfHierarchy(world);
+        parentHierarchy(world);
+        customRelationships(world);
+        isaInheritance(world);
+
+        world.destroy();
     }
 
     private static void childOfHierarchy(World world) {

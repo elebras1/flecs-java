@@ -165,7 +165,7 @@ public class EachBaseGenerator {
                         .addStatement("this.world = world")
                         .addStatement("this.querySeg = querySeg")
                         .build())
-                .addMethod(MethodSpec.methodBuilder("checkClosed")
+                .addMethod(MethodSpec.methodBuilder("checkDestroyed")
                         .addModifiers(Modifier.PROTECTED, Modifier.ABSTRACT)
                         .returns(void.class).build());
 
@@ -185,7 +185,7 @@ public class EachBaseGenerator {
     private MethodSpec buildQueryEachMethod(int n, ViewMode vm, EntityMode em) {
         MethodSpec.Builder mb = startEachMethod(n, vm, em, void.class);
 
-        mb.addStatement("this.checkClosed()");
+        mb.addStatement("this.checkDestroyed()");
         mb.beginControlFlow("try ($T tmpArena = $T.ofConfined())", ARENA, ARENA);
         mb.addStatement("$T iter = $T.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)",
                 MEMORY_SEGMENT, FLECS_H);

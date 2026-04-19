@@ -99,6 +99,6 @@ class WorldTest {
 
     @AfterEach
     void tearDown() {
-        this.world.close();
+        this.world.destroy();
     }
 }

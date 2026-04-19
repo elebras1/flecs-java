@@ -8,17 +8,17 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-public class Query extends QueryBase implements AutoCloseable {
+public class Query extends QueryBase {
 
     private final Arena arena;
     private final Iter iter;
-    private boolean closed;
+    private boolean destroyed;
 
     Query(World world, MemorySegment querySeg) {
         super(world, querySeg);
         this.arena = Arena.ofShared();
         this.iter = new Iter(MemorySegment.NULL, this.world);
-        this.closed = false;
+        this.destroyed = false;
     }
 
     private MemorySegment createIterSeg() {
@@ -26,7 +26,7 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     public void each(EntityCallback callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();
         if (iterSeg.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
@@ -44,7 +44,7 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     public void iter(IterCallback callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();
         if (iterSeg.address() == 0) {
             throw new IllegalStateException("ecs_query_iter returned a null iterator");
@@ -58,7 +58,7 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     public void run(RunCallback callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();
 
         if (iterSeg.address() == 0) {
@@ -70,7 +70,7 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     public int count() {
-        this.checkClosed();
+        this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();
 
         int total = 0;
@@ -82,7 +82,7 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     public long[] entities() {
-        this.checkClosed();
+        this.checkDestroyed();
         int[] index = {0};
         long[] result = new long[this.count()];
         MemorySegment iterSeg = this.createIterSeg();
@@ -97,9 +97,9 @@ public class Query extends QueryBase implements AutoCloseable {
     }
 
     @Override
-    protected void checkClosed() {
-        if (this.closed) {
-            throw new IllegalStateException("The query has already been closed.");
+    protected void checkDestroyed() {
+        if (this.destroyed) {
+            throw new IllegalStateException("The query has already been destroyed.");
         }
     }
 
@@ -111,10 +111,9 @@ public class Query extends QueryBase implements AutoCloseable {
         return strSeg.getString(0);
     }
 
-    @Override
-    public void close() {
-        if (!this.closed) {
-            this.closed = true;
+    public void destroy() {
+        if (!this.destroyed) {
+            this.destroyed = true;
             if (this.querySeg != null && this.querySeg.address() != 0) {
                 flecs_h.ecs_query_fini(this.querySeg);
             }

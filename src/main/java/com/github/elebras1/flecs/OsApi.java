@@ -5,7 +5,7 @@ import com.github.elebras1.flecs.util.internal.FlecsLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
-public class OsApi implements AutoCloseable {
+public class OsApi {
     private final Arena arena;
     private final MemorySegment nativeOsApi;
 
@@ -49,8 +49,7 @@ public class OsApi implements AutoCloseable {
         flecs_h.ecs_os_set_api(this.nativeOsApi);
     }
 
-    @Override
-    public void close() throws Exception {
+    public void destroy() {
         this.arena.close();
     }
 }

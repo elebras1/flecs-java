@@ -16,45 +16,47 @@ public class SimpleQueryBenchmark {
         System.out.println("Benchmark iterations: " + BENCHMARK_ITERATIONS);
         System.out.println();
 
-        try (World world = new World()) {
-            world.component(Position.class);
-            world.component(Velocity.class);
+        World world = new World();
+        world.component(Position.class);
+        world.component(Velocity.class);
 
-            System.out.println("Creating " + ENTITY_COUNT + " entities...");
-            long startCreate = System.nanoTime();
+        System.out.println("Creating " + ENTITY_COUNT + " entities...");
+        long startCreate = System.nanoTime();
 
-            for (int i = 0; i < ENTITY_COUNT; i++) {
-                long entityId = world.entity();
-                Entity entity = world.obtainEntity(entityId);
-                entity.set(new Position(i % 1000, i % 1000));
-                entity.set(new Velocity(1.0f, 0.5f));
-            }
-
-            long endCreate = System.nanoTime();
-            System.out.printf("Entity creation time: %.3f ms%n", (endCreate - startCreate) / 1_000_000.0);
-            System.out.println();
-
-            try (Query query = world.query().with(Position.class).with(Velocity.class).build()) {
-
-                System.out.println("Query matches " + query.count() + " entities");
-                System.out.println();
-
-                System.out.println("--- Benchmark 1: each(Component.class, Component.class, ...) ---");
-                runBenchmark("each+get", () -> benchmarkEach(query));
-
-                System.out.println("--- Benchmark 2: eachView(Component.class, Component.class, ...) ---");
-                runBenchmark("each+getMutView", () -> benchmarkEachMutView(query));
-
-                System.out.println("--- Benchmark 3: iter() + Field<T>.get(i) ---");
-                runBenchmark("iter+Field+get", () -> benchmarkIterFieldGet(query));
-
-                System.out.println("--- Benchmark 4: iter() + Field<T>.getMutView(i) ---");
-                runBenchmark("iter+Field+getMutView", () -> benchmarkIterFieldGetMutView(query));
-
-                System.out.println();
-                System.out.println("=== Benchmark Complete ===");
-            }
+        for (int i = 0; i < ENTITY_COUNT; i++) {
+            long entityId = world.entity();
+            Entity entity = world.obtainEntity(entityId);
+            entity.set(new Position(i % 1000, i % 1000));
+            entity.set(new Velocity(1.0f, 0.5f));
         }
+
+        long endCreate = System.nanoTime();
+        System.out.printf("Entity creation time: %.3f ms%n", (endCreate - startCreate) / 1_000_000.0);
+        System.out.println();
+
+        Query query = world.query().with(Position.class).with(Velocity.class).build();
+
+        System.out.println("Query matches " + query.count() + " entities");
+        System.out.println();
+
+        System.out.println("--- Benchmark 1: each(Component.class, Component.class, ...) ---");
+        runBenchmark("each+get", () -> benchmarkEach(query));
+
+        System.out.println("--- Benchmark 2: eachView(Component.class, Component.class, ...) ---");
+        runBenchmark("each+getMutView", () -> benchmarkEachMutView(query));
+
+        System.out.println("--- Benchmark 3: iter() + Field<T>.get(i) ---");
+        runBenchmark("iter+Field+get", () -> benchmarkIterFieldGet(query));
+
+        System.out.println("--- Benchmark 4: iter() + Field<T>.getMutView(i) ---");
+        runBenchmark("iter+Field+getMutView", () -> benchmarkIterFieldGetMutView(query));
+
+        System.out.println();
+        System.out.println("=== Benchmark Complete ===");
+
+        query.destroy();
+
+        world.destroy();
     }
 
     private static float benchmarkEach(Query query) {

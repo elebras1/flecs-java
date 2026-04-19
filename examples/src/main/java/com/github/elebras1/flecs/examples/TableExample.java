@@ -6,48 +6,48 @@ import com.github.elebras1.flecs.examples.components.*;
 public class TableExample {
 
     public static void main(String[] args) {
-        try (World world = new World()) {
-            world.component(Position.class);
-            world.component(Velocity.class);
-            world.component(Health.class);
+        World world = new World();
+        world.component(Position.class);
+        world.component(Velocity.class);
+        world.component(Health.class);
 
-            world.obtainEntity(world.entity()).set(new Position(0, 0)).set(new Velocity(1, 1));
-            world.obtainEntity(world.entity()).set(new Position(10, 10)).set(new Velocity(2, 2));
-            world.obtainEntity(world.entity()).set(new Position(20, 20)).set(new Health(100));
-            world.obtainEntity(world.entity()).set(new Position(30, 30));
+        world.obtainEntity(world.entity()).set(new Position(0, 0)).set(new Velocity(1, 1));
+        world.obtainEntity(world.entity()).set(new Position(10, 10)).set(new Velocity(2, 2));
+        world.obtainEntity(world.entity()).set(new Position(20, 20)).set(new Health(100));
+        world.obtainEntity(world.entity()).set(new Position(30, 30));
 
-            try (Query q = world.query().with(Position.class).with(Velocity.class).build()) {
-                q.iter(it -> {
-                    Table table = it.table();
+        Query q = world.query().with(Position.class).with(Velocity.class).build();
+        q.iter(it -> {
+            Table table = it.table();
 
-                    System.out.println("Table: " + table.str());
-                    System.out.println("Entities: " + table.count());
+            System.out.println("Table: " + table.str());
+            System.out.println("Entities: " + table.count());
 
-                    long[] typeIds = table.type();
-                    for (long id : typeIds) {
-                        Entity component = world.obtainEntity(id);
-                        System.out.println("  - " + component.getName() + " (" + id + ")");
-                    }
-                });
+            long[] typeIds = table.type();
+            for (long id : typeIds) {
+                Entity component = world.obtainEntity(id);
+                System.out.println("  - " + component.getName() + " (" + id + ")");
             }
+        });
 
-            System.out.println();
+        System.out.println();
 
-            try (Query q = world.query().with(Position.class).with(Velocity.class).build()) {
-                q.iter(it -> {
-                    Table table = it.table();
+        q.iter(it -> {
+            Table table = it.table();
 
-                    for (int row = 0; row < table.count(); row++) {
-                        Position pos = table.get(Position.class, row);
-                        Velocity vel = table.get(Velocity.class, row);
+            for (int row = 0; row < table.count(); row++) {
+                Position pos = table.get(Position.class, row);
+                Velocity vel = table.get(Velocity.class, row);
 
-                        long[] entities = table.entities();
-                        Entity e = world.obtainEntity(entities[row]);
-                        System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
-                    }
-                });
+                long[] entities = table.entities();
+                Entity e = world.obtainEntity(entities[row]);
+                System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
             }
-        }
+        });
+
+        q.destroy();
+
+        world.destroy();
     }
 }
 

@@ -32,7 +32,7 @@ public class EntityRemoveBenchmark {
     @TearDown(Level.Invocation)
     public void tearDown() {
         if (this.ecsWorld != null) {
-            this.ecsWorld.close();
+            this.ecsWorld.destroy();
         }
     }
 

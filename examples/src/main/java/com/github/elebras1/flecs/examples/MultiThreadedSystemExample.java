@@ -9,34 +9,35 @@ import java.util.Random;
 
 public class MultiThreadedSystemExample {
     public static void main(String[] args) {
-        try (World world = new World()) {
-            world.component(Minister.class);
-            world.setThreads(4);
+        World world = new World();
+        world.component(Minister.class);
+        world.setThreads(4);
 
-            Random rnd = new Random();
-            for (int i = 0; i < 1000; i++) {
-                world.obtainEntity(world.entity("Min_" + i)).set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
-            }
-
-            world.system("LoyaltySystem").with(Minister.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded(true).iter(it -> {
-                Field<Minister> ministerField = it.field(Minister.class, 0);
-                for (int i = 0; i < it.count(); i++) {
-                    MinisterView ministerView = ministerField.getMutView(i);
-
-                    float newLoyalty = Math.min(ministerView.loyalty() + 10.0f, 100.0f);
-                    String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
-
-                    ministerView.loyalty(newLoyalty);
-                    ministerView.imageFileName(newImg);
-                }
-            });
-
-            for (int f = 0; f < 5; f++) {
-                world.progress(0.016f);
-            }
-
-            Minister m = world.obtainEntity(world.lookup("Min_42")).get(Minister.class);
-            System.out.printf("Check Min_42 -> Loyalty: %.1f | Img: %s%n", m.loyalty(), m.imageFileName());
+        Random rnd = new Random();
+        for (int i = 0; i < 1000; i++) {
+            world.obtainEntity(world.entity("Min_" + i)).set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
         }
+
+        world.system("LoyaltySystem").with(Minister.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded(true).iter(it -> {
+            Field<Minister> ministerField = it.field(Minister.class, 0);
+            for (int i = 0; i < it.count(); i++) {
+                MinisterView ministerView = ministerField.getMutView(i);
+
+                float newLoyalty = Math.min(ministerView.loyalty() + 10.0f, 100.0f);
+                String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
+
+                ministerView.loyalty(newLoyalty);
+                ministerView.imageFileName(newImg);
+            }
+        });
+
+        for (int f = 0; f < 5; f++) {
+            world.progress(0.016f);
+        }
+
+        Minister m = world.obtainEntity(world.lookup("Min_42")).get(Minister.class);
+        System.out.printf("Check Min_42 -> Loyalty: %.1f | Img: %s%n", m.loyalty(), m.imageFileName());
+
+        world.destroy();
     }
 }

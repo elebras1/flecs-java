@@ -16,10 +16,10 @@ public abstract class QueryBase {
         this.querySeg = querySeg;
     }
 
-    protected abstract void checkClosed();
+    protected abstract void checkDestroyed();
 
     public <A> void each(Class<A> componentClassA, Component1Callback<A> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -39,7 +39,7 @@ public abstract class QueryBase {
     }
 
     public <A> void each(Class<A> componentClassA, Component1WithEntityCallback<A> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -63,7 +63,7 @@ public abstract class QueryBase {
     @SuppressWarnings("unchecked")
     public <A, VA extends ComponentView> void eachView(Class<A> componentClassA,
             ComponentView1Callback<VA> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -87,7 +87,7 @@ public abstract class QueryBase {
     @SuppressWarnings("unchecked")
     public <A, VA extends ComponentView> void eachView(Class<A> componentClassA,
             ComponentView1WithEntityCallback<VA> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -112,7 +112,7 @@ public abstract class QueryBase {
 
     public <A, B> void each(Class<A> componentClassA, Class<B> componentClassB,
             Component2Callback<A, B> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -137,7 +137,7 @@ public abstract class QueryBase {
 
     public <A, B> void each(Class<A> componentClassA, Class<B> componentClassB,
             Component2WithEntityCallback<A, B> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -166,7 +166,7 @@ public abstract class QueryBase {
     public <A, B, VA extends ComponentView, VB extends ComponentView> void eachView(
             Class<A> componentClassA, Class<B> componentClassB,
             ComponentView2Callback<VA, VB> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -196,7 +196,7 @@ public abstract class QueryBase {
     public <A, B, VA extends ComponentView, VB extends ComponentView> void eachView(
             Class<A> componentClassA, Class<B> componentClassB,
             ComponentView2WithEntityCallback<VA, VB> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -226,7 +226,7 @@ public abstract class QueryBase {
 
     public <A, B, C> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Component3Callback<A, B, C> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -255,7 +255,7 @@ public abstract class QueryBase {
 
     public <A, B, C> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Component3WithEntityCallback<A, B, C> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -288,7 +288,7 @@ public abstract class QueryBase {
     public <A, B, C, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView> void eachView(
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             ComponentView3Callback<VA, VB, VC> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -323,7 +323,7 @@ public abstract class QueryBase {
     public <A, B, C, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView> void eachView(
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             ComponentView3WithEntityCallback<VA, VB, VC> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -359,7 +359,7 @@ public abstract class QueryBase {
     public <A, B, C, D> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Class<D> componentClassD,
             Component4Callback<A, B, C, D> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -393,7 +393,7 @@ public abstract class QueryBase {
     public <A, B, C, D> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Class<D> componentClassD,
             Component4WithEntityCallback<A, B, C, D> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -430,7 +430,7 @@ public abstract class QueryBase {
     public <A, B, C, D, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView> void eachView(
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, ComponentView4Callback<VA, VB, VC, VD> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -470,7 +470,7 @@ public abstract class QueryBase {
     public <A, B, C, D, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView> void eachView(
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, ComponentView4WithEntityCallback<VA, VB, VC, VD> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -511,7 +511,7 @@ public abstract class QueryBase {
     public <A, B, C, D, E> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Component5Callback<A, B, C, D, E> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -549,7 +549,7 @@ public abstract class QueryBase {
     public <A, B, C, D, E> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Component5WithEntityCallback<A, B, C, D, E> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -591,7 +591,7 @@ public abstract class QueryBase {
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, Class<E> componentClassE,
             ComponentView5Callback<VA, VB, VC, VD, VE> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -637,7 +637,7 @@ public abstract class QueryBase {
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, Class<E> componentClassE,
             ComponentView5WithEntityCallback<VA, VB, VC, VD, VE> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -683,7 +683,7 @@ public abstract class QueryBase {
     public <A, B, C, D, E, F> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Component6Callback<A, B, C, D, E, F> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -725,7 +725,7 @@ public abstract class QueryBase {
     public <A, B, C, D, E, F> void each(Class<A> componentClassA, Class<B> componentClassB,
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Component6WithEntityCallback<A, B, C, D, E, F> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -771,7 +771,7 @@ public abstract class QueryBase {
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             ComponentView6Callback<VA, VB, VC, VD, VE, VF> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -822,7 +822,7 @@ public abstract class QueryBase {
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             ComponentView6WithEntityCallback<VA, VB, VC, VD, VE, VF> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -874,7 +874,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Class<G> componentClassG,
             Component7Callback<A, B, C, D, E, F, G> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -921,7 +921,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Class<G> componentClassG,
             Component7WithEntityCallback<A, B, C, D, E, F, G> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -971,7 +971,7 @@ public abstract class QueryBase {
             Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC,
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             Class<G> componentClassG, ComponentView7Callback<VA, VB, VC, VD, VE, VF, VG> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1028,7 +1028,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             Class<G> componentClassG,
             ComponentView7WithEntityCallback<VA, VB, VC, VD, VE, VF, VG> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1085,7 +1085,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH,
             Component8Callback<A, B, C, D, E, F, G, H> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1136,7 +1136,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH,
             Component8WithEntityCallback<A, B, C, D, E, F, G, H> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1191,7 +1191,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             Class<G> componentClassG, Class<H> componentClassH,
             ComponentView8Callback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1253,7 +1253,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             Class<G> componentClassG, Class<H> componentClassH,
             ComponentView8WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1315,7 +1315,7 @@ public abstract class QueryBase {
             Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE,
             Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH,
             Class<I> componentClassI, Component9Callback<A, B, C, D, E, F, G, H, I> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1371,7 +1371,7 @@ public abstract class QueryBase {
             Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH,
             Class<I> componentClassI,
             Component9WithEntityCallback<A, B, C, D, E, F, G, H, I> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1430,7 +1430,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             ComponentView9Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1497,7 +1497,7 @@ public abstract class QueryBase {
             Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF,
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             ComponentView9WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1565,7 +1565,7 @@ public abstract class QueryBase {
             Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG,
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Component10Callback<A, B, C, D, E, F, G, H, I, J> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1625,7 +1625,7 @@ public abstract class QueryBase {
             Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG,
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Component10WithEntityCallback<A, B, C, D, E, F, G, H, I, J> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1689,7 +1689,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             Class<J> componentClassJ,
             ComponentView10Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1762,7 +1762,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             Class<J> componentClassJ,
             ComponentView10WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1836,7 +1836,7 @@ public abstract class QueryBase {
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Class<K> componentClassK,
             Component11Callback<A, B, C, D, E, F, G, H, I, J, K> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1901,7 +1901,7 @@ public abstract class QueryBase {
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Class<K> componentClassK,
             Component11WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -1969,7 +1969,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             Class<J> componentClassJ, Class<K> componentClassK,
             ComponentView11Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2047,7 +2047,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             Class<J> componentClassJ, Class<K> componentClassK,
             ComponentView11WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2126,7 +2126,7 @@ public abstract class QueryBase {
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Class<K> componentClassK, Class<L> componentClassL,
             Component12Callback<A, B, C, D, E, F, G, H, I, J, K, L> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2195,7 +2195,7 @@ public abstract class QueryBase {
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Class<K> componentClassK, Class<L> componentClassL,
             Component12WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2267,7 +2267,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             ComponentView12Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2350,7 +2350,7 @@ public abstract class QueryBase {
             Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI,
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             ComponentView12WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2434,7 +2434,7 @@ public abstract class QueryBase {
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Component13Callback<A, B, C, D, E, F, G, H, I, J, K, L, M> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2507,7 +2507,7 @@ public abstract class QueryBase {
             Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ,
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Component13WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2584,7 +2584,7 @@ public abstract class QueryBase {
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             Class<M> componentClassM,
             ComponentView13Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2673,7 +2673,7 @@ public abstract class QueryBase {
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             Class<M> componentClassM,
             ComponentView13WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2763,7 +2763,7 @@ public abstract class QueryBase {
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Class<N> componentClassN,
             Component14Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2841,7 +2841,7 @@ public abstract class QueryBase {
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Class<N> componentClassN,
             Component14WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -2922,7 +2922,7 @@ public abstract class QueryBase {
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             Class<M> componentClassM, Class<N> componentClassN,
             ComponentView14Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3016,7 +3016,7 @@ public abstract class QueryBase {
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             Class<M> componentClassM, Class<N> componentClassN,
             ComponentView14WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3111,7 +3111,7 @@ public abstract class QueryBase {
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Class<N> componentClassN, Class<O> componentClassO,
             Component15Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3193,7 +3193,7 @@ public abstract class QueryBase {
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Class<N> componentClassN, Class<O> componentClassO,
             Component15WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3278,7 +3278,7 @@ public abstract class QueryBase {
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             ComponentView15Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3377,7 +3377,7 @@ public abstract class QueryBase {
             Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL,
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             ComponentView15WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3477,7 +3477,7 @@ public abstract class QueryBase {
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP,
             Component16Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3563,7 +3563,7 @@ public abstract class QueryBase {
             Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM,
             Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP,
             Component16WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3653,7 +3653,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP,
             ComponentView16Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3758,7 +3758,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP,
             ComponentView16WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3864,7 +3864,7 @@ public abstract class QueryBase {
             Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP,
             Class<Q> componentClassQ,
             Component17Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -3955,7 +3955,7 @@ public abstract class QueryBase {
             Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP,
             Class<Q> componentClassQ,
             Component17WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4049,7 +4049,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP, Class<Q> componentClassQ,
             ComponentView17Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4159,7 +4159,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP, Class<Q> componentClassQ,
             ComponentView17WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4270,7 +4270,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Component18Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4365,7 +4365,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Component18WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4463,7 +4463,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             ComponentView18Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4578,7 +4578,7 @@ public abstract class QueryBase {
             Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO,
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             ComponentView18WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4695,7 +4695,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS,
             Component19Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4795,7 +4795,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS,
             Component19WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -4898,7 +4898,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS,
             ComponentView19Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5019,7 +5019,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS,
             ComponentView19WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5141,7 +5141,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT,
             Component20Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5245,7 +5245,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT,
             Component20WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5352,7 +5352,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT,
             ComponentView20Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5478,7 +5478,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT,
             ComponentView20WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5605,7 +5605,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Component21Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5713,7 +5713,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Component21WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5824,7 +5824,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             ComponentView21Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -5955,7 +5955,7 @@ public abstract class QueryBase {
             Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR,
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             ComponentView21WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6088,7 +6088,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV,
             Component22Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6201,7 +6201,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV,
             Component22WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6317,7 +6317,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV,
             ComponentView22Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6454,7 +6454,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV,
             ComponentView22WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6592,7 +6592,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW,
             Component23Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6709,7 +6709,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW,
             Component23WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6829,7 +6829,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW,
             ComponentView23Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -6971,7 +6971,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW,
             ComponentView23WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7114,7 +7114,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Component24Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7235,7 +7235,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Component24WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7359,7 +7359,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             ComponentView24Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7506,7 +7506,7 @@ public abstract class QueryBase {
             Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU,
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             ComponentView24WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7655,7 +7655,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY,
             Component25Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7781,7 +7781,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY,
             Component25WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -7910,7 +7910,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY,
             ComponentView25Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8063,7 +8063,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY,
             ComponentView25WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8217,7 +8217,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ,
             Component26Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8347,7 +8347,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ,
             Component26WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8480,7 +8480,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ,
             ComponentView26Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8638,7 +8638,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ,
             ComponentView26WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8797,7 +8797,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Component27Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -8931,7 +8931,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Component27WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -9068,7 +9068,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             ComponentView27Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -9231,7 +9231,7 @@ public abstract class QueryBase {
             Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX,
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             ComponentView27WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -9396,7 +9396,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB,
             Component28Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -9535,7 +9535,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB,
             Component28WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -9677,7 +9677,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB,
             ComponentView28Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -9846,7 +9846,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB,
             ComponentView28WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10016,7 +10016,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC,
             Component29Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10159,7 +10159,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC,
             Component29WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10305,7 +10305,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC,
             ComponentView29Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10479,7 +10479,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC,
             ComponentView29WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10654,7 +10654,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Component30Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10801,7 +10801,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Component30WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -10951,7 +10951,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             ComponentView30Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -11130,7 +11130,7 @@ public abstract class QueryBase {
             Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA,
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             ComponentView30WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -11311,7 +11311,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE,
             Component31Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -11463,7 +11463,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE,
             Component31WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -11618,7 +11618,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE,
             ComponentView31Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -11803,7 +11803,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE,
             ComponentView31WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -11989,7 +11989,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE, Class<AF> componentClassAF,
             Component32Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -12145,7 +12145,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE, Class<AF> componentClassAF,
             Component32WithEntityCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -12304,7 +12304,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE, Class<AF> componentClassAF,
             ComponentView32Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {
@@ -12494,7 +12494,7 @@ public abstract class QueryBase {
             Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD,
             Class<AE> componentClassAE, Class<AF> componentClassAF,
             ComponentView32WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
-        this.checkClosed();
+        this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
             MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
             if (iter.address() == 0) {

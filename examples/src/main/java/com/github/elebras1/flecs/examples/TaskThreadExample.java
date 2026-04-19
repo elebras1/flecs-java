@@ -37,29 +37,30 @@ public class TaskThreadExample {
             })
             .set();
 
-        try (World world = new World()) {
-            world.setTaskThreads(NUMBER_THREADS);
-            world.component(Health.class);
+        World world = new World();
+        world.setTaskThreads(NUMBER_THREADS);
+        world.component(Health.class);
 
-            for(int i = 0; i < 100_000; i++) {
-                EntityView entity = world.obtainEntityView(world.entity());
-                entity.set(Health.class, (HealthView health) -> health.value(100));
-            }
-
-            world.system().with(Health.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded().iter(iter -> {
-                Field<Health> healthField = iter.field(Health.class, 0);
-                for(int i = 0; i < iter.count(); i++) {
-                    HealthView health = healthField.getMutView(i);
-                    health.value(health.value() - 1);
-                }
-            });
-
-            for(int i = 0; i < 1000; i++) {
-                world.progress();
-            }
-
-            executor.close();
+        for(int i = 0; i < 100_000; i++) {
+            EntityView entity = world.obtainEntityView(world.entity());
+            entity.set(Health.class, (HealthView health) -> health.value(100));
         }
+
+        world.system().with(Health.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded().iter(iter -> {
+            Field<Health> healthField = iter.field(Health.class, 0);
+            for(int i = 0; i < iter.count(); i++) {
+                HealthView health = healthField.getMutView(i);
+                health.value(health.value() - 1);
+            }
+        });
+
+        for(int i = 0; i < 1000; i++) {
+            world.progress();
+        }
+
+        executor.close();
+        osApi.destroy();
+        world.destroy();
 
     }
 }
