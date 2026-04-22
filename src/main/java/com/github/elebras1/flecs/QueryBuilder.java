@@ -237,8 +237,8 @@ public class QueryBuilder {
 
     public <T> QueryBuilder orderBy(long componentId, ComparatorComponent<T> comparator) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentASeg, _, componentBSeg) ->
-                comparator.compare(component.read(componentASeg, 0), component.read(componentBSeg, 0)), this.world.arena());
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentAdressA, _, componentAdressB) ->
+                comparator.compare(component.read(MemorySegment.ofAddress(componentAdressA), 0), component.read(MemorySegment.ofAddress(componentAdressB), 0)), this.world.arena());
         ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
         return this.orderBy(componentId);
     }
@@ -246,11 +246,11 @@ public class QueryBuilder {
     @SuppressWarnings("unchecked")
     public <V extends ComponentView> QueryBuilder orderBy(long componentId, ComparatorComponentView<V> comparator) {
         Class<?> componentClass = this.world.componentRegistry().getComponentClassById(componentId);
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentASeg, _, componentBSeg) -> {
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentAdressA, _, componentAdressB) -> {
             V componentViewA = (V) this.world.viewCache().getComponentView(componentClass);
-            componentViewA.setBaseAddress(componentASeg.address());
+            componentViewA.setBaseAddress(componentAdressA);
             V componentViewB = (V) this.world.viewCache().getComponentView(componentClass);
-            componentViewB.setBaseAddress(componentBSeg.address());
+            componentViewB.setBaseAddress(componentAdressB);
             return comparator.compare(componentViewA, componentViewB);
         }, this.world.arena());
         ecs_query_desc_t.order_by_callback(this.desc, callbackStub);

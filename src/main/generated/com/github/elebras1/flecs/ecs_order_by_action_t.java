@@ -27,15 +27,15 @@ public final class ecs_order_by_action_t {
      * The function pointer signature, expressed as a functional interface
      */
     public interface Function {
-        int apply(long e1, MemorySegment ptr1, long e2, MemorySegment ptr2);
+        int apply(long e1, long ptr1, long e2, long ptr2);
     }
 
     private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
         flecs_h.C_INT,
         flecs_h.C_LONG,
-        flecs_h.C_POINTER,
         flecs_h.C_LONG,
-        flecs_h.C_POINTER
+        flecs_h.C_LONG,
+        flecs_h.C_LONG
     );
 
     /**
@@ -60,7 +60,7 @@ public final class ecs_order_by_action_t {
     /**
      * Invoke the upcall stub {@code funcPtr}, with given parameters
      */
-    public static int invoke(MemorySegment funcPtr, long e1, MemorySegment ptr1, long e2, MemorySegment ptr2) {
+    public static int invoke(MemorySegment funcPtr, long e1, long ptr1, long e2, long ptr2) {
         try {
             return (int) DOWN$MH.invokeExact(funcPtr, e1, ptr1, e2, ptr2);
         } catch (Error | RuntimeException ex) {
