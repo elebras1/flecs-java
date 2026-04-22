@@ -331,6 +331,21 @@ public class World {
         return this.componentRegistry.getComponentId(componentClass);
     }
 
+    public int count(long componentId) {
+        this.checkDestroyed();
+        return flecs_h.ecs_count_id(this.worldSeg, componentId);
+    }
+
+    public int count(Entity entity) {
+        return count(entity.id());
+    }
+
+    public int count(Class<?> componentClass) {
+        this.checkDestroyed();
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return flecs_h.ecs_count_id(this.worldSeg, componentId);
+    }
+
     public void deleteWith(Class<?> componentClass) {
         this.checkDestroyed();
         long componentId = this.componentRegistry.getComponentId(componentClass);
