@@ -847,34 +847,27 @@ public class World {
         flecs_h.FlecsStatsImport(this.worldSeg);
         flecs_h.FlecsMetricsImport(this.worldSeg);
 
+        long restCompId = flecs_h.FLECS_IDEcsRestID_();
+        if( restCompId == 0) {
+            throw new IllegalStateException("Failed to find EcsRest component.");
+        }
+
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment restCompName = arena.allocateFrom("flecs.rest.Rest");
-            long restCompId = flecs_h.ecs_lookup(this.worldSeg, restCompName);
-
-            if (restCompId == 0) {
-                throw new IllegalStateException("Failed to find flecs.rest.Rest component.");
-            }
-
-            MemorySegment restDataSeg = arena.allocate(32);
-            restDataSeg.set(JAVA_SHORT, 0, port);
-
-            flecs_h.ecs_set_id(this.worldSeg, restCompId, restCompId, 32, restDataSeg);
+            MemorySegment restDataSeg = EcsRest.allocate(arena);
+            EcsRest.port(restDataSeg, port);
+            flecs_h.ecs_set_id(this.worldSeg, restCompId, restCompId, EcsRest.sizeof(), restDataSeg);
         }
     }
 
     public void disableRest() {
         this.checkDestroyed();
 
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment restCompNameSeg = arena.allocateFrom("flecs.rest.Rest");
-            long restCompId = flecs_h.ecs_lookup(this.worldSeg, restCompNameSeg);
-
-            if( restCompId == 0) {
-                throw new IllegalStateException("Failed to find flecs.rest.Rest component. Make sure FlecsRest module is imported.");
-            }
-
-            flecs_h.ecs_remove_id(this.worldSeg, restCompId, restCompId);
+        long restCompId = flecs_h.FLECS_IDEcsRestID_();
+        if( restCompId == 0) {
+            throw new IllegalStateException("Failed to find EcsRest component.");
         }
+
+        flecs_h.ecs_remove_id(this.worldSeg, restCompId, restCompId);
     }
 
     public void destroy() {
@@ -905,4 +898,5 @@ public class World {
         return String.format("World[0x%x]", this.worldSeg.address());
     }
 }
+
 
