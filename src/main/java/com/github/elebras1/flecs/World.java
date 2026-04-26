@@ -840,22 +840,33 @@ public class World {
 
     public void enableRest(short port) {
         this.checkDestroyed();
-
-        flecs_h.FlecsDocImport(this.worldSeg);
-        flecs_h.FlecsRestImport(this.worldSeg);
-        flecs_h.FlecsAlertsImport(this.worldSeg);
-        flecs_h.FlecsStatsImport(this.worldSeg);
-        flecs_h.FlecsMetricsImport(this.worldSeg);
-
-        long restCompId = flecs_h.FLECS_IDEcsRestID_();
-        if( restCompId == 0) {
-            throw new IllegalStateException("Failed to find EcsRest component.");
-        }
-
         try (Arena arena = Arena.ofConfined()) {
+            importModule(arena, "FlecsDoc", flecs_h.FlecsDocImport$address());
+            importModule(arena, "FlecsRest", flecs_h.FlecsRestImport$address());
+            importModule(arena, "FlecsAlerts", flecs_h.FlecsAlertsImport$address());
+            importModule(arena, "FlecsStats", flecs_h.FlecsStatsImport$address());
+            importModule(arena, "FlecsMetrics", flecs_h.FlecsMetricsImport$address());
+
+            long restCompId = flecs_h.FLECS_IDEcsRestID_();
+            if (restCompId == 0) {
+                throw new IllegalStateException("Failed to find EcsRest component.");
+            }
+
             MemorySegment restDataSeg = EcsRest.allocate(arena);
+            restDataSeg.fill((byte) 0);
             EcsRest.port(restDataSeg, port);
-            flecs_h.ecs_set_id(this.worldSeg, restCompId, restCompId, EcsRest.sizeof(), restDataSeg);
+            EcsRest.ipaddr(restDataSeg, MemorySegment.NULL);
+            EcsRest.impl(restDataSeg, MemorySegment.NULL);
+
+            flecs_h.ecs_set_id(this.worldSeg, FlecsConstants.EcsWorld, restCompId, EcsRest.sizeof(), restDataSeg);
+        }
+    }
+
+    private void importModule(Arena arena, String moduleName, MemorySegment moduleImportFunction) {
+        MemorySegment moduleNameSeg = arena.allocateFrom(moduleName);
+        long moduleId = flecs_h.ecs_import_c(this.worldSeg, moduleImportFunction, moduleNameSeg);
+        if (moduleId == 0) {
+            throw new IllegalStateException("Failed to import module: " + moduleName);
         }
     }
 
@@ -867,7 +878,7 @@ public class World {
             throw new IllegalStateException("Failed to find EcsRest component.");
         }
 
-        flecs_h.ecs_remove_id(this.worldSeg, restCompId, restCompId);
+        flecs_h.ecs_remove_id(this.worldSeg, FlecsConstants.EcsWorld, restCompId);
     }
 
     public void destroy() {
@@ -898,5 +909,4 @@ public class World {
         return String.format("World[0x%x]", this.worldSeg.address());
     }
 }
-
 
