@@ -21,8 +21,13 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(27))
     }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("--enable-preview")
+    options.release.set(27)
 }
 
 val os: OperatingSystem = OperatingSystem.current()
@@ -48,6 +53,7 @@ jmh {
     failOnError.set(true)
     resultFormat.set("TEXT")
     resultsFile.set(jmhResultFile)
+    jvmArgs.set(listOf("--enable-native-access=ALL-UNNAMED", "--enable-preview"))
 }
 
 val cSrcDir = file("src/jmh/c")

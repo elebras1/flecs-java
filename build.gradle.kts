@@ -26,7 +26,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(27))
     }
     withSourcesJar()
     withJavadocJar()
@@ -262,7 +262,14 @@ val compileProcessor by tasks.registering(JavaCompile::class) {
     }
     classpath = configurations.compileClasspath.get()
     destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))
-    options.release.set(25)
+    options.release.set(27)
+    options.compilerArgs.add("--enable-preview")
+}
+
+tasks.named<JavaCompile>("compileProcessor") {
+    javaCompiler.set(javaToolchains.compilerFor {
+        languageVersion.set(JavaLanguageVersion.of(27))
+    })
 }
 
 val copyProcessorResources by tasks.registering(Copy::class) {
@@ -273,12 +280,13 @@ val copyProcessorResources by tasks.registering(Copy::class) {
 }
 
 tasks.compileJava {
+    options.compilerArgs.add("--enable-preview")
     dependsOn(validateGeneratedBindings, copyProcessorResources, compileProcessor)
 
     exclude("**/processor/**")
     exclude("**/annotation/**")
 
-    options.release.set(25)
+    options.release.set(27)
 
     val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
     classpath = files(processorOutput) + classpath
@@ -330,10 +338,19 @@ tasks.clean {
 
 tasks.test {
     useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(27))
+    })
+    jvmArgs(
+        "--enable-preview",
+        "--enable-native-access=ALL-UNNAMED"
+    )
 }
 
 tasks.compileTestJava {
     dependsOn(compileProcessor)
+    options.compilerArgs.add("--enable-preview")
+    options.release.set(27)
     val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
     classpath = files(processorOutput) + classpath
 
@@ -359,6 +376,8 @@ tasks.named("sourcesJar") {
 
 tasks.withType<Javadoc>().configureEach {
     (options as? StandardJavadocDocletOptions)?.apply {
+        addStringOption("-release", "27")
+        addBooleanOption("-enable-preview", true)
         addBooleanOption("Xdoclint:none", true)
         addStringOption("quiet", "-quiet")
     }
