@@ -1,7 +1,6 @@
 package com.github.elebras1.flecs.benchmark.flecs;
 
 import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.EntityView;
 import com.github.elebras1.flecs.World;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -60,7 +59,7 @@ public class EntityCreationBenchmark {
     public void createWith2ComponentsNoAlloc(Blackhole bh) {
         for (int i = 0; i < 100_000; i++) {
             long entityId = this.ecsWorld.entity();
-            EntityView entity = this.ecsWorld.obtainEntityView(entityId);
+            Entity entity = this.ecsWorld.obtainEntity(entityId);
             entity.set(Health.class, (HealthView healthView) -> healthView.value(100));
             entity.set(Ideology.class, (IdeologyView ideologyView) -> ideologyView.color(0xFF0000).factionDriftingSpeed(10).stabilityIndex(50));
             bh.consume(entity);
@@ -72,7 +71,7 @@ public class EntityCreationBenchmark {
     public void createWith2ComponentsFromPrefab(Blackhole bh) {
         for (int i = 0; i < 100_000; i++) {
             long entityId = this.ecsWorld.entity();
-            EntityView entity = this.ecsWorld.obtainEntityView(entityId);
+            Entity entity = this.ecsWorld.obtainEntity(entityId);
             entity.isA(this.prefabId);
             bh.consume(entity);
         }

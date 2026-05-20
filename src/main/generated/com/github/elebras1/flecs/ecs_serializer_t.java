@@ -47,9 +47,9 @@ public class ecs_serializer_t {
      * int (*value)(const struct ecs_serializer_t *, ecs_entity_t, const void *)
      * }
      */
-    public final static class value {
+    public final static class val {
 
-        private value() {
+        private val() {
             // Should not be called directly
         }
 
@@ -74,13 +74,13 @@ public class ecs_serializer_t {
             return $DESC;
         }
 
-        private static final MethodHandle UP$MH = flecs_h.upcallHandle(value.Function.class, "apply", $DESC);
+        private static final MethodHandle UP$MH = flecs_h.upcallHandle(val.Function.class, "apply", $DESC);
 
         /**
          * Allocates a new upcall stub, whose implementation is defined by {@code fi}.
          * The lifetime of the returned segment is managed by {@code arena}
          */
-        public static MemorySegment allocate(value.Function fi, Arena arena) {
+        public static MemorySegment allocate(val.Function fi, Arena arena) {
             return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, arena);
         }
 

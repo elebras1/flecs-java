@@ -7,7 +7,7 @@ import com.github.elebras1.flecs.annotation.Component;
  * Not for direct use.
  */
 @Component
-public record InternalComponent() {
+public value record InternalComponent() {
 }
 
 

@@ -187,12 +187,6 @@ public class World {
         return new Entity(this, entityId);
     }
 
-    public EntityView obtainEntityView(long entityId) {
-        assert entityId >= 0 : "Invalid entity ID: " + entityId;
-
-        return this.contextCache.getEntityView(entityId);
-    }
-
     MemorySegment getComponentBuffer(long size) {
         return this.defaultBuffers.componentBuffer().ensure(size);
     }

@@ -42,7 +42,7 @@ public class TaskThreadExample {
         world.component(Health.class);
 
         for(int i = 0; i < 100_000; i++) {
-            EntityView entity = world.obtainEntityView(world.entity());
+            Entity entity = world.obtainEntity(world.entity());
             entity.set(Health.class, (HealthView health) -> health.value(100));
         }
 

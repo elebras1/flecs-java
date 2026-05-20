@@ -1,7 +1,6 @@
 package com.github.elebras1.flecs.examples;
 
 import com.github.elebras1.flecs.Entity;
-import com.github.elebras1.flecs.EntityView;
 import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.Health;
 import com.github.elebras1.flecs.examples.components.HealthView;
@@ -36,7 +35,7 @@ public class ManualStagingExample {
                 World stage = world.getStage(stageId);
                 for(int j = stageId * 250; j < (stageId + 1) * 250; j++) {
                     long entityId = stage.lookup("entity_" + j);
-                    EntityView entity = stage.obtainEntityView(entityId);
+                    Entity entity = stage.obtainEntity(entityId);
                     HealthView health = entity.getMutView(Health.class);
                     health.value(health.value() + 1);
                 }

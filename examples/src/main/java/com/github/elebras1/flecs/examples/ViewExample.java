@@ -1,6 +1,6 @@
 package com.github.elebras1.flecs.examples;
 
-import com.github.elebras1.flecs.EntityView;
+import com.github.elebras1.flecs.Entity;
 import com.github.elebras1.flecs.World;
 import com.github.elebras1.flecs.examples.components.*;
 import com.github.elebras1.flecs.util.FlecsConstants;
@@ -15,13 +15,13 @@ public class ViewExample {
 
         for (int i = 0; i < 10; i++) {
             long entityId = world.entity("Entity_" + i);
-            EntityView entityView = world.obtainEntityView(entityId);
+            Entity entity = world.obtainEntity(entityId);
             int finalI = i;
-            entityView.set(Position.class, (PositionView positionView) ->
+            entity.set(Position.class, (PositionView positionView) ->
                     positionView.x(finalI * 10.0f).y(finalI * 5.0f));
-            entityView.set(Velocity.class, (VelocityView velocityView) ->
+            entity.set(Velocity.class, (VelocityView velocityView) ->
                     velocityView.dx(1.0f).dy(0.5f));
-            entityView.set(Inventory.class, (InventoryView inventoryView) -> {
+            entity.set(Inventory.class, (InventoryView inventoryView) -> {
                 for(int j = 0; j < inventoryView.elementsLength(); j++) {
                     inventoryView.elements(j, j);
                 }

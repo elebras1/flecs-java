@@ -4,9 +4,7 @@ public class FlecsContext {
     private static final int BUFFER_SIZE = 48;
     private static final int MASK = BUFFER_SIZE - 1;
     private final ComponentViewPool[] componentViewPools;
-    private final EntityView[] entityViewPool;
     private final ComponentRowViewPool[] componentRowViewPools;
-    private int entityViewCursor;
     private int epoch;
 
     private static class ComponentViewPool {
@@ -35,20 +33,8 @@ public class FlecsContext {
 
     public FlecsContext(World world) {
         this.componentViewPools = new ComponentViewPool[ComponentMap.size()];
-        this.entityViewPool = new EntityView[BUFFER_SIZE];
         this.componentRowViewPools = new ComponentRowViewPool[ComponentMap.size()];
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            this.entityViewPool[i] = new EntityView(world, 0);
-        }
-        this.entityViewCursor = 0;
         this.epoch = 0;
-    }
-
-    public EntityView getEntityView(long entityId) {
-        EntityView entityView = this.entityViewPool[this.entityViewCursor];
-        entityView.setId(entityId);
-        this.entityViewCursor = (this.entityViewCursor + 1) & MASK;
-        return entityView;
     }
 
     public ComponentView getComponentView(Class<?> componentClass) {
@@ -104,6 +90,5 @@ public class FlecsContext {
 
     public void resetCursors() {
         this.epoch++;
-        this.entityViewCursor = 0;
     }
 }

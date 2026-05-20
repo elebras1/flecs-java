@@ -42,13 +42,6 @@ class WorldTest {
     }
 
     @Test
-    void obtainEntityViewTest() {
-        long entityId = this.world.entity();
-        EntityView entityView = this.world.obtainEntityView(entityId);
-        assertEquals(entityView.id(), entityId);
-    }
-
-    @Test
     void entityBulkTest() {
         long[] entityIds = this.world.entityBulk(10);
         assertEquals(10, entityIds.length);
@@ -59,9 +52,9 @@ class WorldTest {
         long[] entityIds = this.world.entityBulk(10, Health.class, Ideology.class);
         assertEquals(10, entityIds.length);
         for(long entityId : entityIds) {
-            EntityView entityView = this.world.obtainEntityView(entityId);
-            assertTrue(entityView.has(Health.class));
-            assertTrue(entityView.has(Ideology.class));
+            Entity entity = this.world.obtainEntity(entityId);
+            assertTrue(entity.has(Health.class));
+            assertTrue(entity.has(Ideology.class));
         }
     }
 
@@ -118,7 +111,7 @@ class WorldTest {
 
         for(int i = 0; i < 10; i++) {
             long entityId = this.world.entity();
-            EntityView entity = this.world.obtainEntityView(entityId);
+            Entity entity = this.world.obtainEntity(entityId);
             entity.set(new Health(100));
         }
 

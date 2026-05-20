@@ -8,17 +8,13 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.function.Consumer;
 
-public class Entity {
+public value class Entity {
 
     private final World world;
-    private long id;
+    private final long id;
 
     Entity(World world, long id) {
         this.world = world;
-        this.id = id;
-    }
-
-    protected void setId(long id) {
         this.id = id;
     }
 
