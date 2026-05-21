@@ -1,6 +1,6 @@
 package com.github.elebras1.flecs.processor;
 
-import com.palantir.javapoet.JavaFile;
+import com.github.elebras1.flecs.util.internal.codegen.SourceFile;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -68,7 +68,7 @@ public class ComponentProcessor extends AbstractProcessor {
 
         if (!this.mapGenerated && !this.processedComponents.isEmpty() && annotations.isEmpty()) {
             try {
-                JavaFile mapFile = this.mapGenerator.generateComponentMap(this.processedComponents);
+                SourceFile mapFile = this.mapGenerator.generateComponentMap(this.processedComponents);
                 mapFile.writeTo(this.filer);
                 this.mapGenerated = true;
             } catch (IOException e) {
@@ -90,13 +90,13 @@ public class ComponentProcessor extends AbstractProcessor {
             }
         }
 
-        JavaFile javaComponentFile = this.componentGenerator.generate(recordElement, fields);
+        SourceFile javaComponentFile = this.componentGenerator.generate(recordElement, fields);
         javaComponentFile.writeTo(this.filer);
 
-        JavaFile javaComponentViewFile = this.componentViewGenerator.generate(recordElement, fields);
+        SourceFile javaComponentViewFile = this.componentViewGenerator.generate(recordElement, fields);
         javaComponentViewFile.writeTo(this.filer);
 
-        JavaFile javaComponentRowFile = this.componentRowViewGenerator.generate(recordElement, fields);
+        SourceFile javaComponentRowFile = this.componentRowViewGenerator.generate(recordElement, fields);
         javaComponentRowFile.writeTo(this.filer);
     }
 
@@ -114,5 +114,3 @@ public class ComponentProcessor extends AbstractProcessor {
         return SUPPORTED_TYPES.contains(type.toString());
     }
 }
-
-

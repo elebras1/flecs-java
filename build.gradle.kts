@@ -18,7 +18,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.palantir.javapoet:javapoet:0.12.0")
     testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -259,6 +258,7 @@ val compileProcessor by tasks.registering(JavaCompile::class) {
     source = fileTree("src/main/java") {
         include("**/processor/**")
         include("**/annotation/**")
+        include("**/util/internal/codegen/**")
     }
     classpath = configurations.compileClasspath.get()
     destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))
