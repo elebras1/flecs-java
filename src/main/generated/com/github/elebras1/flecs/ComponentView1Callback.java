@@ -1,8 +1,8 @@
 package com.github.elebras1.flecs;
 
-import java.lang.FunctionalInterface;
+import com.github.elebras1.flecs.ComponentView;
 
 @FunctionalInterface
 public interface ComponentView1Callback<VA extends ComponentView> {
-  void accept(VA componentViewA);
+    void accept(VA componentViewA);
 }
