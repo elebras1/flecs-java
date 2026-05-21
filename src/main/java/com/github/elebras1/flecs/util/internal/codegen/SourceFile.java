@@ -4,6 +4,8 @@ import javax.annotation.processing.Filer;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -24,6 +26,15 @@ public final class SourceFile {
         try (Writer writer = file.openWriter()) {
             writer.write(this.source);
         }
+    }
+
+    public void writeTo(Path outputDir) throws IOException {
+        Path targetDir = this.packageName.isEmpty()
+                ? outputDir
+                : outputDir.resolve(this.packageName.replace('.', '/'));
+        Files.createDirectories(targetDir);
+        Path targetFile = targetDir.resolve(this.simpleName + ".java");
+        Files.writeString(targetFile, this.source);
     }
 
     public static Builder builder(String packageName, String simpleName) {

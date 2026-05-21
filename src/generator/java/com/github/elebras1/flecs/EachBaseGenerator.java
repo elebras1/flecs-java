@@ -1,8 +1,8 @@
 package com.github.elebras1.flecs;
 
-import com.palantir.javapoet.*;
+import com.github.elebras1.flecs.util.internal.codegen.CodeBuilder;
+import com.github.elebras1.flecs.util.internal.codegen.SourceFile;
 
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,54 +13,63 @@ public class EachBaseGenerator {
 
     private static final int MAX_COMPONENTS = 32;
 
-    private static final ClassName ARENA = ClassName.get("java.lang.foreign", "Arena");
-    private static final ClassName MEMORY_SEGMENT = ClassName.get("java.lang.foreign", "MemorySegment");
-    private static final ClassName COMPONENT = ClassName.get("com.github.elebras1.flecs", "Component");
-    private static final ClassName COMPONENT_VIEW = ClassName.get("com.github.elebras1.flecs", "ComponentView");
-    private static final ClassName FLECS_H = ClassName.get("com.github.elebras1.flecs", "flecs_h");
-    private static final ClassName ECS_ITER_T = ClassName.get("com.github.elebras1.flecs", "ecs_iter_t");
-    private static final ClassName ECS_ITER_ACTION_T = ClassName.get("com.github.elebras1.flecs", "ecs_iter_action_t");
-    private static final ClassName ECS_SYSTEM_DESC_T = ClassName.get("com.github.elebras1.flecs", "ecs_system_desc_t");
-    private static final ClassName ECS_OBSERVER_DESC_T = ClassName.get("com.github.elebras1.flecs", "ecs_observer_desc_t");
-    private static final ClassName WORLD = ClassName.get("com.github.elebras1.flecs", "World");
-    private static final ClassName FLECS_SYSTEM = ClassName.get("com.github.elebras1.flecs", "FlecsSystem");
-    private static final ClassName FLECS_OBSERVER = ClassName.get("com.github.elebras1.flecs", "FlecsObserver");
-    private static final ClassName VALUE_LAYOUT = ClassName.get("java.lang.foreign", "ValueLayout");
-
     private static final String GENERATED_PACKAGE = "com.github.elebras1.flecs";
+
+    private static final String ARENA_FQN = "java.lang.foreign.Arena";
+    private static final String MEMORY_SEGMENT_FQN = "java.lang.foreign.MemorySegment";
+    private static final String COMPONENT_FQN = "com.github.elebras1.flecs.Component";
+    private static final String COMPONENT_VIEW_FQN = "com.github.elebras1.flecs.ComponentView";
+    private static final String FLECS_H_FQN = "com.github.elebras1.flecs.flecs_h";
+    private static final String ECS_ITER_T_FQN = "com.github.elebras1.flecs.ecs_iter_t";
+    private static final String ECS_ITER_ACTION_T_FQN = "com.github.elebras1.flecs.ecs_iter_action_t";
+    private static final String ECS_SYSTEM_DESC_T_FQN = "com.github.elebras1.flecs.ecs_system_desc_t";
+    private static final String ECS_OBSERVER_DESC_T_FQN = "com.github.elebras1.flecs.ecs_observer_desc_t";
+    private static final String WORLD_FQN = "com.github.elebras1.flecs.World";
+    private static final String FLECS_SYSTEM_FQN = "com.github.elebras1.flecs.FlecsSystem";
+    private static final String FLECS_OBSERVER_FQN = "com.github.elebras1.flecs.FlecsObserver";
+    private static final String VALUE_LAYOUT_FQN = "java.lang.foreign.ValueLayout";
 
     private enum EntityMode { WITHOUT_ENTITY, WITH_ENTITY }
     private enum ViewMode { COMPONENT, COMPONENT_VIEW }
 
     private enum BuilderKind {
-        SYSTEM(FLECS_SYSTEM, ECS_SYSTEM_DESC_T),
-        OBSERVER(FLECS_OBSERVER, ECS_OBSERVER_DESC_T);
+        SYSTEM(FLECS_SYSTEM_FQN, ECS_SYSTEM_DESC_T_FQN),
+        OBSERVER(FLECS_OBSERVER_FQN, ECS_OBSERVER_DESC_T_FQN);
 
-        final ClassName returnType;
-        final ClassName descType;
+        final String returnTypeFqn;
+        final String descTypeFqn;
+        final String returnType;
+        final String descType;
 
-        BuilderKind(ClassName returnType, ClassName descType) {
-            this.returnType = returnType;
-            this.descType = descType;
+        BuilderKind(String returnTypeFqn, String descTypeFqn) {
+            this.returnTypeFqn = returnTypeFqn;
+            this.descTypeFqn = descTypeFqn;
+            this.returnType = simpleName(returnTypeFqn);
+            this.descType = simpleName(descTypeFqn);
         }
     }
 
-    @FunctionalInterface
-    private interface CodeEmitter {
-        void addStatement(String format, Object... args);
-
-        static CodeEmitter of(MethodSpec.Builder mb) {
-            return mb::addStatement;
-        }
-
-        static CodeEmitter of(CodeBlock.Builder cb) {
-            return cb::addStatement;
-        }
+    private static String simpleName(String fqn) {
+        int idx = fqn.lastIndexOf('.');
+        return idx >= 0 ? fqn.substring(idx + 1) : fqn;
     }
 
     private static String letter(int i) {
         return i < 26 ? String.valueOf((char) ('A' + i))
                 : "A" + (char) ('A' + (i - 26));
+    }
+
+    private static void indent(CodeBuilder sb, int level) {
+        sb.append("    ".repeat(level));
+    }
+
+    private static void appendLine(CodeBuilder sb, int level, String line) {
+        indent(sb, level);
+        sb.append(line).newline();
+    }
+
+    private static void appendStatement(CodeBuilder sb, int level, String statement) {
+        appendLine(sb, level, statement + ";");
     }
 
     private String buildArgs(String prefix, int n) {
@@ -74,20 +83,24 @@ public class EachBaseGenerator {
         return sb.toString();
     }
 
-    private List<TypeVariableName> compTypeVars(int n) {
-        List<TypeVariableName> vars = new ArrayList<>();
+    private List<String> compTypeVars(int n) {
+        List<String> vars = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            vars.add(TypeVariableName.get(letter(i)));
+            vars.add(letter(i));
         }
         return vars;
     }
 
-    private List<TypeVariableName> viewTypeVars(int n) {
-        List<TypeVariableName> vars = new ArrayList<>();
+    private List<String> viewTypeVars(int n) {
+        List<String> vars = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            vars.add(TypeVariableName.get("V" + letter(i), COMPONENT_VIEW));
+            vars.add("V" + letter(i));
         }
         return vars;
+    }
+
+    private String join(List<String> items) {
+        return String.join(", ", items);
     }
 
     private String callbackInterfaceName(int n, ViewMode vm, EntityMode em) {
@@ -99,21 +112,21 @@ public class EachBaseGenerator {
     public static void main(String[] args) {
         Path outputDir = args.length > 0 ? Paths.get(args[0]) : Paths.get("src/main/generated");
         EachBaseGenerator generator = new EachBaseGenerator();
-        List<JavaFile> files = generator.generate();
+        List<SourceFile> files = generator.generate();
         int count = 0;
-        for (JavaFile file : files) {
+        for (SourceFile file : files) {
             try {
                 file.writeTo(outputDir);
                 count++;
             } catch (IOException e) {
-                throw new RuntimeException("Failed to write file " + file.typeSpec().name() + ": " + e.getMessage(), e);
+                throw new RuntimeException("Failed to write file: " + e.getMessage(), e);
             }
         }
         System.out.println("Generated " + count + " files in " + outputDir.toAbsolutePath());
     }
 
-    public List<JavaFile> generate() {
-        List<JavaFile> files = new ArrayList<>();
+    public List<SourceFile> generate() {
+        List<SourceFile> files = new ArrayList<>();
         for (int n = 1; n <= MAX_COMPONENTS; n++) {
             for (ViewMode vm : ViewMode.values()) {
                 for (EntityMode em : EntityMode.values()) {
@@ -127,241 +140,281 @@ public class EachBaseGenerator {
         return files;
     }
 
-    private JavaFile generateCallbackInterface(int n, ViewMode vm, EntityMode em) {
-        List<TypeVariableName> typeVars = vm == ViewMode.COMPONENT_VIEW ? viewTypeVars(n) : compTypeVars(n);
+    private SourceFile generateCallbackInterface(int n, ViewMode vm, EntityMode em) {
+        String interfaceName = callbackInterfaceName(n, vm, em);
+        List<String> typeVars = vm == ViewMode.COMPONENT_VIEW ? viewTypeVars(n) : compTypeVars(n);
 
-        MethodSpec.Builder accept = MethodSpec.methodBuilder("accept")
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .returns(void.class);
-
-        if (em == EntityMode.WITH_ENTITY) {
-            accept.addParameter(long.class, "entityId");
+        CodeBuilder body = new CodeBuilder();
+        body.append("@FunctionalInterface").newline();
+        body.append("public interface ").append(interfaceName);
+        if (!typeVars.isEmpty()) {
+            if (vm == ViewMode.COMPONENT_VIEW) {
+                List<String> bounds = new ArrayList<>();
+                for (String v : typeVars) {
+                    bounds.add(v + " extends " + simpleName(COMPONENT_VIEW_FQN));
+                }
+                body.append("<").append(join(bounds)).append("> ");
+            } else {
+                body.append("<").append(join(typeVars)).append("> ");
+            }
+        } else {
+            body.append(" ");
         }
+        body.append("{").newline();
 
+        indent(body, 1);
+        body.append("void accept(");
+        List<String> params = new ArrayList<>();
+        if (em == EntityMode.WITH_ENTITY) {
+            params.add("long entityId");
+        }
         String prefix = vm == ViewMode.COMPONENT_VIEW ? "componentView" : "component";
         for (int i = 0; i < n; i++) {
-            accept.addParameter(typeVars.get(i), prefix + letter(i));
+            params.add(typeVars.get(i) + " " + prefix + letter(i));
+        }
+        body.append(join(params)).append(");").newline();
+        body.append("}").newline();
+
+        SourceFile.Builder builder = SourceFile.builder(GENERATED_PACKAGE, interfaceName);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            builder.addImport(COMPONENT_VIEW_FQN);
+        }
+        return builder.classBody(body.toString()).build();
+    }
+
+    private SourceFile generateQueryBase() {
+        CodeBuilder body = new CodeBuilder();
+        body.append("public abstract class QueryBase {").newline();
+        appendLine(body, 1, "protected final " + simpleName(WORLD_FQN) + " world;");
+        appendLine(body, 1, "protected final " + simpleName(MEMORY_SEGMENT_FQN) + " querySeg;");
+        body.newline();
+        appendLine(body, 1, "protected QueryBase(" + simpleName(WORLD_FQN) + " world, " + simpleName(MEMORY_SEGMENT_FQN) + " querySeg) {");
+        appendStatement(body, 2, "this.world = world");
+        appendStatement(body, 2, "this.querySeg = querySeg");
+        appendLine(body, 1, "}");
+        body.newline();
+        appendLine(body, 1, "protected abstract void checkDestroyed();");
+
+        for (int n = 1; n <= MAX_COMPONENTS; n++) {
+            for (ViewMode vm : ViewMode.values()) {
+                for (EntityMode em : EntityMode.values()) {
+                    body.newline();
+                    appendQueryEachMethod(body, n, vm, em);
+                }
+            }
         }
 
-        TypeSpec iface = TypeSpec.interfaceBuilder(callbackInterfaceName(n, vm, em))
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(FunctionalInterface.class)
-                .addTypeVariables(typeVars)
-                .addMethod(accept.build())
+        body.append("}").newline();
+
+        return SourceFile.builder(GENERATED_PACKAGE, "QueryBase")
+                .fileComment("Generated by CallbackGenerator.")
+                .addImport(WORLD_FQN)
+                .addImport(MEMORY_SEGMENT_FQN)
+                .addImport(ARENA_FQN)
+                .addImport(COMPONENT_FQN)
+                .addImport(COMPONENT_VIEW_FQN)
+                .addImport(FLECS_H_FQN)
+                .addImport(ECS_ITER_T_FQN)
+                .addImport(VALUE_LAYOUT_FQN)
+                .classBody(body.toString())
                 .build();
-
-        return JavaFile.builder(GENERATED_PACKAGE, iface).build();
     }
 
-    private JavaFile generateQueryBase() {
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder("QueryBase")
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addField(FieldSpec.builder(WORLD, "world", Modifier.PROTECTED, Modifier.FINAL).build())
-                .addField(FieldSpec.builder(MEMORY_SEGMENT, "querySeg", Modifier.PROTECTED, Modifier.FINAL).build())
-                .addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PROTECTED)
-                        .addParameter(WORLD, "world")
-                        .addParameter(MEMORY_SEGMENT, "querySeg")
-                        .addStatement("this.world = world")
-                        .addStatement("this.querySeg = querySeg")
-                        .build())
-                .addMethod(MethodSpec.methodBuilder("checkDestroyed")
-                        .addModifiers(Modifier.PROTECTED, Modifier.ABSTRACT)
-                        .returns(void.class).build());
+    private void appendQueryEachMethod(CodeBuilder body, int n, ViewMode vm, EntityMode em) {
+        appendEachMethodSignature(body, n, vm, em, "void", "each");
+        appendStatement(body, 2, "this.checkDestroyed()");
+        appendLine(body, 2, "try (" + simpleName(ARENA_FQN) + " tmpArena = " + simpleName(ARENA_FQN) + ".ofConfined()) {");
+        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iter = " + simpleName(FLECS_H_FQN)
+                + ".ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)");
+        appendLine(body, 3, "if (iter.address() == 0) {");
+        appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
+        appendLine(body, 3, "}");
+
+        emitComponentLookups(body, 3, n, vm);
+
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            appendStatement(body, 3, "this.world.viewCache().resetCursors()");
+        }
+
+        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iter)) {");
+        if (em == EntityMode.WITH_ENTITY) {
+            appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iter)");
+        }
+        emitFieldOrBase(body, 4, n, vm, "iter");
+        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iter)");
+        appendLine(body, 4, "for (int i = 0; i < count; i++) {");
+        if (em == EntityMode.WITH_ENTITY) {
+            appendStatement(body, 5, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+        }
+        emitInstanceOrView(body, 5, n, vm);
+        emitCallbackAccept(body, 5, n, vm, em);
+        appendLine(body, 4, "}");
+        appendLine(body, 3, "}");
+        appendLine(body, 2, "}");
+        appendLine(body, 1, "}");
+    }
+
+    private SourceFile generateBuilderBase(String className, BuilderKind kind) {
+        CodeBuilder body = new CodeBuilder();
+        body.append("public abstract class ").append(className).append(" {").newline();
+        appendLine(body, 1, "protected final " + simpleName(WORLD_FQN) + " world;");
+        appendLine(body, 1, "protected final " + simpleName(MEMORY_SEGMENT_FQN) + " desc;");
+        body.newline();
+        appendLine(body, 1, "protected " + className + "(" + simpleName(WORLD_FQN) + " world, " + simpleName(MEMORY_SEGMENT_FQN) + " desc) {");
+        appendStatement(body, 2, "this.world = world");
+        appendStatement(body, 2, "this.desc = desc");
+        appendLine(body, 1, "}");
+        body.newline();
+        appendLine(body, 1, "protected abstract " + kind.returnType + " build();");
 
         for (int n = 1; n <= MAX_COMPONENTS; n++) {
             for (ViewMode vm : ViewMode.values()) {
                 for (EntityMode em : EntityMode.values()) {
-                    classBuilder.addMethod(buildQueryEachMethod(n, vm, em));
+                    body.newline();
+                    appendBuilderEachMethod(body, n, vm, em, kind);
                 }
             }
         }
 
-        return JavaFile.builder(GENERATED_PACKAGE, classBuilder.build())
-                .addFileComment("Generated by CallbackGenerator.")
-                .indent("    ").build();
+        body.append("}").newline();
+
+        return SourceFile.builder(GENERATED_PACKAGE, className)
+                .fileComment("Generated by EachGenerator.")
+                .addImport(WORLD_FQN)
+                .addImport(MEMORY_SEGMENT_FQN)
+                .addImport(COMPONENT_FQN)
+                .addImport(COMPONENT_VIEW_FQN)
+                .addImport(FLECS_H_FQN)
+                .addImport(ECS_ITER_T_FQN)
+                .addImport(ECS_ITER_ACTION_T_FQN)
+                .addImport(VALUE_LAYOUT_FQN)
+                .addImport(kind.returnTypeFqn)
+                .addImport(kind.descTypeFqn)
+                .classBody(body.toString())
+                .build();
     }
 
-    private MethodSpec buildQueryEachMethod(int n, ViewMode vm, EntityMode em) {
-        MethodSpec.Builder mb = startEachMethod(n, vm, em, void.class);
+    private void appendBuilderEachMethod(CodeBuilder body, int n, ViewMode vm, EntityMode em, BuilderKind kind) {
+        appendEachMethodSignature(body, n, vm, em, kind.returnType, "each");
+        emitComponentLookups(body, 2, n, vm);
 
-        mb.addStatement("this.checkDestroyed()");
-        mb.beginControlFlow("try ($T tmpArena = $T.ofConfined())", ARENA, ARENA);
-        mb.addStatement("$T iter = $T.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)",
-                MEMORY_SEGMENT, FLECS_H);
-        mb.beginControlFlow("if (iter.address() == 0)");
-        mb.addStatement("throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
-        mb.endControlFlow();
-
-        emitComponentLookups(CodeEmitter.of(mb), n, vm);
-
+        appendLine(body, 2, simpleName(MEMORY_SEGMENT_FQN) + " callbackStub = " + simpleName(ECS_ITER_ACTION_T_FQN)
+                + ".allocate(iterSegment -> {");
         if (vm == ViewMode.COMPONENT_VIEW) {
-            mb.addStatement("this.world.viewCache().resetCursors()");
+            appendStatement(body, 3, "this.world.viewCache().resetCursors()");
         }
-
-        mb.beginControlFlow("while ($T.ecs_iter_next(iter))", FLECS_H);
         if (em == EntityMode.WITH_ENTITY) {
-            mb.addStatement("$T entities = $T.entities(iter)", MEMORY_SEGMENT, ECS_ITER_T);
+            appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSegment)");
         }
-        emitFieldOrBase(CodeEmitter.of(mb), n, vm, "iter");
-        mb.addStatement("int count = $T.count(iter)", ECS_ITER_T);
-        mb.beginControlFlow("for (int i = 0; i < count; i++)");
+        emitFieldOrBase(body, 3, n, vm, "iterSegment");
+        appendStatement(body, 3, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
+        appendLine(body, 3, "for (int i = 0; i < count; i++) {");
         if (em == EntityMode.WITH_ENTITY) {
-            mb.addStatement("long entityId = entities.getAtIndex($T.JAVA_LONG, i)", VALUE_LAYOUT);
+            appendStatement(body, 4, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
         }
-        emitInstanceOrView(CodeEmitter.of(mb), n, vm);
-        emitCallbackAccept(CodeEmitter.of(mb), n, vm, em);
-        mb.endControlFlow();
-        mb.endControlFlow();
-        mb.endControlFlow();
+        emitInstanceOrView(body, 4, n, vm);
+        emitCallbackAccept(body, 4, n, vm, em);
+        appendLine(body, 3, "}");
+        appendLine(body, 2, "}, this.world.arena());");
 
-        return mb.build();
+        appendStatement(body, 2, kind.descType + ".callback(this.desc, callbackStub)");
+        appendStatement(body, 2, "return build()");
+        appendLine(body, 1, "}");
     }
 
-    private JavaFile generateBuilderBase(String className, BuilderKind kind) {
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className)
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addField(FieldSpec.builder(WORLD, "world", Modifier.PROTECTED, Modifier.FINAL).build())
-                .addField(FieldSpec.builder(MEMORY_SEGMENT, "desc", Modifier.PROTECTED, Modifier.FINAL).build())
-                .addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PROTECTED)
-                        .addParameter(WORLD, "world")
-                        .addParameter(MEMORY_SEGMENT, "desc")
-                        .addStatement("this.world = world")
-                        .addStatement("this.desc = desc")
-                        .build())
-                .addMethod(MethodSpec.methodBuilder("build")
-                        .addModifiers(Modifier.PROTECTED, Modifier.ABSTRACT)
-                        .returns(kind.returnType).build());
+    private void appendEachMethodSignature(CodeBuilder body, int n, ViewMode vm, EntityMode em, String returnType, String methodBase) {
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            appendLine(body, 1, "@SuppressWarnings(\"unchecked\")");
+        }
 
-        for (int n = 1; n <= MAX_COMPONENTS; n++) {
-            for (ViewMode vm : ViewMode.values()) {
-                for (EntityMode em : EntityMode.values()) {
-                    classBuilder.addMethod(buildBuilderEachMethod(n, vm, em, kind));
-                }
+        List<String> compVars = compTypeVars(n);
+        List<String> viewVars = viewTypeVars(n);
+        List<String> typeDecls = new ArrayList<>(compVars);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            for (String v : viewVars) {
+                typeDecls.add(v + " extends " + simpleName(COMPONENT_VIEW_FQN));
             }
         }
 
-        return JavaFile.builder(GENERATED_PACKAGE, classBuilder.build())
-                .addFileComment("Generated by EachGenerator.")
-                .indent("    ").build();
+        String methodName = vm == ViewMode.COMPONENT_VIEW ? methodBase + "View" : methodBase;
+        StringBuilder signature = new StringBuilder();
+        signature.append("public ");
+        if (!typeDecls.isEmpty()) {
+            signature.append("<").append(join(typeDecls)).append("> ");
+        }
+        signature.append(returnType).append(" ").append(methodName).append("(");
+
+        List<String> params = new ArrayList<>();
+        for (String compVar : compVars) {
+            params.add("Class<" + compVar + "> componentClass" + compVar);
+        }
+
+        String callbackName = callbackInterfaceName(n, vm, em);
+        List<String> callbackArgs = vm == ViewMode.COMPONENT_VIEW ? viewVars : compVars;
+        String callbackType = callbackName + "<" + join(callbackArgs) + ">";
+        params.add(callbackType + " callback");
+
+        signature.append(join(params)).append(") {");
+        appendLine(body, 1, signature.toString());
     }
 
-    private MethodSpec buildBuilderEachMethod(int n, ViewMode vm, EntityMode em, BuilderKind kind) {
-        MethodSpec.Builder mb = startEachMethod(n, vm, em, kind.returnType);
-
-        emitComponentLookups(CodeEmitter.of(mb), n, vm);
-
-        CodeBlock.Builder lambda = CodeBlock.builder();
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            lambda.addStatement("this.world.viewCache().resetCursors()");
-        }
-        if (em == EntityMode.WITH_ENTITY) {
-            lambda.addStatement("$T entities = $T.entities(iterSegment)", MEMORY_SEGMENT, ECS_ITER_T);
-        }
-        emitFieldOrBase(CodeEmitter.of(lambda), n, vm, "iterSegment");
-        lambda.addStatement("int count = $T.count(iterSegment)", ECS_ITER_T);
-        lambda.beginControlFlow("for (int i = 0; i < count; i++)");
-        if (em == EntityMode.WITH_ENTITY) {
-            lambda.addStatement("long entityId = entities.getAtIndex($T.JAVA_LONG, i)", VALUE_LAYOUT);
-        }
-        emitInstanceOrView(CodeEmitter.of(lambda), n, vm);
-        emitCallbackAccept(CodeEmitter.of(lambda), n, vm, em);
-        lambda.endControlFlow();
-
-        mb.addCode("$T callbackStub = $T.allocate(iterSegment -> {\n", MEMORY_SEGMENT, ECS_ITER_ACTION_T);
-        mb.addCode(lambda.build());
-        mb.addCode("}, this.world.arena());\n");
-        mb.addStatement("$T.callback(this.desc, callbackStub)", kind.descType);
-        mb.addStatement("return build()");
-
-        return mb.build();
-    }
-
-    private MethodSpec.Builder startEachMethod(int n, ViewMode vm, EntityMode em, Object returnType) {
-        List<TypeVariableName> compVars = compTypeVars(n);
-        List<TypeVariableName> viewVars = viewTypeVars(n);
-        List<TypeVariableName> allVars = new ArrayList<>(compVars);
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            allVars.addAll(viewVars);
-        }
-
-        List<TypeVariableName> callbackTypeVars = vm == ViewMode.COMPONENT_VIEW ? viewVars : compVars;
-        ClassName callbackRaw = ClassName.get(GENERATED_PACKAGE, callbackInterfaceName(n, vm, em));
-        TypeName callbackType = ParameterizedTypeName.get(callbackRaw, callbackTypeVars.toArray(new TypeName[0]));
-
-        TypeName ret = returnType instanceof TypeName ? (TypeName) returnType
-                : returnType instanceof Class<?> ? TypeName.get((Class<?>) returnType)
-                : ClassName.bestGuess(returnType.toString());
-
-        MethodSpec.Builder mb = MethodSpec.methodBuilder(vm == ViewMode.COMPONENT_VIEW ? "eachView" : "each")
-                .addModifiers(Modifier.PUBLIC)
-                .addTypeVariables(allVars)
-                .returns(ret);
-
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            mb.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
-                    .addMember("value", "$S", "unchecked").build());
-        }
-
-        for (TypeVariableName tv : compVars) {
-            mb.addParameter(ParameterizedTypeName.get(ClassName.get("", "Class"), tv), "componentClass" + tv.name());
-        }
-
-        mb.addParameter(callbackType, "callback");
-        return mb;
-    }
-
-    private void emitComponentLookups(CodeEmitter out, int n, ViewMode vm) {
+    private void emitComponentLookups(CodeBuilder body, int level, int n, ViewMode vm) {
         for (int i = 0; i < n; i++) {
-            TypeName compParam = vm == ViewMode.COMPONENT_VIEW
-                    ? ParameterizedTypeName.get(COMPONENT, WildcardTypeName.subtypeOf(Object.class))
-                    : ParameterizedTypeName.get(COMPONENT, TypeVariableName.get(letter(i)));
-            out.addStatement("$T component$L = this.world.componentRegistry().getComponent(componentClass$L)",
-                    compParam, letter(i), letter(i));
+            String comp = letter(i);
+            if (vm == ViewMode.COMPONENT_VIEW) {
+                appendStatement(body, level, simpleName(COMPONENT_FQN) + "<?> component" + comp
+                        + " = this.world.componentRegistry().getComponent(componentClass" + comp + ")");
+            } else {
+                appendStatement(body, level, simpleName(COMPONENT_FQN) + "<" + comp + "> component" + comp
+                        + " = this.world.componentRegistry().getComponent(componentClass" + comp + ")");
+            }
         }
         if (vm == ViewMode.COMPONENT_VIEW) {
             for (int i = 0; i < n; i++) {
-                TypeVariableName vv = TypeVariableName.get("V" + letter(i));
-                out.addStatement("$T componentView$L = ($T) this.world.viewCache().getComponentView(componentClass$L)",
-                        vv, letter(i), vv, letter(i));
+                String comp = letter(i);
+                String view = "V" + comp;
+                appendStatement(body, level, view + " componentView" + comp + " = (" + view
+                        + ") this.world.viewCache().getComponentView(componentClass" + comp + ")");
             }
         }
         for (int i = 0; i < n; i++) {
-            out.addStatement("long size$L = component$L.size()", letter(i), letter(i));
+            String comp = letter(i);
+            appendStatement(body, level, "long size" + comp + " = component" + comp + ".size()");
         }
     }
 
-    private void emitFieldOrBase(CodeEmitter out, int n, ViewMode vm, String iterVar) {
+    private void emitFieldOrBase(CodeBuilder body, int level, int n, ViewMode vm, String iterVar) {
         for (int i = 0; i < n; i++) {
+            String comp = letter(i);
             if (vm == ViewMode.COMPONENT_VIEW) {
-                out.addStatement("long base$L = $T.ecs_field_w_size($L, size$L, (byte) $L).address()",
-                        letter(i), FLECS_H, iterVar, letter(i), i);
+                appendStatement(body, level, "long base" + comp + " = " + simpleName(FLECS_H_FQN)
+                        + ".ecs_field_w_size(" + iterVar + ", size" + comp + ", (byte) " + i + ").address()");
             } else {
-                out.addStatement("$T field$L = $T.ecs_field_w_size($L, size$L, (byte) $L)",
-                        MEMORY_SEGMENT, letter(i), FLECS_H, iterVar, letter(i), i);
+                appendStatement(body, level, simpleName(MEMORY_SEGMENT_FQN) + " field" + comp + " = "
+                        + simpleName(FLECS_H_FQN) + ".ecs_field_w_size(" + iterVar + ", size" + comp + ", (byte) " + i + ")");
             }
         }
     }
 
-    private void emitInstanceOrView(CodeEmitter out, int n, ViewMode vm) {
+    private void emitInstanceOrView(CodeBuilder body, int level, int n, ViewMode vm) {
         for (int i = 0; i < n; i++) {
+            String comp = letter(i);
             if (vm == ViewMode.COMPONENT_VIEW) {
-                out.addStatement("componentView$L.setBaseAddress(base$L + (long) i * size$L)",
-                        letter(i), letter(i), letter(i));
+                appendStatement(body, level, "componentView" + comp + ".setBaseAddress(base" + comp
+                        + " + (long) i * size" + comp + ")");
             } else {
-                out.addStatement("$T componentInstance$L = component$L.read(field$L, (long) i * size$L)",
-                        TypeVariableName.get(letter(i)), letter(i), letter(i), letter(i), letter(i));
+                appendStatement(body, level, comp + " componentInstance" + comp + " = component" + comp
+                        + ".read(field" + comp + ", (long) i * size" + comp + ")");
             }
         }
     }
 
-    private void emitCallbackAccept(CodeEmitter out, int n, ViewMode vm, EntityMode em) {
+    private void emitCallbackAccept(CodeBuilder body, int level, int n, ViewMode vm, EntityMode em) {
         String args = buildArgs(vm == ViewMode.COMPONENT_VIEW ? "componentView" : "componentInstance", n);
         if (em == EntityMode.WITH_ENTITY) {
-            out.addStatement("callback.accept(entityId, $L)", args);
+            appendStatement(body, level, "callback.accept(entityId, " + args + ")");
         } else {
-            out.addStatement("callback.accept($L)", args);
+            appendStatement(body, level, "callback.accept(" + args + ")");
         }
     }
 }
