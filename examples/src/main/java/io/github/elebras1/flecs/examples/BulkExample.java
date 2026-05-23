@@ -1,0 +1,28 @@
+package io.github.elebras1.flecs.examples;
+
+import io.github.elebras1.flecs.World;
+import io.github.elebras1.flecs.examples.components.Health;
+import io.github.elebras1.flecs.examples.components.Position;
+import io.github.elebras1.flecs.examples.components.Velocity;
+
+public class BulkExample {
+    public static void main(String[] args) {
+        World world = new World();
+
+        world.component(Position.class);
+        world.component(Velocity.class);
+        world.component(Health.class);
+
+        int totalEntities = 1_000_000;
+        System.out.println("Creating " + totalEntities + " entities...");
+
+        long startCreate = System.nanoTime();
+
+        long[] entityIds = world.entityBulk(totalEntities, Position.class, Velocity.class, Health.class);
+
+        long endCreate = System.nanoTime();
+        System.out.printf("Entity creation time: %.3f ms%n", (endCreate - startCreate) / 1_000_000.0);
+
+        world.destroy();
+    }
+}
