@@ -197,7 +197,7 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
     commandLine(
         jextractExecutable,
         "--output", generatedSourcesDir.absolutePath,
-        "-t", "com.github.elebras1.flecs",
+        "-t", "io.github.elebras1.flecs",
         "-I", File(flecsSourceDir, "distr").absolutePath,
         flecsHeaderFile.absolutePath
     )
@@ -222,7 +222,7 @@ val generateEachBase by tasks.registering(JavaExec::class) {
     description = "Generate QueryBase, SystemBuilderBase, ObserverBuilderBase and all typed each callback interfaces"
     group = "flecs"
     classpath = sourceSets["generator"].runtimeClasspath
-    mainClass.set("com.github.elebras1.flecs.EachBaseGenerator")
+    mainClass.set("io.github.elebras1.flecs.EachBaseGenerator")
     args(generatedSourcesDir.absolutePath)
     outputs.dir(generatedSourcesDir)
     doFirst {
@@ -233,6 +233,8 @@ val generateEachBase by tasks.registering(JavaExec::class) {
 sourceSets {
     create("generator") {
         java.srcDir(generatorSourcesDir)
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
     }
     main {
         java {
@@ -426,7 +428,14 @@ configure<SigningExtension> {
     val signingPassword = System.getenv("SIGNING_PASSWORD")
     if (signingKey != null && signingPassword != null) {
         useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications["maven"])
+        sign(publishing.publications)
+    }
+}
+
+tasks.withType<Sign>().configureEach {
+    val signingTask = this
+    tasks.withType<PublishToMavenRepository>().configureEach {
+        dependsOn(signingTask)
     }
 }
 

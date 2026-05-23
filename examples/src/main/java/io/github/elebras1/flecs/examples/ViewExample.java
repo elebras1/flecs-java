@@ -1,0 +1,52 @@
+package io.github.elebras1.flecs.examples;
+
+import io.github.elebras1.flecs.EntityView;
+import io.github.elebras1.flecs.World;
+import io.github.elebras1.flecs.examples.components.*;
+import io.github.elebras1.flecs.examples.components.Inventory;
+import io.github.elebras1.flecs.examples.components.Position;
+import io.github.elebras1.flecs.examples.components.Velocity;
+import io.github.elebras1.flecs.util.FlecsConstants;
+
+public class ViewExample {
+
+    public static void main(String[] args) {
+        World world = new World();
+        world.component(Position.class);
+        world.component(Velocity.class);
+        world.component(Inventory.class);
+
+        for (int i = 0; i < 10; i++) {
+            long entityId = world.entity("Entity_" + i);
+            EntityView entityView = world.obtainEntityView(entityId);
+            int finalI = i;
+            entityView.set(Position.class, (PositionView positionView) ->
+                    positionView.x(finalI * 10.0f).y(finalI * 5.0f));
+            entityView.set(Velocity.class, (VelocityView velocityView) ->
+                    velocityView.dx(1.0f).dy(0.5f));
+            entityView.set(Inventory.class, (InventoryView inventoryView) -> {
+                for(int j = 0; j < inventoryView.elementsLength(); j++) {
+                    inventoryView.elements(j, j);
+                }
+            });
+        }
+
+        world.system("MovementSystem")
+                .kind(FlecsConstants.EcsOnUpdate)
+                .with(Position.class)
+                .with(Velocity.class)
+                .with(Inventory.class)
+                .multiThreaded()
+                .eachView(Position.class, Velocity.class, Inventory.class, (long entityId, PositionView posView, VelocityView  velView, InventoryView invView)-> {
+                    posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
+
+                    for(int i = 0; i < invView.elementsLength(); i++) {
+                        invView.elements(i, invView.elements(i) + 1);
+                    }
+                });
+
+        world.progress(0.016f);
+        world.progress(0.016f);
+    }
+}
+

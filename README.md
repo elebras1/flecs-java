@@ -53,8 +53,8 @@ cd flecs-java
 ## Example
 
 ```java
-import com.github.elebras1.flecs.*;
-import com.github.elebras1.flecs.annotation.Component;
+import io.github.elebras1.flecs.*;
+import io.github.elebras1.flecs.annotation.Component;
 
 // Define components as records
 @Component
