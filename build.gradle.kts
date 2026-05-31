@@ -428,14 +428,7 @@ configure<SigningExtension> {
     val signingPassword = System.getenv("SIGNING_PASSWORD")
     if (signingKey != null && signingPassword != null) {
         useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications)
-    }
-}
-
-tasks.withType<Sign>().configureEach {
-    val signingTask = this
-    tasks.withType<PublishToMavenRepository>().configureEach {
-        dependsOn(signingTask)
+        sign(publishing.publications["maven"])
     }
 }
 
