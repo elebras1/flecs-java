@@ -13,7 +13,7 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 ## Requirements
 
 ### Runtime
-- **Java 25+**
+- **Java 25+** (I recommand to used GraalVM Community Edition or Oracle for the Graal JIT compiler, this gave me 50% performance boost in my game compare to a classic OpenJDK)
 - **Gradle 9+**
 
 ### Build from Source
@@ -124,7 +124,7 @@ public class Example {
 ## Documentation
 
 - **[Flecs Manual](https://www.flecs.dev/flecs/)** - Official Flecs documentation
-- **[Examples](examples/src/main/java/com/github/elebras1/flecs/examples/)** - Code examples covering various features
+- **[Examples](examples/src/main/java/io/github/elebras1/flecs/examples/)** - Code examples covering various features
 
 ## Architecture
 
