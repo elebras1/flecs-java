@@ -10,32 +10,67 @@ permissions:
 
 jobs:
   build-natives:
-    name: Build natives for ${{ matrix.platform }}-${{ matrix.arch }}
+    name: Natives ${{ matrix.platform-id }} (${{ matrix.variant }})
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
-            platform: linux
-            arch: x64
+            platform-id: linux-x64
             lib: libflecs.so
+            variant: release
+
+          - os: ubuntu-24.04-arm
+            platform-id: linux-aarch64
+            lib: libflecs.so
+            variant: release
+
           - os: windows-latest
-            platform: windows
-            arch: x64
+            platform-id: windows-x64
             lib: flecs.dll
-          - os: macos-15
-            platform: macos
-            arch: x64
-            lib: libflecs.dylib
+            variant: release
+
           - os: macos-latest
-            platform: macos
-            arch: aarch64
+            platform-id: macos-x64
             lib: libflecs.dylib
+            variant: release
+            compiler_target: x86_64-apple-macos10.15
+
+          - os: macos-latest
+            platform-id: macos-aarch64
+            lib: libflecs.dylib
+            variant: release
+
+          - os: ubuntu-latest
+            platform-id: linux-x64
+            lib: libflecs.so
+            variant: debug
+
+          - os: ubuntu-24.04-arm
+            platform-id: linux-aarch64
+            lib: libflecs.so
+            variant: debug
+
+          - os: windows-latest
+            platform-id: windows-x64
+            lib: flecs.dll
+            variant: debug
+
+          - os: macos-latest
+            platform-id: macos-x64
+            lib: libflecs.dylib
+            variant: debug
+            compiler_target: x86_64-apple-macos10.15
+
+          - os: macos-latest
+            platform-id: macos-aarch64
+            lib: libflecs.dylib
+            variant: debug
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -51,45 +86,48 @@ jobs:
 
       - name: Install GCC (Windows)
         if: runner.os == 'Windows'
-        run: choco install mingw -y
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: mingw-w64-x86_64-gcc
 
       - name: Grant execute permission for gradlew
         if: runner.os != 'Windows'
         run: chmod +x gradlew
 
-      - name: Build natives
-        run: ./gradlew compileFlecsNative -PNATIVE_ARCH=${{ matrix.platform }}-${{ matrix.arch }}
+      - name: Compile native (${{ matrix.variant }})
         shell: bash
-
-      - name: Verify native library was built
         run: |
-          FILE_PATH="build/resources/main/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}"
-          echo "Checking for native library at $FILE_PATH..."
-
-          if [ ! -f "$FILE_PATH" ]; then
-            echo "Error: Native library not found!"
-            exit 1
+          EXTRA_ARGS=""
+          if [ -n "${{ matrix.compiler_target }}" ]; then
+            EXTRA_ARGS="-PCOMPILER_TARGET=${{ matrix.compiler_target }}"
           fi
+          ./gradlew \
+            :compileFlecsNative-${{ matrix.platform-id }}-${{ matrix.variant }} \
+            -PNATIVE_ARCH=${{ matrix.platform-id }} \
+            $EXTRA_ARGS
 
-          FILE_SIZE=$(wc -c < "$FILE_PATH")
-          MIN_SIZE=102400
-
-          echo "File size: $FILE_SIZE bytes"
-
-          if [ "$FILE_SIZE" -lt "$MIN_SIZE" ]; then
-            echo "Error: File size is too small ($FILE_SIZE bytes). Expected at least $MIN_SIZE bytes."
-            exit 1
-          fi
-
-          echo "✓ File exists and size is valid."
-          ls -la "$FILE_PATH"
+      - name: Verify native library
         shell: bash
+        run: |
+          FILE="build/natives/${{ matrix.platform-id }}/${{ matrix.variant }}/${{ matrix.lib }}"
+          echo "Checking $FILE ..."
+          if [ ! -f "$FILE" ]; then
+            echo "❌  Not found: $FILE"; exit 1
+          fi
+          SIZE=$(wc -c < "$FILE")
+          echo "Size: $SIZE bytes"
+          if [ "$SIZE" -lt 102400 ]; then
+            echo "❌  Too small ($SIZE bytes, expected ≥ 102400)"; exit 1
+          fi
+          echo "✅  OK"
+          ls -lh "$FILE"
 
-      - name: Upload natives artifact
+      - name: Upload native artifact
         uses: actions/upload-artifact@v4
         with:
-          name: natives-${{ matrix.platform }}-${{ matrix.arch }}
-          path: build/resources/main/natives/${{ matrix.platform }}-${{ matrix.arch }}/${{ matrix.lib }}
+          name: native-${{ matrix.platform-id }}-${{ matrix.variant }}
+          path: build/natives/${{ matrix.platform-id }}/${{ matrix.variant }}/${{ matrix.lib }}
           retention-days: 1
 
   publish:
@@ -98,8 +136,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -107,49 +144,98 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
 
-      - name: Download all natives
+      - name: Download all native artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: native-*
           path: downloaded-natives
+          merge-multiple: false
 
-      - name: Debug downloaded artifacts
+      - name: Place natives in build/natives/
+        shell: bash
         run: |
-          echo "Downloaded artifacts structure:"
-          find downloaded-natives -type f
+          echo "=== Downloaded artifacts ==="
+          find downloaded-natives -type f | sort
 
-      - name: Organize natives
-        run: |
-          mkdir -p src/main/resources/natives
+          for artifact_dir in downloaded-natives/native-*/; do
+            basename=$(basename "$artifact_dir")
+            rest=${basename#native-}
+            variant=${rest##*-}
+            platform=${rest%-$variant}
 
-          for artifact_dir in downloaded-natives/natives-*/; do
-            platform_arch=$(basename "$artifact_dir" | sed 's/^natives-//')
-            echo "Processing $platform_arch..."
-            mkdir -p "src/main/resources/natives/$platform_arch"
-            cp "$artifact_dir"/* "src/main/resources/natives/$platform_arch/"
+            dest="build/natives/$platform/$variant"
+            mkdir -p "$dest"
+            cp "$artifact_dir"/* "$dest/"
+            echo "✅  $platform/$variant → $dest"
           done
 
-          echo "Final native libraries structure:"
-          find src/main/resources/natives -type f
+          echo ""
+          echo "=== Final tree ==="
+          find build/natives -type f | sort
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build final JAR with all natives
-        run: ./gradlew jar -x compileFlecsNative
+      - name: Build JAR (API + processor, sans natifs embarqués)
+        run: ./gradlew :jar :sourcesJar :javadocJar -PskipNative
+
+      - name: Build all native JARs
+        run: |
+          ./gradlew \
+            :jarNatives-linux-x64-release \
+            :jarNatives-linux-aarch64-release \
+            :jarNatives-windows-x64-release \
+            :jarNatives-macos-x64-release \
+            :jarNatives-macos-aarch64-release \
+            :jarNatives-linux-x64-debug \
+            :jarNatives-linux-aarch64-debug \
+            :jarNatives-windows-x64-debug \
+            :jarNatives-macos-x64-debug \
+            :jarNatives-macos-aarch64-debug \
+            -PskipNative
 
       - name: Verify JAR contents
+        shell: bash
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          echo "Verifying JAR for version $VERSION..."
-          echo ""
-          echo "All natives in JAR:"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/" | sort
-          echo ""
+          JAR="build/libs/flecs-java-$VERSION.jar"
 
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/linux-x64/libflecs.so"    && echo "✓ Linux x64"   || echo "✗ Linux x64 MISSING"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/windows-x64/flecs.dll"    && echo "✓ Windows x64" || echo "✗ Windows x64 MISSING"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-x64/libflecs.dylib" && echo "✓ macOS x64"   || echo "✗ macOS x64 MISSING"
-          jar tf build/libs/flecs-java-$VERSION.jar | grep "natives/macos-aarch64/libflecs.dylib" && echo "✓ macOS ARM64" || echo "✗ macOS ARM64 MISSING"
+          echo "=== Main JAR: $JAR ==="
+          jar tf "$JAR" | grep "natives/" | sort || echo "✅ Aucun natif embarqué (attendu)"
+
+          echo ""
+          echo "=== Native JARs ==="
+          for f in build/libs/flecs-java-$VERSION-natives-*.jar; do
+            [ -f "$f" ] || { echo "Aucun jar natif trouvé"; break; }
+            echo "--- $(basename "$f") ---"
+            jar tf "$f" | grep "natives/"
+          done
+
+          echo ""
+          echo "Verifying all expected classifiers..."
+          EXPECTED=(
+            "natives-linux-x64"
+            "natives-linux-aarch64"
+            "natives-windows-x64"
+            "natives-macos-x64"
+            "natives-macos-aarch64"
+            "natives-linux-x64-debug"
+            "natives-linux-aarch64-debug"
+            "natives-windows-x64-debug"
+            "natives-macos-x64-debug"
+            "natives-macos-aarch64-debug"
+          )
+          ALL_OK=true
+          for classifier in "${EXPECTED[@]}"; do
+            f="build/libs/flecs-java-$VERSION-$classifier.jar"
+            if [ -f "$f" ]; then
+              echo "✅  $classifier"
+            else
+              echo "❌  $classifier — MISSING"
+              ALL_OK=false
+            fi
+          done
+          $ALL_OK || exit 1
 
       - name: Publish to Maven Central
         env:
@@ -157,4 +243,4 @@ jobs:
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        run: ./gradlew :publishToSonatype :closeAndReleaseSonatypeStagingRepository -PskipNative

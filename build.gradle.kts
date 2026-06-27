@@ -42,53 +42,98 @@ val generatedSourcesDir = file("src/main/generated")
 val annotationGeneratedMainDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main").get().asFile
 val annotationGeneratedTestDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test").get().asFile
 
-val os : OperatingSystem = OperatingSystem.current()
-val userHome : String = System.getProperty("user.home")
+val os: OperatingSystem = OperatingSystem.current()
+val userHome: String = System.getProperty("user.home")
 
 val jextractExecutable = when {
     os.isWindows -> "$userHome/.local/jextract-25/bin/jextract.exe"
     else -> "$userHome/.local/jextract-25/bin/jextract"
 }
 
-val nativeLibName = when {
-    os.isWindows -> "flecs.dll"
-    os.isMacOsX -> "libflecs.dylib"
-    else -> "libflecs.so"
-}
+data class Platform(
+    val id: String,
+    val osFamily: String,
+    val archName: String,
+    val libName: String,
+    val compilerFlags: List<String>,
+    val linkerFlags: List<String>,
+    val extraDefinitions: List<String> = emptyList(),
+    val extraLibs: List<String> = emptyList()
+)
 
-val nativeArch = project.findProperty("NATIVE_ARCH") as String? ?: when {
+val platforms = listOf(
+    Platform(
+        id = "linux-x64",
+        osFamily = "linux",
+        archName = "x86-64",
+        libName = "libflecs.so",
+        compilerFlags = listOf("-march=x86-64-v2", "-Ofast", "-flto", "-fomit-frame-pointer", "-funroll-loops", "-fno-semantic-interposition", "-fno-plt"),
+        linkerFlags  = listOf("-shared", "-fPIC"),
+        extraDefinitions = listOf("-D_POSIX_C_SOURCE=200809L", "-D_DEFAULT_SOURCE"),
+        extraLibs = listOf("-lm", "-lrt", "-lpthread")
+    ),
+    Platform(
+        id = "linux-aarch64",
+        osFamily = "linux",
+        archName = "aarch64",
+        libName = "libflecs.so",
+        compilerFlags = listOf("-march=armv8-a", "-Ofast", "-flto", "-fomit-frame-pointer", "-funroll-loops"),
+        linkerFlags  = listOf("-shared", "-fPIC"),
+        extraDefinitions = listOf("-D_POSIX_C_SOURCE=200809L", "-D_DEFAULT_SOURCE"),
+        extraLibs = listOf("-lm", "-lrt", "-lpthread")
+    ),
+    Platform(
+        id = "windows-x64",
+        osFamily = "windows",
+        archName = "x86-64",
+        libName = "flecs.dll",
+        compilerFlags = listOf("-march=x86-64-v2", "-Ofast", "-flto", "-fomit-frame-pointer", "-funroll-loops"),
+        linkerFlags  = listOf("-shared"),
+        extraLibs = listOf("-lws2_32", "-ldbghelp")
+    ),
+    Platform(
+        id = "macos-x64",
+        osFamily = "macos",
+        archName = "x86-64",
+        libName = "libflecs.dylib",
+        compilerFlags = listOf("-mtune=generic", "-Ofast", "-flto", "-fomit-frame-pointer", "-funroll-loops"),
+        linkerFlags  = listOf("-dynamiclib"),
+        extraLibs = listOf("-framework", "CoreFoundation")
+    ),
+    Platform(
+        id = "macos-aarch64",
+        osFamily = "macos",
+        archName = "aarch64",
+        libName = "libflecs.dylib",
+        compilerFlags = listOf("-march=armv8-a", "-Ofast", "-flto", "-fomit-frame-pointer", "-funroll-loops"),
+        linkerFlags  = listOf("-dynamiclib"),
+        extraLibs = listOf("-framework", "CoreFoundation")
+    )
+)
+
+val localPlatformId = project.findProperty("NATIVE_ARCH") as String? ?: when {
     os.isLinux && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "linux-x64"
     os.isLinux && System.getProperty("os.arch") in listOf("aarch64", "arm64") -> "linux-aarch64"
     os.isWindows && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "windows-x64"
-    os.isWindows && System.getProperty("os.arch") == "aarch64" -> "windows-aarch64"
-    os.isMacOsX && System.getProperty("os.arch") == "aarch64" -> "macos-aarch64"
+    os.isMacOsX && System.getProperty("os.arch") in listOf("aarch64", "arm64") -> "macos-aarch64"
     os.isMacOsX && System.getProperty("os.arch") in listOf("amd64", "x86_64") -> "macos-x64"
-    else -> "unknown"
-}
-
-val archFlag = when (nativeArch) {
-    "linux-x64", "windows-x64" -> "-march=x86-64-v2"
-    "macos-x64" -> "-mtune=generic"
-    "linux-aarch64", "windows-aarch64", "macos-aarch64" -> "-march=armv8-a"
-    else -> "-march=native"
+    else -> "linux-x64"
 }
 
 val downloadFlecs by tasks.registering {
     description = "Download Flecs release from GitHub"
     group = "flecs"
 
-    val outputFile = File(flecsDir, "flecs-${flecsVersion}.tar.gz")
+    val outputFile = File(flecsDir, "flecs-$flecsVersion.tar.gz")
     outputs.file(outputFile)
 
     doLast {
         flecsDir.mkdirs()
-        val url = "https://github.com/SanderMertens/flecs/archive/refs/tags/v${flecsVersion}.tar.gz"
+        val url = "https://github.com/SanderMertens/flecs/archive/refs/tags/v$flecsVersion.tar.gz"
         println("Downloading Flecs $flecsVersion from $url")
-
         URI(url).toURL().openConnection().getInputStream().use { input ->
             Files.copy(input, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
-        println("Flecs downloaded to: ${outputFile.absolutePath}")
     }
 }
 
@@ -96,205 +141,127 @@ val extractFlecs by tasks.registering(Copy::class) {
     description = "Extract Flecs archive"
     group = "flecs"
     dependsOn(downloadFlecs)
-
     from(tarTree(downloadFlecs.get().outputs.files.singleFile))
     into(flecsDir)
+}
 
-    doLast {
-        println("Flecs extracted to: ${flecsSourceDir.absolutePath}")
-        if (!flecsCFile.exists()) {
-            println("WARNING: ${flecsCFile.absolutePath} does not exist!")
-            println("Extracted directory content:")
-            flecsSourceDir.walk().maxDepth(2).forEach { println("  ${it.relativeTo(flecsSourceDir)}") }
-        }
+fun nativeOutputDir(platformId: String, variant: String) = layout.buildDirectory.dir("natives/$platformId/$variant").get().asFile
+
+fun compileNativeTask(platform: Platform, debug: Boolean): TaskProvider<Exec> {
+    val variant  = if (debug) "debug" else "release"
+    val taskName = "compileFlecsNative-${platform.id}-$variant"
+
+    tasks.findByName(taskName)?.let {
+        return tasks.named<Exec>(taskName)
+    }
+
+    val outputDir = nativeOutputDir(platform.id, variant)
+    val outputLib = File(outputDir, platform.libName)
+
+    return tasks.register<Exec>(taskName) {
+        description = "Compile Flecs native ($variant) for ${platform.id}"
+        group = "flecs"
+        dependsOn(extractFlecs)
+
+        workingDir(flecsSourceDir)
+        outputs.file(outputLib)
+        doFirst { outputDir.mkdirs() }
+
+        val debugFlags = if (debug)
+            listOf("-DFLECS_DEBUG", "-DFLECS_SANITIZE", "-g", "-O0")
+        else
+            listOf("-DNDEBUG")
+
+        val compilerTarget = project.findProperty("COMPILER_TARGET") as String?
+
+        commandLine(buildList {
+            add("gcc")
+            addAll(platform.linkerFlags)
+            add("-o"); add(outputLib.absolutePath)
+            add(flecsCFile.absolutePath)
+            addAll(platform.compilerFlags)
+            addAll(debugFlags)
+            if (!compilerTarget.isNullOrEmpty()) {
+                add("-target"); add(compilerTarget)
+            }
+            add("-std=c99")
+            add("-Dflecs_EXPORTS")
+            addAll(platform.extraDefinitions)
+            addAll(platform.extraLibs)
+        })
     }
 }
 
-val compileFlecsNative by tasks.registering(Exec::class) {
-    description = "Compile the Flecs C native library"
+val skipNative = providers.gradleProperty("skipNative")
+
+tasks.configureEach {
+    if (name.startsWith("compileFlecsNative") ||
+        name == "downloadFlecs" ||
+        name == "extractFlecs") {
+        onlyIf("skipNative property not set") { !skipNative.isPresent }
+    }
+}
+
+val compileFlecsNative by tasks.registering {
+    description = "Compile Flecs native for the current platform (release)"
     group = "flecs"
-    dependsOn(extractFlecs)
+    val localPlatform = platforms.first { it.id == localPlatformId }
+    dependsOn(compileNativeTask(localPlatform, debug = false))
+}
 
-    workingDir(flecsSourceDir)
-    val outputNativeFile = layout.buildDirectory.dir("resources/main/natives/$nativeArch/$nativeLibName").get().asFile
-    outputs.file(outputNativeFile)
+data class NativeJarSpec(
+    val platform: Platform,
+    val debug: Boolean,
+    val compileTask: TaskProvider<Exec>
+)
 
-    val compileCommand = when {
-        os.isWindows -> listOf(
-            "gcc",
-            "-shared",
-            "-o", outputNativeFile.absolutePath,
-            flecsCFile.absolutePath,
-            "-Ofast",
-            archFlag,
-            "-flto",
-            "-fomit-frame-pointer",
-            "-funroll-loops",
-            "-std=c99",
-            "-Dflecs_EXPORTS",
-            "-DNDEBUG",
-            "-lws2_32",
-            "-ldbghelp"
-        )
-        os.isMacOsX -> listOf(
-            "gcc",
-            "-dynamiclib",
-            "-o", outputNativeFile.absolutePath,
-            flecsCFile.absolutePath,
-            "-Ofast",
-            archFlag,
-            "-flto",
-            "-fomit-frame-pointer",
-            "-funroll-loops",
-            "-std=c99",
-            "-Dflecs_EXPORTS",
-            "-DNDEBUG",
-            "-framework", "CoreFoundation"
-        )
-        else -> listOf(
-            "gcc",
-            "-shared",
-            "-fPIC",
-            "-o", outputNativeFile.absolutePath,
-            flecsCFile.absolutePath,
-            "-Ofast",
-            archFlag,
-            "-flto",
-            "-fomit-frame-pointer",
-            "-funroll-loops",
-            "-fno-semantic-interposition",
-            "-fno-plt",
-            "-std=c99",
-            "-Dflecs_EXPORTS",
-            "-DNDEBUG",
-            "-D_POSIX_C_SOURCE=200809L",
-            "-D_DEFAULT_SOURCE",
-            "-lm",
-            "-lrt",
-            "-lpthread"
+val nativeJarSpecs = platforms.flatMap { platform ->
+    listOf(false, true).map { debug ->
+        val compileTask = compileNativeTask(platform, debug)
+        NativeJarSpec(platform, debug, compileTask)
+    }
+}
+
+val nativeJarTasks = nativeJarSpecs.map { spec ->
+    val variant  = if (spec.debug) "debug" else "release"
+    val taskName = "jarNatives-${spec.platform.id}-$variant"
+
+    val jarTask = tasks.register<Jar>(taskName) {
+        description = "Package Flecs natives (${spec.platform.id}, $variant)"
+        group = "flecs"
+        dependsOn(spec.compileTask)
+
+        from(nativeOutputDir(spec.platform.id, variant)) {
+            into("natives/${spec.platform.id}")
+        }
+
+        archiveClassifier.set(
+            if (spec.debug) {
+                "natives-${spec.platform.id}-debug"
+            } else {
+                "natives-${spec.platform.id}"
+            }
         )
     }
-    commandLine(compileCommand)
+
+    Triple(spec, jarTask, variant)
 }
 
-val generateFlecsBindings by tasks.registering(Exec::class) {
-    description = "Generate Java FFM bindings using jextract (maintainer-only task, run when updating Flecs version)"
-    group = "flecs"
+val nativeVariantConfigurations = nativeJarTasks.map { (spec, jarTask, variant) ->
+    val cfgName = "natives-${spec.platform.id}-$variant"
+    val cfg = configurations.create(cfgName) {
+        isCanBeConsumed = true
+        isCanBeResolved = false
 
-    dependsOn(compileFlecsNative)
-
-    inputs.file(flecsHeaderFile)
-    outputs.dir(generatedSourcesDir)
-
-    doFirst {
-        if (!flecsHeaderFile.exists()) {
-            throw GradleException("Flecs header file not found: ${flecsHeaderFile.absolutePath}")
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, Usage.JAVA_RUNTIME))
+            attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily::class, spec.platform.osFamily))
+            attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture::class, spec.platform.archName))
+            attribute(Attribute.of("io.github.elebras1.flecs.variant", String::class.java), variant)
         }
-        generatedSourcesDir.mkdirs()
-        println("Using external jextract executable")
+        outgoing.artifact(jarTask)
     }
-
-    commandLine(
-        jextractExecutable,
-        "--output", generatedSourcesDir.absolutePath,
-        "-t", "io.github.elebras1.flecs",
-        "-I", File(flecsSourceDir, "distr").absolutePath,
-        flecsHeaderFile.absolutePath
-    )
-
-    doLast {
-        println("Java FFM bindings generated in: ${generatedSourcesDir.absolutePath}")
-    }
-}
-
-val validateGeneratedBindings by tasks.registering {
-    group = "verification"
-    doLast {
-        if (!generatedSourcesDir.exists()) {
-            throw GradleException("Bindings not found at: $generatedSourcesDir")
-        }
-    }
-}
-
-val generatorSourcesDir = file("src/generator/java")
-
-val generateEachBase by tasks.registering(JavaExec::class) {
-    description = "Generate QueryBase, SystemBuilderBase, ObserverBuilderBase and all typed each callback interfaces"
-    group = "flecs"
-    classpath = sourceSets["generator"].runtimeClasspath
-    mainClass.set("io.github.elebras1.flecs.EachBaseGenerator")
-    args(generatedSourcesDir.absolutePath)
-    outputs.dir(generatedSourcesDir)
-    doFirst {
-        generatedSourcesDir.mkdirs()
-    }
-}
-
-sourceSets {
-    create("generator") {
-        java.srcDir(generatorSourcesDir)
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
-    }
-    main {
-        java {
-            srcDir(generatedSourcesDir)
-            srcDir(annotationGeneratedMainDir)
-        }
-    }
-    test {
-        java {
-            srcDir(annotationGeneratedTestDir)
-        }
-    }
-}
-
-configurations["generatorCompileClasspath"].extendsFrom(configurations["compileClasspath"])
-configurations["generatorRuntimeClasspath"].extendsFrom(configurations["runtimeClasspath"])
-
-tasks.named("processResources") {
-    dependsOn(compileFlecsNative)
-}
-
-val compileProcessor by tasks.registering(JavaCompile::class) {
-    source = fileTree("src/main/java") {
-        include("**/processor/**")
-        include("**/annotation/**")
-        include("**/util/internal/codegen/**")
-    }
-    classpath = configurations.compileClasspath.get()
-    destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))
-    options.release.set(25)
-}
-
-val copyProcessorResources by tasks.registering(Copy::class) {
-    from("src/main/resources/META-INF/services") {
-        include("javax.annotation.processing.Processor")
-    }
-    into(layout.buildDirectory.dir("classes/java/processor/META-INF/services"))
-}
-
-tasks.compileJava {
-    dependsOn(validateGeneratedBindings, copyProcessorResources, compileProcessor)
-
-    exclude("**/processor/**")
-    exclude("**/annotation/**")
-
-    options.release.set(25)
-
-    val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
-    classpath = files(processorOutput) + classpath
-
-    options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
-
-    options.compilerArgs.addAll(listOf(
-        "-s", annotationGeneratedMainDir.absolutePath
-    ))
-
-    doFirst {
-        annotationGeneratedMainDir.deleteRecursively()
-        annotationGeneratedMainDir.mkdirs()
-    }
+    Triple(spec, jarTask, cfg)
 }
 
 tasks.jar {
@@ -302,89 +269,30 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(compileProcessor.get().destinationDirectory)
-
     from(copyProcessorResources.get().destinationDir)
 
-    from(configurations.runtimeClasspath.get().map {
-        if (it.isDirectory) it else zipTree(it)
-    })
-
-    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    exclude("natives/**")
 
     manifest {
         attributes(
             "Implementation-Title" to "Flecs Java",
-            "Implementation-Version" to project.version,
+            "Implementation-Version" to project.version
         )
-    }
-}
-
-val cleanFlecs by tasks.registering(Delete::class) {
-    description = "Delete Flecs downloaded, compiled and generated files"
-    group = "flecs"
-
-    delete(flecsDir)
-}
-
-tasks.clean {
-    dependsOn(cleanFlecs)
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.compileTestJava {
-    dependsOn(compileProcessor)
-    val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
-    classpath = files(processorOutput) + classpath
-
-    options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
-
-    options.compilerArgs.addAll(listOf(
-        "-s", annotationGeneratedTestDir.absolutePath
-    ))
-
-    doFirst {
-        annotationGeneratedTestDir.deleteRecursively()
-        annotationGeneratedTestDir.mkdirs()
-    }
-}
-
-tasks.withType<JavaExec> {
-    jvmArgs("--enable-native-access=ALL-UNNAMED")
-}
-
-tasks.named("sourcesJar") {
-    dependsOn(tasks.compileJava)
-}
-
-tasks.withType<Javadoc>().configureEach {
-    (options as? StandardJavadocDocletOptions)?.apply {
-        addBooleanOption("Xdoclint:none", true)
-        addStringOption("quiet", "-quiet")
-    }
-}
-
-configure<io.github.gradlenexus.publishplugin.NexusPublishExtension> {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
-            username.set(System.getenv("OSSRH_USERNAME"))
-            password.set(System.getenv("OSSRH_PASSWORD"))
-        }
     }
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "io.github.elebras1"
+            groupId    = "io.github.elebras1"
             artifactId = "flecs-java"
-            version = project.version.toString()
+            version    = project.version.toString()
 
             from(components["java"])
+
+            nativeJarTasks.forEach { (spec, jarTask, variant) ->
+                artifact(jarTask)
+            }
 
             pom {
                 name.set("Flecs Java")
@@ -432,6 +340,162 @@ configure<SigningExtension> {
     }
 }
 
+configure<io.github.gradlenexus.publishplugin.NexusPublishExtension> {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username.set(System.getenv("OSSRH_USERNAME"))
+            password.set(System.getenv("OSSRH_PASSWORD"))
+        }
+    }
+}
+
+val generateFlecsBindings by tasks.registering(Exec::class) {
+    description = "Generate Java FFM bindings using jextract"
+    group = "flecs"
+    dependsOn(extractFlecs)
+    inputs.file(flecsHeaderFile)
+    outputs.dir(generatedSourcesDir)
+
+    doFirst {
+        if (!flecsHeaderFile.exists())
+            throw GradleException("Flecs header not found: ${flecsHeaderFile.absolutePath}")
+        generatedSourcesDir.mkdirs()
+    }
+
+    commandLine(
+        jextractExecutable,
+        "--output", generatedSourcesDir.absolutePath,
+        "-t", "io.github.elebras1.flecs",
+        "-I", File(flecsSourceDir, "distr").absolutePath,
+        flecsHeaderFile.absolutePath
+    )
+}
+
+val validateGeneratedBindings by tasks.registering {
+    group = "verification"
+    doLast {
+        if (!generatedSourcesDir.exists())
+            throw GradleException("Bindings not found at: $generatedSourcesDir")
+    }
+}
+
+val generatorSourcesDir = file("src/generator/java")
+
+val generateEachBase by tasks.registering(JavaExec::class) {
+    description = "Generate typed each callback interfaces"
+    group = "flecs"
+    classpath = sourceSets["generator"].runtimeClasspath
+    mainClass.set("io.github.elebras1.flecs.EachBaseGenerator")
+    args(generatedSourcesDir.absolutePath)
+    outputs.dir(generatedSourcesDir)
+    doFirst { generatedSourcesDir.mkdirs() }
+}
+
+sourceSets {
+    create("generator") {
+        java.srcDir(generatorSourcesDir)
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+    main {
+        java {
+            srcDir(generatedSourcesDir)
+            srcDir(annotationGeneratedMainDir)
+        }
+    }
+    test {
+        java { srcDir(annotationGeneratedTestDir) }
+    }
+}
+
+configurations["generatorCompileClasspath"].extendsFrom(configurations["compileClasspath"])
+configurations["generatorRuntimeClasspath"].extendsFrom(configurations["runtimeClasspath"])
+
+val compileProcessor by tasks.registering(JavaCompile::class) {
+    source = fileTree("src/main/java") {
+        include("**/processor/**")
+        include("**/annotation/**")
+        include("**/util/internal/codegen/**")
+    }
+    classpath = configurations.compileClasspath.get()
+    destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))
+    options.release.set(25)
+}
+
+val copyProcessorResources by tasks.registering(Copy::class) {
+    from("src/main/resources/META-INF/services") {
+        include("javax.annotation.processing.Processor")
+    }
+    into(layout.buildDirectory.dir("classes/java/processor/META-INF/services"))
+}
+
+tasks.compileJava {
+    dependsOn(validateGeneratedBindings, copyProcessorResources, compileProcessor)
+    exclude("**/processor/**")
+    exclude("**/annotation/**")
+    options.release.set(25)
+
+    val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
+    classpath = files(processorOutput) + classpath
+    options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
+    options.compilerArgs.addAll(listOf("-s", annotationGeneratedMainDir.absolutePath))
+
+    doFirst {
+        annotationGeneratedMainDir.deleteRecursively()
+        annotationGeneratedMainDir.mkdirs()
+    }
+}
+
+tasks.compileTestJava {
+    dependsOn(compileProcessor)
+    val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
+    classpath = files(processorOutput) + classpath
+    options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
+    options.compilerArgs.addAll(listOf("-s", annotationGeneratedTestDir.absolutePath))
+
+    doFirst {
+        annotationGeneratedTestDir.deleteRecursively()
+        annotationGeneratedTestDir.mkdirs()
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+
+    val localPlatform = platforms.first { it.id == localPlatformId }
+    val nativeDir = nativeOutputDir(localPlatformId, "release")
+    systemProperty("flecs.native.path", File(nativeDir, localPlatform.libName).absolutePath)
+
+    dependsOn(compileNativeTask(localPlatform, debug = false))
+}
+
+tasks.withType<JavaExec> {
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}
+
+tasks.named("sourcesJar") {
+    dependsOn(tasks.compileJava)
+}
+
+tasks.withType<Javadoc>().configureEach {
+    (options as? StandardJavadocDocletOptions)?.apply {
+        addBooleanOption("Xdoclint:none", true)
+        addStringOption("quiet", "-quiet")
+    }
+}
+
+val cleanFlecs by tasks.registering(Delete::class) {
+    description = "Delete Flecs downloaded, compiled and generated files"
+    group = "flecs"
+    delete(flecsDir)
+}
+
+tasks.clean {
+    dependsOn(cleanFlecs)
+}
+
 extra["flecsVersion"] = flecsVersion
 extra["flecsIncludeDir"] = File(flecsSourceDir, "include")
-extra["flecsLibDir"] = layout.buildDirectory.dir("resources/main/natives/$nativeArch").get().asFile

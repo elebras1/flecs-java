@@ -8,106 +8,107 @@ import java.nio.file.StandardCopyOption;
 
 public final class FlecsLoader {
 
-    private static boolean loaded = false;
+    private static volatile boolean LOADED = false;
 
-    private FlecsLoader() {
-    }
+    private FlecsLoader() {}
 
     public static synchronized void load() {
-        if (loaded) {
+        if (LOADED) {
+            return;
+        }
+
+        String explicitPath = System.getProperty("flecs.native.path");
+        if (explicitPath != null) {
+            System.load(explicitPath);
+            LOADED = true;
+            return;
+        }
+
+        String platformId = resolvePlatformId();
+        String libName = resolveLibName();
+        String resourcePath = "/natives/" + platformId + "/" + libName;
+
+        if (loadFromResource(resourcePath)) {
+            LOADED = true;
             return;
         }
 
         try {
-            String libPath = getNativeLibraryPath();
-
-            if (loadFromResources(libPath)) {
-                loaded = true;
-                return;
-            }
-
             System.loadLibrary("flecs");
-            loaded = true;
-
-        } catch (Exception e) {
-            throw new UnsatisfiedLinkError("Unable to load the native Flecs library: " + e.getMessage());
+            LOADED = true;
+        } catch (UnsatisfiedLinkError e) {
+            throw new UnsatisfiedLinkError(
+                    "Failed to load the native Flecs library.\n" +
+                            "Tried:\n" +
+                            "  1. System property flecs.native.path  → not set\n" +
+                            "  2. Classpath resource " + resourcePath + "  → not found\n" +
+                            "     Make sure one of the following is on your runtime classpath:\n" +
+                            "       io.github.elebras1:flecs-java-natives-" + platformId + "\n" +
+                            "       io.github.elebras1:flecs-java-natives-" + platformId + "-debug\n" +
+                            "  3. System.loadLibrary(\"flecs\")  → " + e.getMessage()
+            );
         }
     }
 
-    private static String getArchitecture() {
-        String osArch = System.getProperty("os.arch").toLowerCase();
+    static String resolvePlatformId() {
+        return resolveOsName() + "-" + resolveArchName();
+    }
 
-        if (osArch.equals("amd64") || osArch.equals("x86_64")) {
+    private static String resolveOsName() {
+        String os = System.getProperty("os.name", "").toLowerCase();
+        if (os.contains("win")) {
+            return "windows";
+        }
+        if (os.contains("mac")) {
+            return "macos";
+        }
+        if (os.contains("linux") || os.contains("nux")) {
+            return "linux";
+        }
+        throw new UnsupportedOperationException("Unsupported OS: " + os);
+    }
+
+    private static String resolveArchName() {
+        String arch = System.getProperty("os.arch", "").toLowerCase();
+        if (arch.equals("amd64") || arch.equals("x86_64")) {
             return "x64";
-        } else if (osArch.equals("aarch64") || osArch.equals("arm64")) {
+        }
+        if (arch.equals("aarch64") || arch.equals("arm64"))  {
             return "aarch64";
         }
-
-        throw new UnsupportedOperationException("Unsupported architecture: " + osArch);
+        throw new UnsupportedOperationException("Unsupported architecture: " + arch);
     }
 
-    private static String getNativeLibraryPath() {
-        String os = System.getProperty("os.name").toLowerCase();
-        String arch = getArchitecture();
-
-        String osName;
-        String libName;
-
+    private static String resolveLibName() {
+        String os = System.getProperty("os.name", "").toLowerCase();
         if (os.contains("win")) {
-            osName = "windows";
-            libName = "flecs.dll";
-        } else if (os.contains("mac")) {
-            osName = "macos";
-            libName = "libflecs.dylib";
-        } else if (os.contains("linux") || os.contains("nux")) {
-            osName = "linux";
-            libName = "libflecs.so";
-        } else {
-            throw new UnsupportedOperationException("Unsupported OS: " + os);
+            return "flecs.dll";
         }
-
-        return String.format("/natives/%s-%s/%s", osName, arch, libName);
+        if (os.contains("mac")) {
+            return "libflecs.dylib";
+        }
+        if (os.contains("linux") || os.contains("nux")) {
+            return "libflecs.so";
+        }
+        throw new UnsupportedOperationException("Unsupported OS: " + os);
     }
 
-    private static boolean loadFromResources(String libPath) {
-        try {
-            InputStream in = FlecsLoader.class.getResourceAsStream(libPath);
-
+    private static boolean loadFromResource(String resourcePath) {
+        try (InputStream in = FlecsLoader.class.getResourceAsStream(resourcePath)) {
             if (in == null) {
-                // Try fallback to root for backward compatibility
-                String libName = libPath.substring(libPath.lastIndexOf('/') + 1);
-                in = FlecsLoader.class.getResourceAsStream("/" + libName);
-
-                if (in == null) {
-                    return false;
-                }
+                return false;
             }
 
-            Path tempLib = Files.createTempFile("flecs", getSuffix(libPath));
-            tempLib.toFile().deleteOnExit();
+            String suffix = resourcePath.substring(resourcePath.lastIndexOf('.'));
+            Path tmp = Files.createTempFile("flecs-native-", suffix);
+            tmp.toFile().deleteOnExit();
 
-            Files.copy(in, tempLib, StandardCopyOption.REPLACE_EXISTING);
-            in.close();
-
-            System.load(tempLib.toAbsolutePath().toString());
-
+            Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
+            System.load(tmp.toAbsolutePath().toString());
             return true;
 
         } catch (IOException e) {
             return false;
         }
     }
-
-    private static String getSuffix(String filename) {
-        int idx = filename.lastIndexOf('.');
-        if (idx != -1) {
-            return filename.substring(idx);
-        }
-        return "";
-    }
-
-    public static boolean isLoaded() {
-        return loaded;
-    }
 }
-
