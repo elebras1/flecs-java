@@ -1,8 +1,6 @@
 package io.github.elebras1.flecs;
 
 public record FlecsInfo(long lastComponentId,
-                        long minId,
-                        long maxId,
                         float deltaTimeRaw,
                         float deltaTime,
                         float timeScale,

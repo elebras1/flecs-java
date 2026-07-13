@@ -31,7 +31,7 @@ java {
     withJavadocJar()
 }
 
-val flecsVersion = "4.1.5"
+val flecsVersion = "4.1.6"
 val flecsDir = layout.buildDirectory.dir("flecs").get().asFile
 val flecsSourceDir = File(flecsDir, "flecs-$flecsVersion")
 

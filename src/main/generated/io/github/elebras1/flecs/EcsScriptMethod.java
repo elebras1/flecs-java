@@ -2,6 +2,16 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
+import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
+import static java.lang.foreign.ValueLayout.*;
+import static java.lang.foreign.MemoryLayout.PathElement.*;
+
 /**
  * {@snippet lang=c :
  * typedef struct ecs_script_function_t {
@@ -10,6 +20,8 @@ package io.github.elebras1.flecs;
  *     ecs_function_callback_t callback;
  *     ecs_vector_function_callback_t vector_callbacks[18];
  *     void *ctx;
+ *     void *binding_ctx;
+ *     ecs_ctx_free_t binding_ctx_free;
  * } EcsScriptMethod
  * }
  */

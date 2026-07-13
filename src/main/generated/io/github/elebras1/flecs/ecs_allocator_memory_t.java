@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -43,7 +47,7 @@ public class ecs_allocator_memory_t {
         flecs_h.C_INT.withName("bytes_query_impl"),
         flecs_h.C_INT.withName("bytes_query_cache"),
         flecs_h.C_INT.withName("bytes_misc")
-    ).withName("$anon$15386:9");
+    ).withName("$anon$15306:9");
 
     /**
      * The layout of this struct

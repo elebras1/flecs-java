@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -186,7 +190,7 @@ public class ecs_world_stats_t {
         private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
             ecs_metric_t.layout().withName("count"),
             ecs_metric_t.layout().withName("not_alive_count")
-        ).withName("$anon$14856:5");
+        ).withName("$anon$14776:5");
 
         /**
          * The layout of this struct
@@ -409,7 +413,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("type_count"),
             ecs_metric_t.layout().withName("create_count"),
             ecs_metric_t.layout().withName("delete_count")
-        ).withName("$anon$14862:5");
+        ).withName("$anon$14782:5");
 
         /**
          * The layout of this struct
@@ -820,7 +824,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("empty_count"),
             ecs_metric_t.layout().withName("create_count"),
             ecs_metric_t.layout().withName("delete_count")
-        ).withName("$anon$14872:5");
+        ).withName("$anon$14792:5");
 
         /**
          * The layout of this struct
@@ -1133,7 +1137,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("query_count"),
             ecs_metric_t.layout().withName("observer_count"),
             ecs_metric_t.layout().withName("system_count")
-        ).withName("$anon$14880:5");
+        ).withName("$anon$14800:5");
 
         /**
          * The layout of this struct
@@ -1414,7 +1418,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("discard_count"),
             ecs_metric_t.layout().withName("batched_entity_count"),
             ecs_metric_t.layout().withName("batched_count")
-        ).withName("$anon$14887:5");
+        ).withName("$anon$14807:5");
 
         /**
          * The layout of this struct
@@ -2071,7 +2075,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("systems_ran"),
             ecs_metric_t.layout().withName("observers_ran"),
             ecs_metric_t.layout().withName("event_emit_count")
-        ).withName("$anon$14902:5");
+        ).withName("$anon$14822:5");
 
         /**
          * The layout of this struct
@@ -2540,7 +2544,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("rematch_time"),
             ecs_metric_t.layout().withName("fps"),
             ecs_metric_t.layout().withName("delta_time")
-        ).withName("$anon$14913:5");
+        ).withName("$anon$14833:5");
 
         /**
          * The layout of this struct
@@ -3107,7 +3111,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("stack_alloc_count"),
             ecs_metric_t.layout().withName("stack_free_count"),
             ecs_metric_t.layout().withName("stack_outstanding_alloc_count")
-        ).withName("$anon$14925:5");
+        ).withName("$anon$14845:5");
 
         /**
          * The layout of this struct
@@ -3720,7 +3724,7 @@ public class ecs_world_stats_t {
             ecs_metric_t.layout().withName("send_ok_count"),
             ecs_metric_t.layout().withName("send_error_count"),
             ecs_metric_t.layout().withName("busy_count")
-        ).withName("$anon$14942:5");
+        ).withName("$anon$14862:5");
 
         /**
          * The layout of this struct

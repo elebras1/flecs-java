@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -39,7 +43,7 @@ public class EcsWorldMemory {
         ecs_misc_memory_t.layout().withName("misc"),
         ecs_allocator_memory_t.layout().withName("allocators"),
         flecs_h.C_DOUBLE.withName("collection_time")
-    ).withName("$anon$15401:9");
+    ).withName("$anon$15321:9");
 
     /**
      * The layout of this struct

@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -35,7 +39,7 @@ public class ecs_component_index_memory_t {
         flecs_h.C_INT.withName("bytes_ordered_children"),
         flecs_h.C_INT.withName("bytes_children_table_map"),
         flecs_h.C_INT.withName("bytes_reachable_cache")
-    ).withName("$anon$15317:9");
+    ).withName("$anon$15237:9");
 
     /**
      * The layout of this struct

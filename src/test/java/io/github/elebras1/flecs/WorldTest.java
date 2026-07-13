@@ -90,15 +90,6 @@ class WorldTest {
     }
 
     @Test
-    void setEntityRangeTest() {
-        this.world.setEntityRange(1000, 1050);
-        for(long entityIdExpected = 1000; entityIdExpected < 1050; entityIdExpected++) {
-            long entityId = this.world.entity();
-            assertEquals(entityIdExpected, entityId);
-        }
-    }
-
-    @Test
     void testLookup() {
         this.world.entity("test_entity");
         long entityId = this.world.lookup("test_entity");

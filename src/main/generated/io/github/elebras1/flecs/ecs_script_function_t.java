@@ -4,7 +4,10 @@ package io.github.elebras1.flecs;
 
 import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -17,6 +20,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_function_callback_t callback;
  *     ecs_vector_function_callback_t vector_callbacks[18];
  *     void *ctx;
+ *     void *binding_ctx;
+ *     ecs_ctx_free_t binding_ctx_free;
  * }
  * }
  */
@@ -31,7 +36,9 @@ public class ecs_script_function_t {
         ecs_vec_t.layout().withName("params"),
         flecs_h.C_POINTER.withName("callback"),
         MemoryLayout.sequenceLayout(18, flecs_h.C_POINTER).withName("vector_callbacks"),
-        flecs_h.C_POINTER.withName("ctx")
+        flecs_h.C_POINTER.withName("ctx"),
+        flecs_h.C_POINTER.withName("binding_ctx"),
+        flecs_h.C_POINTER.withName("binding_ctx_free")
     ).withName("ecs_script_function_t");
 
     /**
@@ -292,6 +299,94 @@ public class ecs_script_function_t {
      */
     public static void ctx(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(ctx$LAYOUT, ctx$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout binding_ctx$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("binding_ctx"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * void *binding_ctx
+     * }
+     */
+    public static final AddressLayout binding_ctx$layout() {
+        return binding_ctx$LAYOUT;
+    }
+
+    private static final long binding_ctx$OFFSET = $LAYOUT.byteOffset(groupElement("binding_ctx"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * void *binding_ctx
+     * }
+     */
+    public static final long binding_ctx$offset() {
+        return binding_ctx$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * void *binding_ctx
+     * }
+     */
+    public static MemorySegment binding_ctx(MemorySegment struct) {
+        return struct.get(binding_ctx$LAYOUT, binding_ctx$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * void *binding_ctx
+     * }
+     */
+    public static void binding_ctx(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(binding_ctx$LAYOUT, binding_ctx$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout binding_ctx_free$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("binding_ctx_free"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_ctx_free_t binding_ctx_free
+     * }
+     */
+    public static final AddressLayout binding_ctx_free$layout() {
+        return binding_ctx_free$LAYOUT;
+    }
+
+    private static final long binding_ctx_free$OFFSET = $LAYOUT.byteOffset(groupElement("binding_ctx_free"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_ctx_free_t binding_ctx_free
+     * }
+     */
+    public static final long binding_ctx_free$offset() {
+        return binding_ctx_free$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_ctx_free_t binding_ctx_free
+     * }
+     */
+    public static MemorySegment binding_ctx_free(MemorySegment struct) {
+        return struct.get(binding_ctx_free$LAYOUT, binding_ctx_free$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_ctx_free_t binding_ctx_free
+     * }
+     */
+    public static void binding_ctx_free(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(binding_ctx_free$LAYOUT, binding_ctx_free$OFFSET, fieldValue);
     }
 
     /**

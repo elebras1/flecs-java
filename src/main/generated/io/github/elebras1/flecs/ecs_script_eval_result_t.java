@@ -2,15 +2,22 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
+import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
  * struct ecs_script_eval_result_t {
  *     char *error;
+ *     int32_t line;
+ *     int32_t column;
  * }
  * }
  */
@@ -21,7 +28,9 @@ public class ecs_script_eval_result_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        flecs_h.C_POINTER.withName("error")
+        flecs_h.C_POINTER.withName("error"),
+        flecs_h.C_INT.withName("line"),
+        flecs_h.C_INT.withName("column")
     ).withName("ecs_script_eval_result_t");
 
     /**
@@ -73,6 +82,94 @@ public class ecs_script_eval_result_t {
      */
     public static void error(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(error$LAYOUT, error$OFFSET, fieldValue);
+    }
+
+    private static final OfInt line$LAYOUT = (OfInt)$LAYOUT.select(groupElement("line"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t line
+     * }
+     */
+    public static final OfInt line$layout() {
+        return line$LAYOUT;
+    }
+
+    private static final long line$OFFSET = $LAYOUT.byteOffset(groupElement("line"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t line
+     * }
+     */
+    public static final long line$offset() {
+        return line$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t line
+     * }
+     */
+    public static int line(MemorySegment struct) {
+        return struct.get(line$LAYOUT, line$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t line
+     * }
+     */
+    public static void line(MemorySegment struct, int fieldValue) {
+        struct.set(line$LAYOUT, line$OFFSET, fieldValue);
+    }
+
+    private static final OfInt column$LAYOUT = (OfInt)$LAYOUT.select(groupElement("column"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t column
+     * }
+     */
+    public static final OfInt column$layout() {
+        return column$LAYOUT;
+    }
+
+    private static final long column$OFFSET = $LAYOUT.byteOffset(groupElement("column"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t column
+     * }
+     */
+    public static final long column$offset() {
+        return column$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t column
+     * }
+     */
+    public static int column(MemorySegment struct) {
+        return struct.get(column$LAYOUT, column$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t column
+     * }
+     */
+    public static void column(MemorySegment struct, int fieldValue) {
+        struct.set(column$LAYOUT, column$OFFSET, fieldValue);
     }
 
     /**

@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -37,7 +41,7 @@ public class ecs_http_server_desc_t {
         MemoryLayout.paddingLayout(4),
         flecs_h.C_DOUBLE.withName("cache_timeout"),
         flecs_h.C_DOUBLE.withName("cache_purge_timeout")
-    ).withName("$anon$13618:9");
+    ).withName("$anon$13551:9");
 
     /**
      * The layout of this struct
