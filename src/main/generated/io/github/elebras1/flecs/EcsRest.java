@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -28,7 +32,7 @@ public class EcsRest {
         MemoryLayout.paddingLayout(6),
         flecs_h.C_POINTER.withName("ipaddr"),
         flecs_h.C_POINTER.withName("impl")
-    ).withName("$anon$13818:9");
+    ).withName("$anon$13742:9");
 
     /**
      * The layout of this struct

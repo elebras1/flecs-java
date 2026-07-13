@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -79,7 +83,7 @@ public class EcsWorldSummary {
         flecs_h.C_INT.withName("uptime"),
         MemoryLayout.paddingLayout(4),
         ecs_build_info_t.layout().withName("build_info")
-    ).withName("$anon$15255:9");
+    ).withName("$anon$15175:9");
 
     /**
      * The layout of this struct

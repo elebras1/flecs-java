@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -46,6 +50,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_os_api_dlclose_t dlclose_;
  *     ecs_os_api_module_to_path_t module_to_dl_;
  *     ecs_os_api_module_to_path_t module_to_etc_;
+ *     ecs_os_api_fopen_t fopen_;
+ *     ecs_os_api_fclose_t fclose_;
  *     ecs_os_api_perf_trace_t perf_trace_push_;
  *     ecs_os_api_perf_trace_t perf_trace_pop_;
  *     int32_t log_level_;
@@ -99,6 +105,8 @@ public class ecs_os_api_t {
         flecs_h.C_POINTER.withName("dlclose_"),
         flecs_h.C_POINTER.withName("module_to_dl_"),
         flecs_h.C_POINTER.withName("module_to_etc_"),
+        flecs_h.C_POINTER.withName("fopen_"),
+        flecs_h.C_POINTER.withName("fclose_"),
         flecs_h.C_POINTER.withName("perf_trace_push_"),
         flecs_h.C_POINTER.withName("perf_trace_pop_"),
         flecs_h.C_INT.withName("log_level_"),
@@ -1656,6 +1664,94 @@ public class ecs_os_api_t {
      */
     public static void module_to_etc_(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(module_to_etc_$LAYOUT, module_to_etc_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout fopen_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("fopen_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fopen_t fopen_
+     * }
+     */
+    public static final AddressLayout fopen_$layout() {
+        return fopen_$LAYOUT;
+    }
+
+    private static final long fopen_$OFFSET = $LAYOUT.byteOffset(groupElement("fopen_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fopen_t fopen_
+     * }
+     */
+    public static final long fopen_$offset() {
+        return fopen_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fopen_t fopen_
+     * }
+     */
+    public static MemorySegment fopen_(MemorySegment struct) {
+        return struct.get(fopen_$LAYOUT, fopen_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fopen_t fopen_
+     * }
+     */
+    public static void fopen_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(fopen_$LAYOUT, fopen_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout fclose_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("fclose_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fclose_t fclose_
+     * }
+     */
+    public static final AddressLayout fclose_$layout() {
+        return fclose_$LAYOUT;
+    }
+
+    private static final long fclose_$OFFSET = $LAYOUT.byteOffset(groupElement("fclose_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fclose_t fclose_
+     * }
+     */
+    public static final long fclose_$offset() {
+        return fclose_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fclose_t fclose_
+     * }
+     */
+    public static MemorySegment fclose_(MemorySegment struct) {
+        return struct.get(fclose_$LAYOUT, fclose_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fclose_t fclose_
+     * }
+     */
+    public static void fclose_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(fclose_$LAYOUT, fclose_$OFFSET, fieldValue);
     }
 
     private static final AddressLayout perf_trace_push_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("perf_trace_push_"));

@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -27,7 +31,7 @@ public class flecs_hashmap_result_t {
         flecs_h.C_POINTER.withName("key"),
         flecs_h.C_POINTER.withName("value"),
         flecs_h.C_LONG.withName("hash")
-    ).withName("$anon$5386:9");
+    ).withName("$anon$5296:9");
 
     /**
      * The layout of this struct

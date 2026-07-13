@@ -2,9 +2,14 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
+import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
@@ -61,7 +66,7 @@ public class ecs_iter_private_t {
             ecs_page_iter_t.layout().withName("page"),
             ecs_worker_iter_t.layout().withName("worker"),
             ecs_each_iter_t.layout().withName("each")
-        ).withName("$anon$4871:5");
+        ).withName("$anon$4796:5");
 
         /**
          * The layout of this union

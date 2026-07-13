@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -14,6 +18,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     uint16_t clear_generation;
  *     uint16_t delete_generation;
  *     double time_budget_seconds;
+ *     int32_t offset;
  * }
  * }
  */
@@ -27,7 +32,9 @@ public class ecs_delete_empty_tables_desc_t {
         flecs_h.C_SHORT.withName("clear_generation"),
         flecs_h.C_SHORT.withName("delete_generation"),
         MemoryLayout.paddingLayout(4),
-        flecs_h.C_DOUBLE.withName("time_budget_seconds")
+        flecs_h.C_DOUBLE.withName("time_budget_seconds"),
+        flecs_h.C_INT.withName("offset"),
+        MemoryLayout.paddingLayout(4)
     ).withName("ecs_delete_empty_tables_desc_t");
 
     /**
@@ -167,6 +174,50 @@ public class ecs_delete_empty_tables_desc_t {
      */
     public static void time_budget_seconds(MemorySegment struct, double fieldValue) {
         struct.set(time_budget_seconds$LAYOUT, time_budget_seconds$OFFSET, fieldValue);
+    }
+
+    private static final OfInt offset$LAYOUT = (OfInt)$LAYOUT.select(groupElement("offset"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t offset
+     * }
+     */
+    public static final OfInt offset$layout() {
+        return offset$LAYOUT;
+    }
+
+    private static final long offset$OFFSET = $LAYOUT.byteOffset(groupElement("offset"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t offset
+     * }
+     */
+    public static final long offset$offset() {
+        return offset$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t offset
+     * }
+     */
+    public static int offset(MemorySegment struct) {
+        return struct.get(offset$LAYOUT, offset$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t offset
+     * }
+     */
+    public static void offset(MemorySegment struct, int fieldValue) {
+        struct.set(offset$LAYOUT, offset$OFFSET, fieldValue);
     }
 
     /**

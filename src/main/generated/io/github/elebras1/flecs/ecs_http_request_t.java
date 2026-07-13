@@ -4,7 +4,10 @@ package io.github.elebras1.flecs;
 
 import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -41,7 +44,7 @@ public class ecs_http_request_t {
         flecs_h.C_INT.withName("header_count"),
         flecs_h.C_INT.withName("param_count"),
         flecs_h.C_POINTER.withName("conn")
-    ).withName("$anon$13570:9");
+    ).withName("$anon$13503:9");
 
     /**
      * The layout of this struct

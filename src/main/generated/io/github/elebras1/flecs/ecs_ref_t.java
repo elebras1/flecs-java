@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -12,12 +16,11 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * {@snippet lang=c :
  * struct ecs_ref_t {
  *     ecs_entity_t entity;
- *     ecs_entity_t id;
  *     uint64_t table_id;
  *     uint32_t table_version_fast;
  *     uint16_t table_version;
- *     ecs_record_t *record;
  *     void *ptr;
+ *     ecs_entity_t id;
  * }
  * }
  */
@@ -29,13 +32,12 @@ public class ecs_ref_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_LONG.withName("entity"),
-        flecs_h.C_LONG.withName("id"),
         flecs_h.C_LONG.withName("table_id"),
         flecs_h.C_INT.withName("table_version_fast"),
         flecs_h.C_SHORT.withName("table_version"),
         MemoryLayout.paddingLayout(2),
-        flecs_h.C_POINTER.withName("record"),
-        flecs_h.C_POINTER.withName("ptr")
+        flecs_h.C_POINTER.withName("ptr"),
+        flecs_h.C_LONG.withName("id")
     ).withName("ecs_ref_t");
 
     /**
@@ -87,50 +89,6 @@ public class ecs_ref_t {
      */
     public static void entity(MemorySegment struct, long fieldValue) {
         struct.set(entity$LAYOUT, entity$OFFSET, fieldValue);
-    }
-
-    private static final OfLong id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("id"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_entity_t id
-     * }
-     */
-    public static final OfLong id$layout() {
-        return id$LAYOUT;
-    }
-
-    private static final long id$OFFSET = $LAYOUT.byteOffset(groupElement("id"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_entity_t id
-     * }
-     */
-    public static final long id$offset() {
-        return id$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t id
-     * }
-     */
-    public static long id(MemorySegment struct) {
-        return struct.get(id$LAYOUT, id$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t id
-     * }
-     */
-    public static void id(MemorySegment struct, long fieldValue) {
-        struct.set(id$LAYOUT, id$OFFSET, fieldValue);
     }
 
     private static final OfLong table_id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("table_id"));
@@ -265,50 +223,6 @@ public class ecs_ref_t {
         struct.set(table_version$LAYOUT, table_version$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout record_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("record"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_record_t *record
-     * }
-     */
-    public static final AddressLayout record_$layout() {
-        return record_$LAYOUT;
-    }
-
-    private static final long record_$OFFSET = $LAYOUT.byteOffset(groupElement("record"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_record_t *record
-     * }
-     */
-    public static final long record_$offset() {
-        return record_$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_record_t *record
-     * }
-     */
-    public static MemorySegment record_(MemorySegment struct) {
-        return struct.get(record_$LAYOUT, record_$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_record_t *record
-     * }
-     */
-    public static void record_(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(record_$LAYOUT, record_$OFFSET, fieldValue);
-    }
-
     private static final AddressLayout ptr$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("ptr"));
 
     /**
@@ -351,6 +265,50 @@ public class ecs_ref_t {
      */
     public static void ptr(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(ptr$LAYOUT, ptr$OFFSET, fieldValue);
+    }
+
+    private static final OfLong id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("id"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_entity_t id
+     * }
+     */
+    public static final OfLong id$layout() {
+        return id$LAYOUT;
+    }
+
+    private static final long id$OFFSET = $LAYOUT.byteOffset(groupElement("id"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_entity_t id
+     * }
+     */
+    public static final long id$offset() {
+        return id$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t id
+     * }
+     */
+    public static long id(MemorySegment struct) {
+        return struct.get(id$LAYOUT, id$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t id
+     * }
+     */
+    public static void id(MemorySegment struct, long fieldValue) {
+        struct.set(id$LAYOUT, id$OFFSET, fieldValue);
     }
 
     /**

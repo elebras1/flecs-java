@@ -4,7 +4,10 @@ package io.github.elebras1.flecs;
 
 import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -23,6 +26,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     _Bool allow_unresolved_identifiers;
  *     ecs_script_runtime_t *runtime;
  *     void *script_visitor;
+ *     _Bool (*unresolved_identifier_action)(const ecs_world_t *, const char *, void *);
  * }
  * }
  */
@@ -44,7 +48,8 @@ public class ecs_expr_eval_desc_t {
         flecs_h.C_BOOL.withName("allow_unresolved_identifiers"),
         MemoryLayout.paddingLayout(5),
         flecs_h.C_POINTER.withName("runtime"),
-        flecs_h.C_POINTER.withName("script_visitor")
+        flecs_h.C_POINTER.withName("script_visitor"),
+        flecs_h.C_POINTER.withName("unresolved_identifier_action")
     ).withName("ecs_expr_eval_desc_t");
 
     /**
@@ -594,6 +599,108 @@ public class ecs_expr_eval_desc_t {
      */
     public static void script_visitor(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(script_visitor$LAYOUT, script_visitor$OFFSET, fieldValue);
+    }
+
+    /**
+     * {@snippet lang=c :
+     * _Bool (*unresolved_identifier_action)(const ecs_world_t *, const char *, void *)
+     * }
+     */
+    public final static class unresolved_identifier_action {
+
+        private unresolved_identifier_action() {
+            // Should not be called directly
+        }
+
+        /**
+         * The function pointer signature, expressed as a functional interface
+         */
+        public interface Function {
+            boolean apply(MemorySegment _x0, MemorySegment _x1, MemorySegment _x2);
+        }
+
+        private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
+            flecs_h.C_BOOL,
+            flecs_h.C_POINTER,
+            flecs_h.C_POINTER,
+            flecs_h.C_POINTER
+        );
+
+        /**
+         * The descriptor of this function pointer
+         */
+        public static FunctionDescriptor descriptor() {
+            return $DESC;
+        }
+
+        private static final MethodHandle UP$MH = flecs_h.upcallHandle(unresolved_identifier_action.Function.class, "apply", $DESC);
+
+        /**
+         * Allocates a new upcall stub, whose implementation is defined by {@code fi}.
+         * The lifetime of the returned segment is managed by {@code arena}
+         */
+        public static MemorySegment allocate(unresolved_identifier_action.Function fi, Arena arena) {
+            return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, arena);
+        }
+
+        private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
+
+        /**
+         * Invoke the upcall stub {@code funcPtr}, with given parameters
+         */
+        public static boolean invoke(MemorySegment funcPtr, MemorySegment _x0, MemorySegment _x1, MemorySegment _x2) {
+            try {
+                return (boolean) DOWN$MH.invokeExact(funcPtr, _x0, _x1, _x2);
+            } catch (Error | RuntimeException ex) {
+                throw ex;
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        }
+    }
+
+    private static final AddressLayout unresolved_identifier_action$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("unresolved_identifier_action"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool (*unresolved_identifier_action)(const ecs_world_t *, const char *, void *)
+     * }
+     */
+    public static final AddressLayout unresolved_identifier_action$layout() {
+        return unresolved_identifier_action$LAYOUT;
+    }
+
+    private static final long unresolved_identifier_action$OFFSET = $LAYOUT.byteOffset(groupElement("unresolved_identifier_action"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool (*unresolved_identifier_action)(const ecs_world_t *, const char *, void *)
+     * }
+     */
+    public static final long unresolved_identifier_action$offset() {
+        return unresolved_identifier_action$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool (*unresolved_identifier_action)(const ecs_world_t *, const char *, void *)
+     * }
+     */
+    public static MemorySegment unresolved_identifier_action(MemorySegment struct) {
+        return struct.get(unresolved_identifier_action$LAYOUT, unresolved_identifier_action$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool (*unresolved_identifier_action)(const ecs_world_t *, const char *, void *)
+     * }
+     */
+    public static void unresolved_identifier_action(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(unresolved_identifier_action$LAYOUT, unresolved_identifier_action$OFFSET, fieldValue);
     }
 
     /**

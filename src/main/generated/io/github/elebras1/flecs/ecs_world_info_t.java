@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -12,8 +16,6 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * {@snippet lang=c :
  * struct ecs_world_info_t {
  *     ecs_entity_t last_component_id;
- *     ecs_entity_t min_id;
- *     ecs_entity_t max_id;
  *     float delta_time_raw;
  *     float delta_time;
  *     float time_scale;
@@ -68,8 +70,6 @@ public class ecs_world_info_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_LONG.withName("last_component_id"),
-        flecs_h.C_LONG.withName("min_id"),
-        flecs_h.C_LONG.withName("max_id"),
         flecs_h.C_FLOAT.withName("delta_time_raw"),
         flecs_h.C_FLOAT.withName("delta_time"),
         flecs_h.C_FLOAT.withName("time_scale"),
@@ -153,94 +153,6 @@ public class ecs_world_info_t {
      */
     public static void last_component_id(MemorySegment struct, long fieldValue) {
         struct.set(last_component_id$LAYOUT, last_component_id$OFFSET, fieldValue);
-    }
-
-    private static final OfLong min_id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("min_id"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_entity_t min_id
-     * }
-     */
-    public static final OfLong min_id$layout() {
-        return min_id$LAYOUT;
-    }
-
-    private static final long min_id$OFFSET = $LAYOUT.byteOffset(groupElement("min_id"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_entity_t min_id
-     * }
-     */
-    public static final long min_id$offset() {
-        return min_id$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t min_id
-     * }
-     */
-    public static long min_id(MemorySegment struct) {
-        return struct.get(min_id$LAYOUT, min_id$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t min_id
-     * }
-     */
-    public static void min_id(MemorySegment struct, long fieldValue) {
-        struct.set(min_id$LAYOUT, min_id$OFFSET, fieldValue);
-    }
-
-    private static final OfLong max_id$LAYOUT = (OfLong)$LAYOUT.select(groupElement("max_id"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_entity_t max_id
-     * }
-     */
-    public static final OfLong max_id$layout() {
-        return max_id$LAYOUT;
-    }
-
-    private static final long max_id$OFFSET = $LAYOUT.byteOffset(groupElement("max_id"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_entity_t max_id
-     * }
-     */
-    public static final long max_id$offset() {
-        return max_id$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t max_id
-     * }
-     */
-    public static long max_id(MemorySegment struct) {
-        return struct.get(max_id$LAYOUT, max_id$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_entity_t max_id
-     * }
-     */
-    public static void max_id(MemorySegment struct, long fieldValue) {
-        struct.set(max_id$LAYOUT, max_id$OFFSET, fieldValue);
     }
 
     private static final OfFloat delta_time_raw$LAYOUT = (OfFloat)$LAYOUT.select(groupElement("delta_time_raw"));
@@ -1512,7 +1424,7 @@ public class ecs_world_info_t {
             flecs_h.C_LONG.withName("other_count"),
             flecs_h.C_LONG.withName("batched_entity_count"),
             flecs_h.C_LONG.withName("batched_command_count")
-        ).withName("$anon$6488:5");
+        ).withName("$anon$6406:5");
 
         /**
          * The layout of this struct

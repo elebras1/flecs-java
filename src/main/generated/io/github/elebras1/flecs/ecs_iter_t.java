@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -18,6 +22,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     const ecs_entity_t *entities;
  *     void **ptrs;
  *     const ecs_table_record_t **trs;
+ *     const int16_t *columns;
  *     const ecs_size_t *sizes;
  *     ecs_table_t *table;
  *     ecs_table_t *other_table;
@@ -67,6 +72,7 @@ public class ecs_iter_t {
         flecs_h.C_POINTER.withName("entities"),
         flecs_h.C_POINTER.withName("ptrs"),
         flecs_h.C_POINTER.withName("trs"),
+        flecs_h.C_POINTER.withName("columns"),
         flecs_h.C_POINTER.withName("sizes"),
         flecs_h.C_POINTER.withName("table"),
         flecs_h.C_POINTER.withName("other_table"),
@@ -415,6 +421,50 @@ public class ecs_iter_t {
      */
     public static void trs(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(trs$LAYOUT, trs$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout columns$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("columns"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const int16_t *columns
+     * }
+     */
+    public static final AddressLayout columns$layout() {
+        return columns$LAYOUT;
+    }
+
+    private static final long columns$OFFSET = $LAYOUT.byteOffset(groupElement("columns"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const int16_t *columns
+     * }
+     */
+    public static final long columns$offset() {
+        return columns$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const int16_t *columns
+     * }
+     */
+    public static MemorySegment columns(MemorySegment struct) {
+        return struct.get(columns$LAYOUT, columns$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const int16_t *columns
+     * }
+     */
+    public static void columns(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(columns$LAYOUT, columns$OFFSET, fieldValue);
     }
 
     private static final AddressLayout sizes$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("sizes"));

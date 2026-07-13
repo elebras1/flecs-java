@@ -2,8 +2,12 @@
 
 package io.github.elebras1.flecs;
 
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
@@ -15,7 +19,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_id_t ids;
  *     ecs_entity_t sources;
  *     ecs_size_t sizes;
- *     int32_t columns;
+ *     int16_t columns;
  *     const ecs_table_record_t *trs;
  * }
  * }
@@ -31,7 +35,8 @@ public class ecs_each_iter_t {
         flecs_h.C_LONG.withName("ids"),
         flecs_h.C_LONG.withName("sources"),
         flecs_h.C_INT.withName("sizes"),
-        flecs_h.C_INT.withName("columns"),
+        flecs_h.C_SHORT.withName("columns"),
+        MemoryLayout.paddingLayout(2),
         flecs_h.C_POINTER.withName("trs")
     ).withName("ecs_each_iter_t");
 
@@ -218,15 +223,15 @@ public class ecs_each_iter_t {
         struct.set(sizes$LAYOUT, sizes$OFFSET, fieldValue);
     }
 
-    private static final OfInt columns$LAYOUT = (OfInt)$LAYOUT.select(groupElement("columns"));
+    private static final OfShort columns$LAYOUT = (OfShort)$LAYOUT.select(groupElement("columns"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * int32_t columns
+     * int16_t columns
      * }
      */
-    public static final OfInt columns$layout() {
+    public static final OfShort columns$layout() {
         return columns$LAYOUT;
     }
 
@@ -235,7 +240,7 @@ public class ecs_each_iter_t {
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * int32_t columns
+     * int16_t columns
      * }
      */
     public static final long columns$offset() {
@@ -245,20 +250,20 @@ public class ecs_each_iter_t {
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * int32_t columns
+     * int16_t columns
      * }
      */
-    public static int columns(MemorySegment struct) {
+    public static short columns(MemorySegment struct) {
         return struct.get(columns$LAYOUT, columns$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * int32_t columns
+     * int16_t columns
      * }
      */
-    public static void columns(MemorySegment struct, int fieldValue) {
+    public static void columns(MemorySegment struct, short fieldValue) {
         struct.set(columns$LAYOUT, columns$OFFSET, fieldValue);
     }
 

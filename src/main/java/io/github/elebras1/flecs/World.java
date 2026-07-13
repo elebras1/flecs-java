@@ -1,6 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.*;
+import io.github.elebras1.flecs.util.EntityRange;
 import io.github.elebras1.flecs.util.FlecsConstants;
 import io.github.elebras1.flecs.util.internal.FlecsAllocator;
 import io.github.elebras1.flecs.util.internal.FlecsLoader;
@@ -270,14 +271,22 @@ public class World {
         return flecs_h.ecs_get_version(entityId);
     }
 
-    public void setEntityRange(long idStart, long idEnd) {
+    public void rangeNew(int min, int max) {
         this.checkDestroyed();
-        flecs_h.ecs_set_entity_range(this.worldSeg, idStart, idEnd);
+        flecs_h.ecs_entity_range_new(this.worldSeg, min, max);
     }
 
-    public boolean enableRangeCheck(boolean enable) {
-        this.checkDestroyed();
-        return flecs_h.ecs_enable_range_check(this.worldSeg, enable);
+    public EntityRange rangeGet() {
+        MemorySegment rangeSeg = flecs_h.ecs_entity_range_get(this.worldSeg);
+        if (rangeSeg.address() == 0) {
+            return null;
+        }
+
+        MemorySegment recycledSeg = ecs_entity_range_t.recycled(rangeSeg);
+        int count = ecs_vec_t.count(recycledSeg);
+        long[] recycled = ecs_vec_t.array(recycledSeg).reinterpret((long) count * JAVA_LONG.byteSize()).toArray(JAVA_LONG);
+
+        return new EntityRange(ecs_entity_range_t.min(rangeSeg), ecs_entity_range_t.max(rangeSeg), ecs_entity_range_t.cur(rangeSeg), recycled);
     }
 
     public long prefab() {
@@ -538,8 +547,6 @@ public class World {
 
         return new FlecsInfo(
                 ecs_world_info_t.last_component_id(infoSeg),
-                ecs_world_info_t.min_id(infoSeg),
-                ecs_world_info_t.max_id(infoSeg),
                 ecs_world_info_t.delta_time_raw(infoSeg),
                 ecs_world_info_t.delta_time(infoSeg),
                 ecs_world_info_t.time_scale(infoSeg),
