@@ -47,7 +47,7 @@ public class EntityBasicsExample {
         System.out.println("Enemy Health enabled: " + enemy.enabled(Health.class));
 
         Entity playerClone = world.obtainEntity(player.clone(true));
-        playerClone.setName("PlayerClone");
+        playerClone.name("PlayerClone");
         Position clonePos = playerClone.get(Position.class);
         System.out.println("Clone position: (" + clonePos.x() + ", " + clonePos.y() + ")");
 

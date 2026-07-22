@@ -31,7 +31,7 @@ class WorldTest {
         long entityId = this.world.entity("test");
         assertTrue(entityId > 0);
         Entity entity = this.world.obtainEntity(entityId);
-        assertEquals("test", entity.getName());
+        assertEquals("test", entity.name());
     }
 
     @Test

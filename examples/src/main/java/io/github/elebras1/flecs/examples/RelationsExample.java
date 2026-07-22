@@ -36,14 +36,14 @@ public class RelationsExample {
         grandchild.set(new Position(15, 15));
         grandchild.childOf(child1);
 
-        System.out.println("Child1 parent: " + world.obtainEntity(child1.parent()).getName());
-        System.out.println("Grandchild parent: " + world.obtainEntity(grandchild.parent()).getName());
+        System.out.println("Child1 parent: " + world.obtainEntity(child1.parent()).name());
+        System.out.println("Grandchild parent: " + world.obtainEntity(grandchild.parent()).name());
 
         System.out.println("Scene children:");
-        scene.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+        scene.children(c -> System.out.println("  - " + world.obtainEntity(c).name()));
 
         System.out.println("Child1 children:");
-        child1.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+        child1.children(c -> System.out.println("  - " + world.obtainEntity(c).name()));
     }
 
     private static void parentHierarchy(World world) {
@@ -61,14 +61,14 @@ public class RelationsExample {
         Entity fuelTank = world.obtainEntity(world.entity(engine.id(), "FuelTank"));
         fuelTank.set(new Position(93, 188));
 
-        System.out.println("Cockpit parent: " + world.obtainEntity(cockpit.parent()).getName());
-        System.out.println("FuelTank parent: " + world.obtainEntity(fuelTank.parent()).getName());
+        System.out.println("Cockpit parent: " + world.obtainEntity(cockpit.parent()).name());
+        System.out.println("FuelTank parent: " + world.obtainEntity(fuelTank.parent()).name());
 
         System.out.println("Spaceship children:");
-        spaceship.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+        spaceship.children(c -> System.out.println("  - " + world.obtainEntity(c).name()));
 
         System.out.println("Engine children:");
-        engine.children(c -> System.out.println("  - " + world.obtainEntity(c).getName()));
+        engine.children(c -> System.out.println("  - " + world.obtainEntity(c).name()));
     }
 
     private static void customRelationships(World world) {

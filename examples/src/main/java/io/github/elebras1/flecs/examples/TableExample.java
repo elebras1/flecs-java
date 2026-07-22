@@ -2,7 +2,6 @@ package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Table;
-import io.github.elebras1.flecs.examples.components.*;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.Position;
@@ -31,7 +30,7 @@ public class TableExample {
             long[] typeIds = table.type();
             for (long id : typeIds) {
                 Entity component = world.obtainEntity(id);
-                System.out.println("  - " + component.getName() + " (" + id + ")");
+                System.out.println("  - " + component.name() + " (" + id + ")");
             }
         });
 
@@ -46,7 +45,7 @@ public class TableExample {
 
                 long[] entities = table.entities();
                 Entity e = world.obtainEntity(entities[row]);
-                System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
+                System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", e.name(), pos.x(), pos.y(), vel.dx(), vel.dy());
             }
         });
 

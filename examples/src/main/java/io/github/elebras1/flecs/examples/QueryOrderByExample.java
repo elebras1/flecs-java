@@ -20,7 +20,7 @@ public class QueryOrderByExample {
         query.each(entityId -> {
             Entity entity = world.obtainEntity(entityId);
             Position position = entity.get(Position.class);
-            System.out.println(" - " + entity.getName() + " (" + position.x() + ", " + position.y() + ")");
+            System.out.println(" - " + entity.name() + " (" + position.x() + ", " + position.y() + ")");
         });
 
         query.destroy();

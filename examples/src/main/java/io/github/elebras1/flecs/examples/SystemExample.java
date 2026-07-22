@@ -3,7 +3,6 @@ package io.github.elebras1.flecs.examples;
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.FlecsSystem;
 import io.github.elebras1.flecs.World;
-import io.github.elebras1.flecs.examples.components.*;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
@@ -43,7 +42,7 @@ public class SystemExample {
                     Entity entity = world.obtainEntity(it.entity(i));
                     entity.set(new Position(newX, newY));
                     System.out.printf("%s: (%.2f, %.2f) -> (%.2f, %.2f)%n",
-                        entity.getName(), pos.x(), pos.y(), newX, newY);
+                        entity.name(), pos.x(), pos.y(), newX, newY);
                 }
             });
 
@@ -52,7 +51,7 @@ public class SystemExample {
             .kind(FlecsConstants.EcsPostUpdate)
             .each(Position.class, (entityId, pos) -> {
                 Entity entity = world.obtainEntity(entityId);
-                System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.getName(), pos.x(), pos.y());
+                System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.name(), pos.x(), pos.y());
             });
 
         FlecsSystem taskSystem = world.system("TaskSystem")

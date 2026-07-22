@@ -16,7 +16,7 @@ public class PrefabExample {
 
         long enemyPrefabId = world.prefab();
         Entity enemyPrefab = world.obtainEntity(enemyPrefabId);
-        enemyPrefab.setName("EnemyPrefab");
+        enemyPrefab.name("EnemyPrefab");
         enemyPrefab.set(new Position(0, 0));
         enemyPrefab.set(new Health(50));
         enemyPrefab.set(new Velocity(1, 0));

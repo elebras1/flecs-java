@@ -71,7 +71,7 @@ public class Entity {
         return this.has(entity.id());
     }
 
-    public Entity setName(String name) {
+    public Entity name(String name) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment nameSeg = tempArena.allocateFrom(name);
             flecs_h.ecs_set_name(this.world.worldSeg(), this.id, nameSeg);
@@ -79,7 +79,7 @@ public class Entity {
         return this;
     }
 
-    public String getName() {
+    public String name() {
         MemorySegment nameSeg = flecs_h.ecs_get_name(this.world.worldSeg(), this.id);
         if (nameSeg.address() == 0) {
             return null;
@@ -459,7 +459,7 @@ public class Entity {
 
     @Override
     public String toString() {
-        String name = this.getName();
+        String name = this.name();
         if (name != null) {
             return String.format("Entity[%d, \"%s\"]", this.id, name);
         }

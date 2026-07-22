@@ -2,7 +2,6 @@ package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Query;
-import io.github.elebras1.flecs.examples.components.*;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
@@ -31,7 +30,7 @@ public class QueryBasicsExample {
 
         query.each(Position.class, (entityId, pos) -> {
             Entity entity = world.obtainEntity(entityId);
-            System.out.println("  - " + entity.getName() + " at position (" + pos.x() + ", " + pos.y() + ")");
+            System.out.println("  - " + entity.name() + " at position (" + pos.x() + ", " + pos.y() + ")");
         });
 
         System.out.println();
@@ -45,7 +44,7 @@ public class QueryBasicsExample {
                 Velocity vel = velocities.get(i);
                 io.github.elebras1.flecs.Entity entity = world.obtainEntity(it.entity(i));
 
-                System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", entity.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
+                System.out.printf("%s: pos=(%.1f, %.1f), vel=(%.1f, %.1f)%n", entity.name(), pos.x(), pos.y(), vel.dx(), vel.dy());
             }
         });
 

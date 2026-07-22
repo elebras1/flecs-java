@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.examples.components.*;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.Position;
@@ -59,7 +58,7 @@ public class QueryFeaturesExample {
                 Position pos = positions.get(i);
                 Velocity vel = velocities.get(i);
                 Entity e = world.obtainEntity(it.entity(i));
-                System.out.printf("%s: pos=(%.1f,%.1f) vel=(%.1f,%.1f)%n", e.getName(), pos.x(), pos.y(), vel.dx(), vel.dy());
+                System.out.printf("%s: pos=(%.1f,%.1f) vel=(%.1f,%.1f)%n", e.name(), pos.x(), pos.y(), vel.dx(), vel.dy());
             }
         });
 
@@ -70,7 +69,7 @@ public class QueryFeaturesExample {
                 for (int i = 0; i < it.count(); i++) {
                     Entity e = world.obtainEntity(it.entity(i));
                     Health h = e.get(Health.class);
-                    System.out.println(e.getName() + " HP: " + h.value());
+                    System.out.println(e.name() + " HP: " + h.value());
                 }
             }
         });
