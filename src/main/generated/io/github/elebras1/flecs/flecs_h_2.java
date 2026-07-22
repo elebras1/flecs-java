@@ -39918,7 +39918,7 @@ class flecs_h_2 extends flecs_h$shared {
 
     private static class ecs_get_mut_id {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            flecs_h.C_POINTER,
+            flecs_h.C_LONG,
             flecs_h.C_POINTER,
             flecs_h.C_LONG,
             flecs_h.C_LONG
@@ -39964,13 +39964,13 @@ class flecs_h_2 extends flecs_h$shared {
      * void *ecs_get_mut_id(const ecs_world_t *world, ecs_entity_t entity, ecs_id_t component)
      * }
      */
-    public static MemorySegment ecs_get_mut_id(MemorySegment world, long entity, long component) {
+    public static long ecs_get_mut_id(MemorySegment world, long entity, long component) {
         var mh$ = ecs_get_mut_id.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_mut_id", world, entity, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity, component);
+            return (long)mh$.invokeExact(world, entity, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {

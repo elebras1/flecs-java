@@ -159,10 +159,10 @@ public class Entity {
     public <T extends ComponentView> Entity set(Class<?> componentClass, Consumer<T> consumer) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         flecs_h.ecs_add_id(this.world.worldSeg(), this.id, componentId);
-        MemorySegment segment = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
+        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(segment.address());
+        view.setBaseAddress(address);
         consumer.accept(view);
 
         flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
@@ -190,10 +190,10 @@ public class Entity {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
         flecs_h.ecs_add_id(this.world.worldSeg(), this.id, pairId);
-        MemorySegment segment = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
+        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(segment.address());
+        view.setBaseAddress(address);
         consumer.accept(view);
 
         flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, pairId);
