@@ -7,7 +7,7 @@ import io.github.elebras1.flecs.OsApi;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.HealthView;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +49,7 @@ public class TaskThreadExample {
             entity.set(Health.class, (HealthView health) -> health.value(100));
         }
 
-        world.system().with(Health.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded().iter(iter -> {
+        world.system().with(Health.class).kind(Flecs.EcsOnUpdate).multiThreaded().iter(iter -> {
             Field<Health> healthField = iter.field(Health.class, 0);
             for(int i = 0; i < iter.count(); i++) {
                 HealthView health = healthField.getMutView(i);

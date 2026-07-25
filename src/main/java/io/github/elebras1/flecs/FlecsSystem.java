@@ -1,6 +1,6 @@
 package io.github.elebras1.flecs;
 
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.MemorySegment;
 
@@ -31,15 +31,15 @@ public class FlecsSystem {
     }
 
     public void enable() {
-        this.entity.remove(FlecsConstants.EcsDisabled);
+        this.entity.remove(Flecs.EcsDisabled);
     }
 
     public void disable() {
-        this.entity.add(FlecsConstants.EcsDisabled);
+        this.entity.add(Flecs.EcsDisabled);
     }
 
     public boolean isEnabled() {
-        return !this.entity.has(FlecsConstants.EcsDisabled);
+        return !this.entity.has(Flecs.EcsDisabled);
     }
 }
 

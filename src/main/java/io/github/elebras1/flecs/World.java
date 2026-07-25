@@ -2,7 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.*;
 import io.github.elebras1.flecs.util.EntityRange;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 import io.github.elebras1.flecs.util.internal.FlecsAllocator;
 import io.github.elebras1.flecs.util.internal.FlecsLoader;
 
@@ -291,7 +291,7 @@ public class World {
 
     public long prefab() {
         this.checkDestroyed();
-        return flecs_h.ecs_new_w_id(this.worldSeg, FlecsConstants.EcsPrefab);
+        return flecs_h.ecs_new_w_id(this.worldSeg, Flecs.EcsPrefab);
     }
 
     public boolean progress(float deltaTime) {
@@ -865,7 +865,7 @@ public class World {
             EcsRest.ipaddr(restDataSeg, MemorySegment.NULL);
             EcsRest.impl(restDataSeg, MemorySegment.NULL);
 
-            flecs_h.ecs_set_id(this.worldSeg, FlecsConstants.EcsWorld, restCompId, EcsRest.sizeof(), restDataSeg);
+            flecs_h.ecs_set_id(this.worldSeg, Flecs.EcsWorld, restCompId, EcsRest.sizeof(), restDataSeg);
         }
     }
 
@@ -885,7 +885,7 @@ public class World {
             throw new IllegalStateException("Failed to find EcsRest component.");
         }
 
-        flecs_h.ecs_remove_id(this.worldSeg, FlecsConstants.EcsWorld, restCompId);
+        flecs_h.ecs_remove_id(this.worldSeg, Flecs.EcsWorld, restCompId);
     }
 
     public void destroy() {

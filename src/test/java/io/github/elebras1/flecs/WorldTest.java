@@ -2,7 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Health;
 import io.github.elebras1.flecs.component.Ideology;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,7 +101,7 @@ class WorldTest {
         this.world.enableRest((short) 27750);
         this.world.component(Health.class);
 
-        this.world.system("system_test").kind(FlecsConstants.EcsOnUpdate).with(Health.class).iter(iter -> {
+        this.world.system("system_test").kind(Flecs.EcsOnUpdate).with(Health.class).iter(iter -> {
             long entityId = iter.world().lookup("test_entity");
             assertTrue(entityId > 0);
             assertEquals(10, iter.count());

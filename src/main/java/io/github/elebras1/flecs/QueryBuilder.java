@@ -4,14 +4,14 @@ import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.callback.ComparatorComponentView;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import io.github.elebras1.flecs.callback.GroupByCallback;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static io.github.elebras1.flecs.util.FlecsConstants.EcsIn;
-import static io.github.elebras1.flecs.util.FlecsConstants.EcsQueryCacheAuto;
+import static io.github.elebras1.flecs.util.Flecs.EcsIn;
+import static io.github.elebras1.flecs.util.Flecs.EcsQueryCacheAuto;
 
 public class QueryBuilder {
 
@@ -141,7 +141,7 @@ public class QueryBuilder {
         MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, FlecsConstants.EcsOut);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.EcsOut);
 
         return this;
     }
@@ -157,7 +157,7 @@ public class QueryBuilder {
         MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, FlecsConstants.EcsInOut);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.EcsInOut);
 
         return this;
     }
@@ -176,31 +176,31 @@ public class QueryBuilder {
     }
 
     public QueryBuilder and() {
-        return this.operator(FlecsConstants.EcsAnd);
+        return this.operator(Flecs.EcsAnd);
     }
 
     public QueryBuilder or() {
-        return this.operator(FlecsConstants.EcsOr);
+        return this.operator(Flecs.EcsOr);
     }
 
     public QueryBuilder not() {
-        return this.operator(FlecsConstants.EcsNot);
+        return this.operator(Flecs.EcsNot);
     }
 
     public QueryBuilder optional() {
-        return this.operator(FlecsConstants.EcsOptional);
+        return this.operator(Flecs.EcsOptional);
     }
 
     public QueryBuilder andFrom() {
-        return this.operator(FlecsConstants.EcsAndFrom);
+        return this.operator(Flecs.EcsAndFrom);
     }
 
     public QueryBuilder orFrom() {
-        return this.operator(FlecsConstants.EcsOrFrom);
+        return this.operator(Flecs.EcsOrFrom);
     }
 
     public QueryBuilder notFrom() {
-        return this.operator(FlecsConstants.EcsNotFrom);
+        return this.operator(Flecs.EcsNotFrom);
     }
 
     public QueryBuilder src(long entityId) {

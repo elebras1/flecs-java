@@ -3,7 +3,7 @@ package io.github.elebras1.flecs.examples;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.examples.components.Minister;
 import io.github.elebras1.flecs.examples.components.MinisterView;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.util.Random;
 
@@ -18,7 +18,7 @@ public class MultiThreadedSystemExample {
             world.obtainEntity(world.entity("Min_" + i)).set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
         }
 
-        world.system("LoyaltySystem").with(Minister.class).kind(FlecsConstants.EcsOnUpdate).multiThreaded(true).iter(it -> {
+        world.system("LoyaltySystem").with(Minister.class).kind(Flecs.EcsOnUpdate).multiThreaded(true).iter(it -> {
             Field<Minister> ministerField = it.field(Minister.class, 0);
             for (int i = 0; i < it.count(); i++) {
                 MinisterView ministerView = ministerField.getMutView(i);

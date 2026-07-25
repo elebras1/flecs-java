@@ -6,7 +6,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 public class SystemExample {
 
@@ -27,7 +27,7 @@ public class SystemExample {
         FlecsSystem moveSystem = world.system("MoveSystem")
             .with(Position.class)
             .with(Velocity.class)
-            .kind(FlecsConstants.EcsOnUpdate)
+            .kind(Flecs.EcsOnUpdate)
             .iter(it -> {
                 Field<Position> positions = it.field(Position.class, 0);
                 Field<Velocity> velocities = it.field(Velocity.class, 1);
@@ -48,14 +48,14 @@ public class SystemExample {
 
         FlecsSystem debugSystem = world.system("DebugSystem")
             .with(posId)
-            .kind(FlecsConstants.EcsPostUpdate)
+            .kind(Flecs.EcsPostUpdate)
             .each(Position.class, (entityId, pos) -> {
                 Entity entity = world.obtainEntity(entityId);
                 System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.name(), pos.x(), pos.y());
             });
 
         FlecsSystem taskSystem = world.system("TaskSystem")
-            .kind(FlecsConstants.EcsPreUpdate)
+            .kind(Flecs.EcsPreUpdate)
             .run(it -> System.out.println("Frame starting..."));
 
         for (int frame = 0; frame < 3; frame++) {

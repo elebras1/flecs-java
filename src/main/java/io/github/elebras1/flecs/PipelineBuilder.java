@@ -1,6 +1,6 @@
 package io.github.elebras1.flecs;
 
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -41,7 +41,7 @@ public class PipelineBuilder {
         if (this.termCount > 0) {
             long prevTermOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
             MemorySegment prevTerm = queryDesc.asSlice(prevTermOffset, TERM_SIZE);
-            ecs_term_t.oper(prevTerm, (short) FlecsConstants.EcsOr);
+            ecs_term_t.oper(prevTerm, (short) Flecs.EcsOr);
         }
 
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);

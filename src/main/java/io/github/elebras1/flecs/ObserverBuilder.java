@@ -3,13 +3,13 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.EntityCallback;
 import io.github.elebras1.flecs.callback.IterCallback;
 import io.github.elebras1.flecs.callback.RunCallback;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static io.github.elebras1.flecs.util.FlecsConstants.*;
+import static io.github.elebras1.flecs.util.Flecs.*;
 
 public class ObserverBuilder extends ObserverBuilderBase {
 
@@ -177,31 +177,31 @@ public class ObserverBuilder extends ObserverBuilderBase {
     }
 
     public ObserverBuilder and() {
-        return this.operator(FlecsConstants.EcsAnd);
+        return this.operator(Flecs.EcsAnd);
     }
 
     public ObserverBuilder or() {
-        return this.operator(FlecsConstants.EcsOr);
+        return this.operator(Flecs.EcsOr);
     }
 
     public ObserverBuilder not() {
-        return this.operator(FlecsConstants.EcsNot);
+        return this.operator(Flecs.EcsNot);
     }
 
     public ObserverBuilder optional() {
-        return this.operator(FlecsConstants.EcsOptional);
+        return this.operator(Flecs.EcsOptional);
     }
 
     public ObserverBuilder andFrom() {
-        return this.operator(FlecsConstants.EcsAndFrom);
+        return this.operator(Flecs.EcsAndFrom);
     }
 
     public ObserverBuilder orFrom() {
-        return this.operator(FlecsConstants.EcsOrFrom);
+        return this.operator(Flecs.EcsOrFrom);
     }
 
     public ObserverBuilder notFrom() {
-        return this.operator(FlecsConstants.EcsNotFrom);
+        return this.operator(Flecs.EcsNotFrom);
     }
 
     public ObserverBuilder yieldExisting() {

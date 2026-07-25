@@ -5,7 +5,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
 
-import static io.github.elebras1.flecs.util.FlecsConstants.*;
+import static io.github.elebras1.flecs.util.Flecs.*;
 
 public class ObserverExample {
 

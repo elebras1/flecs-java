@@ -6,7 +6,7 @@ import io.github.elebras1.flecs.examples.components.*;
 import io.github.elebras1.flecs.examples.components.Inventory;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 public class ViewExample {
 
@@ -32,7 +32,7 @@ public class ViewExample {
         }
 
         world.system("MovementSystem")
-                .kind(FlecsConstants.EcsOnUpdate)
+                .kind(Flecs.EcsOnUpdate)
                 .with(Position.class)
                 .with(Velocity.class)
                 .with(Inventory.class)

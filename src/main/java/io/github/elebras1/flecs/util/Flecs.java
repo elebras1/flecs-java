@@ -2,9 +2,9 @@ package io.github.elebras1.flecs.util;
 
 import io.github.elebras1.flecs.flecs_h;
 
-public final class FlecsConstants {
+public final class Flecs {
 
-    private FlecsConstants() {
+    private Flecs() {
         // Prevent instantiation
     }
 

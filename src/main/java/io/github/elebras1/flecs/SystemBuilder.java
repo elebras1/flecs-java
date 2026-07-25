@@ -1,13 +1,13 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.*;
-import io.github.elebras1.flecs.util.FlecsConstants;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static io.github.elebras1.flecs.util.FlecsConstants.*;
+import static io.github.elebras1.flecs.util.Flecs.*;
 
 public class SystemBuilder extends SystemBuilderBase {
 
@@ -220,31 +220,31 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder and() {
-        return this.operator(FlecsConstants.EcsAnd);
+        return this.operator(Flecs.EcsAnd);
     }
 
     public SystemBuilder or() {
-        return this.operator(FlecsConstants.EcsOr);
+        return this.operator(Flecs.EcsOr);
     }
 
     public SystemBuilder not() {
-        return this.operator(FlecsConstants.EcsNot);
+        return this.operator(Flecs.EcsNot);
     }
 
     public SystemBuilder optional() {
-        return this.operator(FlecsConstants.EcsOptional);
+        return this.operator(Flecs.EcsOptional);
     }
 
     public SystemBuilder andFrom() {
-        return this.operator(FlecsConstants.EcsAndFrom);
+        return this.operator(Flecs.EcsAndFrom);
     }
 
     public SystemBuilder orFrom() {
-        return this.operator(FlecsConstants.EcsOrFrom);
+        return this.operator(Flecs.EcsOrFrom);
     }
 
     public SystemBuilder notFrom() {
-        return this.operator(FlecsConstants.EcsNotFrom);
+        return this.operator(Flecs.EcsNotFrom);
     }
 
     public <T> SystemBuilder write(Class<T> componentClass) {
