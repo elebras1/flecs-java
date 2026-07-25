@@ -41,7 +41,7 @@ public class PipelineBuilder {
         if (this.termCount > 0) {
             long prevTermOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
             MemorySegment prevTerm = queryDesc.asSlice(prevTermOffset, TERM_SIZE);
-            ecs_term_t.oper(prevTerm, (short) Flecs.EcsOr);
+            ecs_term_t.oper(prevTerm, (short) Flecs.Or);
         }
 
         long termOffset = termsOffset + (this.termCount * TERM_SIZE);

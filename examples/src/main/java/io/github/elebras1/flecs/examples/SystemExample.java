@@ -27,7 +27,7 @@ public class SystemExample {
         FlecsSystem moveSystem = world.system("MoveSystem")
             .with(Position.class)
             .with(Velocity.class)
-            .kind(Flecs.EcsOnUpdate)
+            .kind(Flecs.OnUpdate)
             .iter(it -> {
                 Field<Position> positions = it.field(Position.class, 0);
                 Field<Velocity> velocities = it.field(Velocity.class, 1);
@@ -48,14 +48,14 @@ public class SystemExample {
 
         FlecsSystem debugSystem = world.system("DebugSystem")
             .with(posId)
-            .kind(Flecs.EcsPostUpdate)
+            .kind(Flecs.PostUpdate)
             .each(Position.class, (entityId, pos) -> {
                 Entity entity = world.obtainEntity(entityId);
                 System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.name(), pos.x(), pos.y());
             });
 
         FlecsSystem taskSystem = world.system("TaskSystem")
-            .kind(Flecs.EcsPreUpdate)
+            .kind(Flecs.PreUpdate)
             .run(it -> System.out.println("Frame starting..."));
 
         for (int frame = 0; frame < 3; frame++) {

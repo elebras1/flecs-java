@@ -31,15 +31,15 @@ public class FlecsSystem {
     }
 
     public void enable() {
-        this.entity.remove(Flecs.EcsDisabled);
+        this.entity.remove(Flecs.Disabled);
     }
 
     public void disable() {
-        this.entity.add(Flecs.EcsDisabled);
+        this.entity.add(Flecs.Disabled);
     }
 
     public boolean isEnabled() {
-        return !this.entity.has(Flecs.EcsDisabled);
+        return !this.entity.has(Flecs.Disabled);
     }
 }
 

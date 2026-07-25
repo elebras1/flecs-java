@@ -7,8 +7,6 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static io.github.elebras1.flecs.util.Flecs.*;
-
 public class SystemBuilder extends SystemBuilderBase {
 
     protected final Arena arena;
@@ -166,7 +164,7 @@ public class SystemBuilder extends SystemBuilderBase {
         MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, EcsIn);
+        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.In);
 
         return this;
     }
@@ -183,7 +181,7 @@ public class SystemBuilder extends SystemBuilderBase {
         MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, EcsOut);
+        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.Out);
 
         return this;
     }
@@ -200,7 +198,7 @@ public class SystemBuilder extends SystemBuilderBase {
         MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, EcsInOut);
+        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.InOut);
 
         return this;
     }
@@ -220,31 +218,31 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder and() {
-        return this.operator(Flecs.EcsAnd);
+        return this.operator(Flecs.And);
     }
 
     public SystemBuilder or() {
-        return this.operator(Flecs.EcsOr);
+        return this.operator(Flecs.Or);
     }
 
     public SystemBuilder not() {
-        return this.operator(Flecs.EcsNot);
+        return this.operator(Flecs.Not);
     }
 
     public SystemBuilder optional() {
-        return this.operator(Flecs.EcsOptional);
+        return this.operator(Flecs.Optional);
     }
 
     public SystemBuilder andFrom() {
-        return this.operator(Flecs.EcsAndFrom);
+        return this.operator(Flecs.AndFrom);
     }
 
     public SystemBuilder orFrom() {
-        return this.operator(Flecs.EcsOrFrom);
+        return this.operator(Flecs.OrFrom);
     }
 
     public SystemBuilder notFrom() {
-        return this.operator(Flecs.EcsNotFrom);
+        return this.operator(Flecs.NotFrom);
     }
 
     public <T> SystemBuilder write(Class<T> componentClass) {
@@ -435,7 +433,7 @@ public class SystemBuilder extends SystemBuilderBase {
         if (this.phase != 0) {
             flecs_h.ecs_add_id(this.world.worldSeg(), systemId, this.phase);
 
-            long dependsOnPair = flecs_h.ecs_make_pair(EcsDependsOn, this.phase);
+            long dependsOnPair = flecs_h.ecs_make_pair(Flecs.DependsOn, this.phase);
             flecs_h.ecs_add_id(this.world.worldSeg(), systemId, dependsOnPair);
         }
 

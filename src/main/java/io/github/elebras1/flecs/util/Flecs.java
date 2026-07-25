@@ -8,93 +8,93 @@ public final class Flecs {
         // Prevent instantiation
     }
 
-    public static final long EcsFlecs = flecs_h.EcsFlecs();
-    public static final long EcsFlecsCore = flecs_h.EcsFlecsCore();
-    public static final long EcsWorld = flecs_h.EcsWorld();
+    public static final long Flecs = flecs_h.EcsFlecs();
+    public static final long FlecsCore = flecs_h.EcsFlecsCore();
+    public static final long World = flecs_h.EcsWorld();
 
-    public static final long EcsPrefab = flecs_h.EcsPrefab();
-    public static final long EcsSlotOf = flecs_h.EcsSlotOf();
-    public static final long EcsDisabled = flecs_h.EcsDisabled();
-    public static final long EcsNotQueryable = flecs_h.EcsNotQueryable();
+    public static final long Prefab = flecs_h.EcsPrefab();
+    public static final long SlotOf = flecs_h.EcsSlotOf();
+    public static final long Disabled = flecs_h.EcsDisabled();
+    public static final long NotQueryable = flecs_h.EcsNotQueryable();
 
-    public static final long EcsChildOf = flecs_h.EcsChildOf();
-    public static final long EcsIsA = flecs_h.EcsIsA();
-    public static final long EcsDependsOn = flecs_h.EcsDependsOn();
-    public static final long EcsOnDelete = flecs_h.EcsOnDelete();
-    public static final long EcsOnDeleteTarget = flecs_h.EcsOnDeleteTarget();
-    public static final long EcsCascade = flecs_h.EcsCascade();
+    public static final long ChildOf = flecs_h.EcsChildOf();
+    public static final long IsA = flecs_h.EcsIsA();
+    public static final long DependsOn = flecs_h.EcsDependsOn();
+    public static final long OnDelete = flecs_h.EcsOnDelete();
+    public static final long OnDeleteTarget = flecs_h.EcsOnDeleteTarget();
+    public static final long Cascade = flecs_h.EcsCascade();
 
-    public static final long EcsRemove = flecs_h.EcsRemove();
-    public static final long EcsDelete = flecs_h.EcsDelete();
-    public static final long EcsPanic = flecs_h.EcsPanic();
+    public static final long Remove = flecs_h.EcsRemove();
+    public static final long Delete = flecs_h.EcsDelete();
+    public static final long Panic = flecs_h.EcsPanic();
 
-    public static final long EcsName = flecs_h.EcsName();
-    public static final long EcsSymbol = flecs_h.EcsSymbol();
-    public static final long EcsAlias = flecs_h.EcsAlias();
+    public static final long Name = flecs_h.EcsName();
+    public static final long Symbol = flecs_h.EcsSymbol();
+    public static final long Alias = flecs_h.EcsAlias();
 
-    public static final long EcsOnAdd = flecs_h.EcsOnAdd();
-    public static final long EcsOnRemove = flecs_h.EcsOnRemove();
-    public static final long EcsOnSet = flecs_h.EcsOnSet();
-    public static final long EcsMonitor = flecs_h.EcsMonitor();
-    public static final long EcsOnTableCreate = flecs_h.EcsOnTableCreate();
-    public static final long EcsOnTableDelete = flecs_h.EcsOnTableDelete();
+    public static final long OnAdd = flecs_h.EcsOnAdd();
+    public static final long OnRemove = flecs_h.EcsOnRemove();
+    public static final long OnSet = flecs_h.EcsOnSet();
+    public static final long Monitor = flecs_h.EcsMonitor();
+    public static final long OnTableCreate = flecs_h.EcsOnTableCreate();
+    public static final long OnTableDelete = flecs_h.EcsOnTableDelete();
 
-    public static final long EcsPhase = flecs_h.EcsPhase();
-    public static final long EcsOnStart = flecs_h.EcsOnStart();
-    public static final long EcsPreFrame = flecs_h.EcsPreFrame();
-    public static final long EcsOnLoad = flecs_h.EcsOnLoad();
-    public static final long EcsPostLoad = flecs_h.EcsPostLoad();
-    public static final long EcsPreUpdate = flecs_h.EcsPreUpdate();
-    public static final long EcsOnUpdate = flecs_h.EcsOnUpdate();
-    public static final long EcsOnValidate = flecs_h.EcsOnValidate();
-    public static final long EcsPostUpdate = flecs_h.EcsPostUpdate();
-    public static final long EcsPreStore = flecs_h.EcsPreStore();
-    public static final long EcsOnStore = flecs_h.EcsOnStore();
-    public static final long EcsPostFrame = flecs_h.EcsPostFrame();
+    public static final long Phase = flecs_h.EcsPhase();
+    public static final long OnStart = flecs_h.EcsOnStart();
+    public static final long PreFrame = flecs_h.EcsPreFrame();
+    public static final long OnLoad = flecs_h.EcsOnLoad();
+    public static final long PostLoad = flecs_h.EcsPostLoad();
+    public static final long PreUpdate = flecs_h.EcsPreUpdate();
+    public static final long OnUpdate = flecs_h.EcsOnUpdate();
+    public static final long OnValidate = flecs_h.EcsOnValidate();
+    public static final long PostUpdate = flecs_h.EcsPostUpdate();
+    public static final long PreStore = flecs_h.EcsPreStore();
+    public static final long OnStore = flecs_h.EcsOnStore();
+    public static final long PostFrame = flecs_h.EcsPostFrame();
 
-    public static final long EcsWildcard = flecs_h.EcsWildcard();
-    public static final long EcsAny = flecs_h.EcsAny();
-    public static final long EcsThis = flecs_h.EcsThis();
-    public static final long EcsVariable = flecs_h.EcsVariable();
-    public static final long EcsTransitive = flecs_h.EcsTransitive();
-    public static final long EcsReflexive = flecs_h.EcsReflexive();
-    public static final long EcsFinal = flecs_h.EcsFinal();
-    public static final long EcsDontInherit = flecs_h.EcsDontInherit();
-    public static final long EcsExclusive = flecs_h.EcsExclusive();
-    public static final long EcsAcyclic = flecs_h.EcsAcyclic();
-    public static final long EcsTraversable = flecs_h.EcsTraversable();
-    public static final long EcsSymmetric = flecs_h.EcsSymmetric();
-    public static final long EcsWith = flecs_h.EcsWith();
-    public static final long EcsOneOf = flecs_h.EcsOneOf();
-    public static final long EcsCanToggle = flecs_h.EcsCanToggle();
+    public static final long Wildcard = flecs_h.EcsWildcard();
+    public static final long Any = flecs_h.EcsAny();
+    public static final long This = flecs_h.EcsThis();
+    public static final long Variable = flecs_h.EcsVariable();
+    public static final long Transitive = flecs_h.EcsTransitive();
+    public static final long Reflexive = flecs_h.EcsReflexive();
+    public static final long Final = flecs_h.EcsFinal();
+    public static final long DontInherit = flecs_h.EcsDontInherit();
+    public static final long Exclusive = flecs_h.EcsExclusive();
+    public static final long Acyclic = flecs_h.EcsAcyclic();
+    public static final long Traversable = flecs_h.EcsTraversable();
+    public static final long Symmetric = flecs_h.EcsSymmetric();
+    public static final long With = flecs_h.EcsWith();
+    public static final long OneOf = flecs_h.EcsOneOf();
+    public static final long CanToggle = flecs_h.EcsCanToggle();
 
-    public static final int EcsQueryCacheAuto = flecs_h.EcsQueryCacheAuto();
-    public static final int EcsQueryMatchEmptyTables = flecs_h.EcsQueryMatchEmptyTables();
-    public static final int EcsIn = flecs_h.EcsIn();
-    public static final int EcsOut = flecs_h.EcsOut();
-    public static final int EcsInOut = flecs_h.EcsInOut();
-    public static final int EcsAnd = flecs_h.EcsAnd();
-    public static final int EcsOr = flecs_h.EcsOr();
-    public static final int EcsNot = flecs_h.EcsNot();
-    public static final int EcsOptional = flecs_h.EcsOptional();
-    public static final int EcsAndFrom = flecs_h.EcsAndFrom();
-    public static final int EcsOrFrom = flecs_h.EcsOrFrom();
-    public static final int EcsNotFrom = flecs_h.EcsNotFrom();
+    public static final int QueryCacheAuto = flecs_h.EcsQueryCacheAuto();
+    public static final int QueryMatchEmptyTables = flecs_h.EcsQueryMatchEmptyTables();
+    public static final int In = flecs_h.EcsIn();
+    public static final int Out = flecs_h.EcsOut();
+    public static final int InOut = flecs_h.EcsInOut();
+    public static final int And = flecs_h.EcsAnd();
+    public static final int Or = flecs_h.EcsOr();
+    public static final int Not = flecs_h.EcsNot();
+    public static final int Optional = flecs_h.EcsOptional();
+    public static final int AndFrom = flecs_h.EcsAndFrom();
+    public static final int OrFrom = flecs_h.EcsOrFrom();
+    public static final int NotFrom = flecs_h.EcsNotFrom();
 
-    public static final int EcsObserverYieldOnCreate = flecs_h.EcsObserverYieldOnCreate();
-    public static final int EcsObserverYieldOnDelete = flecs_h.EcsObserverYieldOnDelete();
+    public static final int ObserverYieldOnCreate = flecs_h.EcsObserverYieldOnCreate();
+    public static final int ObserverYieldOnDelete = flecs_h.EcsObserverYieldOnDelete();
 
-    public static final int EcsHttpGet = flecs_h.EcsHttpGet();
-    public static final int EcsHttpPost = flecs_h.EcsHttpPost();
-    public static final int EcsHttpPut = flecs_h.EcsHttpPut();
-    public static final int EcsHttpDelete = flecs_h.EcsHttpDelete();
-    public static final int EcsHttpOptions = flecs_h.EcsHttpOptions();
-    public static final int EcsHttpMethodUnsupported = flecs_h.EcsHttpMethodUnsupported();
+    public static final int HttpGet = flecs_h.EcsHttpGet();
+    public static final int HttpPost = flecs_h.EcsHttpPost();
+    public static final int HttpPut = flecs_h.EcsHttpPut();
+    public static final int HttpDelete = flecs_h.EcsHttpDelete();
+    public static final int HttpOptions = flecs_h.EcsHttpOptions();
+    public static final int HttpMethodUnsupported = flecs_h.EcsHttpMethodUnsupported();
 
-    public static final long EcsPeriod1s = flecs_h.EcsPeriod1s();
-    public static final long EcsPeriod1m = flecs_h.EcsPeriod1m();
-    public static final long EcsPeriod1h = flecs_h.EcsPeriod1h();
-    public static final long EcsPeriod1d = flecs_h.EcsPeriod1d();
+    public static final long Period1s = flecs_h.EcsPeriod1s();
+    public static final long Period1m = flecs_h.EcsPeriod1m();
+    public static final long Period1h = flecs_h.EcsPeriod1h();
+    public static final long Period1d = flecs_h.EcsPeriod1d();
 
 }
 

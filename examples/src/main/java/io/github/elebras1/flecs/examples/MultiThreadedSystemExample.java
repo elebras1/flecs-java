@@ -18,7 +18,7 @@ public class MultiThreadedSystemExample {
             world.obtainEntity(world.entity("Min_" + i)).set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
         }
 
-        world.system("LoyaltySystem").with(Minister.class).kind(Flecs.EcsOnUpdate).multiThreaded(true).iter(it -> {
+        world.system("LoyaltySystem").with(Minister.class).kind(Flecs.OnUpdate).multiThreaded(true).iter(it -> {
             Field<Minister> ministerField = it.field(Minister.class, 0);
             for (int i = 0; i < it.count(); i++) {
                 MinisterView ministerView = ministerField.getMutView(i);

@@ -9,8 +9,6 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static io.github.elebras1.flecs.util.Flecs.*;
-
 public class ObserverBuilder extends ObserverBuilderBase {
 
     private final Iter iter;
@@ -123,7 +121,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsIn);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.In);
 
         return this;
     }
@@ -140,7 +138,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsOut);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.Out);
 
         return this;
     }
@@ -157,7 +155,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsInOut);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.InOut);
 
         return this;
     }
@@ -177,31 +175,31 @@ public class ObserverBuilder extends ObserverBuilderBase {
     }
 
     public ObserverBuilder and() {
-        return this.operator(Flecs.EcsAnd);
+        return this.operator(Flecs.And);
     }
 
     public ObserverBuilder or() {
-        return this.operator(Flecs.EcsOr);
+        return this.operator(Flecs.Or);
     }
 
     public ObserverBuilder not() {
-        return this.operator(Flecs.EcsNot);
+        return this.operator(Flecs.Not);
     }
 
     public ObserverBuilder optional() {
-        return this.operator(Flecs.EcsOptional);
+        return this.operator(Flecs.Optional);
     }
 
     public ObserverBuilder andFrom() {
-        return this.operator(Flecs.EcsAndFrom);
+        return this.operator(Flecs.AndFrom);
     }
 
     public ObserverBuilder orFrom() {
-        return this.operator(Flecs.EcsOrFrom);
+        return this.operator(Flecs.OrFrom);
     }
 
     public ObserverBuilder notFrom() {
-        return this.operator(Flecs.EcsNotFrom);
+        return this.operator(Flecs.NotFrom);
     }
 
     public ObserverBuilder yieldExisting() {

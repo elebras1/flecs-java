@@ -291,7 +291,7 @@ public class World {
 
     public long prefab() {
         this.checkDestroyed();
-        return flecs_h.ecs_new_w_id(this.worldSeg, Flecs.EcsPrefab);
+        return flecs_h.ecs_new_w_id(this.worldSeg, Flecs.Prefab);
     }
 
     public boolean progress(float deltaTime) {
@@ -865,7 +865,7 @@ public class World {
             EcsRest.ipaddr(restDataSeg, MemorySegment.NULL);
             EcsRest.impl(restDataSeg, MemorySegment.NULL);
 
-            flecs_h.ecs_set_id(this.worldSeg, Flecs.EcsWorld, restCompId, EcsRest.sizeof(), restDataSeg);
+            flecs_h.ecs_set_id(this.worldSeg, Flecs.World, restCompId, EcsRest.sizeof(), restDataSeg);
         }
     }
 
@@ -885,7 +885,7 @@ public class World {
             throw new IllegalStateException("Failed to find EcsRest component.");
         }
 
-        flecs_h.ecs_remove_id(this.worldSeg, Flecs.EcsWorld, restCompId);
+        flecs_h.ecs_remove_id(this.worldSeg, Flecs.World, restCompId);
     }
 
     public void destroy() {

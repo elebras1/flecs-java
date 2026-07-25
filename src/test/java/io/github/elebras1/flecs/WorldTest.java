@@ -101,7 +101,7 @@ class WorldTest {
         this.world.enableRest((short) 27750);
         this.world.component(Health.class);
 
-        this.world.system("system_test").kind(Flecs.EcsOnUpdate).with(Health.class).iter(iter -> {
+        this.world.system("system_test").kind(Flecs.OnUpdate).with(Health.class).iter(iter -> {
             long entityId = iter.world().lookup("test_entity");
             assertTrue(entityId > 0);
             assertEquals(10, iter.count());

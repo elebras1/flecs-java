@@ -49,7 +49,7 @@ public class TaskThreadExample {
             entity.set(Health.class, (HealthView health) -> health.value(100));
         }
 
-        world.system().with(Health.class).kind(Flecs.EcsOnUpdate).multiThreaded().iter(iter -> {
+        world.system().with(Health.class).kind(Flecs.OnUpdate).multiThreaded().iter(iter -> {
             Field<Health> healthField = iter.field(Health.class, 0);
             for(int i = 0; i < iter.count(); i++) {
                 HealthView health = healthField.getMutView(i);

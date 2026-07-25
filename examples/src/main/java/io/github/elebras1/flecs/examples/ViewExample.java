@@ -32,7 +32,7 @@ public class ViewExample {
         }
 
         world.system("MovementSystem")
-                .kind(Flecs.EcsOnUpdate)
+                .kind(Flecs.OnUpdate)
                 .with(Position.class)
                 .with(Velocity.class)
                 .with(Inventory.class)

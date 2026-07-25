@@ -10,9 +10,6 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static io.github.elebras1.flecs.util.Flecs.EcsIn;
-import static io.github.elebras1.flecs.util.Flecs.EcsQueryCacheAuto;
-
 public class QueryBuilder {
 
     private final World world;
@@ -105,7 +102,7 @@ public class QueryBuilder {
     }
 
     public QueryBuilder cached() {
-        ecs_query_desc_t.cache_kind(this.desc, EcsQueryCacheAuto);
+        ecs_query_desc_t.cache_kind(this.desc, Flecs.QueryCacheAuto);
         return this;
     }
 
@@ -125,7 +122,7 @@ public class QueryBuilder {
         MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, EcsIn);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.In);
 
         return this;
     }
@@ -141,7 +138,7 @@ public class QueryBuilder {
         MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.EcsOut);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.Out);
 
         return this;
     }
@@ -157,7 +154,7 @@ public class QueryBuilder {
         MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
         long inoutOffset = ecs_term_t.inout$offset();
 
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.EcsInOut);
+        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.InOut);
 
         return this;
     }
@@ -176,31 +173,31 @@ public class QueryBuilder {
     }
 
     public QueryBuilder and() {
-        return this.operator(Flecs.EcsAnd);
+        return this.operator(Flecs.And);
     }
 
     public QueryBuilder or() {
-        return this.operator(Flecs.EcsOr);
+        return this.operator(Flecs.Or);
     }
 
     public QueryBuilder not() {
-        return this.operator(Flecs.EcsNot);
+        return this.operator(Flecs.Not);
     }
 
     public QueryBuilder optional() {
-        return this.operator(Flecs.EcsOptional);
+        return this.operator(Flecs.Optional);
     }
 
     public QueryBuilder andFrom() {
-        return this.operator(Flecs.EcsAndFrom);
+        return this.operator(Flecs.AndFrom);
     }
 
     public QueryBuilder orFrom() {
-        return this.operator(Flecs.EcsOrFrom);
+        return this.operator(Flecs.OrFrom);
     }
 
     public QueryBuilder notFrom() {
-        return this.operator(Flecs.EcsNotFrom);
+        return this.operator(Flecs.NotFrom);
     }
 
     public QueryBuilder src(long entityId) {

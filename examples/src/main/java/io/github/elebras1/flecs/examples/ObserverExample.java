@@ -14,19 +14,19 @@ public class ObserverExample {
         world.component(Position.class);
         world.component(Velocity.class);
 
-        world.observer(Position.class).event(EcsOnAdd).each((entityId) ->
+        world.observer(Position.class).event(OnAdd).each((entityId) ->
                 System.out.println("Position added to " + entityId)
         );
 
         Entity e1 = world.obtainEntity(world.entity("Entity1"));
         e1.set(new Position(10.0f, 20.0f));
 
-        world.observer(Position.class).event(EcsOnSet).each(Position.class, (entityId, pos) ->
+        world.observer(Position.class).event(OnSet).each(Position.class, (entityId, pos) ->
                 System.out.println("Position set to (" + pos.x() + ", " + pos.y() + ") " + "for entity " + entityId));
 
         e1.set(new Position(30.0f, 40.0f));
 
-        world.observer().with(Position.class).with(Velocity.class).event(EcsOnAdd).each((entityId) ->
+        world.observer().with(Position.class).with(Velocity.class).event(OnAdd).each((entityId) ->
                 System.out.println("Entity " + entityId + " has Position and Velocity")
         );
 
@@ -34,8 +34,8 @@ public class ObserverExample {
         e2.set(new Position(5.0f, 5.0f));
         e2.set(new Velocity(1.0f, 1.0f));
 
-        world.observer(Velocity.class).event(EcsOnAdd).event(EcsOnRemove).iter((it) -> {
-            String event = (it.event() == EcsOnAdd) ? "OnAdd" : "OnRemove";
+        world.observer(Velocity.class).event(OnAdd).event(OnRemove).iter((it) -> {
+            String event = (it.event() == OnAdd) ? "OnAdd" : "OnRemove";
             System.out.println("Velocity " + event + " (" + it.count() + " entities)");
         });
 
@@ -43,7 +43,7 @@ public class ObserverExample {
         e3.set(new Velocity(2.0f, 2.0f));
         e3.remove(Velocity.class);
 
-        world.observer().with(Position.class).with(Velocity.class).inOut().event(EcsOnAdd).each((entityId) ->
+        world.observer().with(Position.class).with(Velocity.class).inOut().event(OnAdd).each((entityId) ->
                 System.out.println("Position added to entity with Velocity: " + entityId)
         );
 

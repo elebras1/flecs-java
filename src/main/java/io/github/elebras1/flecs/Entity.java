@@ -109,7 +109,7 @@ public class Entity {
     }
 
     public Entity childOf(long parentId) {
-        return this.addRelation(Flecs.EcsChildOf, parentId);
+        return this.addRelation(Flecs.ChildOf, parentId);
     }
 
     public Entity childOf(Entity parent) {
@@ -117,11 +117,11 @@ public class Entity {
     }
 
     public long parent() {
-        return this.target(Flecs.EcsChildOf, 0);
+        return this.target(Flecs.ChildOf, 0);
     }
 
     public Entity isA(long entityId) {
-        return this.addRelation(Flecs.EcsIsA, entityId);
+        return this.addRelation(Flecs.IsA, entityId);
     }
 
     public Entity removeRelation(long relation, long target) {
@@ -135,11 +135,11 @@ public class Entity {
     }
 
     public Entity removeRelation(long relation) {
-        return this.removeRelation(relation, Flecs.EcsWildcard);
+        return this.removeRelation(relation, Flecs.Wildcard);
     }
 
     public boolean hasRelation(long relation) {
-        return this.hasRelation(relation, Flecs.EcsWildcard);
+        return this.hasRelation(relation, Flecs.Wildcard);
     }
 
     @SuppressWarnings("unchecked")
@@ -280,7 +280,7 @@ public class Entity {
     public FlecsObserver observe(long eventId, Runnable callback) {
         return this.world.observer()
                 .event(eventId)
-                .with(Flecs.EcsAny)
+                .with(Flecs.Any)
                 .each((entityId) -> {
                     if (entityId == this.id) {
                         callback.run();
@@ -292,7 +292,7 @@ public class Entity {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
         return this.world.observer()
                 .event(eventId)
-                .with(Flecs.EcsAny)
+                .with(Flecs.Any)
                 .iter((it) -> {
                     for (int i = 0; i < it.count(); i++) {
                         if (it.entityId(i) == this.id) {
