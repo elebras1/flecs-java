@@ -2,6 +2,8 @@ package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.Query;
+import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
@@ -9,7 +11,7 @@ import io.github.elebras1.flecs.examples.components.Velocity;
 public class QueryFeaturesExample {
 
     public static void main(String[] args) {
-        io.github.elebras1.flecs.World world = new io.github.elebras1.flecs.World();
+        World world = new World();
         world.component(Position.class);
         world.component(Velocity.class);
         world.component(Health.class);
@@ -29,27 +31,27 @@ public class QueryFeaturesExample {
         Entity obstacle = world.obtainEntity(world.entity("Obstacle"));
         obstacle.set(new Position(100, 100));
 
-        io.github.elebras1.flecs.Query q1 = world.query().with(Position.class).with(Velocity.class).build();
+        Query q1 = world.query().with(Position.class).with(Velocity.class).build();
         System.out.println("Position AND Velocity: " + q1.count());
         q1.destroy();
 
-        io.github.elebras1.flecs.Query q2 = world.query().with(enemyTag).with(Health.class).build();
+        Query q2 = world.query().with(enemyTag).with(Health.class).build();
         System.out.println("Enemy with Health: " + q2.count());
         q2.destroy();
 
-        io.github.elebras1.flecs.Query q3 = world.query().with(Position.class).or().with(Velocity.class).build();
+        Query q3 = world.query().with(Position.class).or().with(Velocity.class).build();
         System.out.println("Position OR Velocity: " + q3.count());
         q3.destroy();
 
-        io.github.elebras1.flecs.Query q4 = world.query().with(Position.class).with(Velocity.class).not().build();
+        Query q4 = world.query().with(Position.class).with(Velocity.class).not().build();
         System.out.println("Position NOT Velocity: " + q4.count());
         q4.destroy();
 
-        io.github.elebras1.flecs.Query q5 = world.query().with(Position.class).with(Velocity.class).optional().build();
+        Query q5 = world.query().with(Position.class).with(Velocity.class).optional().build();
         System.out.println("Position + optional Velocity: " + q5.count());
         q5.destroy();
 
-        io.github.elebras1.flecs.Query q6 = world.query().with(Position.class).with(Velocity.class).build();
+        Query q6 = world.query().with(Position.class).with(Velocity.class).build();
         q6.iter(it -> {
             io.github.elebras1.flecs.Field<Position> positions = it.field(Position.class, 0);
             Field<Velocity> velocities = it.field(Velocity.class, 1);
@@ -62,7 +64,7 @@ public class QueryFeaturesExample {
             }
         });
 
-        io.github.elebras1.flecs.Query q7 = world.query().with(Position.class).with(Health.class).build();
+        Query q7 = world.query().with(Position.class).with(Health.class).build();
         q7.run(it -> {
             System.out.println("Total entities: " + q7.count());
             while (it.next()) {

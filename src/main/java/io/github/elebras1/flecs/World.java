@@ -365,11 +365,11 @@ public class World {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemoryLayout memoryLayout = MemoryLayout.structLayout(JAVA_INT.withName("limit"), JAVA_INT.withName("flags"));
-            MemorySegment desc = tempArena.allocate(memoryLayout);
-            desc.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
-            desc.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
+            MemorySegment descSeg = tempArena.allocate(memoryLayout);
+            descSeg.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
+            descSeg.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
 
-            return flecs_h.ecs_delete_empty_tables(this.worldSeg, desc);
+            return flecs_h.ecs_delete_empty_tables(this.worldSeg, descSeg);
         }
     }
 
@@ -866,6 +866,41 @@ public class World {
             EcsRest.impl(restDataSeg, MemorySegment.NULL);
 
             flecs_h.ecs_set_id(this.worldSeg, Flecs.World, restCompId, EcsRest.sizeof(), restDataSeg);
+        }
+    }
+
+    public Entity module(FlecsModule module) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment nameSeg = arena.allocateFrom(module.name());
+
+            MemorySegment descSeg = ecs_component_desc_t.allocate(arena);
+            ecs_component_desc_t.entity(descSeg, 0);
+
+            long moduleEntity = flecs_h.ecs_module_init(this.worldSeg, nameSeg, descSeg);
+            flecs_h.ecs_set_scope(this.worldSeg, moduleEntity);
+
+            return new Entity(this, moduleEntity);
+        }
+    }
+
+    public Entity importModule(FlecsModule module) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment nameSeg = arena.allocateFrom(module.name());
+            long existing = flecs_h.ecs_lookup(this.worldSeg, nameSeg);
+
+            if (existing != 0) {
+                return new Entity(this, existing);
+            }
+
+            long previousScope = flecs_h.ecs_get_scope(this.worldSeg);
+            try {
+                module.initModule(this);
+            } finally {
+                flecs_h.ecs_set_scope(this.worldSeg, previousScope);
+            }
+
+            long moduleEntity = flecs_h.ecs_lookup(this.worldSeg, nameSeg);
+            return new Entity(this, moduleEntity);
         }
     }
 
