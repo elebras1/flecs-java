@@ -194,6 +194,11 @@ public class World {
         return this.contextCache.getEntityView(entityId);
     }
 
+    public Id obtainId(long id) {
+        assert id >= 0 : "Invalid ID: " + id;
+        return new Id(this, id);
+    }
+
     MemorySegment getComponentBuffer(long size) {
         return this.defaultBuffers.componentBuffer().ensure(size);
     }
@@ -254,6 +259,16 @@ public class World {
 
             return entitiesSeg.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
         }
+    }
+
+    public Id pair(long first, long second) {
+        this.checkDestroyed();
+        long pairId = flecs_h.ecs_make_pair(first, second);
+        return new Id(this, pairId);
+    }
+
+    public Id pair(Entity first, Entity secondEntity) {
+        return this.pair(first.id(), secondEntity.id());
     }
 
     public void makeAlive(long entityId) {

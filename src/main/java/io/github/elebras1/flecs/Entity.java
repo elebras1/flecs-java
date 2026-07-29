@@ -8,26 +8,18 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.function.Consumer;
 
-public class Entity {
-
-    private final World world;
-    private long id;
+public class Entity extends Id {
 
     Entity(World world, long id) {
-        this.world = world;
-        this.id = id;
-    }
-
-    protected void setId(long id) {
-        this.id = id;
+        super(world, id);
     }
 
     public long id() {
-        return id;
+        return this.id;
     }
 
     public World world() {
-        return world;
+        return this.world;
     }
 
     public Entity add(long entityId) {
@@ -288,7 +280,7 @@ public class Entity {
                 });
     }
 
-    public <T> FlecsObserver observe(Class<T> eventClass, java.util.function.Consumer<T> callback) {
+    public <T> FlecsObserver observe(Class<T> eventClass, Consumer<T> callback) {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
         return this.world.observer()
                 .event(eventId)

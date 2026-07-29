@@ -46,7 +46,7 @@ public class FlecsContext {
 
     public EntityView getEntityView(long entityId) {
         EntityView entityView = this.entityViewPool[this.entityViewCursor];
-        entityView.setId(entityId);
+        entityView.id = entityId;
         this.entityViewCursor = (this.entityViewCursor + 1) & MASK;
         return entityView;
     }
