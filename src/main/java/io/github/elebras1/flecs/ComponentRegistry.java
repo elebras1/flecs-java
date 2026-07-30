@@ -24,20 +24,25 @@ public class ComponentRegistry {
 
     protected <T> long register(Class<T> componentClass) {
         long existingId = this.componentIds.get(componentClass);
-        if(existingId != -1) {
+        if (existingId != -1) {
             return existingId;
         }
 
         Component<T> component = this.getComponentInstance(componentClass);
-        String componentName = componentClass.getName();
+        String simpleName = componentClass.getSimpleName();
+        String symbol = componentClass.getName();
 
-        long componentId = this.world.lookup(componentName);
-        if(componentId == 0) {
-            try (Arena tempArena = Arena.ofConfined()) {
-                MemorySegment nameSegment = tempArena.allocateFrom(componentName);
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment symbolSegment = tempArena.allocateFrom(symbol);
+
+            long componentId = flecs_h.ecs_lookup_symbol(this.world.worldSeg(), symbolSegment, true, true);
+
+            if (componentId == 0) {
+                MemorySegment nameSegment = tempArena.allocateFrom(simpleName);
 
                 MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
                 ecs_entity_desc_t.name(entityDesc, nameSegment);
+                ecs_entity_desc_t.symbol(entityDesc, symbolSegment);
 
                 long entityId = flecs_h.ecs_entity_init(this.world.worldSeg(), entityDesc);
 
@@ -51,13 +56,14 @@ public class ComponentRegistry {
                 componentId = flecs_h.ecs_component_init(world.worldSeg(), componentDesc);
 
                 if (componentId == 0) {
-                    throw new IllegalStateException("Failed to register component: " + componentName);
+                    throw new IllegalStateException("Failed to register component: " + symbol);
                 }
             }
+
+            this.componentIds.put(componentClass, componentId);
+            this.componentClasses.put(componentId, componentClass);
+            return componentId;
         }
-        this.componentIds.put(componentClass, componentId);
-        this.componentClasses.put(componentId, componentClass);
-        return componentId;
     }
 
     protected <T> long getComponentId(Class<T> componentClass) {

@@ -11,6 +11,7 @@ public final class Flecs {
     public static final long Flecs = flecs_h.EcsFlecs();
     public static final long FlecsCore = flecs_h.EcsFlecsCore();
     public static final long World = flecs_h.EcsWorld();
+    public static final long System = flecs_h.EcsSystem();
 
     public static final long Wildcard = flecs_h.EcsWildcard();
     public static final long Any = flecs_h.EcsAny();
