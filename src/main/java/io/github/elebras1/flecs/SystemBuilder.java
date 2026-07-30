@@ -90,6 +90,21 @@ public class SystemBuilder extends SystemBuilderBase {
         return this;
     }
 
+    public SystemBuilder with(String componentName) {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        MemorySegment termRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.name(termRefSeg, this.arena.allocateFrom(componentName));
+        ecs_term_t.first(termSeg, termRefSeg);
+
+        this.termCount++;
+        return this;
+    }
+
     public SystemBuilder with(Entity entity) {
         return with(entity.id());
     }
@@ -104,11 +119,38 @@ public class SystemBuilder extends SystemBuilderBase {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(first, second);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+
+        MemorySegment firstTermRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(firstTermRefSeg, first);
+
+        MemorySegment secondTermRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(secondTermRefSeg, second);
+
+        ecs_term_t.first(termSeg, firstTermRefSeg);
+        ecs_term_t.second(termSeg, secondTermRefSeg);
+
+        this.termCount++;
+        return this;
+    }
+
+    public SystemBuilder with(String first, String second) {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-        ecs_term_t.id(termSeg, pairId);
+
+        MemorySegment firstTermRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.name(firstTermRefSeg, this.arena.allocateFrom(first));
+
+        MemorySegment secondTermRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.name(secondTermRefSeg, this.arena.allocateFrom(second));
+
+        ecs_term_t.first(termSeg, firstTermRefSeg);
+        ecs_term_t.second(termSeg, secondTermRefSeg);
 
         this.termCount++;
         return this;
