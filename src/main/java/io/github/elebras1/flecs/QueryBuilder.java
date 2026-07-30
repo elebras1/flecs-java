@@ -106,7 +106,7 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder queryFlag(int flag) {
+    public QueryBuilder queryFlags(int flag) {
         ecs_query_desc_t.flags(this.desc, flag);
         return this;
     }
