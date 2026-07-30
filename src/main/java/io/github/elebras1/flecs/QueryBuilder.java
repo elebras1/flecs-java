@@ -8,7 +8,6 @@ import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 
 public class QueryBuilder {
 
@@ -16,7 +15,6 @@ public class QueryBuilder {
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount = 0;
-    private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
 
     public QueryBuilder(World world) {
         this.world = world;
@@ -34,20 +32,16 @@ public class QueryBuilder {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
 
-        MemorySegment termSeg = this.desc.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-
-        termSeg.set(ValueLayout.JAVA_LONG, idOffset, componentId);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount);
+        ecs_term_t.id(termSeg, componentId);
 
         this.termCount++;
         return this;
     }
 
-    public QueryBuilder with(Entity tagEntity) {
-        return with(tagEntity.id());
+    public QueryBuilder with(Entity entity) {
+        return with(entity.id());
     }
 
     public <T> QueryBuilder with(Class<T> componentClass) {
@@ -55,32 +49,41 @@ public class QueryBuilder {
         return this.with(componentId);
     }
 
-    public QueryBuilder with(long relationId, long componentId) {
+    public QueryBuilder with(long first, long second) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
-
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-
-        term.set(ValueLayout.JAVA_LONG, idOffset, pairId);
+        long pairId = flecs_h.ecs_make_pair(first, second);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount);
+        ecs_term_t.id(termSeg, pairId);
 
         this.termCount++;
         return this;
     }
 
-    public <T> QueryBuilder with(long relationId, Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(relationId, componentId);
+    public <T> QueryBuilder with(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.with(firstId, second);
+    }
+
+    public <T> QueryBuilder with(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.with(firstId, second.id());
+    }
+
+    public <A, B> QueryBuilder with(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.with(firstId, secondId);
     }
 
     public QueryBuilder without(long componentId) {
         return this.with(componentId).not();
+    }
+
+    public QueryBuilder without(Entity entity) {
+        return this.without(entity.id());
     }
 
     public <T> QueryBuilder without(Class<T> componentClass) {
@@ -88,17 +91,24 @@ public class QueryBuilder {
         return this.without(componentId);
     }
 
-    public QueryBuilder without(long relationId, long componentId) {
-        return this.with(relationId, componentId).not();
+    public QueryBuilder without(long first, long second) {
+        return this.with(first, second).not();
     }
 
-    public QueryBuilder without(long relationId, Class<?> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.without(relationId, componentId);
+    public <T> QueryBuilder without(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.without(firstId, second);
     }
 
-    public QueryBuilder without(Entity tagEntity) {
-        return this.without(tagEntity.id());
+    public <T> QueryBuilder without(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.without(firstId, second.id());
+    }
+
+    public <A, B> QueryBuilder without(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.without(firstId, secondId);
     }
 
     public QueryBuilder cached() {
@@ -116,13 +126,8 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'in' modifier to");
         }
 
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.In);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.In);
 
         return this;
     }
@@ -132,13 +137,8 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'out' modifier to");
         }
 
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.Out);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.Out);
 
         return this;
     }
@@ -148,13 +148,8 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.InOut);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.InOut);
 
         return this;
     }
@@ -164,11 +159,9 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
 
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        ecs_term_t.oper(termSeg, (short) operator);
 
-        MemorySegment term = this.desc.asSlice(termOffset, TERM_SIZE);
-        ecs_term_t.oper(term, (short) operator);
         return this;
     }
 
@@ -205,13 +198,10 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'src' modifier to");
         }
 
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, entityId);
 
-        MemorySegment termSeg = this.desc.asSlice(termOffset, TERM_SIZE);
-        MemorySegment srcSeg = ecs_term_t.src(termSeg);
-
-        srcSeg.set(ValueLayout.JAVA_LONG, 0, entityId);
         return this;
     }
 
@@ -328,7 +318,7 @@ public class QueryBuilder {
             MemorySegment querySeg = flecs_h.ecs_query_init(this.world.worldSeg(), this.desc);
 
             if (querySeg.address() == 0) {
-                String errorMsg = "Query creation failed. Structural alignment/size problem (TERM_SIZE=" + TERM_SIZE + ").";
+                String errorMsg = "Query creation failed.";
                 throw new IllegalStateException(errorMsg);
             }
 

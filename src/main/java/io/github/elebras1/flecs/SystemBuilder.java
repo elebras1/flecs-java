@@ -12,7 +12,6 @@ public class SystemBuilder extends SystemBuilderBase {
     protected final Arena arena;
     private final Iter[] iters;
     private int termCount = 0;
-    private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private IterCallback iterCallback;
     private RunCallback runCallback;
     private EntityCallback entityCallback;
@@ -84,20 +83,15 @@ public class SystemBuilder extends SystemBuilderBase {
         }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-
-        MemorySegment term = queryDescSeg.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-
-        term.set(ValueLayout.JAVA_LONG, idOffset, componentId);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        ecs_term_t.id(termSeg, componentId);
 
         this.termCount++;
         return this;
     }
 
-    public SystemBuilder with(Entity tagEntity) {
-        return with(tagEntity.id());
+    public SystemBuilder with(Entity entity) {
+        return with(entity.id());
     }
 
     public <T> SystemBuilder with(Class<T> componentClass) {
@@ -105,33 +99,43 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.with(componentId);
     }
 
-    public SystemBuilder with(long relationId, long componentId) {
+    public SystemBuilder with(long first, long second) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
+        long pairId = flecs_h.ecs_make_pair(first, second);
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-
-        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-
-        termSeg.set(ValueLayout.JAVA_LONG, idOffset, pairId);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        ecs_term_t.id(termSeg, pairId);
 
         this.termCount++;
         return this;
     }
 
-    public <T> SystemBuilder with(long relationId, Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(relationId, componentId);
+    public <T> SystemBuilder with(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.with(firstId, second);
+    }
+
+    public <T> SystemBuilder with(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.with(firstId, second.id());
+    }
+
+    public <A, B> SystemBuilder with(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.with(firstId, secondId);
     }
 
     public SystemBuilder without(long componentId) {
         return this.with(componentId).not();
+    }
+
+    public SystemBuilder without(Entity entity) {
+        return this.without(entity.id());
     }
 
     public <T> SystemBuilder without(Class<T> componentClass) {
@@ -139,17 +143,24 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.without(componentId);
     }
 
-    public SystemBuilder without(long relationId, long componentId) {
-        return this.with(relationId, componentId).not();
+    public SystemBuilder without(long first, long second) {
+        return this.with(first, second).not();
     }
 
-    public SystemBuilder without(long relationId, Class<?> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.without(relationId, componentId);
+    public <T> SystemBuilder without(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.without(firstId, second);
     }
 
-    public SystemBuilder without(Entity tagEntity) {
-        return this.without(tagEntity.id());
+    public <T> SystemBuilder without(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.without(firstId, second.id());
+    }
+
+    public <A, B> SystemBuilder without(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.without(firstId, secondId);
     }
 
     public SystemBuilder in() {
@@ -158,13 +169,8 @@ public class SystemBuilder extends SystemBuilderBase {
         }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.In);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.In);
 
         return this;
     }
@@ -175,13 +181,8 @@ public class SystemBuilder extends SystemBuilderBase {
         }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.Out);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.Out);
 
         return this;
     }
@@ -192,13 +193,8 @@ public class SystemBuilder extends SystemBuilderBase {
         }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        termSeg.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.InOut);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.InOut);
 
         return this;
     }
@@ -209,11 +205,9 @@ public class SystemBuilder extends SystemBuilderBase {
         }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment termSeg = queryDescSeg.asSlice(termOffset, TERM_SIZE);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
         ecs_term_t.oper(termSeg, (short) operator);
+
         return this;
     }
 

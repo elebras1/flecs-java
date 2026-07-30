@@ -11,17 +11,18 @@ import java.lang.foreign.ValueLayout;
 
 public class ObserverBuilder extends ObserverBuilderBase {
 
+    private final Arena arena;
     private final Iter iter;
     private int termCount;
     private int eventCount;
     private IterCallback iterCallback;
     private RunCallback runCallback;
     private EntityCallback entityCallback;
-    private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
     private static final int MAX_EVENTS = 8;
 
     private ObserverBuilder(World world, Arena arena) {
         super(world, ecs_observer_desc_t.allocate(arena));
+        this.arena = arena;
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.termCount = 0;
         this.eventCount = 0;
@@ -46,8 +47,8 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("Maximum number of events (" + MAX_EVENTS + ") reached");
         }
 
-        MemorySegment events = ecs_observer_desc_t.events(this.desc);
-        events.setAtIndex(ValueLayout.JAVA_LONG, this.eventCount, eventId);
+        MemorySegment eventsSeg = ecs_observer_desc_t.events(this.desc);
+        eventsSeg.setAtIndex(ValueLayout.JAVA_LONG, this.eventCount, eventId);
         this.eventCount++;
 
         return this;
@@ -62,21 +63,16 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-
-        term.set(ValueLayout.JAVA_LONG, idOffset, componentId);
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        ecs_term_t.id(termSeg, componentId);
 
         this.termCount++;
         return this;
     }
 
-    public ObserverBuilder with(Entity tagEntity) {
-        return with(tagEntity.id());
+    public ObserverBuilder with(Entity entity) {
+        return with(entity.id());
     }
 
     public <T> ObserverBuilder with(Class<T> componentClass) {
@@ -84,29 +80,69 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this.with(componentId);
     }
 
-    public ObserverBuilder with(long relationId, long componentId) {
+    public ObserverBuilder with(long first, long second) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
+        long pairId = flecs_h.ecs_make_pair(first, second);
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long idOffset = ecs_term_t.id$offset();
-
-        term.set(ValueLayout.JAVA_LONG, idOffset, pairId);
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        ecs_term_t.id(termSeg, pairId);
 
         this.termCount++;
         return this;
     }
 
-    public <T> ObserverBuilder with(long relationId, Class<T> componentClass) {
+    public <T> ObserverBuilder with(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.with(firstId, second);
+    }
+
+    public <T> ObserverBuilder with(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.with(firstId, second.id());
+    }
+
+    public <A, B> ObserverBuilder with(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.with(firstId, secondId);
+    }
+
+
+    public ObserverBuilder without(long componentId) {
+        return this.with(componentId).not();
+    }
+
+    public ObserverBuilder without(Entity entity) {
+        return this.without(entity.id());
+    }
+
+    public <T> ObserverBuilder without(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(relationId, componentId);
+        return this.without(componentId);
+    }
+
+    public ObserverBuilder without(long first, long second) {
+        return this.with(first, second).not();
+    }
+
+    public <T> ObserverBuilder without(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.without(firstId, second);
+    }
+
+    public <T> ObserverBuilder without(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.without(firstId, second.id());
+    }
+
+    public <A, B> ObserverBuilder without(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.without(firstId, secondId);
     }
 
     public ObserverBuilder in() {
@@ -114,14 +150,9 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("No term to apply 'in' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.In);
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.In);
 
         return this;
     }
@@ -131,14 +162,9 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("No term to apply 'out' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.Out);
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.Out);
 
         return this;
     }
@@ -148,14 +174,9 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        long inoutOffset = ecs_term_t.inout$offset();
-
-        term.set(ValueLayout.JAVA_INT, inoutOffset, Flecs.InOut);
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.InOut);
 
         return this;
     }
@@ -165,12 +186,10 @@ public class ObserverBuilder extends ObserverBuilderBase {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
 
-        MemorySegment queryDesc = ecs_observer_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-        long termOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.oper(termSeg, (short) operator);
 
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        ecs_term_t.oper(term, (short) operator);
         return this;
     }
 
@@ -271,6 +290,8 @@ public class ObserverBuilder extends ObserverBuilderBase {
         }
 
         this.world.registerObserverCallbacks(observerId, this.iterCallback, this.runCallback, this.entityCallback);
+
+        this.arena.close();
 
         return new FlecsObserver(this.world, observerId);
     }
