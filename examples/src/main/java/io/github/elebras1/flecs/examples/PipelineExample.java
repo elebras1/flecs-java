@@ -1,15 +1,17 @@
 package io.github.elebras1.flecs.examples;
 
+import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Pipeline;
+import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 
 public class PipelineExample {
 
     public static void main(String[] args) {
-        io.github.elebras1.flecs.World world = new io.github.elebras1.flecs.World();
+        World world = new World();
         world.component(Position.class);
 
-        io.github.elebras1.flecs.Entity e = world.obtainEntity(world.entity("Entity"));
+        Entity e = world.obtainEntity(world.entity("Entity"));
         e.set(new Position(0, 0));
 
         long physics = world.entity("Physics");

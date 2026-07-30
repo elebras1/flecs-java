@@ -3,9 +3,6 @@ package io.github.elebras1.flecs.examples;
 import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.*;
-import io.github.elebras1.flecs.examples.components.Inventory;
-import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.util.Flecs;
 
 public class ViewExample {
@@ -25,7 +22,7 @@ public class ViewExample {
             entityView.set(Velocity.class, (VelocityView velocityView) ->
                     velocityView.dx(1.0f).dy(0.5f));
             entityView.set(Inventory.class, (InventoryView inventoryView) -> {
-                for(int j = 0; j < inventoryView.elementsLength(); j++) {
+                for (int j = 0; j < inventoryView.elementsLength(); j++) {
                     inventoryView.elements(j, j);
                 }
             });
@@ -37,10 +34,10 @@ public class ViewExample {
                 .with(Velocity.class)
                 .with(Inventory.class)
                 .multiThreaded()
-                .eachView(Position.class, Velocity.class, Inventory.class, (long entityId, PositionView posView, VelocityView  velView, InventoryView invView)-> {
+                .eachView(Position.class, Velocity.class, Inventory.class, (long entityId, PositionView posView, VelocityView velView, InventoryView invView) -> {
                     posView.x(posView.x() + velView.dx()).y(posView.y() + velView.dy());
 
-                    for(int i = 0; i < invView.elementsLength(); i++) {
+                    for (int i = 0; i < invView.elementsLength(); i++) {
                         invView.elements(i, invView.elements(i) + 1);
                     }
                 });

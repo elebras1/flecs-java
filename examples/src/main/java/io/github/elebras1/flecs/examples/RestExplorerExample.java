@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs.examples;
 
+import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
@@ -9,7 +10,7 @@ import java.util.Random;
 public class RestExplorerExample {
 
     public static void main(String[] args) throws InterruptedException {
-        io.github.elebras1.flecs.World world = new World();
+        World world = new World();
         System.out.println("=== Flecs REST Explorer Example ===");
         world.enableRest((short) 27750);
         System.out.println("Open https://flecs.dev/explorer?remote=true");
@@ -36,7 +37,7 @@ public class RestExplorerExample {
                 .iter(it -> {
                     for (int i = 0; i < it.count(); i++) {
                         long entityId = it.entity(i);
-                        io.github.elebras1.flecs.Entity e = world.obtainEntity(entityId);
+                        Entity e = world.obtainEntity(entityId);
                         Position p = e.get(Position.class);
                         Velocity v = e.get(Velocity.class);
 

@@ -10,13 +10,13 @@ public class HooksExample {
         World world = new World();
         world.component(Position.class, hooks -> {
             hooks.onAdd((components) ->
-                System.out.println("onAdd: " + components.length + " elements"));
+                    System.out.println("onAdd: " + components.length + " elements"));
             hooks.onSet((components) ->
-                System.out.println("onSet: " + components[0]));
+                    System.out.println("onSet: " + components[0]));
             hooks.ctor((components, count) ->
-                System.out.println("ctor: " + count + " elements"));
+                    System.out.println("ctor: " + count + " elements"));
             hooks.dtor((components, count) ->
-                System.out.println("dtor: " + count + " elements"));
+                    System.out.println("dtor: " + count + " elements"));
         });
 
         Entity ent = world.obtainEntity(world.entity("HookedEntity"));

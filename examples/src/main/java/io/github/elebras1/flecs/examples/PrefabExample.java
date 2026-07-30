@@ -2,8 +2,8 @@ package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.World;
-import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Health;
+import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
 
 public class PrefabExample {

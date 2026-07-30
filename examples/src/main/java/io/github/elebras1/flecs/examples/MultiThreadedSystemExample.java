@@ -1,6 +1,7 @@
 package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Minister;
 import io.github.elebras1.flecs.examples.components.MinisterView;
 import io.github.elebras1.flecs.util.Flecs;
@@ -9,7 +10,7 @@ import java.util.Random;
 
 public class MultiThreadedSystemExample {
     public static void main(String[] args) {
-        io.github.elebras1.flecs.World world = new io.github.elebras1.flecs.World();
+        World world = new World();
         world.component(Minister.class);
         world.setThreads(4);
 

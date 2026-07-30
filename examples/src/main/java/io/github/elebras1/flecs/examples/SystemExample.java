@@ -1,9 +1,9 @@
 package io.github.elebras1.flecs.examples;
 
 import io.github.elebras1.flecs.Entity;
+import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.FlecsSystem;
 import io.github.elebras1.flecs.World;
-import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.util.Flecs;
@@ -11,7 +11,7 @@ import io.github.elebras1.flecs.util.Flecs;
 public class SystemExample {
 
     public static void main(String[] args) {
-        World world = new io.github.elebras1.flecs.World();
+        World world = new World();
         long posId = world.component(Position.class);
         long velId = world.component(Velocity.class);
 
@@ -25,38 +25,38 @@ public class SystemExample {
         enemy2.set(new Position(-5, 10)).set(new Velocity(0, -1));
 
         FlecsSystem moveSystem = world.system("MoveSystem")
-            .with(Position.class)
-            .with(Velocity.class)
-            .kind(Flecs.OnUpdate)
-            .iter(it -> {
-                Field<Position> positions = it.field(Position.class, 0);
-                Field<Velocity> velocities = it.field(Velocity.class, 1);
+                .with(Position.class)
+                .with(Velocity.class)
+                .kind(Flecs.OnUpdate)
+                .iter(it -> {
+                    Field<Position> positions = it.field(Position.class, 0);
+                    Field<Velocity> velocities = it.field(Velocity.class, 1);
 
-                for (int i = 0; i < it.count(); i++) {
-                    Position pos = positions.get(i);
-                    Velocity vel = velocities.get(i);
+                    for (int i = 0; i < it.count(); i++) {
+                        Position pos = positions.get(i);
+                        Velocity vel = velocities.get(i);
 
-                    float newX = pos.x() + vel.dx() * it.deltaTime();
-                    float newY = pos.y() + vel.dy() * it.deltaTime();
+                        float newX = pos.x() + vel.dx() * it.deltaTime();
+                        float newY = pos.y() + vel.dy() * it.deltaTime();
 
-                    Entity entity = world.obtainEntity(it.entity(i));
-                    entity.set(new Position(newX, newY));
-                    System.out.printf("%s: (%.2f, %.2f) -> (%.2f, %.2f)%n",
-                        entity.name(), pos.x(), pos.y(), newX, newY);
-                }
-            });
+                        Entity entity = world.obtainEntity(it.entity(i));
+                        entity.set(new Position(newX, newY));
+                        System.out.printf("%s: (%.2f, %.2f) -> (%.2f, %.2f)%n",
+                                entity.name(), pos.x(), pos.y(), newX, newY);
+                    }
+                });
 
         FlecsSystem debugSystem = world.system("DebugSystem")
-            .with(posId)
-            .kind(Flecs.PostUpdate)
-            .each(Position.class, (entityId, pos) -> {
-                Entity entity = world.obtainEntity(entityId);
-                System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.name(), pos.x(), pos.y());
-            });
+                .with(posId)
+                .kind(Flecs.PostUpdate)
+                .each(Position.class, (entityId, pos) -> {
+                    Entity entity = world.obtainEntity(entityId);
+                    System.out.printf("Debug: %s at (%.2f, %.2f)%n", entity.name(), pos.x(), pos.y());
+                });
 
         FlecsSystem taskSystem = world.system("TaskSystem")
-            .kind(Flecs.PreUpdate)
-            .run(it -> System.out.println("Frame starting..."));
+                .kind(Flecs.PreUpdate)
+                .run(it -> System.out.println("Frame starting..."));
 
         for (int frame = 0; frame < 3; frame++) {
             System.out.println("=== Frame " + (frame + 1) + " ===");

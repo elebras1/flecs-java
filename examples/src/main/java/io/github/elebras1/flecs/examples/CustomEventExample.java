@@ -36,7 +36,7 @@ public class CustomEventExample {
         widget.set(new Position(300.0f, 150.0f));
 
         widget.observe(clickedEvent, () ->
-            System.out.println("Widget clicked")
+                System.out.println("Widget clicked")
         );
 
         widget.emit(clickedEvent);

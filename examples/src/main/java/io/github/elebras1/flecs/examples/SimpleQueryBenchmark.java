@@ -9,6 +9,8 @@ import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
 
+import java.util.function.Supplier;
+
 public class SimpleQueryBenchmark {
 
     private static final int ENTITY_COUNT = 1_000_000;
@@ -65,7 +67,7 @@ public class SimpleQueryBenchmark {
         world.destroy();
     }
 
-    private static float benchmarkEach(io.github.elebras1.flecs.Query query) {
+    private static float benchmarkEach(Query query) {
         final float[] sum = {0.0f};
 
         query.each(Position.class, Velocity.class, (pos, vel)
@@ -74,7 +76,7 @@ public class SimpleQueryBenchmark {
         return sum[0];
     }
 
-    private static float benchmarkEachMutView(io.github.elebras1.flecs.Query query) {
+    private static float benchmarkEachMutView(Query query) {
         final float[] sum = {0.0f};
 
         query.eachView(Position.class, Velocity.class, (PositionView posView, VelocityView velView)
@@ -83,7 +85,7 @@ public class SimpleQueryBenchmark {
         return sum[0];
     }
 
-    private static float benchmarkIterFieldGet(io.github.elebras1.flecs.Query query) {
+    private static float benchmarkIterFieldGet(Query query) {
         final float[] sum = {0.0f};
 
         query.iter(iter -> {
@@ -100,7 +102,7 @@ public class SimpleQueryBenchmark {
         return sum[0];
     }
 
-    private static float benchmarkIterFieldGetMutView(io.github.elebras1.flecs.Query query) {
+    private static float benchmarkIterFieldGetMutView(Query query) {
         final float[] sum = {0.0f};
 
         query.iter(iter -> {
@@ -117,7 +119,7 @@ public class SimpleQueryBenchmark {
         return sum[0];
     }
 
-    private static void runBenchmark(String name, java.util.function.Supplier<Float> benchmark) {
+    private static void runBenchmark(String name, Supplier<Float> benchmark) {
         System.out.print("  Warming up... ");
         for (int i = 0; i < WARMUP_ITERATIONS; i++) {
             benchmark.get();

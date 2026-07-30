@@ -27,37 +27,37 @@ public class TaskThreadExample {
 
         OsApi osApi = new OsApi();
         osApi.taskNew(task -> {
-                long id = counter.incrementAndGet();
-                futures.put(id, executor.submit(task));
-                return id;
-            })
-            .taskJoin(id -> {
-                try {
-                    futures.remove(id).get();
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                }
-            })
-            .set();
+                    long id = counter.incrementAndGet();
+                    futures.put(id, executor.submit(task));
+                    return id;
+                })
+                .taskJoin(id -> {
+                    try {
+                        futures.remove(id).get();
+                    } catch (Exception e) {
+                        Thread.currentThread().interrupt();
+                    }
+                })
+                .set();
 
         World world = new World();
         world.setTaskThreads(NUMBER_THREADS);
         world.component(Health.class);
 
-        for(int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 100_000; i++) {
             EntityView entity = world.obtainEntityView(world.entity());
             entity.set(Health.class, (HealthView health) -> health.value(100));
         }
 
         world.system().with(Health.class).kind(Flecs.OnUpdate).multiThreaded().iter(iter -> {
             Field<Health> healthField = iter.field(Health.class, 0);
-            for(int i = 0; i < iter.count(); i++) {
+            for (int i = 0; i < iter.count(); i++) {
                 HealthView health = healthField.getMutView(i);
                 health.value(health.value() - 1);
             }
         });
 
-        for(int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1000; i++) {
             world.progress();
         }
 

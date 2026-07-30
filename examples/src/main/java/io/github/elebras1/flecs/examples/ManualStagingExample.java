@@ -34,7 +34,7 @@ public class ManualStagingExample {
             final int stageId = i;
             futures.add(executor.submit(() -> {
                 World stage = world.getStage(stageId);
-                for(int j = stageId * 250; j < (stageId + 1) * 250; j++) {
+                for (int j = stageId * 250; j < (stageId + 1) * 250; j++) {
                     long entityId = stage.lookup("entity_" + j);
                     EntityView entity = stage.obtainEntityView(entityId);
                     HealthView health = entity.getMutView(Health.class);
