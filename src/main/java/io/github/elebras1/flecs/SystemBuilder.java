@@ -281,14 +281,30 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.operator(Flecs.NotFrom);
     }
 
+    public SystemBuilder write(long componentId) {
+        return this.with(componentId).out();
+    }
+
+    public SystemBuilder write(Entity entity) {
+        return this.with(entity.id()).out();
+    }
+
     public <T> SystemBuilder write(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(componentId).out();
+        return this.write(componentId);
+    }
+
+    public SystemBuilder read(long componentId) {
+        return this.with(componentId).in();
+    }
+
+    public SystemBuilder read(Entity entity) {
+        return this.read(entity.id());
     }
 
     public <T> SystemBuilder read(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(componentId).in();
+        return this.read(componentId);
     }
 
     public SystemBuilder orderBy(long componentId) {

@@ -96,6 +96,21 @@ public class Query extends QueryBase {
         return result;
     }
 
+    public long first() {
+        this.checkDestroyed();
+        long[] result = { 0L };
+        MemorySegment iterSeg = this.createIterSeg();
+        while (flecs_h.ecs_iter_next(iterSeg)) {
+            int count = ecs_iter_t.count(iterSeg);
+            MemorySegment entities = ecs_iter_t.entities(iterSeg);
+            if (count > 0) {
+                result[0] = entities.getAtIndex(ValueLayout.JAVA_LONG, 0);
+                break;
+            }
+        }
+        return result[0];
+    }
+
     @Override
     protected void checkDestroyed() {
         if (this.destroyed) {

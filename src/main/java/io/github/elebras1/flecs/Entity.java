@@ -134,6 +134,16 @@ public class Entity extends Id {
         return this.hasRelation(relation, Flecs.Wildcard);
     }
 
+    public Entity autoOverride(long componentId) {
+        flecs_h.ecs_auto_override_id(this.world.worldSeg(), this.id, componentId);
+        return this;
+    }
+
+    public <T> Entity autoOverride(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.autoOverride(componentId);
+    }
+
     @SuppressWarnings("unchecked")
     public <T> Entity set(T data) {
         Class<T> componentClass = (Class<T>) data.getClass();
