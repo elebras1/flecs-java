@@ -75,9 +75,9 @@ public class RelationComponent {
     // requires: 1.21
     // requires: 1.21
     // expires: 0.5
-    // io.github.elebras1.flecs.examples.components.Requires
-    // io.github.elebras1.flecs.examples.components.Requires
-    // io.github.elebras1.flecs.examples.components.Expires
+    // Requires
+    // Requires
+    // Expires
     // 0
     // requires 1.21 gigawatts
 }

@@ -54,7 +54,7 @@ public class EntityBasics {
 
     // Output:
     // {10.0, 20.0}
-    // [io.github.elebras1.flecs.examples.components.Position, io.github.elebras1.flecs.examples.components.Walking, (Identifier,Name)]
+    // [Position, Walking, (Identifier,Name)]
     // Alice: {10.0, 20.0}
     // Bob: {20.0, 30.0}
 }
