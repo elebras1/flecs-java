@@ -2,27 +2,53 @@
 
 ![Flecs](https://raw.githubusercontent.com/SanderMertens/flecs/master/docs/img/logo.png)
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.elebras1/flecs-java)](https://central.sonatype.com/artifact/io.github.elebras1/flecs-java)
+[![License: MIT](https://img.shields.io/github/license/elebras1/flecs-java)](https://github.com/elebras1/flecs-java/blob/main/LICENSE)
+[![Java 25+](https://img.shields.io/badge/Java-25%2B-orange)](https://github.com/elebras1/flecs-java)
+[![Documentation](https://img.shields.io/badge/docs-flecs.dev-blue)](https://www.flecs.dev/flecs/)
+
 Java bindings for [Flecs](https://github.com/SanderMertens/flecs) (v4.1.6) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
 
-## What is Flecs?
+- **Zero JNI overhead**: direct native calls via Project Panama's FFM API
+- **Type-safe components**: define components as plain Java records, an annotation processor generates the memory layout and accessors
+- **Multi-platform**: Linux, Windows, macOS (x86_64 and aarch64)
 
-Flecs is a powerful ECS framework written in C that provides high-performance data-oriented programming. This wrapper brings Flecs capabilities to Java while using Project Panama's FFM API.
+## Quick example
 
-- **Multi-Platform**: Support for Linux, Windows, and macOS
+```java
+@Component
+record Position(float x, float y) {}
 
-## Requirements
+@Component
+record Velocity(float dx, float dy) {}
 
-### Runtime
-- **Java 25+** (I recommand to used GraalVM Community Edition or Oracle for the Graal JIT compiler, this gave me 50% performance boost in my game compare to a classic OpenJDK)
-- **Gradle 9+**
+World world = new World();
+world.component(Position.class);
+world.component(Velocity.class);
 
-### Build from Source
-- **GCC or compatible C compiler** (for compiling the native Flecs library)
-- **jextract-25** (for generating Java FFM bindings when updating Flecs version)
-- **Supported Architectures**: 
-  - Linux: x86_64, aarch64
-  - Windows: x86_64, aarch64
-  - macOS: x86_64, aarch64
+Entity player = world.obtainEntity(world.entity("Player"));
+player.set(new Position(0, 0)).set(new Velocity(1, 0));
+
+world.system("MoveSystem")
+    .with(Position.class)
+    .with(Velocity.class)
+    .iter(it -> {
+        Field<Position> positions = it.field(Position.class, 0);
+        Field<Velocity> velocities = it.field(Velocity.class, 1);
+        for (int i = 0; i < it.count(); i++) {
+            PositionView p = positions.getMutView(i);
+            VelocityView v = velocities.getMutView(i);
+            p.x(p.x() + v.dx() * it.deltaTime());
+            p.y(p.y() + v.dy() * it.deltaTime());
+        }
+    });
+
+while (world.progress()) {}
+```
+
+Find many examples in [`examples/`](https://github.com/elebras1/flecs-java/blob/main/examples/src/main/java/io/github/elebras1/flecs/examples).
+
+If this project is useful to you, consider giving it a ⭐, it helps others find it.
 
 ## Installation
 
@@ -32,148 +58,62 @@ Flecs is a powerful ECS framework written in C that provides high-performance da
 dependencies {
     implementation 'io.github.elebras1:flecs-java:0.11.2'
     annotationProcessor 'io.github.elebras1:flecs-java:0.11.2'
-
 }
 ```
 
-### Build from Source
+## Requirements
 
-```bash
-# Clone repository
-git clone https://github.com/elebras1/flecs-java.git
-cd flecs-java
+### Runtime
+- **Java 25+**
+- **Gradle 9+**
 
-# Build (downloads Flecs, compiles natives)
-./gradlew build
-
-# Run examples
-./gradlew :examples:run
-```
-
-## Example
-
-```java
-import io.github.elebras1.flecs.*;
-import io.github.elebras1.flecs.annotation.Component;
-
-// Define components as records
-@Component
-record Position(float x, float y) {}
-
-@Component
-record Velocity(float dx, float dy) {}
-
-public class Example {
-    public static void main(String[] args) {
-        World world = new World();
-        // Register components
-        world.component(Position.class);
-        world.component(Velocity.class);
-        
-        // Create entities
-        Entity player = world.obtainEntity(world.entity("Player"));
-        player.set(new Position(0, 0))
-              .set(new Velocity(1, 0));
-        
-        Entity enemy = world.obtainEntity(world.entity("Enemy"));
-        enemy.set(new Position(10, 5))
-             .set(new Velocity(-0.5f, 0));
-
-        // Set number of worker threads
-        world.setThreads(4);
-        
-        // Create a movement system
-        world.system("MoveSystem")
-            .kind(FlecsConstants.EcsOnUpdate)
-            .with(Position.class)
-            .with(Velocity.class)
-            .multithreaded()
-            .iter(it -> {
-                Field<Position> positions = it.field(Position.class, 0);
-                Field<Velocity> velocities = it.field(Velocity.class, 1);
-                
-                for (int i = 0; i < it.count(); i++) {
-                    PositionView positionView = positions.getMutView(i);
-                    VelocityView velocityView = velocities.getMutView(i);
-                    
-                    // Update position
-                    positionView.x(positionView.x() + velocityView.dx() * it.deltaTime());
-                    positionView.y(positionView.y() + velocityView.dy() * it.deltaTime());
-                }
-            });
-        
-        // Run simulation
-        for (int i = 0; i < 10; i++) {
-            world.progress(0.016f); // 60 FPS
-        }
-        
-        // Query entities
-        Query query = world.query().with(Position.class).build();
-        query.each(Position.class, (entityId, pos) -> {
-            Entity e = world.obtainEntity(entityId);
-            System.out.printf("%s: (%.2f, %.2f)%n", e.getName(), pos.x(), pos.y());
-        });
-        
-        query.destroy();
-        
-        world.destroy();
-    }
-}
-```
+### Build from source
+- GCC or compatible C compiler
+- jextract-25 (only needed when regenerating FFM bindings)
+- Supported architectures: Linux, Windows, macOS x86_64 and aarch64
 
 ## Documentation
 
-- **[Flecs Manual](https://www.flecs.dev/flecs/)** - Official Flecs documentation
-- **[Examples](examples/src/main/java/io/github/elebras1/flecs/examples/)** - Code examples covering various features
+- **[Flecs Manual](https://www.flecs.dev/flecs/)** official Flecs documentation
+- **[Examples](https://github.com/elebras1/flecs-java/blob/main/examples/src/main/java/io/github/elebras1/flecs/examples)** code examples covering various features
+- **[Tests](https://github.com/elebras1/flecs-java/tree/main/src/test/java/io/github/elebras1/flecs)** unit and integration test suite
+- **[Benchmarks](https://github.com/elebras1/flecs-java/tree/main/benchmark)** performance benchmarks
 
 ## Architecture
 
-### FFM API Integration
+Flecs-Java uses Java 25's Foreign Function & Memory API for direct C interop, with arena-based memory management and strongly-typed `MemorySegment` layouts. Components are defined as Java records with the `@Component` annotation; an annotation processor generates memory layouts and accessor code at compile time.
 
-Flecs-Java uses Java 25's Foreign Function & Memory API for direct C interop:
-- **Zero JNI overhead**: Direct native calls without marshalling
-- **Memory safety**: Arena-based memory management
-- **Type safety**: Strong typing with `MemorySegment` and layouts
+## Status
 
-### Component System
+All core Flecs features are implemented. What may still be missing:
+- Some convenience overloads (e.g. `method(long entity)` alongside `method(Entity entity)`)
+- Minor or C-specific features that most language bindings don't typically implement
+- Possibly feature that slipped through
 
-Components are defined as Java records with the `@Component` annotation. An annotation processor generates the necessary memory layouts and accessor code at compile time.
+Open an issue if you hit a gap.
 
-## Building
-
-### Build Process Overview
-
-The build process automatically handles the following steps:
-
-1. **Download Flecs C Source** (`downloadFlecs`)
-2. **Compile Native Library** (`compileFlecsNative`)
-3. **Compile Annotation Processor** (`compileProcessor`)
-4. **Generate Java Source** (Annotation Processing Phase)
-5. **Package JAR**
-6. **Runtime Native Loading**
-
-### Updating FFM Bindings
-
-When updating the Flecs version, maintainers must regenerate the FFM bindings:
+## Building from source
 
 ```bash
-# (requires jextract-25 installed)
+git clone https://github.com/elebras1/flecs-java.git
+cd flecs-java
+./gradlew build
+```
+
+The build automatically downloads the Flecs C source, compiles the native library, runs annotation processing, and packages the JAR.
+
+### Updating FFM bindings
+
+```bash
+# requires jextract-25 installed
 ./gradlew generateFlecsBindings
 ```
 
-This generates the Java FFM interface bindings from `flecs.h` and stores them in `src/main/generated/`. Regular users don't need to run this task.
+Regenerates bindings from `flecs.h` into `src/main/generated/`. Regular users don't need to run this.
 
 ## Contributing
 
-This wrapper currently implements core ECS functionality but does not yet support all Flecs features.
-Feel free to open an issue or pull request. All contributions are welcome!
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-Or just report issues you encounter!
+Fork, create a feature branch, make your changes, submit a pull request. Or just open an issue, all contributions welcome!
 
 ## Support
 
@@ -182,6 +122,4 @@ Or just report issues you encounter!
 
 ## License
 
-Flecs-Java is licensed under the [MIT License](LICENSE).
-
-Flecs (the underlying C library) is also licensed under the MIT License. See the [Flecs repository](https://github.com/SanderMertens/flecs) for details.
+Flecs-Java is licensed under the [MIT License](https://github.com/elebras1/flecs-java/blob/main/LICENSE). Flecs itself is also MIT-licensed, see the [Flecs repository](https://github.com/SanderMertens/flecs).
