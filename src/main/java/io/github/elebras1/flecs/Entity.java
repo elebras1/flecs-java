@@ -79,8 +79,35 @@ public class Entity extends Id {
         return nameSeg.getString(0);
     }
 
+    public String symbol() {
+        MemorySegment symbolSeg = flecs_h.ecs_get_symbol(this.world.worldSeg(), this.id);
+        if (symbolSeg.address() == 0) {
+            return null;
+        }
+        return symbolSeg.getString(0);
+    }
+
     public void destruct() {
         flecs_h.ecs_delete(this.world.worldSeg(), this.id);
+    }
+
+    public void setChildOrder(long... childrenIds) {
+        try(Arena arena = Arena.ofConfined()) {
+            MemorySegment childrenSeg = arena.allocate(ValueLayout.JAVA_LONG, childrenIds.length);
+
+            MemorySegment.copy(childrenIds, 0, childrenSeg, ValueLayout.JAVA_LONG, 0, childrenIds.length);
+
+            flecs_h.ecs_set_child_order(this.world.worldSeg(), this.id, childrenSeg, childrenIds.length);
+        }
+    }
+
+    public void setChildOrder(Entity... children) {
+        long[] childrenIds = new long[children.length];
+        for (int i = 0; i < children.length; i++) {
+            childrenIds[i] = children[i].id();
+        }
+
+        setChildOrder(childrenIds);
     }
 
     public boolean isValid() {
