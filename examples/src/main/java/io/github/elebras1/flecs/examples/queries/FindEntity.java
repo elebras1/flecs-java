@@ -16,26 +16,15 @@ public class FindEntity {
 
         world.obtainEntity(world.entity("e1")).set(new Position(10, 20));
         world.obtainEntity(world.entity("e2")).set(new Position(20, 30));
-        world.obtainEntity(world.entity("e3")).set(new Position(30, 40));
 
         // Create a simple query that matches Position.
         Query query = world.query().with(Position.class).build();
 
-        // Find the first entity whose Position.x equals 20.
-        AtomicLong found = new AtomicLong(0L);
-        AtomicBoolean foundFlag = new AtomicBoolean(false);
-        query.each((entityId) -> {
-            if (!foundFlag.get()) {
-                Position p = world.obtainEntity(entityId).get(Position.class);
-                if (p != null && p.x() == 20) {
-                    found.set(entityId);
-                    foundFlag.set(true);
-                }
-            }
-        });
+        // Find the entity for which Position.x is 20.
+        long entityId = query.find(Position.class, position -> position.x() == 20);
 
-        if (foundFlag.get()) {
-            Entity entity = world.obtainEntity(found.get());
+        if (entityId != 0) {
+            Entity entity = world.obtainEntity(entityId);
             System.out.println("Found entity " + entity.name());
         } else {
             System.out.println("No entity found");

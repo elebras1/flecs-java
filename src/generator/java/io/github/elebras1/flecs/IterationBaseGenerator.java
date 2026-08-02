@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EachBaseGenerator {
+public class IterationBaseGenerator {
 
     private static final int MAX_COMPONENTS = 32;
 
@@ -109,9 +109,14 @@ public class EachBaseGenerator {
         return base + n + suffix;
     }
 
+    private String predicateInterfaceName(int n, ViewMode vm) {
+        String base = vm == ViewMode.COMPONENT_VIEW ? "ComponentView" : "Component";
+        return base + n + "Predicate";
+    }
+
     public static void main(String[] args) {
         Path outputDir = args.length > 0 ? Paths.get(args[0]) : Paths.get("src/main/generated");
-        EachBaseGenerator generator = new EachBaseGenerator();
+        IterationBaseGenerator generator = new IterationBaseGenerator();
         List<SourceFile> files = generator.generate();
         int count = 0;
         for (SourceFile file : files) {
@@ -132,6 +137,7 @@ public class EachBaseGenerator {
                 for (EntityMode em : EntityMode.values()) {
                     files.add(generateCallbackInterface(n, vm, em));
                 }
+                files.add(generatePredicateInterface(n, vm));
             }
         }
         files.add(generateQueryBase());
@@ -182,6 +188,45 @@ public class EachBaseGenerator {
         return builder.classBody(body.toString()).build();
     }
 
+    private SourceFile generatePredicateInterface(int n, ViewMode vm) {
+        String interfaceName = predicateInterfaceName(n, vm);
+        List<String> typeVars = vm == ViewMode.COMPONENT_VIEW ? viewTypeVars(n) : compTypeVars(n);
+
+        CodeBuilder body = new CodeBuilder();
+        body.append("@FunctionalInterface").newline();
+        body.append("public interface ").append(interfaceName);
+        if (!typeVars.isEmpty()) {
+            if (vm == ViewMode.COMPONENT_VIEW) {
+                List<String> bounds = new ArrayList<>();
+                for (String v : typeVars) {
+                    bounds.add(v + " extends " + simpleName(COMPONENT_VIEW_FQN));
+                }
+                body.append("<").append(join(bounds)).append("> ");
+            } else {
+                body.append("<").append(join(typeVars)).append("> ");
+            }
+        } else {
+            body.append(" ");
+        }
+        body.append("{").newline();
+
+        indent(body, 1);
+        body.append("boolean test(");
+        List<String> params = new ArrayList<>();
+        String prefix = vm == ViewMode.COMPONENT_VIEW ? "componentView" : "component";
+        for (int i = 0; i < n; i++) {
+            params.add(typeVars.get(i) + " " + prefix + letter(i));
+        }
+        body.append(join(params)).append(");").newline();
+        body.append("}").newline();
+
+        SourceFile.Builder builder = SourceFile.builder(GENERATED_PACKAGE, interfaceName);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            builder.addImport(COMPONENT_VIEW_FQN);
+        }
+        return builder.classBody(body.toString()).build();
+    }
+
     private SourceFile generateQueryBase() {
         CodeBuilder body = new CodeBuilder();
         body.append("public abstract class QueryBase {").newline();
@@ -201,6 +246,8 @@ public class EachBaseGenerator {
                     body.newline();
                     appendQueryEachMethod(body, n, vm, em);
                 }
+                body.newline();
+                appendQueryFindMethod(body, n, vm);
             }
         }
 
@@ -251,6 +298,41 @@ public class EachBaseGenerator {
         appendLine(body, 4, "}");
         appendLine(body, 3, "}");
         appendLine(body, 2, "}");
+        appendLine(body, 1, "}");
+    }
+
+    private void appendQueryFindMethod(CodeBuilder body, int n, ViewMode vm) {
+        appendFindMethodSignature(body, n, vm);
+        appendStatement(body, 2, "this.checkDestroyed()");
+        appendLine(body, 2, "try (" + simpleName(ARENA_FQN) + " tmpArena = " + simpleName(ARENA_FQN) + ".ofConfined()) {");
+        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iter = " + simpleName(FLECS_H_FQN)
+                + ".ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)");
+        appendLine(body, 3, "if (iter.address() == 0) {");
+        appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
+        appendLine(body, 3, "}");
+
+        emitComponentLookups(body, 3, n, vm);
+
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            appendStatement(body, 3, "this.world.viewCache().resetCursors()");
+        }
+
+        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iter)) {");
+        appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iter)");
+        emitFieldOrBase(body, 4, n, vm, "iter");
+        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iter)");
+        appendLine(body, 4, "for (int i = 0; i < count; i++) {");
+        emitInstanceOrView(body, 5, n, vm);
+
+        String args = buildArgs(vm == ViewMode.COMPONENT_VIEW ? "componentView" : "componentInstance", n);
+        appendLine(body, 5, "if (predicate.test(" + args + ")) {");
+        appendStatement(body, 6, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+        appendLine(body, 5, "}");
+
+        appendLine(body, 4, "}");
+        appendLine(body, 3, "}");
+        appendLine(body, 2, "}");
+        appendStatement(body, 2, "return 0L");
         appendLine(body, 1, "}");
     }
 
@@ -353,6 +435,42 @@ public class EachBaseGenerator {
         List<String> callbackArgs = vm == ViewMode.COMPONENT_VIEW ? viewVars : compVars;
         String callbackType = callbackName + "<" + join(callbackArgs) + ">";
         params.add(callbackType + " callback");
+
+        signature.append(join(params)).append(") {");
+        appendLine(body, 1, signature.toString());
+    }
+
+    private void appendFindMethodSignature(CodeBuilder body, int n, ViewMode vm) {
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            appendLine(body, 1, "@SuppressWarnings(\"unchecked\")");
+        }
+
+        List<String> compVars = compTypeVars(n);
+        List<String> viewVars = viewTypeVars(n);
+        List<String> typeDecls = new ArrayList<>(compVars);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            for (String v : viewVars) {
+                typeDecls.add(v + " extends " + simpleName(COMPONENT_VIEW_FQN));
+            }
+        }
+
+        String methodName = vm == ViewMode.COMPONENT_VIEW ? "findView" : "find";
+        StringBuilder signature = new StringBuilder();
+        signature.append("public ");
+        if (!typeDecls.isEmpty()) {
+            signature.append("<").append(join(typeDecls)).append("> ");
+        }
+        signature.append("long ").append(methodName).append("(");
+
+        List<String> params = new ArrayList<>();
+        for (String compVar : compVars) {
+            params.add("Class<" + compVar + "> componentClass" + compVar);
+        }
+
+        String predicateName = predicateInterfaceName(n, vm);
+        List<String> predicateArgs = vm == ViewMode.COMPONENT_VIEW ? viewVars : compVars;
+        String predicateType = predicateName + "<" + join(predicateArgs) + ">";
+        params.add(predicateType + " predicate");
 
         signature.append(join(params)).append(") {");
         appendLine(body, 1, signature.toString());

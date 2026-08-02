@@ -63,6 +63,30 @@ public abstract class QueryBase {
         }
     }
 
+    public <A> long find(Class<A> componentClassA, Component1Predicate<A> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            long sizeA = componentA.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    if (predicate.test(componentInstanceA)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     @SuppressWarnings("unchecked")
     public <A, VA extends ComponentView> void eachView(Class<A> componentClassA, ComponentView1Callback<VA> callback) {
         this.checkDestroyed();
@@ -109,6 +133,33 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A, VA extends ComponentView> long findView(Class<A> componentClassA, ComponentView1Predicate<VA> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            long sizeA = componentA.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    if (predicate.test(componentViewA)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     public <A, B> void each(Class<A> componentClassA, Class<B> componentClassB, Component2Callback<A, B> callback) {
@@ -159,6 +210,34 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B> long find(Class<A> componentClassA, Class<B> componentClassB, Component2Predicate<A, B> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    if (predicate.test(componentInstanceA, componentInstanceB)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -219,6 +298,38 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, VA extends ComponentView, VB extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, ComponentView2Predicate<VA, VB> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    if (predicate.test(componentViewA, componentViewB)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Component3Callback<A, B, C> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -275,6 +386,38 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Component3Predicate<A, B, C> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -345,6 +488,43 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, ComponentView3Predicate<VA, VB, VC> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Component4Callback<A, B, C, D> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -409,6 +589,42 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Component4Predicate<A, B, C, D> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -489,6 +705,48 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, ComponentView4Predicate<VA, VB, VC, VD> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Component5Callback<A, B, C, D, E> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -561,6 +819,46 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Component5Predicate<A, B, C, D, E> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -651,6 +949,53 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, ComponentView5Predicate<VA, VB, VC, VD, VE> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Component6Callback<A, B, C, D, E, F> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -731,6 +1076,50 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Component6Predicate<A, B, C, D, E, F> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -831,6 +1220,58 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, ComponentView6Predicate<VA, VB, VC, VD, VE, VF> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Component7Callback<A, B, C, D, E, F, G> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -919,6 +1360,54 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Component7Predicate<A, B, C, D, E, F, G> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -1029,6 +1518,63 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, ComponentView7Predicate<VA, VB, VC, VD, VE, VF, VG> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Component8Callback<A, B, C, D, E, F, G, H> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -1125,6 +1671,58 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Component8Predicate<A, B, C, D, E, F, G, H> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -1245,6 +1843,68 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, ComponentView8Predicate<VA, VB, VC, VD, VE, VF, VG, VH> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Component9Callback<A, B, C, D, E, F, G, H, I> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -1349,6 +2009,62 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Component9Predicate<A, B, C, D, E, F, G, H, I> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -1479,6 +2195,73 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, ComponentView9Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Component10Callback<A, B, C, D, E, F, G, H, I, J> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -1591,6 +2374,66 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Component10Predicate<A, B, C, D, E, F, G, H, I, J> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -1731,6 +2574,78 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, ComponentView10Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Component11Callback<A, B, C, D, E, F, G, H, I, J, K> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -1851,6 +2766,70 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Component11Predicate<A, B, C, D, E, F, G, H, I, J, K> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2001,6 +2980,83 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, ComponentView11Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Component12Callback<A, B, C, D, E, F, G, H, I, J, K, L> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -2129,6 +3185,74 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Component12Predicate<A, B, C, D, E, F, G, H, I, J, K, L> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2289,6 +3413,88 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, ComponentView12Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Component13Callback<A, B, C, D, E, F, G, H, I, J, K, L, M> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -2425,6 +3631,78 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Component13Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2595,6 +3873,93 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, ComponentView13Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Component14Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -2739,6 +4104,82 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Component14Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -2919,6 +4360,98 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, ComponentView14Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Component15Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -3071,6 +4604,86 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Component15Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -3261,6 +4874,103 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, ComponentView15Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Component16Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -3421,6 +5131,90 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Component16Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -3621,6 +5415,108 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, ComponentView16Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Component17Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -3789,6 +5685,94 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Component17Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -3999,6 +5983,113 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, ComponentView17Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Component18Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -4175,6 +6266,98 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Component18Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -4395,6 +6578,118 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, ComponentView18Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Component19Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -4579,6 +6874,102 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Component19Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -4809,6 +7200,123 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, ComponentView19Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Component20Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -5001,6 +7509,106 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Component20Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -5241,6 +7849,128 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, ComponentView20Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Component21Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -5441,6 +8171,110 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Component21Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -5691,6 +8525,133 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, ComponentView21Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Component22Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -5899,6 +8860,114 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Component22Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -6159,6 +9228,138 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, ComponentView22Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Component23Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -6375,6 +9576,118 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Component23Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -6645,6 +9958,143 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, ComponentView23Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Component24Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -6869,6 +10319,122 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Component24Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -7149,6 +10715,148 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, ComponentView24Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Component25Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -7381,6 +11089,126 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Component25Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -7671,6 +11499,153 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, ComponentView25Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Component26Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -7911,6 +11886,130 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Component26Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -8211,6 +12310,158 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, ComponentView26Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Component27Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -8459,6 +12710,134 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Component27Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<AA> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                MemorySegment fieldAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    AA componentInstanceAA = componentAA.read(fieldAA, (long) i * sizeAA);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -8769,6 +13148,163 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, ComponentView27Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<?> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            VAA componentViewAA = (VAA) this.world.viewCache().getComponentView(componentClassAA);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                long baseAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    componentViewAA.setBaseAddress(baseAA + (long) i * sizeAA);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Component28Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -9025,6 +13561,138 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Component28Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<AA> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<AB> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                MemorySegment fieldAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26);
+                MemorySegment fieldAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    AA componentInstanceAA = componentAA.read(fieldAA, (long) i * sizeAA);
+                    AB componentInstanceAB = componentAB.read(fieldAB, (long) i * sizeAB);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -9345,6 +14013,168 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, ComponentView28Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<?> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<?> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            VAA componentViewAA = (VAA) this.world.viewCache().getComponentView(componentClassAA);
+            VAB componentViewAB = (VAB) this.world.viewCache().getComponentView(componentClassAB);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                long baseAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26).address();
+                long baseAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    componentViewAA.setBaseAddress(baseAA + (long) i * sizeAA);
+                    componentViewAB.setBaseAddress(baseAB + (long) i * sizeAB);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Component29Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -9609,6 +14439,142 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Component29Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<AA> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<AB> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<AC> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                MemorySegment fieldAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26);
+                MemorySegment fieldAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27);
+                MemorySegment fieldAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    AA componentInstanceAA = componentAA.read(fieldAA, (long) i * sizeAA);
+                    AB componentInstanceAB = componentAB.read(fieldAB, (long) i * sizeAB);
+                    AC componentInstanceAC = componentAC.read(fieldAC, (long) i * sizeAC);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -9939,6 +14905,173 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, ComponentView29Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<?> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<?> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<?> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            VAA componentViewAA = (VAA) this.world.viewCache().getComponentView(componentClassAA);
+            VAB componentViewAB = (VAB) this.world.viewCache().getComponentView(componentClassAB);
+            VAC componentViewAC = (VAC) this.world.viewCache().getComponentView(componentClassAC);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                long baseAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26).address();
+                long baseAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27).address();
+                long baseAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    componentViewAA.setBaseAddress(baseAA + (long) i * sizeAA);
+                    componentViewAB.setBaseAddress(baseAB + (long) i * sizeAB);
+                    componentViewAC.setBaseAddress(baseAC + (long) i * sizeAC);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Component30Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -10211,6 +15344,146 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Component30Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<AA> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<AB> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<AC> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            Component<AD> componentAD = this.world.componentRegistry().getComponent(componentClassAD);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            long sizeAD = componentAD.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                MemorySegment fieldAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26);
+                MemorySegment fieldAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27);
+                MemorySegment fieldAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28);
+                MemorySegment fieldAD = flecs_h.ecs_field_w_size(iter, sizeAD, (byte) 29);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    AA componentInstanceAA = componentAA.read(fieldAA, (long) i * sizeAA);
+                    AB componentInstanceAB = componentAB.read(fieldAB, (long) i * sizeAB);
+                    AC componentInstanceAC = componentAC.read(fieldAC, (long) i * sizeAC);
+                    AD componentInstanceAD = componentAD.read(fieldAD, (long) i * sizeAD);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -10551,6 +15824,178 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, ComponentView30Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<?> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<?> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<?> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            Component<?> componentAD = this.world.componentRegistry().getComponent(componentClassAD);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            VAA componentViewAA = (VAA) this.world.viewCache().getComponentView(componentClassAA);
+            VAB componentViewAB = (VAB) this.world.viewCache().getComponentView(componentClassAB);
+            VAC componentViewAC = (VAC) this.world.viewCache().getComponentView(componentClassAC);
+            VAD componentViewAD = (VAD) this.world.viewCache().getComponentView(componentClassAD);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            long sizeAD = componentAD.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                long baseAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26).address();
+                long baseAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27).address();
+                long baseAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28).address();
+                long baseAD = flecs_h.ecs_field_w_size(iter, sizeAD, (byte) 29).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    componentViewAA.setBaseAddress(baseAA + (long) i * sizeAA);
+                    componentViewAB.setBaseAddress(baseAB + (long) i * sizeAB);
+                    componentViewAC.setBaseAddress(baseAC + (long) i * sizeAC);
+                    componentViewAD.setBaseAddress(baseAD + (long) i * sizeAD);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Component31Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -10831,6 +16276,150 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Component31Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<AA> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<AB> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<AC> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            Component<AD> componentAD = this.world.componentRegistry().getComponent(componentClassAD);
+            Component<AE> componentAE = this.world.componentRegistry().getComponent(componentClassAE);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            long sizeAD = componentAD.size();
+            long sizeAE = componentAE.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                MemorySegment fieldAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26);
+                MemorySegment fieldAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27);
+                MemorySegment fieldAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28);
+                MemorySegment fieldAD = flecs_h.ecs_field_w_size(iter, sizeAD, (byte) 29);
+                MemorySegment fieldAE = flecs_h.ecs_field_w_size(iter, sizeAE, (byte) 30);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    AA componentInstanceAA = componentAA.read(fieldAA, (long) i * sizeAA);
+                    AB componentInstanceAB = componentAB.read(fieldAB, (long) i * sizeAB);
+                    AC componentInstanceAC = componentAC.read(fieldAC, (long) i * sizeAC);
+                    AD componentInstanceAD = componentAD.read(fieldAD, (long) i * sizeAD);
+                    AE componentInstanceAE = componentAE.read(fieldAE, (long) i * sizeAE);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -11181,6 +16770,183 @@ public abstract class QueryBase {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, ComponentView31Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<?> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<?> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<?> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            Component<?> componentAD = this.world.componentRegistry().getComponent(componentClassAD);
+            Component<?> componentAE = this.world.componentRegistry().getComponent(componentClassAE);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            VAA componentViewAA = (VAA) this.world.viewCache().getComponentView(componentClassAA);
+            VAB componentViewAB = (VAB) this.world.viewCache().getComponentView(componentClassAB);
+            VAC componentViewAC = (VAC) this.world.viewCache().getComponentView(componentClassAC);
+            VAD componentViewAD = (VAD) this.world.viewCache().getComponentView(componentClassAD);
+            VAE componentViewAE = (VAE) this.world.viewCache().getComponentView(componentClassAE);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            long sizeAD = componentAD.size();
+            long sizeAE = componentAE.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                long baseAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26).address();
+                long baseAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27).address();
+                long baseAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28).address();
+                long baseAD = flecs_h.ecs_field_w_size(iter, sizeAD, (byte) 29).address();
+                long baseAE = flecs_h.ecs_field_w_size(iter, sizeAE, (byte) 30).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    componentViewAA.setBaseAddress(baseAA + (long) i * sizeAA);
+                    componentViewAB.setBaseAddress(baseAB + (long) i * sizeAB);
+                    componentViewAC.setBaseAddress(baseAC + (long) i * sizeAC);
+                    componentViewAD.setBaseAddress(baseAD + (long) i * sizeAD);
+                    componentViewAE.setBaseAddress(baseAE + (long) i * sizeAE);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, Component32Callback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> callback) {
         this.checkDestroyed();
         try (Arena tmpArena = Arena.ofConfined()) {
@@ -11469,6 +17235,154 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> long find(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, Component32Predicate<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<A> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<B> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<C> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<D> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<E> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<F> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<G> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<H> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<I> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<J> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<K> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<L> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<M> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<N> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<O> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<P> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<Q> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<R> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<S> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<T> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<U> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<V> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<W> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<X> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<Y> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<Z> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<AA> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<AB> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<AC> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            Component<AD> componentAD = this.world.componentRegistry().getComponent(componentClassAD);
+            Component<AE> componentAE = this.world.componentRegistry().getComponent(componentClassAE);
+            Component<AF> componentAF = this.world.componentRegistry().getComponent(componentClassAF);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            long sizeAD = componentAD.size();
+            long sizeAE = componentAE.size();
+            long sizeAF = componentAF.size();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                MemorySegment fieldA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0);
+                MemorySegment fieldB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1);
+                MemorySegment fieldC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2);
+                MemorySegment fieldD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3);
+                MemorySegment fieldE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4);
+                MemorySegment fieldF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5);
+                MemorySegment fieldG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6);
+                MemorySegment fieldH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7);
+                MemorySegment fieldI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8);
+                MemorySegment fieldJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9);
+                MemorySegment fieldK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10);
+                MemorySegment fieldL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11);
+                MemorySegment fieldM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12);
+                MemorySegment fieldN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13);
+                MemorySegment fieldO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14);
+                MemorySegment fieldP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15);
+                MemorySegment fieldQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16);
+                MemorySegment fieldR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17);
+                MemorySegment fieldS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18);
+                MemorySegment fieldT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19);
+                MemorySegment fieldU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20);
+                MemorySegment fieldV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21);
+                MemorySegment fieldW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22);
+                MemorySegment fieldX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23);
+                MemorySegment fieldY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24);
+                MemorySegment fieldZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25);
+                MemorySegment fieldAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26);
+                MemorySegment fieldAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27);
+                MemorySegment fieldAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28);
+                MemorySegment fieldAD = flecs_h.ecs_field_w_size(iter, sizeAD, (byte) 29);
+                MemorySegment fieldAE = flecs_h.ecs_field_w_size(iter, sizeAE, (byte) 30);
+                MemorySegment fieldAF = flecs_h.ecs_field_w_size(iter, sizeAF, (byte) 31);
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    A componentInstanceA = componentA.read(fieldA, (long) i * sizeA);
+                    B componentInstanceB = componentB.read(fieldB, (long) i * sizeB);
+                    C componentInstanceC = componentC.read(fieldC, (long) i * sizeC);
+                    D componentInstanceD = componentD.read(fieldD, (long) i * sizeD);
+                    E componentInstanceE = componentE.read(fieldE, (long) i * sizeE);
+                    F componentInstanceF = componentF.read(fieldF, (long) i * sizeF);
+                    G componentInstanceG = componentG.read(fieldG, (long) i * sizeG);
+                    H componentInstanceH = componentH.read(fieldH, (long) i * sizeH);
+                    I componentInstanceI = componentI.read(fieldI, (long) i * sizeI);
+                    J componentInstanceJ = componentJ.read(fieldJ, (long) i * sizeJ);
+                    K componentInstanceK = componentK.read(fieldK, (long) i * sizeK);
+                    L componentInstanceL = componentL.read(fieldL, (long) i * sizeL);
+                    M componentInstanceM = componentM.read(fieldM, (long) i * sizeM);
+                    N componentInstanceN = componentN.read(fieldN, (long) i * sizeN);
+                    O componentInstanceO = componentO.read(fieldO, (long) i * sizeO);
+                    P componentInstanceP = componentP.read(fieldP, (long) i * sizeP);
+                    Q componentInstanceQ = componentQ.read(fieldQ, (long) i * sizeQ);
+                    R componentInstanceR = componentR.read(fieldR, (long) i * sizeR);
+                    S componentInstanceS = componentS.read(fieldS, (long) i * sizeS);
+                    T componentInstanceT = componentT.read(fieldT, (long) i * sizeT);
+                    U componentInstanceU = componentU.read(fieldU, (long) i * sizeU);
+                    V componentInstanceV = componentV.read(fieldV, (long) i * sizeV);
+                    W componentInstanceW = componentW.read(fieldW, (long) i * sizeW);
+                    X componentInstanceX = componentX.read(fieldX, (long) i * sizeX);
+                    Y componentInstanceY = componentY.read(fieldY, (long) i * sizeY);
+                    Z componentInstanceZ = componentZ.read(fieldZ, (long) i * sizeZ);
+                    AA componentInstanceAA = componentAA.read(fieldAA, (long) i * sizeAA);
+                    AB componentInstanceAB = componentAB.read(fieldAB, (long) i * sizeAB);
+                    AC componentInstanceAC = componentAC.read(fieldAC, (long) i * sizeAC);
+                    AD componentInstanceAD = componentAD.read(fieldAD, (long) i * sizeAD);
+                    AE componentInstanceAE = componentAE.read(fieldAE, (long) i * sizeAE);
+                    AF componentInstanceAF = componentAF.read(fieldAF, (long) i * sizeAF);
+                    if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE, componentInstanceAF)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -11827,5 +17741,187 @@ public abstract class QueryBase {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView, VAF extends ComponentView> long findView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, ComponentView32Predicate<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> predicate) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iter = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iter.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Component<?> componentA = this.world.componentRegistry().getComponent(componentClassA);
+            Component<?> componentB = this.world.componentRegistry().getComponent(componentClassB);
+            Component<?> componentC = this.world.componentRegistry().getComponent(componentClassC);
+            Component<?> componentD = this.world.componentRegistry().getComponent(componentClassD);
+            Component<?> componentE = this.world.componentRegistry().getComponent(componentClassE);
+            Component<?> componentF = this.world.componentRegistry().getComponent(componentClassF);
+            Component<?> componentG = this.world.componentRegistry().getComponent(componentClassG);
+            Component<?> componentH = this.world.componentRegistry().getComponent(componentClassH);
+            Component<?> componentI = this.world.componentRegistry().getComponent(componentClassI);
+            Component<?> componentJ = this.world.componentRegistry().getComponent(componentClassJ);
+            Component<?> componentK = this.world.componentRegistry().getComponent(componentClassK);
+            Component<?> componentL = this.world.componentRegistry().getComponent(componentClassL);
+            Component<?> componentM = this.world.componentRegistry().getComponent(componentClassM);
+            Component<?> componentN = this.world.componentRegistry().getComponent(componentClassN);
+            Component<?> componentO = this.world.componentRegistry().getComponent(componentClassO);
+            Component<?> componentP = this.world.componentRegistry().getComponent(componentClassP);
+            Component<?> componentQ = this.world.componentRegistry().getComponent(componentClassQ);
+            Component<?> componentR = this.world.componentRegistry().getComponent(componentClassR);
+            Component<?> componentS = this.world.componentRegistry().getComponent(componentClassS);
+            Component<?> componentT = this.world.componentRegistry().getComponent(componentClassT);
+            Component<?> componentU = this.world.componentRegistry().getComponent(componentClassU);
+            Component<?> componentV = this.world.componentRegistry().getComponent(componentClassV);
+            Component<?> componentW = this.world.componentRegistry().getComponent(componentClassW);
+            Component<?> componentX = this.world.componentRegistry().getComponent(componentClassX);
+            Component<?> componentY = this.world.componentRegistry().getComponent(componentClassY);
+            Component<?> componentZ = this.world.componentRegistry().getComponent(componentClassZ);
+            Component<?> componentAA = this.world.componentRegistry().getComponent(componentClassAA);
+            Component<?> componentAB = this.world.componentRegistry().getComponent(componentClassAB);
+            Component<?> componentAC = this.world.componentRegistry().getComponent(componentClassAC);
+            Component<?> componentAD = this.world.componentRegistry().getComponent(componentClassAD);
+            Component<?> componentAE = this.world.componentRegistry().getComponent(componentClassAE);
+            Component<?> componentAF = this.world.componentRegistry().getComponent(componentClassAF);
+            VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA);
+            VB componentViewB = (VB) this.world.viewCache().getComponentView(componentClassB);
+            VC componentViewC = (VC) this.world.viewCache().getComponentView(componentClassC);
+            VD componentViewD = (VD) this.world.viewCache().getComponentView(componentClassD);
+            VE componentViewE = (VE) this.world.viewCache().getComponentView(componentClassE);
+            VF componentViewF = (VF) this.world.viewCache().getComponentView(componentClassF);
+            VG componentViewG = (VG) this.world.viewCache().getComponentView(componentClassG);
+            VH componentViewH = (VH) this.world.viewCache().getComponentView(componentClassH);
+            VI componentViewI = (VI) this.world.viewCache().getComponentView(componentClassI);
+            VJ componentViewJ = (VJ) this.world.viewCache().getComponentView(componentClassJ);
+            VK componentViewK = (VK) this.world.viewCache().getComponentView(componentClassK);
+            VL componentViewL = (VL) this.world.viewCache().getComponentView(componentClassL);
+            VM componentViewM = (VM) this.world.viewCache().getComponentView(componentClassM);
+            VN componentViewN = (VN) this.world.viewCache().getComponentView(componentClassN);
+            VO componentViewO = (VO) this.world.viewCache().getComponentView(componentClassO);
+            VP componentViewP = (VP) this.world.viewCache().getComponentView(componentClassP);
+            VQ componentViewQ = (VQ) this.world.viewCache().getComponentView(componentClassQ);
+            VR componentViewR = (VR) this.world.viewCache().getComponentView(componentClassR);
+            VS componentViewS = (VS) this.world.viewCache().getComponentView(componentClassS);
+            VT componentViewT = (VT) this.world.viewCache().getComponentView(componentClassT);
+            VU componentViewU = (VU) this.world.viewCache().getComponentView(componentClassU);
+            VV componentViewV = (VV) this.world.viewCache().getComponentView(componentClassV);
+            VW componentViewW = (VW) this.world.viewCache().getComponentView(componentClassW);
+            VX componentViewX = (VX) this.world.viewCache().getComponentView(componentClassX);
+            VY componentViewY = (VY) this.world.viewCache().getComponentView(componentClassY);
+            VZ componentViewZ = (VZ) this.world.viewCache().getComponentView(componentClassZ);
+            VAA componentViewAA = (VAA) this.world.viewCache().getComponentView(componentClassAA);
+            VAB componentViewAB = (VAB) this.world.viewCache().getComponentView(componentClassAB);
+            VAC componentViewAC = (VAC) this.world.viewCache().getComponentView(componentClassAC);
+            VAD componentViewAD = (VAD) this.world.viewCache().getComponentView(componentClassAD);
+            VAE componentViewAE = (VAE) this.world.viewCache().getComponentView(componentClassAE);
+            VAF componentViewAF = (VAF) this.world.viewCache().getComponentView(componentClassAF);
+            long sizeA = componentA.size();
+            long sizeB = componentB.size();
+            long sizeC = componentC.size();
+            long sizeD = componentD.size();
+            long sizeE = componentE.size();
+            long sizeF = componentF.size();
+            long sizeG = componentG.size();
+            long sizeH = componentH.size();
+            long sizeI = componentI.size();
+            long sizeJ = componentJ.size();
+            long sizeK = componentK.size();
+            long sizeL = componentL.size();
+            long sizeM = componentM.size();
+            long sizeN = componentN.size();
+            long sizeO = componentO.size();
+            long sizeP = componentP.size();
+            long sizeQ = componentQ.size();
+            long sizeR = componentR.size();
+            long sizeS = componentS.size();
+            long sizeT = componentT.size();
+            long sizeU = componentU.size();
+            long sizeV = componentV.size();
+            long sizeW = componentW.size();
+            long sizeX = componentX.size();
+            long sizeY = componentY.size();
+            long sizeZ = componentZ.size();
+            long sizeAA = componentAA.size();
+            long sizeAB = componentAB.size();
+            long sizeAC = componentAC.size();
+            long sizeAD = componentAD.size();
+            long sizeAE = componentAE.size();
+            long sizeAF = componentAF.size();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iter)) {
+                MemorySegment entities = ecs_iter_t.entities(iter);
+                long baseA = flecs_h.ecs_field_w_size(iter, sizeA, (byte) 0).address();
+                long baseB = flecs_h.ecs_field_w_size(iter, sizeB, (byte) 1).address();
+                long baseC = flecs_h.ecs_field_w_size(iter, sizeC, (byte) 2).address();
+                long baseD = flecs_h.ecs_field_w_size(iter, sizeD, (byte) 3).address();
+                long baseE = flecs_h.ecs_field_w_size(iter, sizeE, (byte) 4).address();
+                long baseF = flecs_h.ecs_field_w_size(iter, sizeF, (byte) 5).address();
+                long baseG = flecs_h.ecs_field_w_size(iter, sizeG, (byte) 6).address();
+                long baseH = flecs_h.ecs_field_w_size(iter, sizeH, (byte) 7).address();
+                long baseI = flecs_h.ecs_field_w_size(iter, sizeI, (byte) 8).address();
+                long baseJ = flecs_h.ecs_field_w_size(iter, sizeJ, (byte) 9).address();
+                long baseK = flecs_h.ecs_field_w_size(iter, sizeK, (byte) 10).address();
+                long baseL = flecs_h.ecs_field_w_size(iter, sizeL, (byte) 11).address();
+                long baseM = flecs_h.ecs_field_w_size(iter, sizeM, (byte) 12).address();
+                long baseN = flecs_h.ecs_field_w_size(iter, sizeN, (byte) 13).address();
+                long baseO = flecs_h.ecs_field_w_size(iter, sizeO, (byte) 14).address();
+                long baseP = flecs_h.ecs_field_w_size(iter, sizeP, (byte) 15).address();
+                long baseQ = flecs_h.ecs_field_w_size(iter, sizeQ, (byte) 16).address();
+                long baseR = flecs_h.ecs_field_w_size(iter, sizeR, (byte) 17).address();
+                long baseS = flecs_h.ecs_field_w_size(iter, sizeS, (byte) 18).address();
+                long baseT = flecs_h.ecs_field_w_size(iter, sizeT, (byte) 19).address();
+                long baseU = flecs_h.ecs_field_w_size(iter, sizeU, (byte) 20).address();
+                long baseV = flecs_h.ecs_field_w_size(iter, sizeV, (byte) 21).address();
+                long baseW = flecs_h.ecs_field_w_size(iter, sizeW, (byte) 22).address();
+                long baseX = flecs_h.ecs_field_w_size(iter, sizeX, (byte) 23).address();
+                long baseY = flecs_h.ecs_field_w_size(iter, sizeY, (byte) 24).address();
+                long baseZ = flecs_h.ecs_field_w_size(iter, sizeZ, (byte) 25).address();
+                long baseAA = flecs_h.ecs_field_w_size(iter, sizeAA, (byte) 26).address();
+                long baseAB = flecs_h.ecs_field_w_size(iter, sizeAB, (byte) 27).address();
+                long baseAC = flecs_h.ecs_field_w_size(iter, sizeAC, (byte) 28).address();
+                long baseAD = flecs_h.ecs_field_w_size(iter, sizeAD, (byte) 29).address();
+                long baseAE = flecs_h.ecs_field_w_size(iter, sizeAE, (byte) 30).address();
+                long baseAF = flecs_h.ecs_field_w_size(iter, sizeAF, (byte) 31).address();
+                int count = ecs_iter_t.count(iter);
+                for (int i = 0; i < count; i++) {
+                    componentViewA.setBaseAddress(baseA + (long) i * sizeA);
+                    componentViewB.setBaseAddress(baseB + (long) i * sizeB);
+                    componentViewC.setBaseAddress(baseC + (long) i * sizeC);
+                    componentViewD.setBaseAddress(baseD + (long) i * sizeD);
+                    componentViewE.setBaseAddress(baseE + (long) i * sizeE);
+                    componentViewF.setBaseAddress(baseF + (long) i * sizeF);
+                    componentViewG.setBaseAddress(baseG + (long) i * sizeG);
+                    componentViewH.setBaseAddress(baseH + (long) i * sizeH);
+                    componentViewI.setBaseAddress(baseI + (long) i * sizeI);
+                    componentViewJ.setBaseAddress(baseJ + (long) i * sizeJ);
+                    componentViewK.setBaseAddress(baseK + (long) i * sizeK);
+                    componentViewL.setBaseAddress(baseL + (long) i * sizeL);
+                    componentViewM.setBaseAddress(baseM + (long) i * sizeM);
+                    componentViewN.setBaseAddress(baseN + (long) i * sizeN);
+                    componentViewO.setBaseAddress(baseO + (long) i * sizeO);
+                    componentViewP.setBaseAddress(baseP + (long) i * sizeP);
+                    componentViewQ.setBaseAddress(baseQ + (long) i * sizeQ);
+                    componentViewR.setBaseAddress(baseR + (long) i * sizeR);
+                    componentViewS.setBaseAddress(baseS + (long) i * sizeS);
+                    componentViewT.setBaseAddress(baseT + (long) i * sizeT);
+                    componentViewU.setBaseAddress(baseU + (long) i * sizeU);
+                    componentViewV.setBaseAddress(baseV + (long) i * sizeV);
+                    componentViewW.setBaseAddress(baseW + (long) i * sizeW);
+                    componentViewX.setBaseAddress(baseX + (long) i * sizeX);
+                    componentViewY.setBaseAddress(baseY + (long) i * sizeY);
+                    componentViewZ.setBaseAddress(baseZ + (long) i * sizeZ);
+                    componentViewAA.setBaseAddress(baseAA + (long) i * sizeAA);
+                    componentViewAB.setBaseAddress(baseAB + (long) i * sizeAB);
+                    componentViewAC.setBaseAddress(baseAC + (long) i * sizeAC);
+                    componentViewAD.setBaseAddress(baseAD + (long) i * sizeAD);
+                    componentViewAE.setBaseAddress(baseAE + (long) i * sizeAE);
+                    componentViewAF.setBaseAddress(baseAF + (long) i * sizeAF);
+                    if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE, componentViewAF)) {
+                        return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    }
+                }
+            }
+        }
+        return 0L;
     }
 }
