@@ -31,7 +31,7 @@ public class SyncPoint {
                 .iter(it -> {
                     for (int i = 0; i < it.count(); i++) {
                         long entityId = it.entity(i);
-                        world.obtainEntity(entityId).set(Velocity.class, (VelocityView v) -> {
+                        world.obtainEntity(entityId).insert(Velocity.class, (VelocityView v) -> {
                             v.dx(1);
                             v.dy(2);
                         });

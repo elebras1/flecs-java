@@ -24,7 +24,7 @@ public class SystemBasics {
                     // The Velocity component is read from the entity directly.
                     EntityView entity = world.obtainEntityView(entityId);
                     Velocity vel = entity.get(Velocity.class);
-                    entity.set(Position.class, (PositionView posView) -> {
+                    entity.insert(Position.class, (PositionView posView) -> {
                         posView.x(pos.x() + vel.dx());
                         posView.y(pos.y() + vel.dy());
                     });

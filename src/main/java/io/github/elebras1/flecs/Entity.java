@@ -187,7 +187,7 @@ public class Entity extends Id {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ComponentView> Entity set(Class<?> componentClass, Consumer<T> consumer) {
+    public <T extends ComponentView> Entity insert(Class<?> componentClass, Consumer<T> consumer) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
