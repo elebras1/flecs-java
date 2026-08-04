@@ -6,7 +6,9 @@ import io.github.elebras1.flecs.util.Flecs;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 public class Entity extends Id {
 
@@ -471,6 +473,20 @@ public class Entity extends Id {
             return null;
         }
         return new Table(this.world, tableSeg);
+    }
+
+    public void each(LongConsumer callback) {
+        MemorySegment typeSeg = flecs_h.ecs_get_type(this.world.worldSeg(), this.id);
+        if (typeSeg.address() == 0) {
+            return;
+        }
+
+        int count = ecs_type_t.count(typeSeg);
+        MemorySegment ids = ecs_type_t.array(typeSeg);
+
+        for (int i = 0; i < count; i++) {
+            callback.accept(ids.getAtIndex(ValueLayout.JAVA_LONG, i));
+        }
     }
 
     @Override

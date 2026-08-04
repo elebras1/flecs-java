@@ -10,6 +10,8 @@ import io.github.elebras1.flecs.examples.components.Human;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Demonstrates how to iterate the component ids of an entity and inspect
  * regular ids versus pairs.
@@ -44,34 +46,39 @@ public class IterateComponents {
     }
 
     private static void iterateComponents(World world, Entity entity) {
-        // The easiest way to print the components is to use the table string.
+        // 1. The easiest way to print the components is to use the table string.
         Table table = entity.table();
-        if (table != null) {
-            System.out.println(table.str());
-        }
+        System.out.println(table.str() + "\n");
+
+        // 2. To get individual component ids, use Entity.each.
+        AtomicInteger i = new AtomicInteger();
+        entity.each(idL -> {
+            Id id = world.obtainId(idL);
+            System.out.println(i.getAndIncrement() + ": " + id.str());
+        });
         System.out.println();
 
-        // To get individual component ids, use the entity's table type.
-        long[] type = table != null ? table.type() : new long[0];
-        for (int i = 0; i < type.length; i++) {
-            System.out.println(i + ": " + idString(world, type[i]));
-        }
-        System.out.println();
+        // 3. we can also inspect and print the ids in our own way. This is a
+        // bit more complicated as we need to handle the edge cases of what can be
+        // encoded in an id, but provides the most flexibility.
+        AtomicInteger j = new AtomicInteger();
+        entity.each(idL -> {
+            System.out.print(j.getAndIncrement() + ": ");
 
-        // Inspect and print the ids in our own way. This is more complicated
-        // because we need to handle what can be encoded in an id.
-        for (int i = 0; i < type.length; i++) {
-            System.out.print(i + ": ");
-            Id id = world.obtainId(type[i]);
-            if (id.isPair()) {
+            Id id = world.obtainId(idL);
+            if(id.isPair()) {
+                // If id is a pair, extract & print both parts of the pair
                 long rel = id.first();
                 long tgt = id.second();
-                System.out.println("rel: " + world.obtainEntity(rel).name() + ", tgt: " + world.obtainEntity(tgt).name());
+                System.out.print("rel: " + world.obtainEntity(rel).name() + ", tgt: " + world.obtainEntity(tgt).name());
             } else {
-                System.out.println("entity: " + world.obtainEntity(type[i]).name());
+                long comp = id.entity();
+                System.out.print("entity: " + world.obtainEntity(comp).name());
             }
-        }
-        System.out.println("\n");
+
+            System.out.println();
+        });
+        System.out.println();
     }
 
     private static String idString(World world, long id) {
@@ -84,9 +91,7 @@ public class IterateComponents {
         return world.obtainEntity(id).name();
     }
 
-    // Output (format may vary slightly depending on the binding):
-    // Entity's components:
-    // Position, Velocity, Human, (Eats,Apples)
+    // Output:
     //
     // 0: Position
     // 1: Velocity
