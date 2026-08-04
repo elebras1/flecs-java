@@ -140,7 +140,7 @@ public class World {
         this.owned = true;
     }
 
-    private World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
+    World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
         this.arena = Arena.ofShared();
         this.worldSeg = stageSeg;
         this.componentRegistry = componentRegistry;

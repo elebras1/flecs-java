@@ -422,6 +422,10 @@ public class Entity extends Id {
         return flecs_h.ecs_clone(this.world.worldSeg(), 0, this.id, cloneValues);
     }
 
+    public ScopedWorld scope() {
+        return new ScopedWorld(this.world, this.id);
+    }
+
     public long lookup(String path) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment pathSeg = tempArena.allocateFrom(path);
