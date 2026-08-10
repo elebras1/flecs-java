@@ -189,10 +189,12 @@ public class Entity extends Id {
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> Entity insert(Class<?> componentClass, Consumer<T> consumer) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
+        long size = this.world.componentRegistry().getComponent(componentClass).size();
+
+        MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentId, size);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(address);
+        view.setBaseAddress(dataSeg.address());
         consumer.accept(view);
 
         flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
@@ -218,12 +220,13 @@ public class Entity extends Id {
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> Entity set(Class<?> componentClass, long target, Consumer<T> consumer) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long size = this.world.componentRegistry().getComponent(componentClass).size();
         long pairId = flecs_h.ecs_make_pair(componentId, target);
-        flecs_h.ecs_add_id(this.world.worldSeg(), this.id, pairId);
-        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
+
+        MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size);
 
         T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(address);
+        view.setBaseAddress(dataSeg.address());
         consumer.accept(view);
 
         flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, pairId);
@@ -432,6 +435,15 @@ public class Entity extends Id {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment pathSeg = tempArena.allocateFrom(path);
             return flecs_h.ecs_lookup_child(this.world.worldSeg(), this.id, pathSeg);
+        }
+    }
+
+    public long lookup(String path, boolean recursive) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment pathSeg = tempArena.allocateFrom(path);
+            MemorySegment sepSeg = tempArena.allocateFrom("::");
+            MemorySegment rootSepSeg = tempArena.allocateFrom("::");
+            return flecs_h.ecs_lookup_path_w_sep(this.world.worldSeg(), this.id, pathSeg, sepSeg, rootSepSeg, recursive);
         }
     }
 

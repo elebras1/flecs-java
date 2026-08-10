@@ -3,8 +3,8 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.*;
 import io.github.elebras1.flecs.util.EntityRange;
 import io.github.elebras1.flecs.util.Flecs;
-import io.github.elebras1.flecs.util.internal.FlecsAllocator;
 import io.github.elebras1.flecs.util.internal.FlecsLoader;
+import io.github.elebras1.flecs.util.internal.buffer.FlecsBuffers;
 
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
@@ -21,8 +21,8 @@ public class World {
     private final ComponentRegistry componentRegistry;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
-    private final FlecsBuffers defaultBuffers;
-    private final FlecsContext contextCache;
+    private final FlecsBuffers buffers;
+    private final FlecsContext context;
     private World[] stages;
     private final boolean owned;
     private boolean destroyed;
@@ -30,98 +30,6 @@ public class World {
 
     static {
         FlecsLoader.load();
-    }
-
-    public record FlecsBuffers(NameBuffer nameBuffer, ComponentBuffer componentBuffer, EntityDescBuffer entityDescBuffer) implements AutoCloseable {
-        public FlecsBuffers() {
-            this(new NameBuffer(64), new ComponentBuffer(256), new EntityDescBuffer());
-        }
-
-        @Override
-        public void close() {
-            this.nameBuffer.close();
-            this.componentBuffer.close();
-            this.entityDescBuffer.close();
-        }
-    }
-
-    private static final class NameBuffer implements AutoCloseable {
-        private MemorySegment segment;
-        private long capacity;
-
-        NameBuffer(long initialCapacity) {
-            this.capacity = initialCapacity;
-            this.segment = FlecsAllocator.malloc(initialCapacity);
-        }
-
-        private MemorySegment ensure(long needed) {
-            if (needed > this.capacity) {
-                this.capacity = Math.max(needed, this.capacity * 2);
-                FlecsAllocator.free(this.segment);
-                this.segment = FlecsAllocator.malloc(this.capacity);
-            }
-            return segment;
-        }
-
-        public MemorySegment set(String name) {
-            byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
-            long needed = nameBytes.length + 1;
-            MemorySegment nameSeg = ensure(needed);
-            nameSeg.fill((byte) 0);
-            nameSeg.setString(0, name);
-            return nameSeg;
-        }
-
-        @Override
-        public void close() {
-            if (this.segment != null && this.segment.address() != 0) {
-                FlecsAllocator.free(this.segment);
-            }
-        }
-    }
-
-    private static final class ComponentBuffer implements AutoCloseable {
-        private MemorySegment segment;
-        private long capacity;
-
-        ComponentBuffer(long initialCapacity) {
-            this.capacity = initialCapacity;
-            this.segment = FlecsAllocator.malloc(initialCapacity);
-        }
-
-        MemorySegment ensure(long needed) {
-            if (needed > this.capacity) {
-                this.capacity = Math.max(needed, this.capacity * 2);
-                FlecsAllocator.free(segment);
-                this.segment = FlecsAllocator.malloc(this.capacity);
-            }
-            return this.segment.fill((byte) 0);
-        }
-
-        @Override
-        public void close() {
-            if (this.segment != null && this.segment.address() != 0) {
-                FlecsAllocator.free(this.segment);
-            }
-        }
-    }
-
-    private static final class EntityDescBuffer implements AutoCloseable {
-        private final MemorySegment segment;
-
-        EntityDescBuffer() {
-            this.segment = FlecsAllocator.malloc(ecs_entity_desc_t.sizeof());
-        }
-
-        MemorySegment get() {
-            this.segment.fill((byte) 0);
-            return this.segment;
-        }
-
-        @Override
-        public void close() {
-            FlecsAllocator.free(this.segment);
-        }
     }
 
     public World() {
@@ -133,8 +41,8 @@ public class World {
         this.componentRegistry = new ComponentRegistry(this);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.defaultBuffers = new FlecsBuffers();
-        this.contextCache = new FlecsContext(this);
+        this.buffers = new FlecsBuffers();
+        this.context = new FlecsContext(this);
         this.stages = new World[] { this };
         this.destroyed = false;
         this.owned = true;
@@ -146,8 +54,8 @@ public class World {
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.defaultBuffers = new FlecsBuffers();
-        this.contextCache = new FlecsContext(this);
+        this.buffers = new FlecsBuffers();
+        this.context = new FlecsContext(this);
         this.destroyed = false;
         this.owned = false;
     }
@@ -167,9 +75,9 @@ public class World {
 
     public long entity(String name) {
         this.checkDestroyed();
-        MemorySegment nameSegment = this.defaultBuffers.nameBuffer().set(name);
+        MemorySegment nameSegment = this.buffers.stringRing().set(name);
 
-        MemorySegment descSeg = this.defaultBuffers.entityDescBuffer().get();
+        MemorySegment descSeg = this.buffers.entityDescBuffer().get();
         ecs_entity_desc_t.name(descSeg, nameSegment);
 
         return flecs_h.ecs_entity_init(this.worldSeg, descSeg);
@@ -191,7 +99,7 @@ public class World {
     public EntityView obtainEntityView(long entityId) {
         assert entityId >= 0 : "Invalid entity ID: " + entityId;
 
-        return this.contextCache.getEntityView(entityId);
+        return this.context.getEntityView(entityId);
     }
 
     public Id obtainId(long id) {
@@ -200,7 +108,7 @@ public class World {
     }
 
     MemorySegment getComponentBuffer(long size) {
-        return this.defaultBuffers.componentBuffer().ensure(size);
+        return this.buffers.componentBuffer().ensure(size);
     }
 
     public long[] entityBulk(int count) {
@@ -326,13 +234,6 @@ public class World {
     public Query query(String expr) {
         this.checkDestroyed();
         return this.query().expr(expr).build();
-    }
-
-    public long lookup(String name) {
-        this.checkDestroyed();
-        MemorySegment segment = this.defaultBuffers.nameBuffer().set(name);
-
-        return flecs_h.ecs_lookup(this.worldSeg, segment);
     }
 
     public <T> long component(Class<T> componentClass) {
@@ -634,7 +535,7 @@ public class World {
     }
 
     FlecsContext viewCache() {
-        return this.contextCache;
+        return this.context;
     }
 
     public void setStageCount(int count) {
@@ -767,14 +668,16 @@ public class World {
         }
     }
 
+    public long lookup(String name) {
+        return lookup(name, "::", "::", true);
+    }
+
     public long lookup(String name, String sep, String rootSep, boolean recursive) {
         this.checkDestroyed();
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment nameSeg = tempArena.allocateFrom(name);
-            MemorySegment sepSeg = tempArena.allocateFrom(sep);
-            MemorySegment rootSepSeg = tempArena.allocateFrom(rootSep);
-            return flecs_h.ecs_lookup_path_w_sep(this.worldSeg, 0, nameSeg, sepSeg, rootSepSeg, recursive);
-        }
+        MemorySegment nameSeg = this.buffers.stringRing().set(name);
+        MemorySegment sepSeg = this.buffers.stringRing().set(sep);
+        MemorySegment rootSepSeg = this.buffers.stringRing().set(rootSep);
+        return flecs_h.ecs_lookup_path_w_sep(this.worldSeg, 0, nameSeg, sepSeg, rootSepSeg, recursive);
     }
 
     public PipelineBuilder pipeline() {
@@ -949,7 +852,7 @@ public class World {
                 }
             }
 
-            this.defaultBuffers.close();
+            this.buffers.close();
 
             if (this.arena != null) {
                 this.arena.close();

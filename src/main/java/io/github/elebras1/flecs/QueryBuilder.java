@@ -266,8 +266,15 @@ public class QueryBuilder {
 
     public <T> QueryBuilder orderBy(long componentId, ComparatorComponent<T> comparator) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentAdressA, _, componentAdressB) ->
-                comparator.compare(component.read(MemorySegment.ofAddress(componentAdressA), 0), component.read(MemorySegment.ofAddress(componentAdressB), 0)), this.world.arena());
+        long componentSize = component.size();
+        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentAdressA, _, componentAdressB) -> {
+            if (componentAdressA == 0 || componentAdressB == 0) {
+                return 0;
+            }
+            MemorySegment segmentA = MemorySegment.ofAddress(componentAdressA).reinterpret(componentSize);
+            MemorySegment segmentB = MemorySegment.ofAddress(componentAdressB).reinterpret(componentSize);
+            return comparator.compare(component.read(segmentA, 0), component.read(segmentB, 0));
+        }, this.world.arena());
         ecs_query_desc_t.order_by_callback(this.desc, callbackStub);
         return this.orderBy(componentId);
     }

@@ -1140,7 +1140,7 @@ class flecs_h_1 extends flecs_h_2 {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_lookup_path_w_sep");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
