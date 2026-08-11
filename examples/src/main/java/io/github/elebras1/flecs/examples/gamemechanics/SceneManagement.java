@@ -149,21 +149,21 @@ public class SceneManagement {
         initSystems(world, menuSceneId, gameSceneId);
 
         // Start in the menu scene.
-        world.obtainEntity(Flecs.World).addRelation(activeSceneId, menuSceneId);
+        world.obtainEntity(Flecs.World).add(activeSceneId, menuSceneId);
         world.progress();
 
         // Switch to game scene and run a few frames.
-        world.obtainEntity(Flecs.World).addRelation(activeSceneId, gameSceneId);
+        world.obtainEntity(Flecs.World).add(activeSceneId, gameSceneId);
         world.progress();
         world.progress();
         world.progress();
 
         // Switch back to menu.
-        world.obtainEntity(Flecs.World).addRelation(activeSceneId, menuSceneId);
+        world.obtainEntity(Flecs.World).add(activeSceneId, menuSceneId);
         world.progress();
 
         // Switch back to game and run a few frames.
-        world.obtainEntity(Flecs.World).addRelation(activeSceneId, gameSceneId);
+        world.obtainEntity(Flecs.World).add(activeSceneId, gameSceneId);
         world.progress();
         world.progress();
         world.progress();

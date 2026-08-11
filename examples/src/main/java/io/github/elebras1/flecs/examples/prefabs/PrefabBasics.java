@@ -17,7 +17,7 @@ public class PrefabBasics {
         // prefab, and is shared across all instances.
         long defenseId = world.component(Defense.class);
         Entity defenseEntity = world.obtainEntity(defenseId);
-        defenseEntity.addRelation(Flecs.OnInstantiate, Flecs.Inherit);
+        defenseEntity.add(Flecs.OnInstantiate, Flecs.Inherit);
         // The line above configures the component's OnInstantiate policy.
         // In the Java binding this is done by adding the (OnInstantiate, Inherit)
         // pair to the component entity.

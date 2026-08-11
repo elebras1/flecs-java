@@ -12,12 +12,8 @@ import io.github.elebras1.flecs.examples.components.Container;
 import io.github.elebras1.flecs.examples.components.ContainedBy;
 import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.Inventory;
-import io.github.elebras1.flecs.examples.components.IronArmor;
-import io.github.elebras1.flecs.examples.components.IronSword;
 import io.github.elebras1.flecs.examples.components.Item;
 import io.github.elebras1.flecs.examples.components.Sword;
-import io.github.elebras1.flecs.examples.components.WoodenArmor;
-import io.github.elebras1.flecs.examples.components.WoodenSword;
 import io.github.elebras1.flecs.util.Flecs;
 
 /**
@@ -112,7 +108,7 @@ public class InventorySystem {
                 return;
             }
         }
-        item.addRelation(containedById, container.id());
+        item.add(containedById, container.id());
     }
 
     private static void transferItems(World world, long containedById, long inventoryId, Entity dst, Entity src, long swordId, long armorId, long coinId) {
@@ -240,9 +236,9 @@ public class InventorySystem {
         world.obtainEntity(containedById).add(Flecs.Exclusive);
 
         // Item kinds inherit from Item.
-        world.obtainEntity(swordId).addRelation(Flecs.IsA, itemId);
-        world.obtainEntity(armorId).addRelation(Flecs.IsA, itemId);
-        world.obtainEntity(coinId).addRelation(Flecs.IsA, itemId);
+        world.obtainEntity(swordId).add(Flecs.IsA, itemId);
+        world.obtainEntity(armorId).add(Flecs.IsA, itemId);
+        world.obtainEntity(coinId).add(Flecs.IsA, itemId);
 
         // Register prefabs.
         long woodenSword = world.prefab();
@@ -273,19 +269,19 @@ public class InventorySystem {
 
         // Create a loot box with items.
         Entity chest = world.obtainEntity(world.entity("Chest")).add(Container.class);
-        world.obtainEntity(world.entity()).isA(ironSword).addRelation(containedById, chest.id());
-        world.obtainEntity(world.entity()).isA(woodenArmor).addRelation(containedById, chest.id());
+        world.obtainEntity(world.entity()).isA(ironSword).add(containedById, chest.id());
+        world.obtainEntity(world.entity()).isA(woodenArmor).add(containedById, chest.id());
         world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(30))
-                .addRelation(containedById, chest.id());
+                .add(containedById, chest.id());
 
         // Create a player with an inventory containing some coins.
         Entity playerInventory = world.obtainEntity(world.entity()).add(Container.class);
         world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(20))
-                .addRelation(containedById, playerInventory.id());
+                .add(containedById, playerInventory.id());
 
         Entity player = world.obtainEntity(world.entity("Player"))
                 .set(new Health(10))
-                .addRelation(inventoryId, playerInventory.id());
+                .add(inventoryId, playerInventory.id());
 
         // Print initial inventories.
         printItems(world, inventoryId, swordId, armorId, coinId, chest);

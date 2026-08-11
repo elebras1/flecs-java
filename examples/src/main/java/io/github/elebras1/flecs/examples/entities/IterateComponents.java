@@ -33,7 +33,7 @@ public class IterateComponents {
                 .set(new Position(10, 20))
                 .set(new Velocity(1, 1))
                 .add(Human.class)
-                .addRelation(eatsId, applesId);
+                .add(eatsId, applesId);
 
         System.out.println("Entity's components:");
         iterateComponents(world, bob);

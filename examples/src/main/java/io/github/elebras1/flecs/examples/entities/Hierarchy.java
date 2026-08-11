@@ -45,7 +45,7 @@ public class Hierarchy {
         world.setScope(previousScope);
 
         // Is the Moon a child of Earth?
-        System.out.println("Child of Earth? " + (moon.hasRelation(Flecs.ChildOf, earth.id()) ? 1 : 0));
+        System.out.println("Child of Earth? " + (moon.has(Flecs.ChildOf, earth.id()) ? 1 : 0));
         System.out.println();
 
         // The moon entity was already obtained while creating it.

@@ -52,14 +52,14 @@ public class Immediate {
                         // components to the entities being iterated would
                         // interfere with the system iterator.
                         world.deferSuspend();
-                        waiter.addRelation(plateId, plate.id());
+                        waiter.add(plateId, plate.id());
                         world.deferResume();
 
                         // Now that deferring is resumed, also add the waiter to
                         // the plate. We can't do this while deferring is
                         // suspended because the plate is the entity we're
                         // iterating.
-                        plate.addRelation(waiterId, waiter.id());
+                        plate.add(waiterId, waiter.id());
 
                         System.out.println("Assigned " + waiter.name() + " to " + plate.name() + "!");
                     }
@@ -75,8 +75,8 @@ public class Immediate {
         world.obtainEntity(world.entity("plate_3")).add(Plate.class);
 
         // waiter_1 already has a plate (plate_2).
-        waiter1.addRelation(plateId, plate2.id());
-        plate2.addRelation(waiterId, waiter1.id());
+        waiter1.add(plateId, plate2.id());
+        plate2.add(waiterId, waiter1.id());
 
         // Run systems.
         world.progress();

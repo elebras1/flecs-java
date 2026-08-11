@@ -42,7 +42,7 @@ public class HelloWorld {
         Entity bob = world.obtainEntity(world.entity("Bob"))
                 .set(new Position(0, 0))
                 .set(new Velocity(1, 2))
-                .addRelation(eatsId, applesId);
+                .add(eatsId, applesId);
 
         // Show us what you got.
         System.out.println(bob.name() + "'s got [" + bob.table().str() + "]");

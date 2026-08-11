@@ -6,7 +6,6 @@ import io.github.elebras1.flecs.util.Flecs;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
@@ -14,10 +13,6 @@ public class Entity extends Id {
 
     Entity(World world, long id) {
         super(world, id);
-    }
-
-    public long id() {
-        return this.id;
     }
 
     public World world() {
@@ -38,6 +33,27 @@ public class Entity extends Id {
         return this.add(componentId);
     }
 
+    public Entity add(long first, long second) {
+        long pair = flecs_h.ecs_make_pair(first, second);
+        return this.add(pair);
+    }
+
+    public <T> Entity add(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.add(firstId, second);
+    }
+
+    public <T> Entity add(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.add(firstId, second.id());
+    }
+
+    public <A, B> Entity add(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.add(firstId, secondId);
+    }
+
     public Entity remove(long entityId) {
         flecs_h.ecs_remove_id(world.worldSeg(), this.id, entityId);
         return this;
@@ -52,8 +68,33 @@ public class Entity extends Id {
         return this.remove(componentId);
     }
 
+    public Entity remove(long first, long second) {
+        long pair = flecs_h.ecs_make_pair(first, second);
+        return this.remove(pair);
+    }
+
+    public <T> Entity remove(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.remove(firstId, second);
+    }
+
+    public <T> Entity remove(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.remove(firstId, second.id());
+    }
+
+    public <A, B> Entity remove(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.remove(firstId, secondId);
+    }
+
     public boolean has(long componentId) {
         return flecs_h.ecs_has_id(this.world.worldSeg(), this.id, componentId);
+    }
+
+    public boolean has(Entity entity) {
+        return this.has(entity.id());
     }
 
     public boolean has(Class<?> componentClass) {
@@ -61,8 +102,25 @@ public class Entity extends Id {
         return this.has(componentId);
     }
 
-    public boolean has(Entity entity) {
-        return this.has(entity.id());
+    public boolean has(long first, long second) {
+        long pair = flecs_h.ecs_make_pair(first, second);
+        return this.has(pair);
+    }
+
+    public <T> boolean has(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.has(firstId, second);
+    }
+
+    public <T> boolean has(Class<T> first, Entity second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.has(firstId, second.id());
+    }
+
+    public <A, B> boolean has(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.has(firstId, secondId);
     }
 
     public Entity name(String name) {
@@ -124,13 +182,8 @@ public class Entity extends Id {
         flecs_h.ecs_clear(this.world.worldSeg(), this.id);
     }
 
-    public Entity addRelation(long relation, long target) {
-        long pair = flecs_h.ecs_make_pair(relation, target);
-        return this.add(pair);
-    }
-
     public Entity childOf(long parentId) {
-        return this.addRelation(Flecs.ChildOf, parentId);
+        return this.add(Flecs.ChildOf, parentId);
     }
 
     public Entity childOf(Entity parent) {
@@ -142,25 +195,11 @@ public class Entity extends Id {
     }
 
     public Entity isA(long entityId) {
-        return this.addRelation(Flecs.IsA, entityId);
+        return this.add(Flecs.IsA, entityId);
     }
 
-    public Entity removeRelation(long relation, long target) {
-        long pair = flecs_h.ecs_make_pair(relation, target);
-        return this.remove(pair);
-    }
-
-    public boolean hasRelation(long relation, long target) {
-        long pair = flecs_h.ecs_make_pair(relation, target);
-        return this.has(pair);
-    }
-
-    public Entity removeRelation(long relation) {
-        return this.removeRelation(relation, Flecs.Wildcard);
-    }
-
-    public boolean hasRelation(long relation) {
-        return this.hasRelation(relation, Flecs.Wildcard);
+    public Entity isA(Entity entity) {
+        return this.add(Flecs.IsA, entity.id());
     }
 
     public Entity autoOverride(long componentId) {
@@ -373,20 +412,36 @@ public class Entity extends Id {
         this.emit(eventId, componentId);
     }
 
+    public long target(long relationId, int index) {
+        return flecs_h.ecs_get_target(this.world.worldSeg(), this.id, relationId, index);
+    }
+
+    public long target(Entity relation, int index) {
+        return this.target(relation.id(), index);
+    }
+
     public long target(long relationId) {
         return this.target(relationId, 0);
     }
 
-    public long target(long relationId, int index) {
-        return flecs_h.ecs_get_target(this.world.worldSeg(), this.id, relationId, index);
+    public long target(Entity relation) {
+        return this.target(relation.id(), 0);
     }
 
     public int depth(long relationId) {
         return flecs_h.ecs_get_depth(this.world.worldSeg(), this.id, relationId);
     }
 
+    public int depth(Entity relation) {
+        return this.depth(relation.id());
+    }
+
     public boolean owns(long componentId) {
         return flecs_h.ecs_owns_id(this.world.worldSeg(), this.id, componentId);
+    }
+
+    public boolean owns(Entity component) {
+        return this.owns(component.id());
     }
 
     public boolean owns(Class<?> componentClass) {
@@ -463,9 +518,12 @@ public class Entity extends Id {
     }
 
     public void children(long relationId, EntityCallback callback) {
+        if (this.id == Flecs.Wildcard || this.id == Flecs.Any) {
+            return;
+        }
+
         try (Arena tempArena = Arena.ofConfined()) {
-            long pair = flecs_h.ecs_make_pair(relationId, this.id);
-            MemorySegment iterSeg = flecs_h.ecs_each_id(tempArena, this.world.worldSeg(), pair);
+            MemorySegment iterSeg = flecs_h.ecs_children_w_rel(tempArena, this.world.worldSeg(), relationId, this.id);
 
             while (flecs_h.ecs_each_next(iterSeg)) {
                 int count = ecs_iter_t.count(iterSeg);

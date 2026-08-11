@@ -49,7 +49,7 @@ public class RelationComponent {
         // PairIsTag forces a pair to have no payload even if one of the pair
         // elements is a component.
         world.obtainEntity(mustHaveId).add(Flecs.PairIsTag);
-        world.obtainEntity(world.entity()).addRelation(mustHaveId, positionId);
+        world.obtainEntity(world.entity()).add(mustHaveId, positionId);
 
         // Print the component type used by each pair.
         Id requiresPair = world.pair(requiresId, gigawattsId);

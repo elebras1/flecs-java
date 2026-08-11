@@ -28,19 +28,19 @@ public class ExclusiveRelations {
         Entity unit = world.obtainEntity(world.entity());
 
         // Add unit to platoon 1.
-        unit.addRelation(platoonId, platoon1);
+        unit.add(platoonId, platoon1);
 
         // Log platoon of unit.
-        System.out.println("Unit in platoon 1: " + (unit.hasRelation(platoonId, platoon1)));
-        System.out.println("Unit in platoon 2: " + (unit.hasRelation(platoonId, platoon2)));
+        System.out.println("Unit in platoon 1: " + (unit.has(platoonId, platoon1)));
+        System.out.println("Unit in platoon 2: " + (unit.has(platoonId, platoon2)));
         System.out.println();
 
         // Add unit to platoon 2. Because Platoon is exclusive, this removes the
         // first pair and adds the second one in a single operation.
-        unit.addRelation(platoonId, platoon2);
+        unit.add(platoonId, platoon2);
 
-        System.out.println("Unit in platoon 1: " + (unit.hasRelation(platoonId, platoon1)));
-        System.out.println("Unit in platoon 2: " + (unit.hasRelation(platoonId, platoon2)));
+        System.out.println("Unit in platoon 1: " + (unit.has(platoonId, platoon1)));
+        System.out.println("Unit in platoon 2: " + (unit.has(platoonId, platoon2)));
 
         world.destroy();
     }

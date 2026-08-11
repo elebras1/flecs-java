@@ -37,30 +37,30 @@ public class GroupBy {
         // Create entities in three different groups and two different tables.
         Entity e1 = world.obtainEntity(world.entity())
                 .set(new Position(1, 1));
-        e1.addRelation(world.component(Group.class), third);
+        e1.add(world.component(Group.class), third);
 
         Entity e2 = world.obtainEntity(world.entity())
                 .set(new Position(2, 2));
-        e2.addRelation(world.component(Group.class), second);
+        e2.add(world.component(Group.class), second);
 
         Entity e3 = world.obtainEntity(world.entity())
                 .set(new Position(3, 3));
-        e3.addRelation(world.component(Group.class), first);
+        e3.add(world.component(Group.class), first);
 
         Entity e4 = world.obtainEntity(world.entity())
                 .set(new Position(4, 4))
                 .add(DummyTag.class);
-        e4.addRelation(world.component(Group.class), third);
+        e4.add(world.component(Group.class), third);
 
         Entity e5 = world.obtainEntity(world.entity())
                 .set(new Position(5, 5))
                 .add(DummyTag.class);
-        e5.addRelation(world.component(Group.class), second);
+        e5.add(world.component(Group.class), second);
 
         Entity e6 = world.obtainEntity(world.entity())
                 .set(new Position(6, 6))
                 .add(DummyTag.class);
-        e6.addRelation(world.component(Group.class), first);
+        e6.add(world.component(Group.class), first);
 
         // Iterate the query. Entities are returned grouped by their group id.
         query.iter(it -> {

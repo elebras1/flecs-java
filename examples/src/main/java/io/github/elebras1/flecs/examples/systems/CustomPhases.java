@@ -24,11 +24,11 @@ public class CustomPhases {
         // pipeline to discover which systems it should run.
         Entity physics = world.obtainEntity(world.entity("Physics"));
         physics.add(Flecs.Phase);
-        physics.addRelation(Flecs.DependsOn, Flecs.OnUpdate);
+        physics.add(Flecs.DependsOn, Flecs.OnUpdate);
 
         Entity collisions = world.obtainEntity(world.entity("Collisions"));
         collisions.add(Flecs.Phase);
-        collisions.addRelation(Flecs.DependsOn, physics.id());
+        collisions.add(Flecs.DependsOn, physics.id());
 
         // Create 3 dummy systems.
         world.system("CollisionSystem")

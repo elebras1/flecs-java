@@ -23,17 +23,17 @@ public class RelationBasics {
         Entity bob = world.obtainEntity(world.entity("Bob"));
 
         // Pairs can be constructed from a component id and entity id.
-        bob.addRelation(eatsId, apples);
-        bob.addRelation(eatsId, pears);
+        bob.add(eatsId, apples);
+        bob.add(eatsId, pears);
 
         // Pairs can also be constructed from two entity ids.
-        bob.addRelation(grows, pears);
+        bob.add(grows, pears);
 
         // has can be used with relationships as well.
-        System.out.println("Bob eats apples? " + (bob.hasRelation(eatsId, apples) ? 1 : 0));
+        System.out.println("Bob eats apples? " + (bob.has(eatsId, apples) ? 1 : 0));
 
         // Wildcards can be used to match relationships.
-        System.out.println("Bob grows food? " + (bob.hasRelation(grows, Flecs.Wildcard) ? 1 : 0));
+        System.out.println("Bob grows food? " + (bob.has(grows, Flecs.Wildcard) ? 1 : 0));
 
         // Print the type of the entity. The exact string depends on how the
         // Java binding formats component names (here fully-qualified names).

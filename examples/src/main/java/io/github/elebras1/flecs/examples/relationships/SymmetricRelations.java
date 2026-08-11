@@ -25,11 +25,11 @@ public class SymmetricRelations {
 
         // Add (TradesWith, player2) to player1. Because TradesWith is symmetric,
         // (TradesWith, player1) is also added to player2.
-        player1.addRelation(tradesWithId, player2.id());
+        player1.add(tradesWithId, player2.id());
 
         // Check the relationship in both directions.
-        System.out.println("Player 1 trades with Player 2: " + (player1.hasRelation(tradesWithId, player2.id())));
-        System.out.println("Player 2 trades with Player 1: " + (player2.hasRelation(tradesWithId, player1.id())));
+        System.out.println("Player 1 trades with Player 2: " + (player1.has(tradesWithId, player2.id())));
+        System.out.println("Player 2 trades with Player 1: " + (player2.has(tradesWithId, player1.id())));
 
         world.destroy();
     }

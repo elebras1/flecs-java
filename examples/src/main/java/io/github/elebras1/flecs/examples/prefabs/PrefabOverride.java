@@ -22,8 +22,8 @@ public class PrefabOverride {
         long defenseId = world.component(Defense.class);
         long damageId = world.component(Damage.class);
 
-        world.obtainEntity(attackId).addRelation(Flecs.OnInstantiate, Flecs.Inherit);
-        world.obtainEntity(defenseId).addRelation(Flecs.OnInstantiate, Flecs.Inherit);
+        world.obtainEntity(attackId).add(Flecs.OnInstantiate, Flecs.Inherit);
+        world.obtainEntity(defenseId).add(Flecs.OnInstantiate, Flecs.Inherit);
 
         // Create a SpaceShip prefab.
         Entity spaceShip = world.obtainEntity(world.entity("SpaceShip"))
