@@ -65,15 +65,17 @@ public class Iter {
         assert (index >= 0 && index < 32) : "The field index must be between 0 and 31.";
 
         Field<T> field = (Field<T>) this.fields[index];
+        boolean shared = !flecs_h.ecs_field_is_self(this.iterSeg, (byte) index);
+        int fieldCount = shared ? 1 : this.count();
 
         if (field == null) {
             Component<T> component = this.world.componentRegistry().getComponent(componentClass);
             MemorySegment columnSeg = flecs_h.ecs_field_w_size(this.iterSeg, component.size(), (byte) index);
-            field = new Field<>(columnSeg, this.count(), this.world, componentClass);
+            field = new Field<>(columnSeg, fieldCount, this.world, componentClass, shared);
             this.fields[index] = field;
         } else {
             MemorySegment columnSeg = flecs_h.ecs_field_w_size(this.iterSeg, field.componentSize(), (byte) index);
-            field.reset(columnSeg, this.count());
+            field.reset(columnSeg, fieldCount, shared);
         }
 
         return field;
