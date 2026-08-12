@@ -364,7 +364,7 @@ public class Entity extends Id {
         ComponentView view = this.world.viewCache().getComponentView(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 
-        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
+        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
         if (address == 0) {
             return null;
@@ -383,7 +383,7 @@ public class Entity extends Id {
 
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
-        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
+        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, pairId);
 
         if (address == 0) {
             return null;
