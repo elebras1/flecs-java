@@ -15,7 +15,7 @@ public class SystemBuilder extends SystemBuilderBase {
     private IterCallback iterCallback;
     private RunCallback runCallback;
     private EntityCallback entityCallback;
-    private long phase = 0;
+    private long phase;
 
     public SystemBuilder(World world) {
         Arena arena = Arena.ofConfined();
@@ -26,6 +26,7 @@ public class SystemBuilder extends SystemBuilderBase {
             World worldStage = world.getStage(i);
             this.iters[i] = new Iter(MemorySegment.NULL, worldStage);
         }
+        this.phase = Flecs.OnUpdate;
     }
 
     public SystemBuilder(World world, String name) {
@@ -39,6 +40,13 @@ public class SystemBuilder extends SystemBuilderBase {
 
     public SystemBuilder kind(long phase) {
         this.phase = phase;
+        return this;
+    }
+
+    public SystemBuilder expr(String expr) {
+        MemorySegment exprSeg = this.arena.allocateFrom(expr);
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.expr(queryDescSeg, exprSeg);
         return this;
     }
 

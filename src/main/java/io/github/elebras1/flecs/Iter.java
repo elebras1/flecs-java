@@ -79,6 +79,11 @@ public class Iter {
         return field;
     }
 
+    public long fieldSource(int index) {
+        assert (index >= 0 && index < 32) : "The field index must be between 0 and 31.";
+        return flecs_h.ecs_field_src(this.iterSeg, (byte) index);
+    }
+
     public boolean isFieldSet(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 

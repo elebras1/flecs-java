@@ -19,6 +19,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
     private RunCallback runCallback;
     private EntityCallback entityCallback;
     private static final int MAX_EVENTS = 8;
+    private int selectedTerm;
 
     private ObserverBuilder(World world, Arena arena) {
         super(world, ecs_observer_desc_t.allocate(arena));
@@ -26,6 +27,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         this.iter = new Iter(MemorySegment.NULL, this.world);
         this.termCount = 0;
         this.eventCount = 0;
+        this.selectedTerm = -1;
     }
 
     public ObserverBuilder(World world) {
@@ -114,6 +116,56 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
         this.termCount++;
         return this;
+    }
+
+    public ObserverBuilder termAt(int index) {
+        if (index < 0 || index >= this.termCount) {
+            throw new IndexOutOfBoundsException("Invalid observer term index: " + index);
+        }
+        this.selectedTerm = index;
+        return this;
+    }
+
+    public ObserverBuilder second(long entityId) {
+        MemorySegment termSeg = this.term(indexForConfiguration());
+        MemorySegment secondSeg = ecs_term_t.second(termSeg);
+        ecs_term_ref_t.id(secondSeg, entityId);
+
+        long relationId = ecs_term_t.id(termSeg);
+        if (relationId == 0) {
+            relationId = ecs_term_ref_t.id(ecs_term_t.first(termSeg));
+        }
+        if (relationId != 0) {
+            ecs_term_t.id(termSeg, flecs_h.ecs_make_pair(relationId, entityId));
+        }
+        return this;
+    }
+
+    public ObserverBuilder second(Entity entity) {
+        return this.second(entity.id());
+    }
+
+    public <T> ObserverBuilder second(Class<T> componentClass) {
+        return this.second(this.world.componentRegistry().getComponentId(componentClass));
+    }
+
+    public ObserverBuilder second(String componentName) {
+        MemorySegment termSeg = this.term(indexForConfiguration());
+        MemorySegment secondRef = ecs_term_t.second(termSeg);
+        ecs_term_ref_t.name(secondRef, this.arena.allocateFrom(componentName));
+        return this;
+    }
+
+    private int indexForConfiguration() {
+        if (this.selectedTerm < 0) {
+            throw new IllegalStateException("Call termAt(index) before configuring a term");
+        }
+        return this.selectedTerm;
+    }
+
+    private MemorySegment term(int index) {
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        return ecs_query_desc_t.terms(queryDescSeg, index);
     }
 
     public ObserverBuilder with(String first, String second) {

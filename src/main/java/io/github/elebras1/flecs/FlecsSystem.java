@@ -31,11 +31,11 @@ public class FlecsSystem {
     }
 
     public void enable() {
-        this.entity.remove(Flecs.Disabled);
+        flecs_h.ecs_enable(this.world.worldSeg(), this.entity.id(), true);
     }
 
     public void disable() {
-        this.entity.add(Flecs.Disabled);
+        flecs_h.ecs_enable(this.world.worldSeg(), this.entity.id(), false);
     }
 
     public boolean isEnabled() {
