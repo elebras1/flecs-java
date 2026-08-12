@@ -268,7 +268,21 @@ public class Entity extends Id {
         view.setBaseAddress(dataSeg.address());
         consumer.accept(view);
 
-        flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, pairId);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ComponentView> Entity setSecond(Class<?> componentClass, long relationId, Consumer<T> consumer) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long size = this.world.componentRegistry().getComponent(componentClass).size();
+        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
+
+        MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size);
+
+        T view = (T) this.world.viewCache().getComponentView(componentClass);
+        view.setBaseAddress(dataSeg.address());
+        consumer.accept(view);
+
         return this;
     }
 
@@ -293,17 +307,56 @@ public class Entity extends Id {
     public <T> T get(Class<T> componentClass, long target) {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
-
         if (address == 0) {
             return null;
         }
 
         MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
         return component.read(dataSeg, 0);
+    }
+
+    public <T> T get(Class<T> componentClass, Class<?> targetClass) {
+        long targetId = this.world.componentRegistry().getComponentId(targetClass);
+        return this.get(componentClass, targetId);
+    }
+
+    public <T> T getSecond(Class<T> componentClass, long relationId) {
+        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long pairId = flecs_h.ecs_make_pair(relationId, componentId);
+
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
+        if (address == 0) {
+            return null;
+        }
+
+        MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
+        return component.read(dataSeg, 0);
+    }
+
+    public <T> T getSecond(Class<T> componentClass, Class<?> relationClass) {
+        long relationId = this.world.componentRegistry().getComponentId(relationClass);
+        return this.getSecond(componentClass, relationId);
+    }
+
+    public Entity modified(long first, long second) {
+        long pairId = flecs_h.ecs_make_pair(first, second);
+        flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, pairId);
+        return this;
+    }
+
+    public <T> Entity modified(Class<T> first, long second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        return this.modified(firstId, second);
+    }
+
+    public <A, B> Entity modified(Class<A> first, Class<B> second) {
+        long firstId = this.world.componentRegistry().getComponentId(first);
+        long secondId = this.world.componentRegistry().getComponentId(second);
+        return this.modified(firstId, secondId);
     }
 
     @SuppressWarnings("unchecked")
@@ -487,10 +540,7 @@ public class Entity extends Id {
     }
 
     public long lookup(String path) {
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment pathSeg = tempArena.allocateFrom(path);
-            return flecs_h.ecs_lookup_child(this.world.worldSeg(), this.id, pathSeg);
-        }
+        return this.lookup(path, false);
     }
 
     public long lookup(String path, boolean recursive) {
