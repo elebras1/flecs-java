@@ -30,12 +30,14 @@ public class Id {
 
     public long first() {
         assert isPair() : "Invalid pair : " + this.id;
-        return (this.id & flecs_h.ECS_COMPONENT_MASK())  >>> 32;
+        long raw = (this.id & flecs_h.ECS_COMPONENT_MASK()) >>> 32;
+        return flecs_h.ecs_get_alive(this.world.worldSeg(), raw);
     }
 
     public long second() {
         assert isPair() : "Invalid pair : " + this.id;
-        return (this.id & flecs_h.ECS_COMPONENT_MASK()) & 0xFFFFFFFFL;
+        long raw = (this.id & flecs_h.ECS_COMPONENT_MASK()) & 0xFFFFFFFFL;
+        return flecs_h.ecs_get_alive(this.world.worldSeg(), raw);
     }
 
     public long addFlags(long flags) {
