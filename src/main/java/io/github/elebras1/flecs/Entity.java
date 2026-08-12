@@ -587,6 +587,11 @@ public class Entity extends Id {
         }
     }
 
+    public Type type() {
+        MemorySegment typeSeg = flecs_h.ecs_get_type(this.world.worldSeg(), this.id);
+        return new Type(this.world, typeSeg);
+    }
+
     public Table table() {
         MemorySegment tableSeg = flecs_h.ecs_get_table(this.world.worldSeg(), this.id);
         if (tableSeg.address() == 0) {

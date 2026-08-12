@@ -26,17 +26,9 @@ public class Table {
         this.tableSeg = tableSeg;
     }
 
-    public long[] type() {
+    public Type type() {
         MemorySegment typeSeg = flecs_h.ecs_table_get_type(this.tableSeg);
-        if (typeSeg.address() == 0) {
-            return new long[0];
-        }
-        MemorySegment arraySeg = ecs_type_t.array(typeSeg);
-        int count = ecs_type_t.count(typeSeg);
-        if (arraySeg.address() == 0 || count == 0) {
-            return new long[0];
-        }
-        return arraySeg.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
+        return new Type(this.world, typeSeg);
     }
 
     public int count() {

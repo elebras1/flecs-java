@@ -123,6 +123,15 @@ public class Iter {
         return ecs_iter_t.event(this.iterSeg);
     }
 
+    public Type type() {
+        MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
+        if (tableSeg.address() == 0) {
+            return new Type(this.world, MemorySegment.NULL);
+        }
+        MemorySegment typeSeg = flecs_h.ecs_table_get_type(tableSeg);
+        return new Type(this.world, typeSeg);
+    }
+
     public Table table() {
         MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
         if (tableSeg.address() == 0) {
