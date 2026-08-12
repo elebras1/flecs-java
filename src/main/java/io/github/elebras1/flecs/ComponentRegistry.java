@@ -4,6 +4,7 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.collection.ClassLongMap;
 import io.github.elebras1.flecs.collection.LongClassMap;
 import io.github.elebras1.flecs.collection.LongObjectMap;
+import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -35,7 +36,7 @@ public class ComponentRegistry {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment symbolSegment = tempArena.allocateFrom(symbol);
 
-            long componentId = flecs_h.ecs_lookup_symbol(this.world.worldSeg(), symbolSegment, true, true);
+            long componentId = flecs_h.ecs_lookup_symbol(this.world.worldSeg(), symbolSegment, false, false);
 
             if (componentId == 0) {
                 MemorySegment nameSegment = tempArena.allocateFrom(simpleName);
@@ -43,8 +44,13 @@ public class ComponentRegistry {
                 MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
                 ecs_entity_desc_t.name(entityDesc, nameSegment);
                 ecs_entity_desc_t.symbol(entityDesc, symbolSegment);
+                long scope = flecs_h.ecs_get_scope(this.world.worldSeg());
+                ecs_entity_desc_t.parent(entityDesc, scope);
 
                 long entityId = flecs_h.ecs_entity_init(this.world.worldSeg(), entityDesc);
+                if (scope != 0) {
+                    flecs_h.ecs_add_id(this.world.worldSeg(), entityId, flecs_h.ecs_make_pair(Flecs.ChildOf, scope));
+                }
 
                 MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
                 ecs_component_desc_t.entity(componentDesc, entityId);
