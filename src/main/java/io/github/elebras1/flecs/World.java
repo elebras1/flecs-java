@@ -26,6 +26,7 @@ public class World {
     private World[] stages;
     private final boolean owned;
     private boolean destroyed;
+    private long importingModule;
     private Object ctx;
 
     static {
@@ -45,6 +46,7 @@ public class World {
         this.context = new FlecsContext(this);
         this.stages = new World[] { this };
         this.destroyed = false;
+        this.importingModule = 0;
         this.owned = true;
     }
 
@@ -57,38 +59,38 @@ public class World {
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.destroyed = false;
+        this.importingModule = 0;
         this.owned = false;
     }
 
     public long entity() {
         this.checkDestroyed();
-        return flecs_h.ecs_new(this.worldSeg);
+        return flecs_h.ecs_cpp_new(this.worldSeg, 0, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
     }
 
     public long entity(long parentId) {
-        long id = flecs_h.ecs_new(this.worldSeg);
-        MemorySegment dataSegment = this.getComponentBuffer(EcsParent.sizeof());
-        EcsParent.value(dataSegment, parentId);
-        flecs_h.ecs_set_id(this.worldSeg, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSegment);
-        return id;
+        this.checkDestroyed();
+        return flecs_h.ecs_new_w_parent(this.worldSeg, parentId, MemorySegment.NULL);
     }
 
     public long entity(String name) {
         this.checkDestroyed();
-        MemorySegment nameSegment = this.buffers.stringRing().set(name);
 
+        MemorySegment nameSegment = this.buffers.stringRing().set(name);
+        MemorySegment separator = this.buffers.stringRing().set("::");
+        MemorySegment rootSeparator = this.buffers.stringRing().set("::");
         MemorySegment descSeg = this.buffers.entityDescBuffer().get();
         ecs_entity_desc_t.name(descSeg, nameSegment);
+        ecs_entity_desc_t.sep(descSeg, separator);
+        ecs_entity_desc_t.root_sep(descSeg, rootSeparator);
 
         return flecs_h.ecs_entity_init(this.worldSeg, descSeg);
     }
 
     public long entity(long parentId, String name) {
-        long id = this.entity(name);
-        MemorySegment dataSeg = this.getComponentBuffer(EcsParent.sizeof());
-        EcsParent.value(dataSeg, parentId);
-        flecs_h.ecs_set_id(this.worldSeg, id, flecs_h_1.FLECS_IDEcsParentID_(), EcsParent.sizeof(), dataSeg);
-        return id;
+        this.checkDestroyed();
+         MemorySegment nameSegment = name == null ? MemorySegment.NULL : this.buffers.stringRing().set(name);
+         return flecs_h.ecs_new_w_parent(this.worldSeg, parentId, nameSegment);
     }
 
     public Entity obtainEntity(long entityId) {
@@ -103,7 +105,6 @@ public class World {
     }
 
     public Id obtainId(long id) {
-        assert id >= 0 : "Invalid ID: " + id;
         return new Id(this, id);
     }
 
@@ -269,6 +270,27 @@ public class World {
         this.checkDestroyed();
         long componentId = this.componentRegistry.getComponentId(componentClass);
         return flecs_h.ecs_count_id(this.worldSeg, componentId);
+    }
+
+    public int count(long first, long second) {
+        this.checkDestroyed();
+        long pairId = flecs_h.ecs_make_pair(first, second);
+        return flecs_h.ecs_count_id(this.worldSeg, pairId);
+    }
+
+    public int count(Entity first, Entity second) {
+        return this.count(first.id(), second.id());
+    }
+
+    public <T> int count(Class<T> first, long second) {
+        long firstId = this.componentRegistry.getComponentId(first);
+        return this.count(firstId, second);
+    }
+
+    public <A, B> int count(Class<A> first, Class<B> second) {
+        long firstId = this.componentRegistry.getComponentId(first);
+        long secondId = this.componentRegistry.getComponentId(second);
+        return this.count(firstId, secondId);
     }
 
     public void deleteWith(Class<?> componentClass) {
@@ -788,6 +810,13 @@ public class World {
     }
 
     public Entity module(FlecsModule module) {
+        this.checkDestroyed();
+
+        long scope = flecs_h.ecs_get_scope(this.worldSeg);
+        if (scope != 0 && scope == this.importingModule) {
+            return new Entity(this, scope);
+        }
+
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment nameSeg = arena.allocateFrom(module.name());
 
@@ -802,22 +831,32 @@ public class World {
     }
 
     public Entity importModule(FlecsModule module) {
+        this.checkDestroyed();
+
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment nameSeg = arena.allocateFrom(module.name());
-            long existing = flecs_h.ecs_lookup(this.worldSeg, nameSeg);
+            int moduleCount = flecs_h.ecs_count_id(this.worldSeg, Flecs.Module);
 
-            if (existing != 0) {
-                return new Entity(this, existing);
+            MemorySegment descSeg = ecs_component_desc_t.allocate(arena);
+            ecs_component_desc_t.entity(descSeg, 0);
+            long moduleEntity = flecs_h.ecs_module_init(this.worldSeg, nameSeg, descSeg);
+            if (moduleEntity == 0) {
+                throw new IllegalStateException("Failed to initialize module: " + module.name());
             }
 
-            long previousScope = flecs_h.ecs_get_scope(this.worldSeg);
+            if (flecs_h.ecs_count_id(this.worldSeg, Flecs.Module) == moduleCount) {
+                return new Entity(this, moduleEntity);
+            }
+
+            long previousScope = flecs_h.ecs_set_scope(this.worldSeg, moduleEntity);
+            this.importingModule = moduleEntity;
             try {
                 module.initModule(this);
             } finally {
+                this.importingModule = 0;
                 flecs_h.ecs_set_scope(this.worldSeg, previousScope);
             }
 
-            long moduleEntity = flecs_h.ecs_lookup(this.worldSeg, nameSeg);
             return new Entity(this, moduleEntity);
         }
     }

@@ -38764,7 +38764,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_entity_init");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
