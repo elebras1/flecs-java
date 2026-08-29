@@ -232,6 +232,15 @@ public class World {
         return new QueryBuilder(this);
     }
 
+    public Query query(Class<?>... componentClasses) {
+        this.checkDestroyed();
+        QueryBuilder queryBuilder = new QueryBuilder(this);
+        for(Class<?> componentClass : componentClasses) {
+            queryBuilder.with(componentClass);
+        }
+        return queryBuilder.build();
+    }
+
     public Query query(String expr) {
         this.checkDestroyed();
         return this.query().expr(expr).build();
@@ -336,9 +345,27 @@ public class World {
         return new SystemBuilder(this);
     }
 
+    public SystemBuilder system(Class<?>... componentClasses) {
+        this.checkDestroyed();
+        SystemBuilder systemBuilder = new SystemBuilder(this);
+        for (Class<?> componentClass : componentClasses) {
+            systemBuilder.with(componentClass);
+        }
+        return systemBuilder;
+    }
+
     public SystemBuilder system(String name) {
         this.checkDestroyed();
         return new SystemBuilder(this, name);
+    }
+
+    public SystemBuilder system(String name, Class<?>... componentClasses) {
+        this.checkDestroyed();
+        SystemBuilder systemBuilder = new SystemBuilder(this, name);
+        for (Class<?> componentClass : componentClasses) {
+            systemBuilder.with(componentClass);
+        }
+        return systemBuilder;
     }
 
     public ObserverBuilder observer() {
@@ -346,14 +373,27 @@ public class World {
         return new ObserverBuilder(this);
     }
 
+    public ObserverBuilder observer(Class<?>... componentClasses) {
+        this.checkDestroyed();
+        ObserverBuilder observerBuilder = new ObserverBuilder(this);
+        for (Class<?> componentClass : componentClasses) {
+            observerBuilder.with(componentClass);
+        }
+        return observerBuilder;
+    }
+
     public ObserverBuilder observer(String name) {
         this.checkDestroyed();
         return new ObserverBuilder(this, name);
     }
 
-    public <T> ObserverBuilder observer(Class<T> componentClass) {
+    public ObserverBuilder observer(String name, Class<?>... componentClasses) {
         this.checkDestroyed();
-        return new ObserverBuilder(this).with(componentClass);
+        ObserverBuilder observerBuilder = new ObserverBuilder(this, name);
+        for (Class<?> componentClass : componentClasses) {
+            observerBuilder.with(componentClass);
+        }
+        return observerBuilder;
     }
 
     public TimerBuilder timer() {

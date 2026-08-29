@@ -697,7 +697,7 @@ class PairsTest {
     @Test
     void modifiedTagSecond() {
         AtomicInteger count = new AtomicInteger();
-        world.observer(Position.class)
+        world.observer(Position.class, Tag.class)
                 .termAt(0).second(Tag.class)
                 .event(Flecs.OnSet)
                 .iter(it -> {

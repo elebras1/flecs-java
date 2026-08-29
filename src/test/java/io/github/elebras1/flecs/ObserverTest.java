@@ -46,9 +46,8 @@ class ObserverTest {
     @Test
     void onRemove() {
         AtomicInteger count = new AtomicInteger();
-        this.world.observer()
+        this.world.observer(Position.class)
                 .event(Flecs.OnRemove)
-                .with(Position.class)
                 .each(entityId -> count.incrementAndGet());
 
         Entity e = this.world.obtainEntity(this.world.entity()).add(Position.class);

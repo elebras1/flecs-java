@@ -85,6 +85,16 @@ class WorldFactoryTest {
     }
 
     @Test
+    void systemWithNameAndComponents() {
+        FlecsSystem sys = this.world.system("MySystem", Position.class, Velocity.class)
+                .each(entityId -> {
+                });
+
+        assertTrue(sys.id() != 0);
+        assertEquals("MySystem", sys.entity().name());
+    }
+
+    @Test
     void query() {
         Entity entity = this.world.obtainEntity(this.world.entity())
                 .set(new Position(10, 20))
@@ -117,6 +127,32 @@ class WorldFactoryTest {
                 .set(new Velocity(1, 2));
 
         Query query = this.world.query("Position, [in] Velocity");
+
+        query.iter(it -> {
+            Field<Position> positions = it.field(Position.class, 0);
+            Field<Velocity> velocities = it.field(Velocity.class, 1);
+            for (int i = 0; i < it.count(); i++) {
+                Position p = positions.get(i);
+                Velocity v = velocities.get(i);
+                positions.set(i, new Position(p.x() + v.x(), p.y() + v.y()));
+            }
+        });
+
+        Position p = entity.get(Position.class);
+        assertNotNull(p);
+        assertEquals(11.0f, p.x());
+        assertEquals(22.0f, p.y());
+
+        query.destroy();
+    }
+
+    @Test
+    void queryWithComponents() {
+        Entity entity = this.world.obtainEntity(this.world.entity())
+                .set(new Position(10, 20))
+                .set(new Velocity(1, 2));
+
+        Query query = this.world.query(Position.class, Velocity.class);
 
         query.iter(it -> {
             Field<Position> positions = it.field(Position.class, 0);
