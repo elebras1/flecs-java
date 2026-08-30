@@ -256,6 +256,15 @@ class WorldTest {
     }
 
     @Test
+    void getRef() {
+        long componentId = this.world.getComponentId(Position.class);
+        Ref<Position> ref = this.world.getRef(Position.class);
+        assertNotNull(ref);
+        assertEquals(componentId, ref.component());
+        ref.destroy();
+    }
+
+    @Test
     void setGetContext() {
         Object ctx = new Object();
         this.world.setCtx(ctx);

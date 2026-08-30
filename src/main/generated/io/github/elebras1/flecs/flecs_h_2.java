@@ -40105,7 +40105,7 @@ class flecs_h_2 extends flecs_h$shared {
 
     private static class ecs_ref_get_id {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            flecs_h.C_POINTER,
+            flecs_h.C_LONG,
             flecs_h.C_POINTER,
             flecs_h.C_POINTER,
             flecs_h.C_LONG
@@ -40151,13 +40151,13 @@ class flecs_h_2 extends flecs_h$shared {
      * void *ecs_ref_get_id(const ecs_world_t *world, ecs_ref_t *ref, ecs_id_t component)
      * }
      */
-    public static MemorySegment ecs_ref_get_id(MemorySegment world, MemorySegment ref, long component) {
+    public static long ecs_ref_get_id(MemorySegment world, MemorySegment ref, long component) {
         var mh$ = ecs_ref_get_id.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ref_get_id", world, ref, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, ref, component);
+            return (long)mh$.invokeExact(world, ref, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {

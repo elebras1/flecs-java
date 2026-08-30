@@ -513,6 +513,11 @@ public class World {
         flecs_h.ecs_set_target_fps(this.worldSeg, fps);
     }
 
+    public <T> Ref<T> getRef(Class<T> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return new Ref<>(this, componentId, componentClass);
+    }
+
     public FlecsInfo getInfo() {
         this.checkDestroyed();
 

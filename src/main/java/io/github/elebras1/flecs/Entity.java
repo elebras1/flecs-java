@@ -404,6 +404,20 @@ public class Entity extends Id {
         return (T) view;
     }
 
+    public <T> Ref<T> getRef(Class<T> componentClass) {
+        return new Ref<>(this.world, this.id, componentClass);
+    }
+
+    public <T> Ref<T> getRef(Class<T> componentClass, long target) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long pairId = flecs_h.ecs_make_pair(componentId, target);
+        return new Ref<>(this.world, this.id, pairId, componentClass);
+    }
+
+    public <T> Ref<T> getRef(Class<T> componentClass, Entity target) {
+        return this.getRef(componentClass, target.id());
+    }
+
     public void enable() {
         flecs_h.ecs_enable(this.world.worldSeg(), this.id, true);
     }

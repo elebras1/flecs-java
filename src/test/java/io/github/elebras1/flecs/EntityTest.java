@@ -317,6 +317,21 @@ class EntityTest {
     }
 
     @Test
+    void getRef() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+        Ref<Position> ref = entity.getRef(Position.class);
+        assertNotNull(ref);
+        assertEquals(entity.id(), ref.entity());
+        assertEquals(this.world.getComponentId(Position.class), ref.component());
+        assertTrue(ref.has());
+        Position p = ref.get();
+        assertNotNull(p);
+        assertEquals(10.0f, p.x());
+        assertEquals(20.0f, p.y());
+        ref.destroy();
+    }
+
+    @Test
     void table() {
         Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
         Table table = entity.table();
