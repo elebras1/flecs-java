@@ -9,7 +9,7 @@ import java.lang.foreign.ValueLayout;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
-public class Entity extends Id {
+public class Entity extends EntityBase<Entity> {
 
     Entity(World world, long id) {
         super(world, id);
@@ -222,21 +222,6 @@ public class Entity extends Id {
         component.write(dataSeg, 0, data);
         flecs_h.ecs_set_id(this.world.worldSeg(), this.id, componentId, component.size(), dataSeg);
 
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends ComponentView> Entity insert(Class<?> componentClass, Consumer<T> consumer) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        long size = this.world.componentRegistry().getComponent(componentClass).size();
-
-        MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentId, size);
-
-        T view = (T) this.world.viewCache().getComponentView(componentClass);
-        view.setBaseAddress(dataSeg.address());
-        consumer.accept(view);
-
-        flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
         return this;
     }
 

@@ -4,6 +4,7 @@ import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
+import io.github.elebras1.flecs.component.VelocityView;
 import io.github.elebras1.flecs.util.Flecs;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -416,6 +417,77 @@ class EntityTest {
         assertNotNull(p);
         assertEquals(10.0f, p.x());
         assertEquals(20.0f, p.y());
+    }
+
+    @Test
+    void insertMultiple() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        entity.insert(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+            pos.x(10);
+            pos.y(20);
+            vel.x(1);
+            vel.y(2);
+        });
+
+        assertTrue(entity.has(Position.class));
+        assertTrue(entity.has(Velocity.class));
+
+        Position p = entity.get(Position.class);
+        assertNotNull(p);
+        assertEquals(10.0f, p.x());
+        assertEquals(20.0f, p.y());
+
+        Velocity v = entity.get(Velocity.class);
+        assertNotNull(v);
+        assertEquals(1.0f, v.x());
+        assertEquals(2.0f, v.y());
+    }
+
+    @Test
+    void insertOnExistingComponents() {
+        Entity entity = this.world.obtainEntity(this.world.entity())
+                .set(new Position(1, 2));
+
+        entity.insert(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+            pos.x(10);
+            pos.y(20);
+            vel.x(3);
+            vel.y(4);
+        });
+
+        Position p = entity.get(Position.class);
+        assertEquals(10.0f, p.x());
+        assertEquals(20.0f, p.y());
+
+        Velocity v = entity.get(Velocity.class);
+        assertEquals(3.0f, v.x());
+        assertEquals(4.0f, v.y());
+    }
+
+    @Test
+    void insertDeferred() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+
+        this.world.deferBegin();
+        entity.insert(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+            pos.x(10);
+            pos.y(20);
+            vel.x(1);
+            vel.y(2);
+        });
+
+        assertFalse(entity.has(Position.class));
+        assertFalse(entity.has(Velocity.class));
+        this.world.deferEnd();
+
+        assertTrue(entity.has(Position.class));
+        assertTrue(entity.has(Velocity.class));
+        Position p = entity.get(Position.class);
+        assertEquals(10.0f, p.x());
+        assertEquals(20.0f, p.y());
+        Velocity v = entity.get(Velocity.class);
+        assertEquals(1.0f, v.x());
+        assertEquals(2.0f, v.y());
     }
 
     @Test

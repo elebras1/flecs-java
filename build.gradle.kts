@@ -218,11 +218,11 @@ val validateGeneratedBindings by tasks.registering {
 
 val generatorSourcesDir = file("src/generator/java")
 
-val generateIterationBase by tasks.registering(JavaExec::class) {
-    description = "Generate QueryBase, SystemBuilderBase, ObserverBuilderBase and all typed iteration callback interfaces"
+val generateBase by tasks.registering(JavaExec::class) {
+    description = "Generate callback interfaces, QueryBase, SystemBuilderBase, ObserverBuilderBase and EntityBase"
     group = "flecs"
     classpath = sourceSets["generator"].runtimeClasspath
-    mainClass.set("io.github.elebras1.flecs.IterationBaseGenerator")
+    mainClass.set("io.github.elebras1.flecs.GenerateAll")
     args(generatedSourcesDir.absolutePath)
     outputs.dir(generatedSourcesDir)
     doFirst {
