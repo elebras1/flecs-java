@@ -137,7 +137,7 @@ public class ComponentRegistry {
         long id = this.componentIds.get(componentClass);
 
         if (id <= 0) {
-            throw new IllegalArgumentException("Component not registered: " + componentClass.getName());
+            id = this.register(componentClass);
         }
 
         return id;

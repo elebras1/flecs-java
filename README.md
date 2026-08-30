@@ -23,8 +23,6 @@ record Position(float x, float y) {}
 record Velocity(float dx, float dy) {}
 
 World world = new World();
-world.component(Position.class);
-world.component(Velocity.class);
 
 Entity player = world.obtainEntity(world.entity("Player"));
 player.set(new Position(0, 0)).set(new Velocity(1, 0));
