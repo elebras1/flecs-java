@@ -86,11 +86,8 @@ public class ComponentRegistry {
 
         List<MemoryLayout> memberLayouts = group.memberLayouts();
         long realMemberCount = memberLayouts.stream().filter(memoryLayout -> memoryLayout.name().isPresent()).count();
-        if (realMemberCount == 0) {
+        if (realMemberCount == 0 || realMemberCount > flecs_h.ECS_MEMBER_DESC_CACHE_SIZE()) {
             return;
-        }
-        if (realMemberCount > flecs_h.ECS_MEMBER_DESC_CACHE_SIZE()) {
-            throw new IllegalStateException("Too many members in component layout: " + realMemberCount + ". Maximum allowed is " + flecs_h.ECS_MEMBER_DESC_CACHE_SIZE());
         }
 
         MemorySegment structDesc = ecs_struct_desc_t.allocate(tempArena);
