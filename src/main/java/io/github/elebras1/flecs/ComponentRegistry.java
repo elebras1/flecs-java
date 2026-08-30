@@ -1,13 +1,18 @@
 package io.github.elebras1.flecs;
 
-
 import io.github.elebras1.flecs.collection.ClassLongMap;
 import io.github.elebras1.flecs.collection.LongClassMap;
 import io.github.elebras1.flecs.collection.LongObjectMap;
 import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.GroupLayout;
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemoryLayout.PathElement;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SequenceLayout;
+import java.lang.foreign.ValueLayout;
+import java.util.List;
 
 public class ComponentRegistry {
 
@@ -64,6 +69,8 @@ public class ComponentRegistry {
                 if (componentId == 0) {
                     throw new IllegalStateException("Failed to register component: " + symbol);
                 }
+
+                this.registerReflectionData(tempArena, componentId, component.layout());
             }
 
             this.componentIds.put(componentClass, componentId);
@@ -71,6 +78,60 @@ public class ComponentRegistry {
             return componentId;
         }
     }
+
+    private void registerReflectionData(Arena tempArena, long componentId, MemoryLayout layout) {
+        if (!(layout instanceof GroupLayout group)) {
+            return;
+        }
+
+        List<MemoryLayout> memberLayouts = group.memberLayouts();
+        long realMemberCount = memberLayouts.stream().filter(memoryLayout -> memoryLayout.name().isPresent()).count();
+        if (realMemberCount == 0) {
+            return;
+        }
+        if (realMemberCount > flecs_h.ECS_MEMBER_DESC_CACHE_SIZE()) {
+            throw new IllegalStateException("Too many members in component layout: " + realMemberCount + ". Maximum allowed is " + flecs_h.ECS_MEMBER_DESC_CACHE_SIZE());
+        }
+
+        MemorySegment structDesc = ecs_struct_desc_t.allocate(tempArena);
+        ecs_struct_desc_t.entity(structDesc, componentId);
+
+        MemorySegment members = ecs_struct_desc_t.members(structDesc);
+        long memberDescSize = ecs_member_t.sizeof();
+
+        int i = 0;
+        for (MemoryLayout member : memberLayouts) {
+            if (member.name().isEmpty()) {
+                continue;
+            }
+            String fieldName = member.name().get();
+            long offset = group.byteOffset(PathElement.groupElement(fieldName));
+
+            int count;
+            MemoryLayout elementLayout;
+            if (member instanceof SequenceLayout sequenceLayout) {
+                count = (int) sequenceLayout.elementCount();
+                elementLayout = sequenceLayout.elementLayout();
+            } else {
+                count = 0;
+                elementLayout = member;
+            }
+
+            MemorySegment memberDesc = members.asSlice(i * memberDescSize, memberDescSize);
+            ecs_member_t.name(memberDesc, tempArena.allocateFrom(fieldName));
+            ecs_member_t.type(memberDesc, resolveFlecsPrimitive(elementLayout));
+            ecs_member_t.count(memberDesc, count);
+            ecs_member_t.offset(memberDesc, (int) offset);
+            ecs_member_t.use_offset(memberDesc, true);
+            i++;
+        }
+
+        long structId = flecs_h.ecs_struct_init(this.world.worldSeg(), structDesc);
+        if (structId == 0) {
+            throw new IllegalStateException("Failed to register reflection data for component id: " + componentId);
+        }
+    }
+
 
     protected <T> long getComponentId(Class<T> componentClass) {
         long id = this.componentIds.get(componentClass);
@@ -120,5 +181,19 @@ public class ComponentRegistry {
 
     private <T> Component<T> getComponentInstance(Class<T> componentClass) {
         return ComponentMap.getInstance(componentClass);
+    }
+
+    private static long resolveFlecsPrimitive(MemoryLayout elementLayout) {
+        return switch (elementLayout) {
+            case ValueLayout.OfBoolean _ -> flecs_h.FLECS_IDecs_bool_tID_();
+            case ValueLayout.OfByte _ -> flecs_h.FLECS_IDecs_byte_tID_();
+            case ValueLayout.OfChar _ -> flecs_h.FLECS_IDecs_char_tID_();
+            case ValueLayout.OfShort _ -> flecs_h.FLECS_IDecs_i16_tID_();
+            case ValueLayout.OfInt _ -> flecs_h.FLECS_IDecs_i32_tID_();
+            case ValueLayout.OfLong _ -> flecs_h.FLECS_IDecs_i64_tID_();
+            case ValueLayout.OfFloat _ -> flecs_h.FLECS_IDecs_f32_tID_();
+            case ValueLayout.OfDouble _ -> flecs_h.FLECS_IDecs_f64_tID_();
+            default -> throw new IllegalStateException("Unsupported member layout for flecs reflection: " + elementLayout);
+        };
     }
 }
