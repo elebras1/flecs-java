@@ -342,6 +342,16 @@ public class Entity extends Id {
         return this.getSecond(componentClass, relationId);
     }
 
+    public Entity modified(long componentId) {
+        flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
+        return this;
+    }
+
+    public <T> Entity modified(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.modified(componentId);
+    }
+
     public Entity modified(long first, long second) {
         long pairId = flecs_h.ecs_make_pair(first, second);
         flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, pairId);
