@@ -289,6 +289,55 @@ public class Entity extends EntityBase<Entity> {
         return this.add(Flecs.IsA, entity.id());
     }
 
+    public Entity dependsOn(long entityId) {
+        return this.add(Flecs.DependsOn, entityId);
+    }
+
+    public Entity dependsOn(Entity entity) {
+        return this.add(Flecs.DependsOn, entity.id());
+    }
+
+    public <T> Entity dependsOn(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.dependsOn(componentId);
+    }
+
+    public Entity setAlias(String alias) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            flecs_h.ecs_set_alias(this.world.worldSeg(), this.id, tempArena.allocateFrom(alias));
+        }
+        return this;
+    }
+
+    public long targetFor(long relationId, long componentId) {
+        return flecs_h.ecs_get_target_for_id(this.world.worldSeg(), this.id, relationId, componentId);
+    }
+
+    public long targetFor(Entity relation, long componentId) {
+        return this.targetFor(relation.id(), componentId);
+    }
+
+    public <T> long targetFor(long relationId, Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.targetFor(relationId, componentId);
+    }
+
+    public boolean hasSecond(long firstId, long secondId) {
+        return this.has(firstId, secondId);
+    }
+
+    public boolean ownsSecond(long firstId, long secondId) {
+        return this.owns(flecs_h.ecs_make_pair(firstId, secondId));
+    }
+
+    public boolean addIf(boolean condition, long entityId) {
+        if (condition) {
+            this.add(entityId);
+            return true;
+        }
+        return false;
+    }
+
     public Entity slotOf(long targetId) {
         return this.add(Flecs.SlotOf, targetId);
     }

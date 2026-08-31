@@ -96,6 +96,32 @@ public class Iter {
         return (setFields & (1 << index)) != 0;
     }
 
+    public boolean isSelf(int index) {
+        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        return flecs_h.ecs_field_is_self(this.iterSeg, (byte) index);
+    }
+
+    public boolean isReadonly(int index) {
+        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        return flecs_h.ecs_field_is_readonly(this.iterSeg, (byte) index);
+    }
+
+    public boolean changed() {
+        return flecs_h.ecs_iter_changed(this.iterSeg);
+    }
+
+    public void skip() {
+        flecs_h.ecs_iter_skip(this.iterSeg);
+    }
+
+    public Table otherTable() {
+        MemorySegment tableSeg = ecs_iter_t.other_table(this.iterSeg);
+        if (tableSeg == null || tableSeg.address() == 0) {
+            return null;
+        }
+        return new Table(this.world, tableSeg);
+    }
+
     public long termId(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 

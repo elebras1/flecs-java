@@ -261,4 +261,18 @@ class QueryBuilderTest {
         assertEquals(1, query.count());
         query.destroy();
     }
+
+    @Test
+    void termAt() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).set(new Velocity(1, 2));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Velocity.class)
+                .termAt(0).in()
+                .termAt(1).out()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
 }

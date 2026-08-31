@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -182,6 +183,80 @@ class WorldTest {
         assertFalse(this.world.obtainEntity(e1).isAlive());
         assertFalse(this.world.obtainEntity(e2).isAlive());
         assertFalse(this.world.obtainEntity(e3).isAlive());
+    }
+
+    @Test
+    void removeAll() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+        this.world.obtainEntity(this.world.entity()).set(new Position(5, 6));
+        assertEquals(3, this.world.count(Position.class));
+
+        this.world.removeAll(Position.class);
+        assertEquals(0, this.world.count(Position.class));
+    }
+
+    @Test
+    void setWith() {
+        this.world.setWith(Position.class);
+        try {
+            long entityId = this.world.entity();
+            assertTrue(this.world.obtainEntity(entityId).has(Position.class));
+        } finally {
+            this.world.setWith(0);
+        }
+    }
+
+    @Test
+    void runPostFrame() {
+        AtomicBoolean ran = new AtomicBoolean(false);
+        this.world.runPostFrame(() -> ran.set(true));
+
+        this.world.progress();
+        this.world.progress();
+
+        assertTrue(ran.get());
+    }
+
+    @Test
+    void atfini() {
+        AtomicBoolean ran = new AtomicBoolean(false);
+        this.world.atfini(() -> ran.set(true));
+        this.world.destroy();
+        assertTrue(ran.get());
+
+        // destroy() ran, re-create a world so the teardown stays safe
+        this.world = new World();
+    }
+
+    @Test
+    void rangeSet() {
+        this.world.rangeSet(100, 200, 100);
+
+        long e1 = this.world.entity();
+        assertTrue(e1 >= 100 && e1 <= 200);
+    }
+
+    @Test
+    void stripGeneration() {
+        // generation bits live in bits 32-47: (gen << 32) | index
+        long stripped = this.world.stripGeneration(0x1_0000_0010L);
+        assertEquals(0x10, stripped);
+    }
+
+    @Test
+    void typeInfo() {
+        TypeInfo info = this.world.typeInfo(Position.class);
+        assertNotNull(info);
+        assertEquals(Float.BYTES * 2, info.size());
+        assertNotNull(info.name());
+    }
+
+    @Test
+    void singleton() {
+        Entity singleton = this.world.singleton(Position.class);
+        assertNotNull(singleton);
+        assertEquals(this.world.getComponentId(Position.class), singleton.id());
     }
 
     @Test

@@ -408,4 +408,56 @@ class QueryTest {
 
         query.destroy();
     }
+
+    @Test
+    void iterFieldSelfAndReadonly() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        query.run(it -> {
+            while (it.next()) {
+                assertTrue(it.isFieldSet(0));
+                assertTrue(it.isSelf(0));
+                assertFalse(it.isReadonly(0));
+            }
+        });
+        query.destroy();
+    }
+
+    @Test
+    void iterSkip() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+
+        Query query = this.world.query(Position.class);
+        AtomicInteger count = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                count.incrementAndGet();
+                it.skip();
+            }
+        });
+        assertEquals(1, count.get());
+        query.destroy();
+    }
+
+    @Test
+    void iterChanged() {
+        Query query = this.world.query(Position.class);
+
+        AtomicInteger changedCount = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                if (it.changed()) {
+                    changedCount.incrementAndGet();
+                }
+            }
+        });
+        assertEquals(0, changedCount.get());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        assertEquals(1, this.world.count(Position.class));
+        query.destroy();
+    }
+
 }

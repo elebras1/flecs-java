@@ -102,6 +102,54 @@ class EntityTest {
     }
 
     @Test
+    void dependsOn() {
+        long target = this.world.entity();
+        Entity entity = this.world.obtainEntity(this.world.entity()).dependsOn(target);
+        assertTrue(entity.has(Flecs.DependsOn, target));
+    }
+
+    @Test
+    void dependsOnComponent() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).dependsOn(Position.class);
+        assertTrue(entity.has(Flecs.DependsOn, this.world.getComponentId(Position.class)));
+    }
+
+    @Test
+    void setAlias() {
+        Entity entity = this.world.obtainEntity(this.world.entity("B"));
+        entity.setAlias("AliasB");
+        // aliases are indexed for lookup (no public getter in C++ either)
+        assertEquals(entity.id(), this.world.lookup("AliasB"));
+    }
+
+    @Test
+    void targetFor() {
+        long rel = this.world.entity();
+        long obj = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).id();
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(rel, obj);
+
+        long positionId = this.world.getComponentId(Position.class);
+        assertEquals(obj, entity.targetFor(rel, positionId));
+    }
+
+    @Test
+    void addIf() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        assertTrue(entity.addIf(true, Flecs.Prefab));
+        assertTrue(entity.has(Flecs.Prefab));
+        assertFalse(entity.addIf(false, Flecs.Prefab));
+    }
+
+    @Test
+    void hasSecondAndOwnsSecond() {
+        long rel = this.world.entity();
+        long obj = this.world.entity();
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(rel, obj);
+        assertTrue(entity.hasSecond(rel, obj));
+        assertTrue(entity.ownsSecond(rel, obj));
+    }
+
+    @Test
     void remove() {
         Entity entity = this.world.obtainEntity(this.world.entity()).add(Position.class);
         assertTrue(entity.has(Position.class));

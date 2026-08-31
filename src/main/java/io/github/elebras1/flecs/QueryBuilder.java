@@ -8,7 +8,6 @@ import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 
 public class QueryBuilder {
 
@@ -16,6 +15,7 @@ public class QueryBuilder {
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount = 0;
+    private int selectedTerm = -1;
 
     public QueryBuilder(World world) {
         this.world = world;
@@ -169,12 +169,35 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder termAt(int index) {
+        if (index < 0 || index >= this.termCount) {
+            throw new IndexOutOfBoundsException("Invalid query term index: " + index);
+        }
+        this.selectedTerm = index;
+        return this;
+    }
+
+    public QueryBuilder term() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No terms in query");
+        }
+        this.selectedTerm = this.termCount - 1;
+        return this;
+    }
+
+    private int selectedTermIndex() {
+        if (this.selectedTerm < 0) {
+            return this.termCount - 1;
+        }
+        return this.selectedTerm;
+    }
+
     public QueryBuilder in() {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'in' modifier to");
         }
 
-        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         ecs_term_t.inout(termSeg, (short) Flecs.In);
 
         return this;
@@ -185,7 +208,7 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'out' modifier to");
         }
 
-        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         ecs_term_t.inout(termSeg, (short) Flecs.Out);
 
         return this;
@@ -196,7 +219,7 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
-        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         ecs_term_t.inout(termSeg, (short) Flecs.InOut);
 
         return this;
@@ -207,7 +230,7 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
 
-        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         ecs_term_t.oper(termSeg, (short) operator);
 
         return this;
@@ -246,7 +269,7 @@ public class QueryBuilder {
             throw new IllegalStateException("No term to apply 'src' modifier to");
         }
 
-        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount - 1);
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
         ecs_term_ref_t.id(srcRefSeg, entityId);
 

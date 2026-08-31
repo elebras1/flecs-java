@@ -4,6 +4,7 @@ import io.github.elebras1.flecs.callback.*;
 import io.github.elebras1.flecs.util.EntityRange;
 import io.github.elebras1.flecs.util.Flecs;
 import io.github.elebras1.flecs.util.internal.FlecsLoader;
+import io.github.elebras1.flecs.util.internal.ParamRegistry;
 import io.github.elebras1.flecs.util.internal.buffer.FlecsBuffers;
 
 import java.lang.foreign.*;
@@ -198,6 +199,22 @@ public class World {
         flecs_h.ecs_entity_range_new(this.worldSeg, min, max);
     }
 
+    public void rangeSet(int min, int max, int cur) {
+        this.checkDestroyed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment rangeSeg = ecs_entity_range_t.allocate(tempArena);
+            ecs_entity_range_t.min(rangeSeg, min);
+            ecs_entity_range_t.max(rangeSeg, max);
+            ecs_entity_range_t.cur(rangeSeg, cur);
+            flecs_h.ecs_entity_range_set(this.worldSeg, rangeSeg);
+        }
+    }
+
+    public long stripGeneration(long entityId) {
+        this.checkDestroyed();
+        return flecs_h.ecs_strip_generation(entityId);
+    }
+
     public EntityRange rangeGet() {
         MemorySegment rangeSeg = flecs_h.ecs_entity_range_get(this.worldSeg);
         if (rangeSeg.address() == 0) {
@@ -306,6 +323,30 @@ public class World {
         flecs_h.ecs_delete_with(this.worldSeg, componentId);
     }
 
+    public void removeAll(long componentId) {
+        this.checkDestroyed();
+        flecs_h.ecs_remove_all(this.worldSeg, componentId);
+    }
+
+    public void removeAll(Entity component) {
+        this.removeAll(component.id());
+    }
+
+    public <T> void removeAll(Class<T> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        this.removeAll(componentId);
+    }
+
+    public long setWith(long componentId) {
+        this.checkDestroyed();
+        return flecs_h.ecs_set_with(this.worldSeg, componentId);
+    }
+
+    public <T> long setWith(Class<T> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return this.setWith(componentId);
+    }
+
     public int deleteEmptyTables(int limit) {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
@@ -316,6 +357,41 @@ public class World {
 
             return flecs_h.ecs_delete_empty_tables(this.worldSeg, descSeg);
         }
+    }
+
+    public void runPostFrame(Runnable action) {
+        this.checkDestroyed();
+        MemorySegment ctxSeg = this.registerCallbackCtx(action);
+        MemorySegment actionSeg = ecs_fini_action_t.allocate((world, ctx) -> {
+            long id = ctx.get(ValueLayout.JAVA_LONG, 0);
+            Object cb = ParamRegistry.get(id);
+            if (cb instanceof Runnable runnable) {
+                runnable.run();
+            }
+            ParamRegistry.remove(id);
+        }, this.arena);
+        flecs_h.ecs_run_post_frame(this.worldSeg, actionSeg, ctxSeg);
+    }
+
+    public void atfini(Runnable action) {
+        this.checkDestroyed();
+        MemorySegment ctxSeg = this.registerCallbackCtx(action);
+        MemorySegment actionSeg = ecs_fini_action_t.allocate((world, ctx) -> {
+            long id = ctx.get(ValueLayout.JAVA_LONG, 0);
+            Object cb = ParamRegistry.get(id);
+            if (cb instanceof Runnable runnable) {
+                runnable.run();
+            }
+            ParamRegistry.remove(id);
+        }, this.arena);
+        flecs_h.ecs_atfini(this.worldSeg, actionSeg, ctxSeg);
+    }
+
+    private MemorySegment registerCallbackCtx(Runnable action) {
+        long id = ParamRegistry.put(action);
+        MemorySegment ctxSeg = this.arena.allocate(ValueLayout.JAVA_LONG);
+        ctxSeg.set(ValueLayout.JAVA_LONG, 0, id);
+        return ctxSeg;
     }
 
     public void deferBegin() {
@@ -1061,6 +1137,37 @@ public class World {
         }
 
         return ecs_world_info_t.delta_time(infoSeg);
+    }
+
+    public TypeInfo typeInfo(long componentId) {
+        this.checkDestroyed();
+        MemorySegment typeInfoSeg = flecs_h.ecs_get_type_info(this.worldSeg, componentId);
+        if (typeInfoSeg == null || typeInfoSeg.address() == 0) {
+            return null;
+        }
+
+        typeInfoSeg = typeInfoSeg.reinterpret(ecs_type_info_t.layout().byteSize());
+
+        MemorySegment nameSeg = ecs_type_info_t.name(typeInfoSeg);
+        String name = (nameSeg == null || nameSeg.address() == 0) ? null : nameSeg.getString(0);
+
+        return new TypeInfo(
+                ecs_type_info_t.size(typeInfoSeg),
+                ecs_type_info_t.alignment(typeInfoSeg),
+                ecs_type_info_t.component(typeInfoSeg),
+                name
+        );
+    }
+
+    public <T> TypeInfo typeInfo(Class<T> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return this.typeInfo(componentId);
+    }
+
+    public Entity singleton(Class<?> componentClass) {
+        this.checkDestroyed();
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return new Entity(this, componentId);
     }
 
     public WorldStats stats() {
