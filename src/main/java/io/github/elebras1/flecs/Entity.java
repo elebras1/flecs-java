@@ -148,6 +148,92 @@ public class Entity extends EntityBase<Entity> {
         return symbolSeg.getString(0);
     }
 
+    public Entity setDocName(String value) {
+        this.setDoc("name", value);
+        return this;
+    }
+
+    public Entity setDocBrief(String value) {
+        this.setDoc("brief", value);
+        return this;
+    }
+
+    public Entity setDocDetail(String value) {
+        this.setDoc("detail", value);
+        return this;
+    }
+
+    public Entity setDocLink(String value) {
+        this.setDoc("link", value);
+        return this;
+    }
+
+    public Entity setDocColor(String value) {
+        this.setDoc("color", value);
+        return this;
+    }
+
+    public Entity setDocUuid(String value) {
+        this.setDoc("uuid", value);
+        return this;
+    }
+
+    private void setDoc(String kind, String value) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment valueSeg = value == null ? MemorySegment.NULL : tempArena.allocateFrom(value);
+            switch (kind) {
+                case "name" -> flecs_h.ecs_doc_set_name(this.world.worldSeg(), this.id, valueSeg);
+                case "brief" -> flecs_h.ecs_doc_set_brief(this.world.worldSeg(), this.id, valueSeg);
+                case "detail" -> flecs_h.ecs_doc_set_detail(this.world.worldSeg(), this.id, valueSeg);
+                case "link" -> flecs_h.ecs_doc_set_link(this.world.worldSeg(), this.id, valueSeg);
+                case "color" -> flecs_h.ecs_doc_set_color(this.world.worldSeg(), this.id, valueSeg);
+                case "uuid" -> flecs_h.ecs_doc_set_uuid(this.world.worldSeg(), this.id, valueSeg);
+                default -> throw new IllegalArgumentException("Unknown doc kind: " + kind);
+            }
+        }
+    }
+
+    public String docName() {
+        return this.getDoc("name");
+    }
+
+    public String docBrief() {
+        return this.getDoc("brief");
+    }
+
+    public String docDetail() {
+        return this.getDoc("detail");
+    }
+
+    public String docLink() {
+        return this.getDoc("link");
+    }
+
+    public String docColor() {
+        return this.getDoc("color");
+    }
+
+    public String docUuid() {
+        return this.getDoc("uuid");
+    }
+
+    private String getDoc(String kind) {
+        MemorySegment seg;
+        switch (kind) {
+            case "name" -> seg = flecs_h.ecs_doc_get_name(this.world.worldSeg(), this.id);
+            case "brief" -> seg = flecs_h.ecs_doc_get_brief(this.world.worldSeg(), this.id);
+            case "detail" -> seg = flecs_h.ecs_doc_get_detail(this.world.worldSeg(), this.id);
+            case "link" -> seg = flecs_h.ecs_doc_get_link(this.world.worldSeg(), this.id);
+            case "color" -> seg = flecs_h.ecs_doc_get_color(this.world.worldSeg(), this.id);
+            case "uuid" -> seg = flecs_h.ecs_doc_get_uuid(this.world.worldSeg(), this.id);
+            default -> throw new IllegalArgumentException("Unknown doc kind: " + kind);
+        }
+        if (seg == null || seg.address() == 0) {
+            return null;
+        }
+        return seg.getString(0);
+    }
+
     public void destruct() {
         flecs_h.ecs_delete(this.world.worldSeg(), this.id);
     }
@@ -222,6 +308,27 @@ public class Entity extends EntityBase<Entity> {
             throw new IllegalStateException("add ChildOf pair before using slot()");
         }
         return this.slotOf(target);
+    }
+
+    public <E extends Enum<E>> E toConstant(Class<E> enumClass) {
+        long underlyingId = flecs_h.FLECS_IDecs_i32_tID_();
+        long pairId = flecs_h.ecs_make_pair(Flecs.Constant, underlyingId);
+
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
+        if (address == 0) {
+            throw new IllegalStateException("Entity is not a constant: " + this.id);
+        }
+
+        MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(Integer.BYTES);
+        int value = dataSeg.get(ValueLayout.JAVA_INT, 0);
+
+        E[] constants = enumClass.getEnumConstants();
+        for (E constant : constants) {
+            if (constant.ordinal() == value) {
+                return constant;
+            }
+        }
+        throw new IllegalStateException("Unknown constant value: " + value + " on " + enumClass.getName());
     }
 
     public Entity autoOverride(long componentId) {

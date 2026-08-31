@@ -42,7 +42,21 @@ public final class Flecs {
     public static final long Inherit = flecs_h.EcsInherit();
     public static final long DontInherit = flecs_h.EcsDontInherit();
 
+    public static final long Constant = flecs_h.EcsConstant();
     public static final long ChildOf = flecs_h.EcsChildOf();
+    public static final long UnitPrefixes = flecs_h.EcsUnitPrefixes();
+    public static final long Quantity = flecs_h.EcsQuantity();
+    public static final long Metric = flecs_h.EcsMetric();
+    public static final long MetricInstance = flecs_h.EcsMetricInstance();
+    public static final long Counter = flecs_h.EcsCounter();
+    public static final long CounterIncrement = flecs_h.EcsCounterIncrement();
+    public static final long CounterId = flecs_h.EcsCounterId();
+    public static final long Gauge = flecs_h.EcsGauge();
+    public static final long AlertInfo = flecs_h.EcsAlertInfo();
+    public static final long AlertWarning = flecs_h.EcsAlertWarning();
+    public static final long AlertError = flecs_h.EcsAlertError();
+    public static final long AlertCritical = flecs_h.EcsAlertCritical();
+
     public static final long IsA = flecs_h.EcsIsA();
     public static final long DependsOn = flecs_h.EcsDependsOn();
     public static final long SlotOf = flecs_h.EcsSlotOf();

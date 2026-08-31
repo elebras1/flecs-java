@@ -366,6 +366,65 @@ public class World {
         return systemBuilder;
     }
 
+    public <E extends Enum<E>> long enumeration(Class<E> enumClass) {
+        this.checkDestroyed();
+        return this.componentRegistry.registerEnum(enumClass);
+    }
+
+    public <E extends Enum<E>> Entity toEntity(Class<E> enumClass, E constant) {
+        this.checkDestroyed();
+        long enumId = this.componentRegistry.getComponentId(enumClass);
+        long constantId = this.componentRegistry.getOrLookupConstant(enumClass, enumId, constant);
+        return new Entity(this, constantId);
+    }
+
+    public void units() {
+        this.checkDestroyed();
+        try (Arena arena = Arena.ofConfined()) {
+            importModule(arena, "FlecsUnits", flecs_h.FlecsUnitsImport$address());
+        }
+    }
+
+    public UnitBuilder unit(String name) {
+        this.checkDestroyed();
+        return new UnitBuilder(this, name);
+    }
+
+    public void metrics() {
+        this.checkDestroyed();
+        this.units();
+        try (Arena arena = Arena.ofConfined()) {
+            importModule(arena, "FlecsMetrics", flecs_h.FlecsMetricsImport$address());
+        }
+    }
+
+    public MetricBuilder metric(long entityId) {
+        this.checkDestroyed();
+        return new MetricBuilder(this, entityId);
+    }
+
+    public MetricBuilder metric(Entity entity) {
+        return this.metric(entity.id());
+    }
+
+    public MetricBuilder metric(String name) {
+        long entityId = this.entity(name);
+        return this.metric(entityId);
+    }
+
+    public void alerts() {
+        this.checkDestroyed();
+        this.metrics();
+        try (Arena arena = Arena.ofConfined()) {
+            importModule(arena, "FlecsAlerts", flecs_h.FlecsAlertsImport$address());
+        }
+    }
+
+    public AlertBuilder alert(String name) {
+        this.checkDestroyed();
+        return new AlertBuilder(this, name);
+    }
+
     public EventBuilder event(long eventId) {
         this.checkDestroyed();
         return new EventBuilder(this, eventId);
@@ -544,7 +603,7 @@ public class World {
         return new Ref<>(this, componentId, componentClass);
     }
 
-    public FlecsInfo getInfo() {
+    public WorldInfo getInfo() {
         this.checkDestroyed();
 
         MemorySegment infoSeg = flecs_h.ecs_get_world_info(this.worldSeg);
@@ -554,7 +613,7 @@ public class World {
 
         infoSeg = infoSeg.reinterpret(ecs_world_info_t.layout().byteSize());
 
-        return new FlecsInfo(
+        return new WorldInfo(
                 ecs_world_info_t.last_component_id(infoSeg),
                 ecs_world_info_t.delta_time_raw(infoSeg),
                 ecs_world_info_t.delta_time(infoSeg),
@@ -589,9 +648,9 @@ public class World {
         );
     }
 
-    private FlecsInfo.CommandStats extractCommandStats(MemorySegment info) {
+    private WorldInfo.CommandStats extractCommandStats(MemorySegment info) {
         MemorySegment commandSeg = ecs_world_info_t.cmd(info);
-        return new FlecsInfo.CommandStats(
+        return new WorldInfo.CommandStats(
                 ecs_world_info_t.cmd.add_count(commandSeg),
                 ecs_world_info_t.cmd.remove_count(commandSeg),
                 ecs_world_info_t.cmd.delete_count(commandSeg),
@@ -1002,6 +1061,43 @@ public class World {
         }
 
         return ecs_world_info_t.delta_time(infoSeg);
+    }
+
+    public WorldStats stats() {
+        this.checkDestroyed();
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment statsSeg = ecs_world_stats_t.allocate(tempArena);
+            flecs_h.ecs_world_stats_get(this.worldSeg, statsSeg);
+            long t = ecs_world_stats_t.t(statsSeg);
+
+            return new WorldStats(
+                    statsGaugeAvg(ecs_world_stats_t.entities.count(ecs_world_stats_t.entities(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.entities.not_alive_count(ecs_world_stats_t.entities(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.tables.count(ecs_world_stats_t.tables(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.tables.empty_count(ecs_world_stats_t.tables(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.components.tag_count(ecs_world_stats_t.components(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.components.component_count(ecs_world_stats_t.components(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.components.pair_count(ecs_world_stats_t.components(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.components.type_count(ecs_world_stats_t.components(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.queries.query_count(ecs_world_stats_t.queries(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.queries.observer_count(ecs_world_stats_t.queries(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.queries.system_count(ecs_world_stats_t.queries(statsSeg)), t),
+                    statsCounterValue(ecs_world_stats_t.frame.systems_ran(ecs_world_stats_t.frame(statsSeg)), t),
+                    statsCounterValue(ecs_world_stats_t.frame.observers_ran(ecs_world_stats_t.frame(statsSeg)), t),
+                    statsCounterValue(ecs_world_stats_t.frame.event_emit_count(ecs_world_stats_t.frame(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.performance.delta_time(ecs_world_stats_t.performance(statsSeg)), t),
+                    statsGaugeAvg(ecs_world_stats_t.performance.fps(ecs_world_stats_t.performance(statsSeg)), t)
+            );
+        }
+    }
+
+    private long statsGaugeAvg(MemorySegment metric, long t) {
+        return (long) ecs_gauge_t.avg(ecs_metric_t.gauge(metric), t);
+    }
+
+    private double statsCounterValue(MemorySegment metric, long t) {
+        return ecs_counter_t.value(ecs_metric_t.counter(metric), t);
     }
 
     public void destroy() {

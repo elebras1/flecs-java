@@ -133,6 +133,58 @@ public class ComponentRegistry {
     }
 
 
+    protected <E extends Enum<E>> long registerEnum(Class<E> enumClass) {
+        long existingId = this.componentIds.get(enumClass);
+        if (existingId != -1) {
+            return existingId;
+        }
+
+        E[] constants = enumClass.getEnumConstants();
+        String simpleName = enumClass.getSimpleName();
+        String symbol = enumClass.getName();
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment symbolSegment = tempArena.allocateFrom(symbol);
+
+            MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
+            ecs_entity_desc_t.name(entityDesc, tempArena.allocateFrom(simpleName));
+            ecs_entity_desc_t.symbol(entityDesc, symbolSegment);
+
+            long enumId = flecs_h.ecs_entity_init(this.world.worldSeg(), entityDesc);
+
+            MemorySegment enumDesc = ecs_enum_desc_t.allocate(tempArena);
+            ecs_enum_desc_t.entity(enumDesc, enumId);
+            ecs_enum_desc_t.underlying_type(enumDesc, flecs_h.FLECS_IDecs_i32_tID_());
+
+            int n = Math.min(constants.length, 32);
+            for (int i = 0; i < n; i++) {
+                MemorySegment constDesc = ecs_enum_desc_t.constants(enumDesc, i);
+                ecs_enum_constant_t.name(constDesc, tempArena.allocateFrom(constants[i].name()));
+                ecs_enum_constant_t.value(constDesc, constants[i].ordinal());
+            }
+
+            long resultId = flecs_h.ecs_enum_init(this.world.worldSeg(), enumDesc);
+            if (resultId == 0) {
+                throw new IllegalStateException("Failed to register enum: " + symbol);
+            }
+
+            this.componentIds.put(enumClass, resultId);
+            this.componentClasses.put(resultId, enumClass);
+            return resultId;
+        }
+    }
+
+    protected <E extends Enum<E>> long getOrLookupConstant(Class<E> enumClass, long enumId, E constant) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            long constantId = flecs_h.ecs_lookup_child(this.world.worldSeg(), enumId,
+                tempArena.allocateFrom(constant.name()));
+            if (constantId != 0) {
+                return constantId;
+            }
+        }
+        throw new IllegalArgumentException("Unknown enum constant: " + constant.name() + " on " + enumClass.getName());
+    }
+
     protected <T> long getComponentId(Class<T> componentClass) {
         long id = this.componentIds.get(componentClass);
 
