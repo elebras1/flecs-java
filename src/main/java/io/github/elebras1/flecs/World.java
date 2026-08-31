@@ -952,6 +952,7 @@ public class World {
     }
 
     public boolean isAlive(long entityId) {
+        this.checkDestroyed();
         return flecs_h.ecs_is_alive(this.worldSeg, entityId);
     }
 
@@ -965,6 +966,7 @@ public class World {
     }
 
     public long getAlive(long entityId) {
+        this.checkDestroyed();
         return flecs_h.ecs_get_alive(this.worldSeg, entityId);
     }
 
@@ -975,6 +977,17 @@ public class World {
     public long getAlive(Class<?> componentClass) {
         long componentId = this.componentRegistry.getComponentId(componentClass);
         return this.getAlive(componentId);
+    }
+
+    public float deltaTime() {
+        this.checkDestroyed();
+
+        MemorySegment infoSeg = flecs_h.ecs_get_world_info(this.worldSeg);
+        if (infoSeg.address() == 0) {
+            throw new IllegalStateException("Failed to get world info");
+        }
+
+        return ecs_world_info_t.delta_time(infoSeg);
     }
 
     public void destroy() {

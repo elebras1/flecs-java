@@ -424,4 +424,35 @@ class WorldTest {
         long posId = this.world.getComponentId(Position.class);
         assertEquals(posId, this.world.getAlive(Position.class));
     }
+
+    @Test
+    void eachEntities() {
+        int aliveCount = 5;
+        for (int i = 0; i < aliveCount; i++) {
+            this.world.entity();
+        }
+
+        long deadId = this.world.entity();
+        this.world.obtainEntity(deadId).destruct();
+
+        AtomicInteger aliveIterCount = new AtomicInteger(0);
+        this.world.each(entityId -> {
+            if (this.world.isAlive(entityId)) {
+                aliveIterCount.incrementAndGet();
+            }
+        });
+
+        assertEquals(aliveCount, aliveIterCount.get());
+    }
+
+    @Test
+    void deltaTime() {
+        assertEquals(0.0f, this.world.deltaTime(), 0.0001f);
+
+        this.world.progress(0.5f);
+        assertEquals(0.5f, this.world.deltaTime(), 0.0001f);
+
+        this.world.progress(1.0f);
+        assertEquals(1.0f, this.world.deltaTime(), 0.0001f);
+    }
 }
