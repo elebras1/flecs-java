@@ -35,6 +35,9 @@ public class ComponentRegistry {
         }
 
         Component<T> component = this.getComponentInstance(componentClass);
+        if (component == null) {
+            throw new IllegalArgumentException("Component class in the argument is not a component : " + componentClass.getName());
+        }
         String simpleName = componentClass.getSimpleName();
         String symbol = componentClass.getName();
 

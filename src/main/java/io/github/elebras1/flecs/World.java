@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static java.lang.foreign.ValueLayout.*;
-
 public class World {
     public static final MemorySegment WHOLE_MEMORY = MemorySegment.NULL.reinterpret(Long.MAX_VALUE);
     private final MemorySegment worldSeg;
@@ -121,7 +119,7 @@ public class World {
 
             MemorySegment idsSegment = flecs_h.ecs_bulk_init(this.worldSeg, descSeg);
 
-            return idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
+            return idsSegment.asSlice(0, (long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
         }
     }
 
@@ -158,7 +156,7 @@ public class World {
 
             MemorySegment idsArray = ecs_bulk_desc_t.ids(descSeg);
             for (int i = 0; i < componentIds.length; i++) {
-                idsArray.setAtIndex(JAVA_LONG, i, componentIds[i]);
+                idsArray.setAtIndex(ValueLayout.JAVA_LONG, i, componentIds[i]);
             }
 
             ecs_bulk_desc_t.data(descSeg, MemorySegment.NULL);
@@ -166,7 +164,7 @@ public class World {
 
             MemorySegment entitiesSeg = flecs_h.ecs_bulk_init(this.worldSeg, descSeg);
 
-            return entitiesSeg.asSlice(0, (long) count * Long.BYTES).toArray(JAVA_LONG);
+            return entitiesSeg.asSlice(0, (long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
         }
     }
 
@@ -208,7 +206,7 @@ public class World {
 
         MemorySegment recycledSeg = ecs_entity_range_t.recycled(rangeSeg);
         int count = ecs_vec_t.count(recycledSeg);
-        long[] recycled = ecs_vec_t.array(recycledSeg).reinterpret((long) count * JAVA_LONG.byteSize()).toArray(JAVA_LONG);
+        long[] recycled = ecs_vec_t.array(recycledSeg).reinterpret((long) count * ValueLayout.JAVA_LONG.byteSize()).toArray(ValueLayout.JAVA_LONG);
 
         return new EntityRange(ecs_entity_range_t.min(rangeSeg), ecs_entity_range_t.max(rangeSeg), ecs_entity_range_t.cur(rangeSeg), recycled);
     }
@@ -311,10 +309,10 @@ public class World {
     public int deleteEmptyTables(int limit) {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemoryLayout memoryLayout = MemoryLayout.structLayout(JAVA_INT.withName("limit"), JAVA_INT.withName("flags"));
+            MemoryLayout memoryLayout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("limit"), ValueLayout.JAVA_INT.withName("flags"));
             MemorySegment descSeg = tempArena.allocate(memoryLayout);
-            descSeg.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
-            descSeg.set(JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
+            descSeg.set(ValueLayout.JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
+            descSeg.set(ValueLayout.JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
 
             return flecs_h.ecs_delete_empty_tables(this.worldSeg, descSeg);
         }
@@ -430,15 +428,29 @@ public class World {
         return flecs_h.ecs_get_max_id(this.worldSeg);
     }
 
-    public long[] getEntities() {
+    public void each(EntityCallback entityCallback) {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entitiesSeg = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
-            int count = entitiesSeg.get(JAVA_INT, ADDRESS.byteSize());
+            int count = entitiesSeg.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
+
+            MemorySegment entityIdsSeg = ecs_entities_t.ids(entitiesSeg).reinterpret((long) count * Long.BYTES);
+
+            for (int i = 0; i < count; i++) {
+                entityCallback.accept(entityIdsSeg.getAtIndex(ValueLayout.JAVA_LONG, i));
+            }
+        }
+    }
+
+    public long[] entities() {
+        this.checkDestroyed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment entitiesSeg = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
+            int count = entitiesSeg.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
 
             long[] entities = new long[0];
             if (count > 0) {
-                return ecs_entities_t.ids(entitiesSeg).reinterpret((long) count * Long.BYTES).toArray(JAVA_LONG);
+                return ecs_entities_t.ids(entitiesSeg).reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
             }
 
             return entities;
@@ -718,19 +730,19 @@ public class World {
     public long[] setLookupPath(long[] searchPath) {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment pathSeg = tempArena.allocate(JAVA_LONG, searchPath.length + 1);
-            MemorySegment.copy(searchPath, 0, pathSeg, JAVA_LONG, 0, searchPath.length);
+            MemorySegment pathSeg = tempArena.allocate(ValueLayout.JAVA_LONG, searchPath.length + 1);
+            MemorySegment.copy(searchPath, 0, pathSeg, ValueLayout.JAVA_LONG, 0, searchPath.length);
             MemorySegment oldPathSeg = flecs_h.ecs_set_lookup_path(this.worldSeg, pathSeg);
             if (oldPathSeg.address() == 0) {
                 return new long[0];
             }
             int len = 0;
-            while (oldPathSeg.getAtIndex(JAVA_LONG, len) != 0L) {
+            while (oldPathSeg.getAtIndex(ValueLayout.JAVA_LONG, len) != 0L) {
                 len++;
             }
 
             long[] oldPath = new long[len];
-            MemorySegment.copy(oldPathSeg, JAVA_LONG, 0, oldPath, 0, len);
+            MemorySegment.copy(oldPathSeg, ValueLayout.JAVA_LONG, 0, oldPath, 0, len);
             return oldPath;
         }
     }
@@ -817,7 +829,7 @@ public class World {
             byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
             MemorySegment jsonSeg = tempArena.allocate(jsonBytes.length + 1);
             jsonSeg.asSlice(0, jsonBytes.length).copyFrom(MemorySegment.ofArray(jsonBytes));
-            jsonSeg.set(JAVA_BYTE, jsonBytes.length, (byte)0);
+            jsonSeg.set(ValueLayout.JAVA_BYTE, jsonBytes.length, (byte)0);
 
             MemorySegment resultSeg = flecs_h.ecs_world_from_json(this.worldSeg, jsonSeg, MemorySegment.NULL);
             if (resultSeg.address() == 0) {
@@ -923,6 +935,46 @@ public class World {
         }
 
         flecs_h.ecs_remove_id(this.worldSeg, Flecs.World, restCompId);
+    }
+
+    public boolean exists(long entityId) {
+        this.checkDestroyed();
+        return flecs_h.ecs_exists(this.worldSeg, entityId);
+    }
+
+    public boolean exists(Entity entity) {
+        return this.exists(entity.id());
+    }
+
+    public boolean exists(Class<?> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return this.exists(componentId);
+    }
+
+    public boolean isAlive(long entityId) {
+        return flecs_h.ecs_is_alive(this.worldSeg, entityId);
+    }
+
+    public boolean isAlive(Entity entity) {
+        return this.isAlive(entity.id());
+    }
+
+    public boolean isAlive(Class<?> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return this.isAlive(componentId);
+    }
+
+    public long getAlive(long entityId) {
+        return flecs_h.ecs_get_alive(this.worldSeg, entityId);
+    }
+
+    public long getAlive(Entity entity) {
+        return this.getAlive(entity.id());
+    }
+
+    public long getAlive(Class<?> componentClass) {
+        long componentId = this.componentRegistry.getComponentId(componentClass);
+        return this.getAlive(componentId);
     }
 
     public void destroy() {

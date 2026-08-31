@@ -1,10 +1,6 @@
 package io.github.elebras1.flecs;
 
-import io.github.elebras1.flecs.component.Health;
-import io.github.elebras1.flecs.component.Ideology;
-import io.github.elebras1.flecs.component.Mass;
-import io.github.elebras1.flecs.component.Position;
-import io.github.elebras1.flecs.component.Velocity;
+import io.github.elebras1.flecs.component.*;
 import io.github.elebras1.flecs.util.Flecs;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -338,7 +334,94 @@ class WorldTest {
     @Test
     void maxIdAndEntities() {
         this.world.entity();
-        long[] entities = this.world.getEntities();
+        long[] entities = this.world.entities();
         assertTrue(entities.length > 0);
+    }
+
+    @Test
+    void existsWithEntityIdTest() {
+        long id = this.world.entity();
+        assertTrue(this.world.exists(id));
+
+        this.world.obtainEntity(id).destruct();
+        assertTrue(this.world.exists(id));
+
+        assertFalse(this.world.exists(999999L));
+    }
+
+    @Test
+    void existsWithEntityTest() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        assertTrue(this.world.exists(entity));
+
+        entity.destruct();
+        assertTrue(this.world.exists(entity));
+
+        Entity invalid = new Entity(this.world, 0);
+        assertFalse(this.world.exists(invalid));
+    }
+
+    @Test
+    void existsWithComponentClassTest() {
+        assertTrue(this.world.exists(Position.class));
+        assertTrue(this.world.exists(Health.class));
+    }
+
+    @Test
+    void isAliveWithEntityIdTest() {
+        long id = this.world.entity();
+        assertTrue(this.world.isAlive(id));
+        this.world.obtainEntity(id).destruct();
+        assertFalse(this.world.isAlive(id));
+        assertFalse(this.world.isAlive(999999L));
+    }
+
+    @Test
+    void isAliveWithEntityTest() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        assertTrue(this.world.isAlive(entity));
+        entity.destruct();
+        assertFalse(this.world.isAlive(entity));
+        Entity invalid = new Entity(this.world, 0);
+        assertFalse(this.world.isAlive(invalid));
+    }
+
+    @Test
+    void isAliveWithComponentClassTest() {
+        assertTrue(this.world.isAlive(Position.class));
+        assertTrue(this.world.isAlive(Health.class));
+    }
+
+    @Test
+    void getAliveWithEntityIdTest() {
+        long id = this.world.entity();
+        assertEquals(id, this.world.getAlive(id));
+
+        this.world.obtainEntity(id).destruct();
+        long alive = this.world.getAlive(id);
+        if (alive != 0) {
+            assertTrue(this.world.isAlive(alive));
+        }
+        assertEquals(0, this.world.getAlive(999999L));
+    }
+
+    @Test
+    void getAliveWithEntityTest() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        assertEquals(entity.id(), this.world.getAlive(entity));
+
+        entity.destruct();
+        long alive = this.world.getAlive(entity);
+        if (alive != 0) {
+            assertTrue(this.world.isAlive(alive));
+        }
+        Entity invalid = new Entity(this.world, 0);
+        assertEquals(0, this.world.getAlive(invalid));
+    }
+
+    @Test
+    void getAliveWithComponentClassTest() {
+        long posId = this.world.getComponentId(Position.class);
+        assertEquals(posId, this.world.getAlive(Position.class));
     }
 }
