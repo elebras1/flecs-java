@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.EntityCallback;
 import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.util.internal.FlecsAllocator;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -200,6 +201,19 @@ public class Entity extends EntityBase<Entity> {
 
     public Entity isA(Entity entity) {
         return this.add(Flecs.IsA, entity.id());
+    }
+
+    public Entity slotOf(long targetId) {
+        return this.add(Flecs.SlotOf, targetId);
+    }
+
+    public Entity slotOf(Entity target) {
+        return this.slotOf(target.id());
+    }
+
+    public <T> Entity slotOf(Class<T> targetClass) {
+        long targetId = this.world.componentRegistry().getComponentId(targetClass);
+        return this.slotOf(targetId);
     }
 
     public Entity autoOverride(long componentId) {
@@ -561,6 +575,38 @@ public class Entity extends EntityBase<Entity> {
         }
     }
 
+    public String path() {
+        return this.path("::", "");
+    }
+
+    public String path(String sep, String initSep) {
+        return this.pathFrom(0, sep, initSep);
+    }
+
+    public String pathFrom(Entity parent) {
+        return this.pathFrom(parent.id());
+    }
+
+    public String pathFrom(long parentId) {
+        return this.pathFrom(parentId, "::", "");
+    }
+
+    public String pathFrom(long parentId, String sep, String initSep) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment sepSeg = tempArena.allocateFrom(sep);
+            MemorySegment initSepSeg = tempArena.allocateFrom(initSep);
+
+            MemorySegment pathSeg = flecs_h.ecs_get_path_w_sep(this.world.worldSeg(), parentId, this.id, sepSeg, initSepSeg);
+            if (pathSeg.address() == 0) {
+                return null;
+            }
+
+            String path = pathSeg.reinterpret(Long.MAX_VALUE).getString(0);
+            FlecsAllocator.free(pathSeg);
+            return path;
+        }
+    }
+
     public void children(EntityCallback callback) {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment iterSeg = flecs_h.ecs_children(tempArena, this.world.worldSeg(), this.id);
@@ -607,6 +653,45 @@ public class Entity extends EntityBase<Entity> {
             return null;
         }
         return new Table(this.world, tableSeg);
+    }
+
+    public String toJson() {
+        return this.toJsonDesc(MemorySegment.NULL);
+    }
+
+    public String toJson(boolean serializeValues) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment descSeg = ecs_entity_to_json_desc_t.allocate(tempArena);
+            ecs_entity_to_json_desc_t.serialize_values(descSeg, serializeValues);
+            return this.toJsonDesc(descSeg);
+        }
+    }
+
+    private String toJsonDesc(MemorySegment desc) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment jsonSeg = flecs_h.ecs_entity_to_json(this.world.worldSeg(), this.id, desc);
+            if (jsonSeg.address() == 0) {
+                return null;
+            }
+
+            String json = jsonSeg.reinterpret(Long.MAX_VALUE).getString(0);
+            FlecsAllocator.free(jsonSeg);
+            return json;
+        }
+    }
+
+    public void fromJson(String json) {
+        if (json == null || json.isEmpty()) {
+            throw new IllegalArgumentException("JSON cannot be null or empty");
+        }
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment jsonSeg = tempArena.allocateFrom(json);
+            MemorySegment resultSeg = flecs_h.ecs_entity_from_json(this.world.worldSeg(), this.id, jsonSeg, MemorySegment.NULL);
+            if (resultSeg.address() == 0) {
+                throw new RuntimeException("Failed to parse JSON into entity");
+            }
+        }
     }
 
     public void each(LongConsumer callback) {

@@ -540,4 +540,37 @@ class EntityTest {
 
         query.destroy();
     }
+
+    @Test
+    void slotOf() {
+        long prefab = this.world.entity("prefab");
+        Entity entity = this.world.obtainEntity(this.world.entity()).slotOf(prefab);
+        assertTrue(entity.has(Flecs.SlotOf, prefab));
+
+        Entity entity2 = this.world.obtainEntity(this.world.entity()).slotOf(this.world.obtainEntity(prefab));
+        assertTrue(entity2.has(Flecs.SlotOf, prefab));
+
+        Entity entity3 = this.world.obtainEntity(this.world.entity()).slotOf(Position.class);
+        long positionId = this.world.component(Position.class);
+        assertTrue(entity3.has(Flecs.SlotOf, positionId));
+    }
+
+    @Test
+    void toJsonAndFromJson() {
+        Entity entity = this.world.obtainEntity(this.world.entity("json_entity")).set(new Position(10, 20));
+
+        String json = entity.toJson();
+        assertNotNull(json);
+        assertFalse(json.isEmpty());
+        assertTrue(json.contains("json_entity"));
+        assertTrue(json.contains("Position"));
+
+        Entity restored = this.world.obtainEntity(this.world.entity("json_entity2"));
+        restored.fromJson(json);
+        assertTrue(restored.has(Position.class));
+        Position p = restored.get(Position.class);
+        assertNotNull(p);
+        assertEquals(10.0f, p.x());
+        assertEquals(20.0f, p.y());
+    }
 }

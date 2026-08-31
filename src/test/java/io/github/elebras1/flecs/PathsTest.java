@@ -89,4 +89,31 @@ class PathsTest {
         long byName = this.world.lookup("Position");
         assertEquals(componentId, byName);
     }
+
+    @Test
+    void path() {
+        Entity e = this.world.obtainEntity(this.world.entity("foo::bar"));
+        assertEquals("foo::bar", e.path());
+
+        Entity root = this.world.obtainEntity(this.world.entity("hello"));
+        assertEquals("hello", root.path());
+    }
+
+    @Test
+    void pathCustomSeparator() {
+        Entity e = this.world.obtainEntity(this.world.entity("foo::bar"));
+        assertEquals("foo.bar", e.path(".", ""));
+    }
+
+    @Test
+    void pathFrom() {
+        long parent = this.world.entity("foo");
+        Entity e = this.world.obtainEntity(this.world.entity("foo::bar"));
+
+        assertEquals("bar", e.pathFrom(parent));
+        assertEquals("foo::bar", e.pathFrom(0));
+
+        Entity parentEntity = this.world.obtainEntity(parent);
+        assertEquals("bar", e.pathFrom(parentEntity));
+    }
 }
