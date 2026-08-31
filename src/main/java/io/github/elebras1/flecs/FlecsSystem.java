@@ -1,6 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.util.internal.ParamRegistry;
 
 import java.lang.foreign.MemorySegment;
 
@@ -20,6 +21,24 @@ public class FlecsSystem {
 
     public void run(float deltaTime) {
         flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), deltaTime, MemorySegment.NULL);
+    }
+
+    public <T> void run(T param) {
+        long id = ParamRegistry.put(param);
+        try {
+            flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), 0.0f, MemorySegment.ofAddress(id));
+        } finally {
+            ParamRegistry.remove(id);
+        }
+    }
+
+    public <T> void run(float deltaTime, T param) {
+        long id = ParamRegistry.put(param);
+        try {
+            flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), deltaTime, MemorySegment.ofAddress(id));
+        } finally {
+            ParamRegistry.remove(id);
+        }
     }
 
     public long id() {

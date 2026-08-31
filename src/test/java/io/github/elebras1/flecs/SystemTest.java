@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -225,5 +226,34 @@ class SystemTest {
         assertEquals(1, count.get());
         sys.run();
         assertEquals(2, count.get());
+    }
+
+    @Test
+    void runWithParam() {
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        AtomicReference<String> received = new AtomicReference<>();
+        FlecsSystem sys = this.world.system("ParamSystem")
+                .with(Position.class)
+                .iter(it -> received.set(it.<String>param()));
+
+        sys.run("hello");
+        assertEquals("hello", received.get());
+
+        sys.run(0.5f, "world");
+        assertEquals("world", received.get());
+    }
+
+    @Test
+    void runWithoutParam() {
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        AtomicReference<String> received = new AtomicReference<>("unset");
+        FlecsSystem sys = this.world.system("NoParamSystem")
+                .with(Position.class)
+                .iter(it -> received.set(it.param()));
+
+        sys.run();
+        assertNull(received.get());
     }
 }

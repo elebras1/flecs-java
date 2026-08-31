@@ -1,5 +1,7 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.util.internal.ParamRegistry;
+
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
@@ -139,6 +141,12 @@ public class Iter {
         }
         this.table.reset(tableSeg);
         return this.table;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T param() {
+        long id = ecs_iter_t.param(this.iterSeg).address();
+        return (T) ParamRegistry.get(id);
     }
 
     public void destroy() {
