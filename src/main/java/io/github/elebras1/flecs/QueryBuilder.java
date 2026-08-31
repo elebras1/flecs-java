@@ -163,6 +163,12 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder detectChanges() {
+        int flags = ecs_query_desc_t.flags(this.desc);
+        ecs_query_desc_t.flags(this.desc, flags | Flecs.QueryDetectChanges);
+        return this;
+    }
+
     public QueryBuilder in() {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'in' modifier to");

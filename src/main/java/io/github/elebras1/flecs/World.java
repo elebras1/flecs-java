@@ -432,7 +432,7 @@ public class World {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entitiesSeg = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
-            int count = entitiesSeg.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
+            int count = ecs_entities_t.alive_count(entitiesSeg);
 
             MemorySegment entityIdsSeg = ecs_entities_t.ids(entitiesSeg).reinterpret((long) count * Long.BYTES);
 

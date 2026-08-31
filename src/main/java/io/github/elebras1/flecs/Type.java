@@ -60,10 +60,8 @@ public final class Type {
             return "";
         }
 
-        try {
-            return strSeg.reinterpret(Long.MAX_VALUE).getString(0);
-        } finally {
-            FlecsAllocator.free(strSeg);
-        }
+        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(strSeg);
+        return str;
     }
 }

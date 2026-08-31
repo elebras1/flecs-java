@@ -279,7 +279,7 @@ class WorldTest {
     }
 
     @Test
-    void deltaTime() {
+    void deltaTimeFromIterator() {
         AtomicInteger dt = new AtomicInteger();
         this.world.obtainEntity(this.world.entity()).add(Position.class);
 
@@ -436,13 +436,19 @@ class WorldTest {
         this.world.obtainEntity(deadId).destruct();
 
         AtomicInteger aliveIterCount = new AtomicInteger(0);
+        AtomicInteger deadIterCount = new AtomicInteger(0);
         this.world.each(entityId -> {
             if (this.world.isAlive(entityId)) {
                 aliveIterCount.incrementAndGet();
+            } else {
+                deadIterCount.incrementAndGet();
             }
         });
 
-        assertEquals(aliveCount, aliveIterCount.get());
+        // Matches C++ world::each, which iterates entities.alive_count
+        // (alive entities only, flecs builtins included).
+        assertEquals(0, deadIterCount.get());
+        assertTrue(aliveIterCount.get() >= aliveCount);
     }
 
     @Test

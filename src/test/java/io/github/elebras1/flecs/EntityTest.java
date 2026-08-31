@@ -556,6 +556,16 @@ class EntityTest {
     }
 
     @Test
+    void slot() {
+        long prefab = this.world.entity("prefab");
+        Entity child = this.world.obtainEntity(this.world.entity()).childOf(prefab);
+
+        // slot() adds SlotOf to the entity's ChildOf target
+        child.slot();
+        assertTrue(child.has(Flecs.SlotOf, prefab));
+    }
+
+    @Test
     void toJsonAndFromJson() {
         Entity entity = this.world.obtainEntity(this.world.entity("json_entity")).set(new Position(10, 20));
 

@@ -69,6 +69,11 @@ public class Query extends QueryBase {
         callback.accept(this.iter);
     }
 
+    public boolean changed() {
+        this.checkDestroyed();
+        return flecs_h.ecs_query_changed(this.querySeg);
+    }
+
     public int count() {
         this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();

@@ -216,6 +216,14 @@ public class Entity extends EntityBase<Entity> {
         return this.slotOf(targetId);
     }
 
+    public Entity slot() {
+        long target = this.target(Flecs.ChildOf, 0);
+        if (target == 0) {
+            throw new IllegalStateException("add ChildOf pair before using slot()");
+        }
+        return this.slotOf(target);
+    }
+
     public Entity autoOverride(long componentId) {
         flecs_h.ecs_auto_override_id(this.world.worldSeg(), this.id, componentId);
         return this;
@@ -576,7 +584,7 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public String path() {
-        return this.path("::", "");
+        return this.path("::", "::");
     }
 
     public String path(String sep, String initSep) {
@@ -587,8 +595,13 @@ public class Entity extends EntityBase<Entity> {
         return this.pathFrom(parent.id());
     }
 
+    public String pathFrom(Class<?> parentClass) {
+        long parentId = this.world.componentRegistry().getComponentId(parentClass);
+        return this.pathFrom(parentId);
+    }
+
     public String pathFrom(long parentId) {
-        return this.pathFrom(parentId, "::", "");
+        return this.pathFrom(parentId, "::", "::");
     }
 
     public String pathFrom(long parentId, String sep, String initSep) {

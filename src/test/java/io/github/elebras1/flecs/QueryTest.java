@@ -317,4 +317,31 @@ class QueryTest {
         assertEquals(1, query.count());
         query.destroy();
     }
+
+    @Test
+    void changed() {
+        Query query = this.world.query()
+                .with(Position.class)
+                .detectChanges()
+                .build();
+
+        // A new query starts dirty
+        assertTrue(query.changed());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        assertTrue(query.changed());
+
+        // Iterating resets the changed state
+        query.count();
+        assertFalse(query.changed());
+
+        // Adding a matching entity marks the query dirty again
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+        assertTrue(query.changed());
+
+        query.count();
+        assertFalse(query.changed());
+
+        query.destroy();
+    }
 }

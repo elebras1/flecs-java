@@ -86,6 +86,7 @@ public final class Flecs {
 
     public static final int QueryCacheAuto = flecs_h.EcsQueryCacheAuto();
     public static final int QueryMatchEmptyTables = flecs_h.EcsQueryMatchEmptyTables();
+    public static final int QueryDetectChanges = flecs_h.EcsQueryDetectChanges();
     public static final int In = flecs_h.EcsIn();
     public static final int Out = flecs_h.EcsOut();
     public static final int InOut = flecs_h.EcsInOut();

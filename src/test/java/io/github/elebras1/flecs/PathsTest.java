@@ -92,11 +92,12 @@ class PathsTest {
 
     @Test
     void path() {
+        // C++ default: sep = "::", init_sep = "::" (prefixes root-scoped paths)
         Entity e = this.world.obtainEntity(this.world.entity("foo::bar"));
-        assertEquals("foo::bar", e.path());
+        assertEquals("::foo::bar", e.path());
 
         Entity root = this.world.obtainEntity(this.world.entity("hello"));
-        assertEquals("hello", root.path());
+        assertEquals("::hello", root.path());
     }
 
     @Test
@@ -111,7 +112,7 @@ class PathsTest {
         Entity e = this.world.obtainEntity(this.world.entity("foo::bar"));
 
         assertEquals("bar", e.pathFrom(parent));
-        assertEquals("foo::bar", e.pathFrom(0));
+        assertEquals("::foo::bar", e.pathFrom(0));
 
         Entity parentEntity = this.world.obtainEntity(parent);
         assertEquals("bar", e.pathFrom(parentEntity));
