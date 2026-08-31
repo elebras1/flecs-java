@@ -74,6 +74,13 @@ public class Query extends QueryBase {
         return flecs_h.ecs_query_changed(this.querySeg);
     }
 
+    public int findVar(String name) {
+        this.checkDestroyed();
+        try (Arena tempArena = Arena.ofConfined()) {
+            return flecs_h.ecs_query_find_var(this.querySeg, tempArena.allocateFrom(name));
+        }
+    }
+
     public int count() {
         this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();

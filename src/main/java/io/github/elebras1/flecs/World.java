@@ -366,6 +366,20 @@ public class World {
         return systemBuilder;
     }
 
+    public EventBuilder event(long eventId) {
+        this.checkDestroyed();
+        return new EventBuilder(this, eventId);
+    }
+
+    public EventBuilder event(Entity event) {
+        return this.event(event.id());
+    }
+
+    public <T> EventBuilder event(Class<T> eventClass) {
+        long eventId = this.componentRegistry.getComponentId(eventClass);
+        return this.event(eventId);
+    }
+
     public ObserverBuilder observer() {
         this.checkDestroyed();
         return new ObserverBuilder(this);

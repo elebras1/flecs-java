@@ -319,23 +319,87 @@ class QueryTest {
     }
 
     @Test
+    void variables() {
+        long v1 = this.world.obtainEntity(this.world.entity())
+                .set(new Position(1, 2)).set(new Velocity(3, 4)).id();
+        long v2 = this.world.obtainEntity(this.world.entity())
+                .set(new Position(5, 6)).set(new Velocity(7, 8)).id();
+
+        Query query = this.world.query().expr("Position($this), Velocity($v)").build();
+
+        assertEquals(0, query.findVar("this"));
+        int varId = query.findVar("v");
+        assertTrue(varId > 0);
+        assertEquals(-1, query.findVar("nonexistent"));
+
+        List<Long> matchedV = new ArrayList<>();
+        query.iter(it -> matchedV.add(it.getVar(varId)));
+
+        assertEquals(2, matchedV.size());
+        assertTrue(matchedV.contains(v1));
+        assertTrue(matchedV.contains(v2));
+
+        query.destroy();
+    }
+
+    @Test
+    void getVarByName() {
+        long v1 = this.world.obtainEntity(this.world.entity())
+                .set(new Position(1, 2)).set(new Velocity(3, 4)).id();
+        this.world.obtainEntity(this.world.entity())
+                .set(new Position(5, 6)).set(new Velocity(7, 8));
+
+        Query query = this.world.query().expr("Position($this), Velocity($v)").build();
+
+        List<Long> matchedV = new ArrayList<>();
+        query.iter(it -> matchedV.add(it.getVar("v")));
+
+        assertEquals(2, matchedV.size());
+        assertTrue(matchedV.contains(v1));
+
+        query.destroy();
+    }
+
+    @Test
+    void setVar() {
+        long v1 = this.world.obtainEntity(this.world.entity())
+                .set(new Position(1, 2)).set(new Velocity(3, 4)).id();
+        this.world.obtainEntity(this.world.entity())
+                .set(new Position(5, 6)).set(new Velocity(7, 8));
+
+        Query query = this.world.query().expr("Position($this), Velocity($v)").build();
+
+        AtomicInteger count = new AtomicInteger();
+        query.run(it -> {
+            it.setVar("v", v1);
+            while (it.next()) {
+                for (int i = 0; i < it.count(); i++) {
+                    assertEquals(v1, it.getVar("v"));
+                    count.incrementAndGet();
+                }
+            }
+        });
+
+        assertEquals(2, count.get());
+
+        query.destroy();
+    }
+
+    @Test
     void changed() {
         Query query = this.world.query()
                 .with(Position.class)
                 .detectChanges()
                 .build();
 
-        // A new query starts dirty
         assertTrue(query.changed());
 
         this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
         assertTrue(query.changed());
 
-        // Iterating resets the changed state
         query.count();
         assertFalse(query.changed());
 
-        // Adding a matching entity marks the query dirty again
         this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
         assertTrue(query.changed());
 

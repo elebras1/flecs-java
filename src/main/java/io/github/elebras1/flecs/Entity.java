@@ -496,6 +496,38 @@ public class Entity extends EntityBase<Entity> {
         this.emit(eventId, componentId);
     }
 
+    public <E> void emit(Class<E> payloadClass, E payload) {
+        this.world.event(payloadClass)
+                .entity(this)
+                .payload(payload)
+                .emit();
+    }
+
+    public void enqueue(long eventId) {
+        this.world.event(eventId)
+                .entity(this)
+                .enqueue();
+    }
+
+    public void enqueue(long eventId, long componentId) {
+        this.world.event(eventId)
+                .id(componentId)
+                .entity(this)
+                .enqueue();
+    }
+
+    public <T> void enqueue(long eventId, Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        this.enqueue(eventId, componentId);
+    }
+
+    public <E> void enqueue(Class<E> payloadClass, E payload) {
+        this.world.event(payloadClass)
+                .entity(this)
+                .payload(payload)
+                .enqueue();
+    }
+
     public long target(long relationId, int index) {
         return flecs_h.ecs_get_target(this.world.worldSeg(), this.id, relationId, index);
     }

@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.util.internal.ParamRegistry;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
@@ -147,6 +148,52 @@ public class Iter {
     public <T> T param() {
         long id = ecs_iter_t.param(this.iterSeg).address();
         return (T) ParamRegistry.get(id);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T payload(Class<T> payloadClass) {
+        MemorySegment paramSeg = ecs_iter_t.param(this.iterSeg);
+        if (paramSeg == null || paramSeg.address() == 0) {
+            return null;
+        }
+
+        Component<T> component = this.world.componentRegistry().getComponent(payloadClass);
+        MemorySegment dataSeg = paramSeg.reinterpret(component.size());
+        return component.read(dataSeg, 0);
+    }
+
+    public long getVar(int varId) {
+        return flecs_h.ecs_iter_get_var(this.iterSeg, varId);
+    }
+
+    public long getVar(String name) {
+        int varId = this.findVar(name);
+        if (varId < 0) {
+            return 0;
+        }
+        return this.getVar(varId);
+    }
+
+    public void setVar(int varId, long entityId) {
+        flecs_h.ecs_iter_set_var(this.iterSeg, varId, entityId);
+    }
+
+    public void setVar(String name, long entityId) {
+        int varId = this.findVar(name);
+        if (varId < 0) {
+            throw new IllegalArgumentException("Unknown query variable: " + name);
+        }
+        this.setVar(varId, entityId);
+    }
+
+    public int findVar(String name) {
+        MemorySegment querySeg = ecs_iter_t.query(this.iterSeg);
+        if (querySeg == null || querySeg.address() == 0) {
+            return -1;
+        }
+        try (Arena tempArena = Arena.ofConfined()) {
+            return flecs_h.ecs_query_find_var(querySeg, tempArena.allocateFrom(name));
+        }
     }
 
     public void destroy() {
