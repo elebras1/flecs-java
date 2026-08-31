@@ -8,7 +8,7 @@ import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Timeout;
 import io.github.elebras1.flecs.examples.components.TimeoutView;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates how to mutate (here, delete) the currently iterated entity from

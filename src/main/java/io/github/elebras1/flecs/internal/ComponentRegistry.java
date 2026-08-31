@@ -1,9 +1,10 @@
-package io.github.elebras1.flecs;
+package io.github.elebras1.flecs.internal;
 
+import io.github.elebras1.flecs.*;
 import io.github.elebras1.flecs.collection.ClassLongMap;
 import io.github.elebras1.flecs.collection.LongClassMap;
 import io.github.elebras1.flecs.collection.LongObjectMap;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.GroupLayout;
@@ -16,19 +17,19 @@ import java.util.List;
 
 public class ComponentRegistry {
 
-    private final World world;
+    private final MemorySegment worldSeg;
     private final ClassLongMap componentIds;
     private final LongClassMap componentClasses;
     private final LongObjectMap<Component<?>> components;
 
-    protected ComponentRegistry(World world) {
-        this.world = world;
+    public ComponentRegistry(MemorySegment worldSeg) {
+        this.worldSeg = worldSeg;
         this.componentIds = new ClassLongMap(ComponentMap.size());
         this.componentClasses = new LongClassMap(ComponentMap.size());
         this.components = new LongObjectMap<>(ComponentMap.size());
     }
 
-    protected <T> long register(Class<T> componentClass) {
+    public <T> long register(Class<T> componentClass) {
         long existingId = this.componentIds.get(componentClass);
         if (existingId != -1) {
             return existingId;
@@ -44,7 +45,7 @@ public class ComponentRegistry {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment symbolSegment = tempArena.allocateFrom(symbol);
 
-            long componentId = flecs_h.ecs_lookup_symbol(this.world.worldSeg(), symbolSegment, false, false);
+            long componentId = flecs_h.ecs_lookup_symbol(this.worldSeg, symbolSegment, false, false);
 
             if (componentId == 0) {
                 MemorySegment nameSegment = tempArena.allocateFrom(simpleName);
@@ -52,12 +53,12 @@ public class ComponentRegistry {
                 MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
                 ecs_entity_desc_t.name(entityDesc, nameSegment);
                 ecs_entity_desc_t.symbol(entityDesc, symbolSegment);
-                long scope = flecs_h.ecs_get_scope(this.world.worldSeg());
+                long scope = flecs_h.ecs_get_scope(this.worldSeg);
                 ecs_entity_desc_t.parent(entityDesc, scope);
 
-                long entityId = flecs_h.ecs_entity_init(this.world.worldSeg(), entityDesc);
+                long entityId = flecs_h.ecs_entity_init(this.worldSeg, entityDesc);
                 if (scope != 0) {
-                    flecs_h.ecs_add_id(this.world.worldSeg(), entityId, flecs_h.ecs_make_pair(Flecs.ChildOf, scope));
+                    flecs_h.ecs_add_id(this.worldSeg, entityId, flecs_h.ecs_make_pair(Flecs.ChildOf, scope));
                 }
 
                 MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
@@ -67,7 +68,7 @@ public class ComponentRegistry {
                 ecs_type_info_t.size(typeInfo, (int) component.size());
                 ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
 
-                componentId = flecs_h.ecs_component_init(world.worldSeg(), componentDesc);
+                componentId = flecs_h.ecs_component_init(this.worldSeg, componentDesc);
 
                 if (componentId == 0) {
                     throw new IllegalStateException("Failed to register component: " + symbol);
@@ -126,14 +127,13 @@ public class ComponentRegistry {
             i++;
         }
 
-        long structId = flecs_h.ecs_struct_init(this.world.worldSeg(), structDesc);
+        long structId = flecs_h.ecs_struct_init(this.worldSeg, structDesc);
         if (structId == 0) {
             throw new IllegalStateException("Failed to register reflection data for component id: " + componentId);
         }
     }
 
-
-    protected <E extends Enum<E>> long registerEnum(Class<E> enumClass) {
+    public <E extends Enum<E>> long registerEnum(Class<E> enumClass) {
         long existingId = this.componentIds.get(enumClass);
         if (existingId != -1) {
             return existingId;
@@ -150,7 +150,7 @@ public class ComponentRegistry {
             ecs_entity_desc_t.name(entityDesc, tempArena.allocateFrom(simpleName));
             ecs_entity_desc_t.symbol(entityDesc, symbolSegment);
 
-            long enumId = flecs_h.ecs_entity_init(this.world.worldSeg(), entityDesc);
+            long enumId = flecs_h.ecs_entity_init(this.worldSeg, entityDesc);
 
             MemorySegment enumDesc = ecs_enum_desc_t.allocate(tempArena);
             ecs_enum_desc_t.entity(enumDesc, enumId);
@@ -163,7 +163,7 @@ public class ComponentRegistry {
                 ecs_enum_constant_t.value(constDesc, constants[i].ordinal());
             }
 
-            long resultId = flecs_h.ecs_enum_init(this.world.worldSeg(), enumDesc);
+            long resultId = flecs_h.ecs_enum_init(this.worldSeg, enumDesc);
             if (resultId == 0) {
                 throw new IllegalStateException("Failed to register enum: " + symbol);
             }
@@ -174,9 +174,9 @@ public class ComponentRegistry {
         }
     }
 
-    protected <E extends Enum<E>> long getOrLookupConstant(Class<E> enumClass, long enumId, E constant) {
+    public <E extends Enum<E>> long getOrLookupConstant(Class<E> enumClass, long enumId, E constant) {
         try (Arena tempArena = Arena.ofConfined()) {
-            long constantId = flecs_h.ecs_lookup_child(this.world.worldSeg(), enumId,
+            long constantId = flecs_h.ecs_lookup_child(this.worldSeg, enumId,
                 tempArena.allocateFrom(constant.name()));
             if (constantId != 0) {
                 return constantId;
@@ -185,7 +185,7 @@ public class ComponentRegistry {
         throw new IllegalArgumentException("Unknown enum constant: " + constant.name() + " on " + enumClass.getName());
     }
 
-    protected <T> long getComponentId(Class<T> componentClass) {
+    public <T> long getComponentId(Class<T> componentClass) {
         long id = this.componentIds.get(componentClass);
 
         if (id <= 0) {
@@ -195,12 +195,12 @@ public class ComponentRegistry {
         return id;
     }
 
-    protected <T> Component<T> getComponent(Class<T> componentClass) {
+    public <T> Component<T> getComponent(Class<T> componentClass) {
         return ComponentMap.getInstance(componentClass);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> Component<T> getComponentById(long componentId) {
+    public <T> Component<T> getComponentById(long componentId) {
         Component<T> component = (Component<T>) this.components.get(componentId);
         if(component == null) {
             return this.getAndCacheComponentInstance(componentId);
@@ -209,7 +209,7 @@ public class ComponentRegistry {
         return component;
     }
 
-    protected Class<?> getComponentClassById(long componentId) {
+    public Class<?> getComponentClassById(long componentId) {
         Class<?> componentClass = this.componentClasses.get(componentId);
         if(componentClass == null) {
             throw new IllegalArgumentException("Unknown component ID: " + componentId);

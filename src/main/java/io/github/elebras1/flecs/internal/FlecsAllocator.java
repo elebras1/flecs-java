@@ -1,4 +1,4 @@
-package io.github.elebras1.flecs.util.internal;
+package io.github.elebras1.flecs.internal;
 
 import io.github.elebras1.flecs.ecs_os_api_free_t;
 import io.github.elebras1.flecs.ecs_os_api_malloc_t;

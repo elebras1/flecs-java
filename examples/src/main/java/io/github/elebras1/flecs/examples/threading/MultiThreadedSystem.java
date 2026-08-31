@@ -4,7 +4,7 @@ import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Minister;
 import io.github.elebras1.flecs.examples.components.MinisterView;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 import java.util.Locale;
 import java.util.Random;

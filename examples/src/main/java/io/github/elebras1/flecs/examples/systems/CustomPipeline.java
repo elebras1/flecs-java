@@ -4,7 +4,7 @@ import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Pipeline;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 public class CustomPipeline {
 

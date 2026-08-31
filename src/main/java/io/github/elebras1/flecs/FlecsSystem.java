@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs;
 
-import io.github.elebras1.flecs.util.Flecs;
-import io.github.elebras1.flecs.util.internal.ParamRegistry;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.MemorySegment;
 

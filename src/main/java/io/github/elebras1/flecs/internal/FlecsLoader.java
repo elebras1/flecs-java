@@ -1,4 +1,4 @@
-package io.github.elebras1.flecs.util.internal;
+package io.github.elebras1.flecs.internal;
 
 import java.io.IOException;
 import java.io.InputStream;

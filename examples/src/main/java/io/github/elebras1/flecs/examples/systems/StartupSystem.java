@@ -1,7 +1,7 @@
 package io.github.elebras1.flecs.examples.systems;
 
 import io.github.elebras1.flecs.World;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 public class StartupSystem {
 

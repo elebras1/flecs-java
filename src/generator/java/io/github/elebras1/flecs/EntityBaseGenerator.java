@@ -1,7 +1,7 @@
 package io.github.elebras1.flecs;
 
-import io.github.elebras1.flecs.util.internal.codegen.CodeBuilder;
-import io.github.elebras1.flecs.util.internal.codegen.SourceFile;
+import io.github.elebras1.flecs.internal.codegen.CodeBuilder;
+import io.github.elebras1.flecs.internal.codegen.SourceFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

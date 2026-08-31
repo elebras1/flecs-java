@@ -7,7 +7,7 @@ import io.github.elebras1.flecs.examples.components.Apples;
 import io.github.elebras1.flecs.examples.components.Eats;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 public class HelloWorld {
 

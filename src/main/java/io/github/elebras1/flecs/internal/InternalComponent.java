@@ -1,4 +1,4 @@
-package io.github.elebras1.flecs.util.internal;
+package io.github.elebras1.flecs.internal;
 
 import io.github.elebras1.flecs.annotation.Component;
 

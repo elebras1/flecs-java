@@ -1,7 +1,7 @@
-package io.github.elebras1.flecs.util.internal.buffer;
+package io.github.elebras1.flecs.internal.buffer;
 
 import io.github.elebras1.flecs.ecs_entity_desc_t;
-import io.github.elebras1.flecs.util.internal.FlecsAllocator;
+import io.github.elebras1.flecs.internal.FlecsAllocator;
 
 import java.lang.foreign.MemorySegment;
 

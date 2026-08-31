@@ -4,7 +4,6 @@ import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.callback.ComparatorComponentView;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import io.github.elebras1.flecs.callback.GroupByCallback;
-import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;

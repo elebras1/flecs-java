@@ -2,7 +2,7 @@ package io.github.elebras1.flecs.examples.systems;
 
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.DummyTag;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates how to print the delta time. This system does not query for any

@@ -5,7 +5,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Attack;
 import io.github.elebras1.flecs.examples.components.Damage;
 import io.github.elebras1.flecs.examples.components.Defense;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates prefab component override behavior. Components can be configured

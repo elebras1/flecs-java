@@ -63,7 +63,7 @@ public class AlertBuilder {
             throw new IllegalStateException("No term to apply 'not' modifier to");
         }
         MemorySegment termSeg = ecs_query_desc_t.terms(ecs_alert_desc_t.query(this.desc), this.termCount - 1);
-        ecs_term_t.oper(termSeg, (short) io.github.elebras1.flecs.util.Flecs.Not);
+        ecs_term_t.oper(termSeg, (short) Flecs.Not);
         return this;
     }
 

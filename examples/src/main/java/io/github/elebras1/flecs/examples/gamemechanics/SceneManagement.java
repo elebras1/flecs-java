@@ -13,7 +13,7 @@ import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.MenuScene;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.SceneRoot;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Shows one possible way to implement scene management using pipelines.

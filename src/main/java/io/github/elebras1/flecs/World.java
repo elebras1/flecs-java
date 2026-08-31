@@ -1,11 +1,10 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.*;
-import io.github.elebras1.flecs.util.EntityRange;
-import io.github.elebras1.flecs.util.Flecs;
-import io.github.elebras1.flecs.util.internal.FlecsLoader;
-import io.github.elebras1.flecs.util.internal.ParamRegistry;
-import io.github.elebras1.flecs.util.internal.buffer.FlecsBuffers;
+import io.github.elebras1.flecs.internal.ComponentRegistry;
+import io.github.elebras1.flecs.internal.FlecsLoader;
+import io.github.elebras1.flecs.internal.ParamRegistry;
+import io.github.elebras1.flecs.internal.buffer.FlecsBuffers;
 
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +37,7 @@ public class World {
         if (this.worldSeg.address() == 0) {
             throw new IllegalStateException("Flecs world initialization failed");
         }
-        this.componentRegistry = new ComponentRegistry(this);
+        this.componentRegistry = new ComponentRegistry(this.worldSeg);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.buffers = new FlecsBuffers();

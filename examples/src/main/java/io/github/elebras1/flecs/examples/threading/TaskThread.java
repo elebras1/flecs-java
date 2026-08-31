@@ -5,7 +5,7 @@ import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.OsApi;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Health;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

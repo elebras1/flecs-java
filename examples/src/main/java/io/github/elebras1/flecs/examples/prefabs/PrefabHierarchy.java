@@ -2,7 +2,7 @@ package io.github.elebras1.flecs.examples.prefabs;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.World;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates that instantiating a prefab also instantiates its children.

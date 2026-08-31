@@ -1,6 +1,4 @@
-package io.github.elebras1.flecs.util;
-
-import io.github.elebras1.flecs.flecs_h;
+package io.github.elebras1.flecs;
 
 public final class Flecs {
 

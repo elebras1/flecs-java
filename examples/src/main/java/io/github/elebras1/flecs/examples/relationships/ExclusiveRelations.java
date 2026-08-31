@@ -3,7 +3,7 @@ package io.github.elebras1.flecs.examples.relationships;
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Platoon;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates an exclusive relationship: an entity can be related to at most

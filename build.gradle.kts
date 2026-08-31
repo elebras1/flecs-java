@@ -260,7 +260,7 @@ val compileProcessor by tasks.registering(JavaCompile::class) {
     source = fileTree("src/main/java") {
         include("**/processor/**")
         include("**/annotation/**")
-        include("**/util/internal/codegen/**")
+        include("**/internal/codegen/**")
     }
     classpath = configurations.compileClasspath.get()
     destinationDirectory.set(layout.buildDirectory.dir("classes/java/processor"))

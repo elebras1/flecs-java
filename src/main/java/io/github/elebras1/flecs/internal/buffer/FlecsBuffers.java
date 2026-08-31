@@ -1,4 +1,4 @@
-package io.github.elebras1.flecs.util.internal.buffer;
+package io.github.elebras1.flecs.internal.buffer;
 
 public record FlecsBuffers(StringRing stringRing, ComponentBuffer componentBuffer, EntityDescBuffer entityDescBuffer) implements AutoCloseable {
     public FlecsBuffers() {

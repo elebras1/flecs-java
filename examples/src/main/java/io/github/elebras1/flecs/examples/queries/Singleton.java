@@ -6,7 +6,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Gravity;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates singleton components. A singleton component lives on the world

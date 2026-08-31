@@ -14,7 +14,7 @@ import io.github.elebras1.flecs.examples.components.Health;
 import io.github.elebras1.flecs.examples.components.Inventory;
 import io.github.elebras1.flecs.examples.components.Item;
 import io.github.elebras1.flecs.examples.components.Sword;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates one possible way to implement an inventory system using ECS

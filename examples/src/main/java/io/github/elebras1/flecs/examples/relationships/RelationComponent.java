@@ -10,7 +10,7 @@ import io.github.elebras1.flecs.examples.components.MustHave;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Requires;
 import io.github.elebras1.flecs.examples.components.RequiresView;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Shows how relationships can carry data. When one element of a pair is a

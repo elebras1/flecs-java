@@ -1,8 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.EntityCallback;
-import io.github.elebras1.flecs.util.Flecs;
-import io.github.elebras1.flecs.util.internal.FlecsAllocator;
+import io.github.elebras1.flecs.internal.FlecsAllocator;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;

@@ -6,7 +6,6 @@ import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Tag;
 import io.github.elebras1.flecs.component.Velocity;
-import io.github.elebras1.flecs.util.Flecs;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

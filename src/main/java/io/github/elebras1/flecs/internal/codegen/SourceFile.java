@@ -1,4 +1,4 @@
-package io.github.elebras1.flecs.util.internal.codegen;
+package io.github.elebras1.flecs.internal.codegen;
 
 import javax.annotation.processing.Filer;
 import javax.tools.JavaFileObject;

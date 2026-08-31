@@ -6,7 +6,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates the built-in pipeline. Systems are assigned to phases such as

@@ -1,6 +1,6 @@
 package io.github.elebras1.flecs.processor;
 
-import io.github.elebras1.flecs.util.internal.codegen.SourceFile;
+import io.github.elebras1.flecs.internal.codegen.SourceFile;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;

@@ -6,7 +6,7 @@ import io.github.elebras1.flecs.examples.components.Moon;
 import io.github.elebras1.flecs.examples.components.Planet;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Star;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 public class Hierarchy {
 

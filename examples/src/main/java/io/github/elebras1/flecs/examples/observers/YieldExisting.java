@@ -3,7 +3,7 @@ package io.github.elebras1.flecs.examples.observers;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 /**
  * Demonstrates observers that trigger for entities already matching the query

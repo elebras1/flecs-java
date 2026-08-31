@@ -5,7 +5,7 @@ import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Plate;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 import io.github.elebras1.flecs.examples.components.Waiter;
 
 /**

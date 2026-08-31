@@ -7,7 +7,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Apples;
 import io.github.elebras1.flecs.examples.components.Eats;
 import io.github.elebras1.flecs.examples.components.Pears;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 public class Wildcards {
 

@@ -3,7 +3,6 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.EntityCallback;
 import io.github.elebras1.flecs.callback.IterCallback;
 import io.github.elebras1.flecs.callback.RunCallback;
-import io.github.elebras1.flecs.util.Flecs;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;

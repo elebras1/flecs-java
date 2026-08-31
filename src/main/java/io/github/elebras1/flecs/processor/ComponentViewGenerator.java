@@ -1,7 +1,7 @@
 package io.github.elebras1.flecs.processor;
 
-import io.github.elebras1.flecs.util.internal.codegen.CodeBuilder;
-import io.github.elebras1.flecs.util.internal.codegen.SourceFile;
+import io.github.elebras1.flecs.internal.codegen.CodeBuilder;
+import io.github.elebras1.flecs.internal.codegen.SourceFile;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -12,7 +12,7 @@ import java.util.List;
 public class ComponentViewGenerator extends AbstractGenerator {
 
     private static final String COMPONENT_VIEW_INTERFACE = "io.github.elebras1.flecs.ComponentView";
-    private static final String MEMORY_ACCESS_CLASS = "io.github.elebras1.flecs.util.internal.MemoryAccess";
+    private static final String MEMORY_ACCESS_CLASS = "io.github.elebras1.flecs.internal.MemoryAccess";
     private static final String WORLD_CLASS = "io.github.elebras1.flecs.World";
 
     @Override

@@ -6,7 +6,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Bee;
 import io.github.elebras1.flecs.examples.components.Flower;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.util.Flecs;
+import io.github.elebras1.flecs.Flecs;
 
 import java.util.Random;
 

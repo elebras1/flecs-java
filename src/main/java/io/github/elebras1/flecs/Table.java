@@ -1,7 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.RowCallback;
-import io.github.elebras1.flecs.util.internal.FlecsAllocator;
+import io.github.elebras1.flecs.internal.FlecsAllocator;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;

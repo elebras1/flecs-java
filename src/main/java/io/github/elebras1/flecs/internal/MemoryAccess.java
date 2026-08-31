@@ -1,4 +1,4 @@
-package io.github.elebras1.flecs.util.internal;
+package io.github.elebras1.flecs.internal;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
