@@ -387,4 +387,21 @@ class ObserverTest {
         earth.set(new Position(5, 6));
         assertEquals(1, count.get());
     }
+
+    @Test
+    void observerCtx() {
+        Object ctx = new Object();
+        FlecsObserver observer = this.world.observer("CtxObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .ctx(ctx)
+                .each(entityId -> { });
+
+        assertEquals(ctx, observer.getCtx());
+
+        // Post-creation ctx update (C++ observer::ctx() parity).
+        Object ctx2 = new Object();
+        observer.setCtx(ctx2);
+        assertEquals(ctx2, observer.getCtx());
+    }
 }

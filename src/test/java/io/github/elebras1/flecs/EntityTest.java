@@ -603,6 +603,15 @@ class EntityTest {
     }
 
     @Test
+    void setSymbol() {
+        Entity entity = this.world.obtainEntity(this.world.entity("symbol_entity"));
+        entity.setSymbol("MySymbol");
+
+        java.lang.foreign.MemorySegment symbolSeg = flecs_h.ecs_get_symbol(this.world.worldSeg(), entity.id());
+        assertNotNull(symbolSeg);
+        assertEquals("MySymbol", symbolSeg.getString(0));
+    }
+
     void slot() {
         long prefab = this.world.entity("prefab");
         Entity child = this.world.obtainEntity(this.world.entity()).childOf(prefab);

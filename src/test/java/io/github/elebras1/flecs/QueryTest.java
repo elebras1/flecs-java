@@ -459,4 +459,16 @@ class QueryTest {
         query.destroy();
     }
 
+    @Test
+    void toJson() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        Query query = this.world.query(Position.class);
+
+        String json = query.toJson();
+        assertNotNull(json);
+        assertTrue(json.contains("\"results\""));
+        assertTrue(json.contains("\"x\":1"));
+        query.destroy();
+    }
+
 }

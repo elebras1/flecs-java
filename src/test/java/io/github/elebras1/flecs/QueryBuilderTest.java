@@ -395,4 +395,120 @@ class QueryBuilderTest {
         assertEquals(List.of("Moon", "Earth"), names);
         query.destroy();
     }
+
+    @Test
+    void selfModifier() {
+        this.world.obtainEntity(this.world.entity("root"));
+        Entity parent = this.world.obtainEntity(this.world.entity("parent")).childOf(this.world.obtainEntity(this.world.entity("root")))
+                .set(new Position(10, 20));
+        this.world.obtainEntity(this.world.entity("childOwn")).childOf(parent).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity("childShared")).childOf(parent);
+
+        // Up only: matches components found via traversal, ignores self-owned.
+        // Parent is excluded (its Position is self-owned, nothing to traverse).
+        Query upOnly = this.world.query()
+                .with(Position.class).term().up()
+                .build();
+        List<String> upNames = new ArrayList<>();
+        upOnly.iter(it -> {
+            for (int i = 0; i < it.count(); i++) {
+                upNames.add(this.world.obtainEntity(it.entity(i)).name());
+            }
+        });
+        upNames.sort(String::compareTo);
+        assertEquals(List.of("childOwn", "childShared"), upNames);
+        upOnly.destroy();
+
+        // Self + up: matches self-owned and traversed components.
+        Query selfUp = this.world.query()
+                .with(Position.class).term().self().up()
+                .build();
+        List<String> selfNames = new ArrayList<>();
+        selfUp.iter(it -> {
+            for (int i = 0; i < it.count(); i++) {
+                selfNames.add(this.world.obtainEntity(it.entity(i)).name());
+            }
+        });
+        selfNames.sort(String::compareTo);
+        assertEquals(List.of("childOwn", "childShared", "parent"), selfNames);
+        selfUp.destroy();
+    }
+
+    @Test
+    void varModifier() {
+        long e1 = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).id();
+        this.world.obtainEntity(this.world.entity()).set(new Position(30, 40)).id();
+
+        Query query = this.world.query()
+                .with(Position.class).var("target")
+                .build();
+
+        AtomicInteger invocations = new AtomicInteger();
+        query.run(it -> {
+            it.setVar("target", e1);
+            while (it.next()) {
+                invocations.incrementAndGet();
+                Position p = it.field(Position.class, 0).get(0);
+                assertEquals(10.0f, p.x());
+            }
+        });
+        assertEquals(1, invocations.get());
+        query.destroy();
+    }
+
+    @Test
+    void readWriteModifiers() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Query query = this.world.query()
+                .with(Position.class).read()
+                .with(Position.class).readWrite()
+                .termAt(1).write()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void queryCtx() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Object ctx = new Object();
+        Query query = this.world.query()
+                .with(Position.class)
+                .ctx(ctx)
+                .build();
+
+        assertEquals(ctx, query.getCtx());
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void iterSetGroup() {
+        long region = this.world.entity("Region");
+        long region1 = this.world.entity("Region1");
+        long region2 = this.world.entity("Region2");
+
+        this.world.obtainEntity(this.world.entity()).add(region, region1).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).add(region, region1).set(new Position(3, 4));
+        this.world.obtainEntity(this.world.entity()).add(region, region2).set(new Position(5, 6));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .groupBy(region)
+                .cached()
+                .build();
+        assertEquals(3, query.count());
+
+        AtomicInteger count = new AtomicInteger();
+        query.run(it -> {
+            it.setGroup(region1);
+            while (it.next()) {
+                count.addAndGet(it.count());
+            }
+        });
+        assertEquals(2, count.get());
+        query.destroy();
+    }
 }

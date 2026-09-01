@@ -3,6 +3,7 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.EntityCallback;
 import io.github.elebras1.flecs.callback.IterCallback;
 import io.github.elebras1.flecs.callback.RunCallback;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -57,6 +58,19 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
     public ObserverBuilder event(Entity event) {
         return this.event(event.id());
+    }
+
+    public ObserverBuilder ctx(Object ctx) {
+        MemorySegment prev = ecs_observer_desc_t.ctx(this.desc);
+        if (prev != null && prev.address() != 0) {
+            ParamRegistry.remove(prev.address());
+            this.world.untrackCtx(prev.address());
+        }
+
+        long id = ParamRegistry.put(ctx);
+        ecs_observer_desc_t.ctx(this.desc, MemorySegment.ofAddress(id));
+        this.world.trackCtx(id);
+        return this;
     }
 
     public ObserverBuilder queryFlags(int flag) {
@@ -400,6 +414,45 @@ public class ObserverBuilder extends ObserverBuilderBase {
         ecs_term_t.trav(termSeg, trav);
 
         return this;
+    }
+
+    public ObserverBuilder self() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'self' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsSelf());
+
+        return this;
+    }
+
+    public ObserverBuilder var(String varName) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'var' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsIsVariable());
+        ecs_term_ref_t.name(srcRefSeg, this.arena.allocateFrom(varName));
+
+        return this;
+    }
+
+    public ObserverBuilder read() {
+        return this.in();
+    }
+
+    public ObserverBuilder write() {
+        return this.out();
+    }
+
+    public ObserverBuilder readWrite() {
+        return this.inOut();
     }
 
     public ObserverBuilder yieldExisting() {

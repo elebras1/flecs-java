@@ -10,10 +10,12 @@ import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class World {
-    public static final MemorySegment WHOLE_MEMORY = MemorySegment.NULL.reinterpret(Long.MAX_VALUE);
+    public static final MemorySegment WHOLE_MEMORY;
     private final MemorySegment worldSeg;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
@@ -25,10 +27,12 @@ public class World {
     private final boolean owned;
     private boolean destroyed;
     private long importingModule;
-    private Object ctx;
+    private long ctxId;
+    private final Set<Long> trackedCtxIds;
 
     static {
         FlecsLoader.load();
+        WHOLE_MEMORY = MemorySegment.NULL.reinterpret(Long.MAX_VALUE);
     }
 
     public World() {
@@ -46,6 +50,7 @@ public class World {
         this.destroyed = false;
         this.importingModule = 0;
         this.owned = true;
+        this.trackedCtxIds = ConcurrentHashMap.newKeySet();
     }
 
     World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
@@ -59,6 +64,7 @@ public class World {
         this.destroyed = false;
         this.importingModule = 0;
         this.owned = false;
+        this.trackedCtxIds = ConcurrentHashMap.newKeySet();
     }
 
     public long entity() {
@@ -354,6 +360,11 @@ public class World {
     public <T> long setWith(Class<T> componentClass) {
         long componentId = this.componentRegistry.getComponentId(componentClass);
         return this.setWith(componentId);
+    }
+
+    public long getWith() {
+        this.checkDestroyed();
+        return flecs_h.ecs_get_with(this.worldSeg);
     }
 
     public int deleteEmptyTables(int limit) {
@@ -863,11 +874,41 @@ public class World {
     }
 
     public void setCtx(Object ctx) {
-        this.ctx = ctx;
+        this.checkDestroyed();
+        if (this.ctxId != 0) {
+            ParamRegistry.remove(this.ctxId);
+            this.ctxId = 0;
+        }
+
+        if (ctx == null) {
+            flecs_h.ecs_set_ctx(this.worldSeg, MemorySegment.NULL, MemorySegment.NULL);
+            return;
+        }
+
+        long id = ParamRegistry.put(ctx);
+        this.ctxId = id;
+        flecs_h.ecs_set_ctx(this.worldSeg, MemorySegment.ofAddress(id), MemorySegment.NULL);
     }
 
     public Object getCtx() {
-        return this.ctx;
+        this.checkDestroyed();
+        MemorySegment ctxSeg = flecs_h.ecs_get_ctx(this.worldSeg);
+        if (ctxSeg == null || ctxSeg.address() == 0) {
+            return null;
+        }
+        return ParamRegistry.get(ctxSeg.address());
+    }
+
+    void trackCtx(long id) {
+        if (id != 0) {
+            this.trackedCtxIds.add(id);
+        }
+    }
+
+    void untrackCtx(long id) {
+        if (id != 0) {
+            this.trackedCtxIds.remove(id);
+        }
     }
 
     public boolean isDeferred() {
@@ -1218,6 +1259,15 @@ public class World {
 
     public void destroy() {
         if (!this.destroyed) {
+            for (long id : this.trackedCtxIds) {
+                ParamRegistry.remove(id);
+            }
+            this.trackedCtxIds.clear();
+            if (this.ctxId != 0) {
+                ParamRegistry.remove(this.ctxId);
+                this.ctxId = 0;
+            }
+
             if (this.owned && this.worldSeg != null && this.worldSeg.address() != 0) {
                 flecs_h.ecs_fini(this.worldSeg);
                 for(World stage : this.stages) {

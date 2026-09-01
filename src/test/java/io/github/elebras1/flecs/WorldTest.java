@@ -535,4 +535,38 @@ class WorldTest {
         this.world.progress(1.0f);
         assertEquals(1.0f, this.world.deltaTime(), 0.0001f);
     }
+
+    @Test
+    void getWith() {
+        long positionId = this.world.getComponentId(Position.class);
+        assertEquals(0, this.world.getWith());
+
+        this.world.setWith(positionId);
+        assertEquals(positionId, this.world.getWith());
+
+        this.world.setWith(0);
+        assertEquals(0, this.world.getWith());
+    }
+
+    @Test
+    void worldCtx() {
+        assertNull(this.world.getCtx());
+
+        Object ctx = new Object();
+        this.world.setCtx(ctx);
+        assertEquals(ctx, this.world.getCtx());
+
+        this.world.setCtx(null);
+        assertNull(this.world.getCtx());
+    }
+
+    @Test
+    void scriptRunAndUpdate() {
+        Entity script = this.world.script("ScriptEntityA {}").name("managed_script").run();
+        assertNotEquals(0, this.world.lookup("ScriptEntityA"));
+
+        this.world.script("ScriptEntityB {}").update(script);
+        assertNotEquals(0, this.world.lookup("ScriptEntityB"));
+        assertEquals(0, this.world.lookup("ScriptEntityA"));
+    }
 }

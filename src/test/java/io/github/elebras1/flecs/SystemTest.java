@@ -255,4 +255,14 @@ class SystemTest {
         sys.run();
         assertNull(received.get());
     }
+
+    @Test
+    void timerStartStop() {
+        Entity timer = this.world.timer().interval(1.0f).build();
+
+        timer.startTimer();
+        assertTrue(timer.isAlive());
+        timer.stopTimer();
+        assertTrue(timer.isAlive());
+    }
 }

@@ -4,9 +4,11 @@ import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.callback.ComparatorComponentView;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import io.github.elebras1.flecs.callback.GroupByCallback;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 public class QueryBuilder {
 
@@ -452,6 +454,57 @@ public class QueryBuilder {
         MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         ecs_term_t.trav(termSeg, trav);
 
+        return this;
+    }
+
+    public QueryBuilder self() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'self' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsSelf());
+
+        return this;
+    }
+
+    public QueryBuilder var(String varName) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'var' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsIsVariable());
+        ecs_term_ref_t.name(srcRefSeg, this.arena.allocateFrom(varName));
+
+        return this;
+    }
+
+    public QueryBuilder read() {
+        return this.in();
+    }
+
+    public QueryBuilder write() {
+        return this.out();
+    }
+
+    public QueryBuilder readWrite() {
+        return this.inout();
+    }
+
+    public QueryBuilder ctx(Object ctx) {
+        long offset = ecs_query_desc_t.ctx$offset();
+        MemorySegment prev = this.desc.get(ValueLayout.ADDRESS, offset);
+        if (prev != null && prev.address() != 0) {
+            ParamRegistry.remove(prev.address());
+            this.world.untrackCtx(prev.address());
+        }
+
+        long id = ParamRegistry.put(ctx);
+        this.desc.set(ValueLayout.ADDRESS, offset, MemorySegment.ofAddress(id));
+        this.world.trackCtx(id);
         return this;
     }
 

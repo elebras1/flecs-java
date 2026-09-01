@@ -308,6 +308,21 @@ public class Entity extends EntityBase<Entity> {
         return this;
     }
 
+    public Entity setSymbol(String symbol) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            flecs_h.ecs_set_symbol(this.world.worldSeg(), this.id, tempArena.allocateFrom(symbol));
+        }
+        return this;
+    }
+
+    public void startTimer() {
+        flecs_h.ecs_start_timer(this.world.worldSeg(), this.id);
+    }
+
+    public void stopTimer() {
+        flecs_h.ecs_stop_timer(this.world.worldSeg(), this.id);
+    }
+
     public long targetFor(long relationId, long componentId) {
         return flecs_h.ecs_get_target_for_id(this.world.worldSeg(), this.id, relationId, componentId);
     }

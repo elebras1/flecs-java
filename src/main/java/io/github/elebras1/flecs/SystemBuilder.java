@@ -1,6 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.*;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -96,6 +97,19 @@ public class SystemBuilder extends SystemBuilderBase {
 
     public SystemBuilder immediate(boolean immediate) {
         ecs_system_desc_t.immediate(this.desc, immediate);
+        return this;
+    }
+
+    public SystemBuilder ctx(Object ctx) {
+        MemorySegment prev = ecs_system_desc_t.ctx(this.desc);
+        if (prev != null && prev.address() != 0) {
+            ParamRegistry.remove(prev.address());
+            this.world.untrackCtx(prev.address());
+        }
+
+        long id = ParamRegistry.put(ctx);
+        ecs_system_desc_t.ctx(this.desc, MemorySegment.ofAddress(id));
+        this.world.trackCtx(id);
         return this;
     }
 
@@ -374,6 +388,46 @@ public class SystemBuilder extends SystemBuilderBase {
         ecs_term_t.trav(termSeg, trav);
 
         return this;
+    }
+
+    public SystemBuilder self() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'self' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsSelf());
+
+        return this;
+    }
+
+    public SystemBuilder var(String varName) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'var' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsIsVariable());
+        ecs_term_ref_t.name(srcRefSeg, this.arena.allocateFrom(varName));
+
+        return this;
+    }
+
+    public SystemBuilder readWrite(long componentId) {
+        return this.with(componentId).inOut();
+    }
+
+    public SystemBuilder readWrite(Entity entity) {
+        return this.with(entity.id()).inOut();
+    }
+
+    public <T> SystemBuilder readWrite(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.readWrite(componentId);
     }
 
     public SystemBuilder write(long componentId) {

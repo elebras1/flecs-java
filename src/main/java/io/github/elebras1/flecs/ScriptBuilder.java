@@ -42,13 +42,33 @@ public class ScriptBuilder {
         }
     }
 
-    public void run() {
+    public long run() {
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment nameSeg = (this.name != null) ? arena.allocateFrom(this.name) : MemorySegment.NULL;
-            MemorySegment codeSeg = (this.code != null) ? arena.allocateFrom(this.code) : MemorySegment.NULL;
-            int result = flecs_h.ecs_script_run(this.world.worldSeg(), nameSeg, codeSeg, MemorySegment.NULL);
-            if (result != 0) {
+            MemorySegment desc = ecs_script_desc_t.allocate(arena);
+            if (this.name != null) {
+                ecs_script_desc_t.filename(desc, arena.allocateFrom(this.name));
+            }
+            if (this.code != null) {
+                ecs_script_desc_t.code(desc, arena.allocateFrom(this.code));
+            }
+
+            long scriptId = flecs_h.ecs_script_init(this.world.worldSeg(), desc);
+            if (scriptId == 0) {
                 throw new RuntimeException("Flecs script execution failed. Check console for parsing errors.");
+            }
+            return scriptId;
+        }
+    }
+
+    public void update(Entity script) {
+        this.update(script, this.code);
+    }
+
+    public void update(Entity script, String newCode) {
+        try (Arena arena = Arena.ofConfined()) {
+            int result = flecs_h.ecs_script_update(this.world.worldSeg(), script.id(), 0, arena.allocateFrom(newCode));
+            if (result != 0) {
+                throw new RuntimeException("Flecs script update failed. Check console for parsing errors.");
             }
         }
     }

@@ -3,6 +3,7 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.EntityCallback;
 import io.github.elebras1.flecs.callback.IterCallback;
 import io.github.elebras1.flecs.callback.RunCallback;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -138,10 +139,34 @@ public class Query extends QueryBase {
         return strSeg.getString(0);
     }
 
+    public String toJson() {
+        this.checkDestroyed();
+        MemorySegment iterSeg = this.createIterSeg();
+        MemorySegment jsonSeg = flecs_h.ecs_iter_to_json(iterSeg, MemorySegment.NULL);
+        if (jsonSeg.address() == 0) {
+            return null;
+        }
+        return jsonSeg.getString(0);
+    }
+
+    public Object getCtx() {
+        this.checkDestroyed();
+        MemorySegment ctxSeg = ecs_query_t.ctx(this.querySeg);
+        if (ctxSeg == null || ctxSeg.address() == 0) {
+            return null;
+        }
+        return ParamRegistry.get(ctxSeg.address());
+    }
+
     public void destroy() {
         if (!this.destroyed) {
             this.destroyed = true;
             if (this.querySeg != null && this.querySeg.address() != 0) {
+                MemorySegment ctxSeg = ecs_query_t.ctx(this.querySeg);
+                if (ctxSeg != null && ctxSeg.address() != 0) {
+                    ParamRegistry.remove(ctxSeg.address());
+                    this.world.untrackCtx(ctxSeg.address());
+                }
                 flecs_h.ecs_query_fini(this.querySeg);
             }
             this.arena.close();

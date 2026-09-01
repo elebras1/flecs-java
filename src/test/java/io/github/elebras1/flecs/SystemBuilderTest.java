@@ -219,4 +219,25 @@ class SystemBuilderTest {
         sys.run();
         assertEquals(1, count.get());
     }
+
+    @Test
+    void ctxAndSetGroup() {
+        Object ctx = new Object();
+        FlecsSystem sys = this.world.system("CtxSystem")
+                .with(Position.class)
+                .ctx(ctx)
+                .each(entityId -> { });
+
+        assertEquals(ctx, sys.getCtx());
+
+        // Post-creation ctx update (C++ system::ctx() parity).
+        Object ctx2 = new Object();
+        sys.setCtx(ctx2);
+        assertEquals(ctx2, sys.getCtx());
+
+        sys.setCtx(null);
+        assertNull(sys.getCtx());
+
+        sys.setGroup(1);
+    }
 }

@@ -114,6 +114,18 @@ public class Iter {
         flecs_h.ecs_iter_skip(this.iterSeg);
     }
 
+    public void setGroup(long groupId) {
+        flecs_h.ecs_iter_set_group(this.iterSeg, groupId);
+    }
+
+    public String toJson() {
+        MemorySegment jsonSeg = flecs_h.ecs_iter_to_json(this.iterSeg, MemorySegment.NULL);
+        if (jsonSeg.address() == 0) {
+            return null;
+        }
+        return jsonSeg.getString(0);
+    }
+
     public Table otherTable() {
         MemorySegment tableSeg = ecs_iter_t.other_table(this.iterSeg);
         if (tableSeg == null || tableSeg.address() == 0) {
