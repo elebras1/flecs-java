@@ -49,4 +49,20 @@ class AlertTest {
 
         assertTrue(alert.id() != 0);
     }
+
+    @Test
+    void alertWithQueryFlags() {
+        this.world.alerts();
+        this.world.component(Position.class);
+
+        Entity alert = this.world.alert("flagged_alert")
+                .with(Position.class)
+                .queryFlags(Flecs.QueryDetectChanges)
+                .queryFlags(Flecs.QueryMatchEmptyTables)
+                .cached()
+                .message("Entity has Position")
+                .build();
+
+        assertTrue(alert.id() != 0);
+    }
 }

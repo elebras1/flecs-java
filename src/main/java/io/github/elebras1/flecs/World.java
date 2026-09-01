@@ -178,6 +178,16 @@ public class World {
         return this.pair(first.id(), secondEntity.id());
     }
 
+    public Id pair(Class<?> first, long second) {
+        long firstId = this.componentRegistry.getComponentId(first);
+        return this.pair(firstId, second);
+    }
+
+    public Id pair(Class<?> first, Entity second) {
+        long firstId = this.componentRegistry.getComponentId(first);
+        return this.pair(firstId, second.id());
+    }
+
     public void makeAlive(long entityId) {
         this.checkDestroyed();
         flecs_h.ecs_make_alive(this.worldSeg, entityId);

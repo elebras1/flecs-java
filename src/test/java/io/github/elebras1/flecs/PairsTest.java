@@ -716,6 +716,27 @@ class PairsTest {
     }
 
     @Test
+    void pairWithClassAndLong() {
+        long obj = world.entity();
+        Id pair = world.pair(Tag.class, obj);
+
+        assertTrue(pair.isPair());
+        assertEquals(tagId, pair.first());
+        assertEquals(obj, pair.second());
+    }
+
+    @Test
+    void pairWithClassAndEntity() {
+        Entity obj = world.obtainEntity(world.entity());
+        Id pair = world.pair(Tag.class, obj);
+
+        assertTrue(pair.isPair());
+        assertEquals(tagId, pair.first());
+        assertEquals(obj.id(), pair.second());
+        assertEquals(world.pair(tagId, obj.id()).id(), pair.id());
+    }
+
+    @Test
     void modifiedTagFirst() {
         AtomicInteger count = new AtomicInteger();
         world.observer()

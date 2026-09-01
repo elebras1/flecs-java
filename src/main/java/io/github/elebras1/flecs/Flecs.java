@@ -110,6 +110,8 @@ public final class Flecs {
     public static final int OrFrom = flecs_h.EcsOrFrom();
     public static final int NotFrom = flecs_h.EcsNotFrom();
 
+    public static final int ObserverMatchPrefab = flecs_h.EcsObserverMatchPrefab();
+    public static final int ObserverMatchDisabled = flecs_h.EcsObserverMatchDisabled();
     public static final int ObserverYieldOnCreate = flecs_h.EcsObserverYieldOnCreate();
     public static final int ObserverYieldOnDelete = flecs_h.EcsObserverYieldOnDelete();
 

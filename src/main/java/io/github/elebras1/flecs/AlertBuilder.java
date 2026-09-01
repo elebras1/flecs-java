@@ -121,6 +121,21 @@ public class AlertBuilder {
         return this;
     }
 
+    public AlertBuilder queryFlags(int flag) {
+        MemorySegment queryDesc = ecs_alert_desc_t.query(this.desc);
+        ecs_query_desc_t.flags(queryDesc, ecs_query_desc_t.flags(queryDesc) | flag);
+        return this;
+    }
+
+    public AlertBuilder cached() {
+        ecs_query_desc_t.cache_kind(ecs_alert_desc_t.query(this.desc), Flecs.QueryCacheAuto);
+        return this;
+    }
+
+    public AlertBuilder detectChanges() {
+        return this.queryFlags(Flecs.QueryDetectChanges);
+    }
+
     public Entity build() {
         try {
             long id = flecs_h.ecs_alert_init(this.world.worldSeg(), this.desc);

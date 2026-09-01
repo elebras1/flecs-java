@@ -209,6 +209,96 @@ class ObserverTest {
     }
 
     @Test
+    void observerFlagsAccumulate() {
+        long e1 = this.world.obtainEntity(this.world.entity()).add(Position.class).id();
+
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .observerFlags(Flecs.ObserverYieldOnCreate)
+                .observerFlags(Flecs.ObserverYieldOnDelete)
+                .each(entityId -> count.incrementAndGet());
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void observerMatchPrefab() {
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .observerFlags(Flecs.ObserverMatchPrefab)
+                .each(entityId -> count.incrementAndGet());
+
+        Entity prefab = this.world.obtainEntity(this.world.entity())
+                .add(Flecs.Prefab)
+                .add(Position.class);
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void observerMatchDisabled() {
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .observerFlags(Flecs.ObserverMatchDisabled)
+                .each(entityId -> count.incrementAndGet());
+
+        Entity disabled = this.world.obtainEntity(this.world.entity())
+                .add(Flecs.Disabled)
+                .add(Position.class);
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void observerNotMatchPrefabByDefault() {
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .each(entityId -> count.incrementAndGet());
+
+        Entity prefab = this.world.obtainEntity(this.world.entity())
+                .add(Flecs.Prefab)
+                .add(Position.class);
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void observerQueryFlags() {
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .queryFlags(Flecs.QueryMatchEmptyTables)
+                .queryFlags(Flecs.QueryDetectChanges)
+                .cached()
+                .each(entityId -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void observerFlagsRejectsYieldWithYieldExisting() {
+        assertThrows(IllegalStateException.class, () -> this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .yieldExisting()
+                .observerFlags(Flecs.ObserverYieldOnCreate));
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .observerFlags(Flecs.ObserverYieldOnDelete)
+                .yieldExisting());
+    }
+
+    @Test
     void onAddExpr() {
         long tag = this.world.entity();
 
@@ -279,6 +369,22 @@ class ObserverTest {
 
         observer.enable();
         this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void parentTerm() {
+        Entity sun = this.world.obtainEntity(this.world.entity("Sun")).set(new Position(10, 20));
+        Entity earth = this.world.obtainEntity(this.world.entity("Earth")).childOf(sun);
+
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer("ParentObserver")
+                .event(Flecs.OnSet)
+                .with(Position.class)
+                .with(Position.class).parent()
+                .each(entityId -> count.incrementAndGet());
+
+        earth.set(new Position(5, 6));
         assertEquals(1, count.get());
     }
 }

@@ -21,9 +21,7 @@ public class RelationComponent {
     public static void main(String[] args) {
         World world = new World();
 
-        long requiresId = world.component(Requires.class);
         long gigawattsId = world.component(Gigawatts.class);
-        long expiresId = world.component(Expires.class);
         long positionId = world.component(Position.class);
         long mustHaveId = world.component(MustHave.class);
 
@@ -52,11 +50,11 @@ public class RelationComponent {
         world.obtainEntity(world.entity()).add(mustHaveId, positionId);
 
         // Print the component type used by each pair.
-        Id requiresPair = world.pair(requiresId, gigawattsId);
+        Id requiresPair = world.pair(Requires.class, gigawattsId);
         System.out.println(world.obtainEntity(requiresPair.typeId()).name());
         System.out.println(world.obtainEntity(requiresPair.typeId()).name());
-        System.out.println(world.obtainEntity(world.pair(expiresId, positionId).typeId()).name());
-        System.out.println(world.pair(mustHaveId, positionId).typeId());
+        System.out.println(world.obtainEntity(world.pair(Expires.class, positionId).typeId()).name());
+        System.out.println(world.pair(MustHave.class, positionId).typeId());
 
         // Query for all (Requires, Gigawatts) pairs and print the payload.
         Query query = world.query()

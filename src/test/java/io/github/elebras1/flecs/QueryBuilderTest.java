@@ -274,4 +274,125 @@ class QueryBuilderTest {
         assertEquals(1, query.count());
         query.destroy();
     }
+
+    @Test
+    void queryFlagsAccumulate() {
+        Query query = this.world.query()
+                .with(Position.class)
+                .queryFlags(Flecs.QueryDetectChanges)
+                .queryFlags(Flecs.QueryMatchEmptyTables)
+                .build();
+
+        assertTrue(query.changed());
+
+        query.count();
+        assertFalse(query.changed());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+        assertTrue(query.changed());
+
+        query.destroy();
+    }
+
+    @Test
+    void parent() {
+        Entity sun = this.world.obtainEntity(this.world.entity("Sun")).set(new Position(10, 20));
+        this.world.obtainEntity(this.world.entity("Earth")).childOf(sun).set(new Position(1, 2));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Position.class).termAt(1).parent()
+                .build();
+
+        List<String> names = new ArrayList<>();
+        List<Float> parentXs = new ArrayList<>();
+        query.iter(it -> {
+            Field<Position> parental = it.field(Position.class, 1);
+            assertEquals(1, parental.count());
+            for (int i = 0; i < it.count(); i++) {
+                names.add(this.world.obtainEntity(it.entity(i)).name());
+                parentXs.add(parental.get(0).x());
+            }
+        });
+
+        assertEquals(List.of("Earth"), names);
+        assertEquals(List.of(10.0f), parentXs);
+        query.destroy();
+    }
+
+    @Test
+    void parentWithCustomRelationship() {
+        long layered = this.world.entity("Layered");
+        this.world.obtainEntity(layered).add(Flecs.Traversable);
+
+        Entity root = this.world.obtainEntity(this.world.entity("root")).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity("leaf"))
+                .set(new Position(3, 4))
+                .add(layered, root.id());
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Position.class).termAt(1).up(layered)
+                .build();
+
+        List<Float> parentXs = new ArrayList<>();
+        query.iter(it -> {
+            Field<Position> parental = it.field(Position.class, 1);
+            for (int i = 0; i < it.count(); i++) {
+                parentXs.add(parental.get(0).x());
+            }
+        });
+
+        assertEquals(List.of(1.0f), parentXs);
+        query.destroy();
+    }
+
+    @Test
+    void cascade() {
+        Entity sun = this.world.obtainEntity(this.world.entity("Sun")).set(new Position(10, 20));
+        Entity earth = this.world.obtainEntity(this.world.entity("Earth")).childOf(sun).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity("Moon")).childOf(earth).set(new Position(3, 4));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Position.class).termAt(1).cascade()
+                .build();
+
+        List<String> names = new ArrayList<>();
+        List<Float> parentXs = new ArrayList<>();
+        query.iter(it -> {
+            Field<Position> parental = it.field(Position.class, 1);
+            for (int i = 0; i < it.count(); i++) {
+                names.add(this.world.obtainEntity(it.entity(i)).name());
+                parentXs.add(parental.get(0).x());
+            }
+        });
+
+        // Breadth-first: Earth (depth 1) before Moon (depth 2).
+        assertEquals(List.of("Earth", "Moon"), names);
+        assertEquals(List.of(10.0f, 1.0f), parentXs);
+        query.destroy();
+    }
+
+    @Test
+    void cascadeDesc() {
+        Entity sun = this.world.obtainEntity(this.world.entity("Sun")).set(new Position(10, 20));
+        Entity earth = this.world.obtainEntity(this.world.entity("Earth")).childOf(sun).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity("Moon")).childOf(earth).set(new Position(3, 4));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Position.class).termAt(1).cascade().desc()
+                .build();
+
+        List<String> names = new ArrayList<>();
+        query.iter(it -> {
+            for (int i = 0; i < it.count(); i++) {
+                names.add(this.world.obtainEntity(it.entity(i)).name());
+            }
+        });
+
+        assertEquals(List.of("Moon", "Earth"), names);
+        query.destroy();
+    }
 }

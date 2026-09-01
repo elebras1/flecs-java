@@ -186,4 +186,37 @@ class SystemBuilderTest {
         this.world.progress();
         assertEquals(1, count.get());
     }
+
+    @Test
+    void queryFlags() {
+        long e1 = this.world.obtainEntity(this.world.entity()).add(Position.class).id();
+
+        FlecsSystem sys = this.world.system()
+                .with(Position.class)
+                .queryFlags(Flecs.QueryDetectChanges)
+                .queryFlags(Flecs.QueryMatchEmptyTables)
+                .cached()
+                .each(entityId -> { });
+
+        sys.run();
+    }
+
+    @Test
+    void parentTerm() {
+        Entity sun = this.world.obtainEntity(this.world.entity("Sun")).set(new Position(10, 20));
+        this.world.obtainEntity(this.world.entity("Earth")).childOf(sun).set(new Position(1, 2));
+
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem sys = this.world.system("ParentSystem")
+                .with(Position.class)
+                .with(Position.class).parent()
+                .iter(it -> {
+                    Field<Position> parental = it.field(Position.class, 1);
+                    assertEquals(1, parental.count());
+                    count.addAndGet(it.count());
+                });
+
+        sys.run();
+        assertEquals(1, count.get());
+    }
 }

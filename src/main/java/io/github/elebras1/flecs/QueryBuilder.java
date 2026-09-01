@@ -158,14 +158,12 @@ public class QueryBuilder {
     }
 
     public QueryBuilder queryFlags(int flag) {
-        ecs_query_desc_t.flags(this.desc, flag);
+        ecs_query_desc_t.flags(this.desc, ecs_query_desc_t.flags(this.desc) | flag);
         return this;
     }
 
     public QueryBuilder detectChanges() {
-        int flags = ecs_query_desc_t.flags(this.desc);
-        ecs_query_desc_t.flags(this.desc, flags | Flecs.QueryDetectChanges);
-        return this;
+        return this.queryFlags(Flecs.QueryDetectChanges);
     }
 
     public QueryBuilder termAt(int index) {
@@ -388,6 +386,73 @@ public class QueryBuilder {
 
     public QueryBuilder groupBy(Entity entity, GroupByCallback groupByCallback) {
         return this.groupBy(entity.id(), groupByCallback);
+    }
+
+    public QueryBuilder up() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'up' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsUp());
+
+        return this;
+    }
+
+    public QueryBuilder up(long trav) {
+        this.up();
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public QueryBuilder parent() {
+        return this.up();
+    }
+
+    public QueryBuilder cascade() {
+        this.up();
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsCascade());
+
+        return this;
+    }
+
+    public QueryBuilder cascade(long trav) {
+        this.cascade();
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public QueryBuilder desc() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'desc' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsDesc());
+
+        return this;
+    }
+
+    public QueryBuilder trav(long trav) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'trav' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
     }
 
     public Query build() {

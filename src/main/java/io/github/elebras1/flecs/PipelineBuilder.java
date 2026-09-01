@@ -62,6 +62,21 @@ public class PipelineBuilder {
         return this;
     }
 
+    public PipelineBuilder queryFlags(int flag) {
+        MemorySegment queryDesc = ecs_pipeline_desc_t.query(this.desc);
+        ecs_query_desc_t.flags(queryDesc, ecs_query_desc_t.flags(queryDesc) | flag);
+        return this;
+    }
+
+    public PipelineBuilder cached() {
+        ecs_query_desc_t.cache_kind(ecs_pipeline_desc_t.query(this.desc), Flecs.QueryCacheAuto);
+        return this;
+    }
+
+    public PipelineBuilder detectChanges() {
+        return this.queryFlags(Flecs.QueryDetectChanges);
+    }
+
     public Pipeline build() {
         long pipelineId = flecs_h.ecs_pipeline_init(this.world.worldSeg(), this.desc);
 

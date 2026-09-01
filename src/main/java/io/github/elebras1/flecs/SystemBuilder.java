@@ -49,6 +49,21 @@ public class SystemBuilder extends SystemBuilderBase {
         return this;
     }
 
+    public SystemBuilder queryFlags(int flag) {
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        ecs_query_desc_t.flags(queryDescSeg, ecs_query_desc_t.flags(queryDescSeg) | flag);
+        return this;
+    }
+
+    public SystemBuilder cached() {
+        ecs_query_desc_t.cache_kind(ecs_system_desc_t.query(this.desc), Flecs.QueryCacheAuto);
+        return this;
+    }
+
+    public SystemBuilder detectChanges() {
+        return this.queryFlags(Flecs.QueryDetectChanges);
+    }
+
     public SystemBuilder interval(float interval) {
         ecs_system_desc_t.interval(this.desc, interval);
         return this;
@@ -286,6 +301,79 @@ public class SystemBuilder extends SystemBuilderBase {
 
     public SystemBuilder notFrom() {
         return this.operator(Flecs.NotFrom);
+    }
+
+    public SystemBuilder up() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'up' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsUp());
+
+        return this;
+    }
+
+    public SystemBuilder up(long trav) {
+        this.up();
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public SystemBuilder parent() {
+        return this.up();
+    }
+
+    public SystemBuilder cascade() {
+        this.up();
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsCascade());
+
+        return this;
+    }
+
+    public SystemBuilder cascade(long trav) {
+        this.cascade();
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public SystemBuilder desc() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'desc' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsDesc());
+
+        return this;
+    }
+
+    public SystemBuilder trav(long trav) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'trav' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
     }
 
     public SystemBuilder write(long componentId) {

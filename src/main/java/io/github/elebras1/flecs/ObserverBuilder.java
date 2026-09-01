@@ -59,6 +59,21 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this.event(event.id());
     }
 
+    public ObserverBuilder queryFlags(int flag) {
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        ecs_query_desc_t.flags(queryDescSeg, ecs_query_desc_t.flags(queryDescSeg) | flag);
+        return this;
+    }
+
+    public ObserverBuilder cached() {
+        ecs_query_desc_t.cache_kind(ecs_observer_desc_t.query(this.desc), Flecs.QueryCacheAuto);
+        return this;
+    }
+
+    public ObserverBuilder detectChanges() {
+        return this.queryFlags(Flecs.QueryDetectChanges);
+    }
+
     public ObserverBuilder with(long componentId) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
@@ -314,19 +329,102 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this.operator(Flecs.NotFrom);
     }
 
-    public ObserverBuilder yieldExisting() {
-        ecs_observer_desc_t.yield_existing(this.desc, true);
+    public ObserverBuilder up() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'up' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsUp());
+
         return this;
     }
 
+    public ObserverBuilder up(long trav) {
+        this.up();
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public ObserverBuilder parent() {
+        return this.up();
+    }
+
+    public ObserverBuilder cascade() {
+        this.up();
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsCascade());
+
+        return this;
+    }
+
+    public ObserverBuilder cascade(long trav) {
+        this.cascade();
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public ObserverBuilder desc() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'desc' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsDesc());
+
+        return this;
+    }
+
+    public ObserverBuilder trav(long trav) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'trav' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.trav(termSeg, trav);
+
+        return this;
+    }
+
+    public ObserverBuilder yieldExisting() {
+        return this.yieldExisting(true);
+    }
+
     public ObserverBuilder yieldExisting(boolean yieldExisting) {
+        if (yieldExisting && (this.currentObserverFlags() & (Flecs.ObserverYieldOnCreate | Flecs.ObserverYieldOnDelete)) != 0) {
+            throw new IllegalStateException("yieldExisting() cannot be combined with ObserverYieldOnCreate/ObserverYieldOnDelete flags");
+        }
         ecs_observer_desc_t.yield_existing(this.desc, yieldExisting);
         return this;
     }
 
     public ObserverBuilder observerFlags(int flags) {
-        ecs_observer_desc_t.flags_(this.desc, flags);
+        if (ecs_observer_desc_t.yield_existing(this.desc)
+                && (flags & (Flecs.ObserverYieldOnCreate | Flecs.ObserverYieldOnDelete)) != 0) {
+            throw new IllegalStateException("ObserverYieldOnCreate/ObserverYieldOnDelete flags cannot be combined with yieldExisting()");
+        }
+        ecs_observer_desc_t.flags_(this.desc, this.currentObserverFlags() | flags);
         return this;
+    }
+
+    private int currentObserverFlags() {
+        return ecs_observer_desc_t.flags_(this.desc);
     }
 
     public FlecsObserver iter(IterCallback callback) {
