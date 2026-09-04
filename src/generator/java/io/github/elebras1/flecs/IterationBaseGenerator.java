@@ -15,7 +15,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
     private static final String ECS_SYSTEM_DESC_T_FQN = "io.github.elebras1.flecs.ecs_system_desc_t";
     private static final String ECS_OBSERVER_DESC_T_FQN = "io.github.elebras1.flecs.ecs_observer_desc_t";
     private static final String FLECS_SYSTEM_FQN = "io.github.elebras1.flecs.FlecsSystem";
-    private static final String FLECS_OBSERVER_FQN = "io.github.elebras1.flecs.FlecsObserver";
+    private static final String FLECS_OBSERVER_FQN = "io.github.elebras1.flecs.Observer";
 
     private enum BuilderKind {
         SYSTEM(FLECS_SYSTEM_FQN, ECS_SYSTEM_DESC_T_FQN),

@@ -563,9 +563,14 @@ public class World {
         return observerBuilder;
     }
 
-    public TimerBuilder timer() {
+    public Timer timer() {
         this.checkDestroyed();
-        return new TimerBuilder(this);
+        return new Timer(this, this.entity());
+    }
+
+    public Timer timer(long entityId) {
+        this.checkDestroyed();
+        return new Timer(this, entityId);
     }
 
     public ScriptBuilder script(String code) {

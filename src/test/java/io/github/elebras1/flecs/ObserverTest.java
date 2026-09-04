@@ -358,7 +358,7 @@ class ObserverTest {
     @Test
     void enableDisable() {
         AtomicInteger count = new AtomicInteger();
-        FlecsObserver observer = this.world.observer()
+        Observer observer = this.world.observer()
                 .event(Flecs.OnAdd)
                 .with(Position.class)
                 .each(entityId -> count.incrementAndGet());
@@ -391,7 +391,7 @@ class ObserverTest {
     @Test
     void observerCtx() {
         Object ctx = new Object();
-        FlecsObserver observer = this.world.observer("CtxObserver")
+        Observer observer = this.world.observer("CtxObserver")
                 .event(Flecs.OnAdd)
                 .with(Position.class)
                 .ctx(ctx)

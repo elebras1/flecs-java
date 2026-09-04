@@ -315,14 +315,6 @@ public class Entity extends EntityBase<Entity> {
         return this;
     }
 
-    public void startTimer() {
-        flecs_h.ecs_start_timer(this.world.worldSeg(), this.id);
-    }
-
-    public void stopTimer() {
-        flecs_h.ecs_stop_timer(this.world.worldSeg(), this.id);
-    }
-
     public long targetFor(long relationId, long componentId) {
         return flecs_h.ecs_get_target_for_id(this.world.worldSeg(), this.id, relationId, componentId);
     }
@@ -603,7 +595,7 @@ public class Entity extends EntityBase<Entity> {
         flecs_h.ecs_enable(this.world.worldSeg(), this.id, false);
     }
 
-    public FlecsObserver observe(long eventId, Runnable callback) {
+    public Observer observe(long eventId, Runnable callback) {
         return this.world.observer()
                 .event(eventId)
                 .with(Flecs.Any)
@@ -614,7 +606,7 @@ public class Entity extends EntityBase<Entity> {
                 });
     }
 
-    public <T> FlecsObserver observe(Class<T> eventClass, Consumer<T> callback) {
+    public <T> Observer observe(Class<T> eventClass, Consumer<T> callback) {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
         return this.world.observer()
                 .event(eventId)

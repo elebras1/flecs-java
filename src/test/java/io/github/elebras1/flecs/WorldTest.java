@@ -562,7 +562,7 @@ class WorldTest {
 
     @Test
     void scriptRunAndUpdate() {
-        Entity script = this.world.script("ScriptEntityA {}").name("managed_script").run();
+        Entity script = this.world.obtainEntity(this.world.script("ScriptEntityA {}").name("managed_script").run());
         assertNotEquals(0, this.world.lookup("ScriptEntityA"));
 
         this.world.script("ScriptEntityB {}").update(script);

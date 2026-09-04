@@ -5,12 +5,12 @@ import io.github.elebras1.flecs.internal.ParamRegistry;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
-public class FlecsObserver {
+public class Observer {
 
     private final World world;
     private final long observerId;
 
-    FlecsObserver(World world, long observerId) {
+    Observer(World world, long observerId) {
         this.world = world;
         this.observerId = observerId;
     }
@@ -86,7 +86,7 @@ public class FlecsObserver {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof FlecsObserver other)) {
+        if (!(obj instanceof Observer other)) {
             return false;
         }
         return this.observerId == other.observerId && this.world == other.world;

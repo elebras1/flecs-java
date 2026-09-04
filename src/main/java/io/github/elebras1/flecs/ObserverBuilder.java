@@ -480,7 +480,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return ecs_observer_desc_t.flags_(this.desc);
     }
 
-    public FlecsObserver iter(IterCallback callback) {
+    public Observer iter(IterCallback callback) {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
@@ -494,7 +494,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return build();
     }
 
-    public FlecsObserver run(RunCallback callback) {
+    public Observer run(RunCallback callback) {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
@@ -508,7 +508,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return build();
     }
 
-    public FlecsObserver each(EntityCallback callback) {
+    public Observer each(EntityCallback callback) {
         this.entityCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
@@ -526,7 +526,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
     }
 
     @Override
-    protected FlecsObserver build() {
+    protected Observer build() {
         long observerId = flecs_h.ecs_observer_init(this.world.worldSeg(), this.desc);
 
         if (observerId == 0) {
@@ -537,6 +537,6 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
         this.arena.close();
 
-        return new FlecsObserver(this.world, observerId);
+        return new Observer(this.world, observerId);
     }
 }

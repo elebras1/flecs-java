@@ -258,11 +258,11 @@ class SystemTest {
 
     @Test
     void timerStartStop() {
-        Entity timer = this.world.timer().interval(1.0f).build();
+        Timer timer = this.world.timer().interval(1.0f);
 
-        timer.startTimer();
+        timer.start();
         assertTrue(timer.isAlive());
-        timer.stopTimer();
+        timer.stop();
         assertTrue(timer.isAlive());
     }
 }
