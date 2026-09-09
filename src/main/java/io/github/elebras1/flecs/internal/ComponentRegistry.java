@@ -27,6 +27,17 @@ public class ComponentRegistry {
         this.componentIds = new ClassLongMap(ComponentMap.size());
         this.componentClasses = new LongClassMap(ComponentMap.size());
         this.components = new LongObjectMap<>(ComponentMap.size());
+        this.registerBuiltins();
+    }
+
+    private void registerBuiltins() {
+        this.registerBuiltin(ComponentInfo.class, flecs_h.FLECS_IDEcsComponentID_(), ComponentInfoComponent.getInstance());
+    }
+
+    private void registerBuiltin(Class<?> componentClass, long componentId, Component<?> component) {
+        this.componentIds.put(componentClass, componentId);
+        this.componentClasses.put(componentId, componentClass);
+        this.components.put(componentId, component);
     }
 
     public <T> long register(Class<T> componentClass) {

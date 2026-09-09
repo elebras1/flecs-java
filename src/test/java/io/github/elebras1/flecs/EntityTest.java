@@ -40,6 +40,16 @@ class EntityTest {
     }
 
     @Test
+    void getBuiltinComponentInfo() {
+        Entity posEntity = this.world.obtainEntity(this.world.component(Position.class));
+
+        ComponentInfo c = posEntity.get(ComponentInfo.class);
+        assertNotNull(c);
+        assertEquals(8, c.size());
+        assertEquals(4, c.alignment());
+    }
+
+    @Test
     void newNamed() {
         Entity entity = this.world.obtainEntity(this.world.entity("Foo"));
         assertNotNull(entity);
