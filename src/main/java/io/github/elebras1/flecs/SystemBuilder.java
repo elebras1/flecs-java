@@ -598,11 +598,11 @@ public class SystemBuilder extends SystemBuilderBase {
     public FlecsSystem run(RunCallback callback) {
         this.runCallback = callback;
 
-        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
-            MemorySegment stageSeg = ecs_iter_t.world(iterSegment);
+        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
+            MemorySegment stageSeg = ecs_iter_t.world(iterSeg);
             int stageId = flecs_h.ecs_stage_get_id(stageSeg);
             Iter iter = this.iters[stageId];
-            iter.setIterSeg(iterSegment);
+            iter.setIterSeg(iterSeg);
             iter.world().viewCache().resetCursors();
             callback.accept(this.iters[stageId]);
         }, this.world.arena());
@@ -615,9 +615,9 @@ public class SystemBuilder extends SystemBuilderBase {
     public FlecsSystem each(EntityCallback callback) {
         this.entityCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
-            int count = ecs_iter_t.count(iterSegment);
-            MemorySegment entitiesSeg = ecs_iter_t.entities(iterSegment);
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSeg -> {
+            int count = ecs_iter_t.count(iterSeg);
+            MemorySegment entitiesSeg = ecs_iter_t.entities(iterSeg);
 
             for (int i = 0; i < count; i++) {
                 long entityId = entitiesSeg.getAtIndex(ValueLayout.JAVA_LONG, i);

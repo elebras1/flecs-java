@@ -483,8 +483,8 @@ public class ObserverBuilder extends ObserverBuilderBase {
     public Observer iter(IterCallback callback) {
         this.iterCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
-            this.iter.setIterSeg(iterSegment);
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSeg -> {
+            this.iter.setIterSeg(iterSeg);
             this.world.viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());
@@ -497,8 +497,8 @@ public class ObserverBuilder extends ObserverBuilderBase {
     public Observer run(RunCallback callback) {
         this.runCallback = callback;
 
-        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSegment -> {
-            this.iter.setIterSeg(iterSegment);
+        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
+            this.iter.setIterSeg(iterSeg);
             this.world.viewCache().resetCursors();
             callback.accept(this.iter);
         }, this.world.arena());
@@ -511,9 +511,9 @@ public class ObserverBuilder extends ObserverBuilderBase {
     public Observer each(EntityCallback callback) {
         this.entityCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(it -> {
-            int count = ecs_iter_t.count(it);
-            MemorySegment entities = ecs_iter_t.entities(it);
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSeg -> {
+            int count = ecs_iter_t.count(iterSeg);
+            MemorySegment entities = ecs_iter_t.entities(iterSeg);
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                 callback.accept(entityId);

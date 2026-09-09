@@ -85,6 +85,161 @@ class SingletonTest {
         query.destroy();
     }
 
+    private void setupMassSingleton(float value) {
+        this.world.obtainEntity(this.world.getComponentId(Mass.class)).add(Flecs.Singleton);
+        this.world.obtainEntity(this.world.getComponentId(Mass.class)).set(new Mass(value));
+    }
+
+    @Test
+    void singletonSystemEach() {
+        this.setupMassSingleton(1.5f);
+
+        List<Float> values = new ArrayList<>();
+        this.world.system()
+                .with(Mass.class)
+                .each(Mass.class, m -> values.add(m.value()));
+
+        this.world.progress(1.0f);
+
+        assertEquals(List.of(1.5f), values);
+    }
+
+    @Test
+    void singletonSystemEachWithEntity() {
+        this.setupMassSingleton(1.5f);
+
+        List<Long> entities = new ArrayList<>();
+        this.world.system()
+                .with(Mass.class)
+                .each(Mass.class, (entityId, m) -> entities.add(entityId));
+
+        this.world.progress(1.0f);
+
+        assertTrue(entities.isEmpty());
+    }
+
+    @Test
+    void singletonSystemEachMixed() {
+        this.setupMassSingleton(1.5f);
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        List<Float> values = new ArrayList<>();
+        this.world.system()
+                .with(Position.class)
+                .with(Mass.class)
+                .each(Position.class, Mass.class, (p, m) -> values.add(m.value()));
+
+        this.world.progress(1.0f);
+
+        assertEquals(List.of(1.5f, 1.5f), values);
+    }
+
+    @Test
+    void singletonSystemIter() {
+        this.setupMassSingleton(1.5f);
+
+        List<Float> values = new ArrayList<>();
+        this.world.system()
+                .with(Mass.class)
+                .iter(it -> {
+                    assertEquals(0, it.count());
+                    Field<Mass> masses = it.field(Mass.class, 0);
+                    assertEquals(1, masses.count());
+                    values.add(masses.get(0).value());
+                });
+
+        this.world.progress(1.0f);
+
+        assertEquals(List.of(1.5f), values);
+    }
+
+    @Test
+    void singletonQueryEach() {
+        this.setupMassSingleton(1.5f);
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query().with(Mass.class).build();
+        query.each(Mass.class, m -> values.add(m.value()));
+
+        assertEquals(List.of(1.5f), values);
+        query.destroy();
+    }
+
+    @Test
+    void singletonQueryEachWithEntity() {
+        this.setupMassSingleton(1.5f);
+
+        List<Long> entities = new ArrayList<>();
+        Query query = this.world.query().with(Mass.class).build();
+        query.each(Mass.class, (entityId, m) -> entities.add(entityId));
+
+        assertTrue(entities.isEmpty());
+        query.destroy();
+    }
+
+    @Test
+    void singletonQueryEachMixed() {
+        this.setupMassSingleton(1.5f);
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query().with(Position.class).with(Mass.class).build();
+        query.each(Position.class, Mass.class, (p, m) -> values.add(m.value()));
+
+        assertEquals(List.of(1.5f, 1.5f), values);
+        query.destroy();
+    }
+
+    @Test
+    void singletonQueryIter() {
+        this.setupMassSingleton(1.5f);
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query().with(Mass.class).build();
+        query.iter(it -> {
+            Field<Mass> masses = it.field(Mass.class, 0);
+            values.add(masses.get(0).value());
+        });
+
+        assertEquals(List.of(1.5f), values);
+        query.destroy();
+    }
+
+    @Test
+    void singletonQueryRun() {
+        this.setupMassSingleton(1.5f);
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query().with(Mass.class).build();
+        query.run(it -> {
+            while (it.next()) {
+                Field<Mass> masses = it.field(Mass.class, 0);
+                values.add(masses.get(0).value());
+            }
+        });
+
+        assertEquals(List.of(1.5f), values);
+        query.destroy();
+    }
+
+    @Test
+    void singletonObserverEachMixed() {
+        this.setupMassSingleton(1.5f);
+
+        List<Float> values = new ArrayList<>();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .with(Mass.class)
+                .each(Position.class, Mass.class, (p, m) -> values.add(m.value()));
+
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        assertEquals(List.of(1.5f), values);
+    }
+
     @Test
     void getTarget() {
         long relation = this.world.component(Tag.class);

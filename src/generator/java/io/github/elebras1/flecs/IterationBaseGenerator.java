@@ -94,9 +94,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendEachMethodSignature(body, n, vm, em, "void", "each");
         appendStatement(body, 2, "this.checkDestroyed()");
         appendLine(body, 2, "try (" + simpleName(ARENA_FQN) + " tmpArena = " + simpleName(ARENA_FQN) + ".ofConfined()) {");
-        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iter = " + simpleName(FLECS_H_FQN)
+        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iterSeg = " + simpleName(FLECS_H_FQN)
                 + ".ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)");
-        appendLine(body, 3, "if (iter.address() == 0) {");
+        appendLine(body, 3, "if (iterSeg.address() == 0) {");
         appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         appendLine(body, 3, "}");
 
@@ -106,12 +106,14 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
             appendStatement(body, 3, "this.world.viewCache().resetCursors()");
         }
 
-        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iter)) {");
+        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
         if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iter)");
+            appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
         }
-        emitFieldOrBase(body, 4, n, vm, "iter");
-        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iter)");
+        emitFieldOrBase(body, 4, n, vm, "iterSeg");
+        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
+        emitEmptyTableGuard(body, 4, em, "iterSeg");
+        emitSelfFlags(body, 4, n, "iterSeg");
         appendLine(body, 4, "for (int i = 0; i < count; i++) {");
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, 5, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
@@ -128,9 +130,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendFindMethodSignature(body, n, vm);
         appendStatement(body, 2, "this.checkDestroyed()");
         appendLine(body, 2, "try (" + simpleName(ARENA_FQN) + " tmpArena = " + simpleName(ARENA_FQN) + ".ofConfined()) {");
-        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iter = " + simpleName(FLECS_H_FQN)
+        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iterSeg = " + simpleName(FLECS_H_FQN)
                 + ".ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)");
-        appendLine(body, 3, "if (iter.address() == 0) {");
+        appendLine(body, 3, "if (iterSeg.address() == 0) {");
         appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         appendLine(body, 3, "}");
 
@@ -140,10 +142,11 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
             appendStatement(body, 3, "this.world.viewCache().resetCursors()");
         }
 
-        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iter)) {");
-        appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iter)");
-        emitFieldOrBase(body, 4, n, vm, "iter");
-        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iter)");
+        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
+        appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
+        emitFieldOrBase(body, 4, n, vm, "iterSeg");
+        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
+        emitSelfFlags(body, 4, n, "iterSeg");
         appendLine(body, 4, "for (int i = 0; i < count; i++) {");
         emitInstanceOrView(body, 5, n, vm);
 
@@ -213,6 +216,8 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         }
         emitFieldOrBase(body, 3, n, vm, "iterSegment");
         appendStatement(body, 3, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
+        emitEmptyTableGuard(body, 3, em, "iterSegment");
+        emitSelfFlags(body, 3, n, "iterSegment");
         appendLine(body, 3, "for (int i = 0; i < count; i++) {");
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, 4, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
@@ -337,15 +342,30 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         }
     }
 
+    private void emitEmptyTableGuard(CodeBuilder body, int level, EntityMode em, String iterVar) {
+        if (em == EntityMode.WITH_ENTITY) {
+            return;
+        }
+        String condition = "count == 0 && " + simpleName(ECS_ITER_T_FQN) + ".table(" + iterVar + ").address() == 0";
+        appendLine(body, level, "if (" + condition + ") {");
+        appendLine(body, level + 1, "count = 1;");
+        appendLine(body, level, "}");
+    }
+
+    private void emitSelfFlags(CodeBuilder body, int level, int n, String iterVar) {
+        for (int i = 0; i < n; i++) {
+            String comp = letter(i);
+            appendStatement(body, level, "boolean isSelf" + comp + " = " + simpleName(FLECS_H_FQN) + ".ecs_field_is_self(" + iterVar + ", (byte) " + i + ")");
+        }
+    }
+
     private void emitInstanceOrView(CodeBuilder body, int level, int n, ViewMode vm) {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             if (vm == ViewMode.COMPONENT_VIEW) {
-                appendStatement(body, level, "componentView" + comp + ".setBaseAddress(base" + comp
-                        + " + (long) i * size" + comp + ")");
+                appendStatement(body, level, "componentView" + comp + ".setBaseAddress(base" + comp + " + (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
             } else {
-                appendStatement(body, level, comp + " componentInstance" + comp + " = component" + comp
-                        + ".read(field" + comp + ", (long) i * size" + comp + ")");
+                appendStatement(body, level, comp + " componentInstance" + comp + " = component" + comp + ".read(field" + comp + ", (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
             }
         }
     }
