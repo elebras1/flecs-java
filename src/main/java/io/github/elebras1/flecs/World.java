@@ -296,6 +296,12 @@ public class World {
         return this.componentRegistry.getComponentId(componentClass);
     }
 
+    public Entity entity(Class<?> componentClass) {
+        this.checkDestroyed();
+        long entityId = this.componentRegistry.ensureEntity(componentClass);
+        return this.obtainEntity(entityId);
+    }
+
     public int count(long componentId) {
         this.checkDestroyed();
         return flecs_h.ecs_count_id(this.worldSeg, componentId);

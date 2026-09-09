@@ -50,6 +50,26 @@ class EntityTest {
     }
 
     @Test
+    void entityForComponentDoesNotRegisterComponent() {
+        World localWorld = new World();
+        Entity posEntity = localWorld.entity(Position.class);
+
+        assertEquals("Position", posEntity.name());
+        assertNull(posEntity.get(ComponentInfo.class));
+
+        localWorld.component(Position.class);
+        ComponentInfo c = posEntity.get(ComponentInfo.class);
+        assertNotNull(c);
+        assertEquals(8, c.size());
+
+        Entity e = localWorld.obtainEntity(localWorld.entity()).add(Position.class);
+        e.set(new Position(10, 20));
+        assertEquals(10.0f, e.get(Position.class).x());
+
+        localWorld.destroy();
+    }
+
+    @Test
     void newNamed() {
         Entity entity = this.world.obtainEntity(this.world.entity("Foo"));
         assertNotNull(entity);

@@ -40,11 +40,45 @@ public class ComponentRegistry {
         this.components.put(componentId, component);
     }
 
-    public <T> long register(Class<T> componentClass) {
+    public long ensureEntity(Class<?> componentClass) {
         long existingId = this.componentIds.get(componentClass);
         if (existingId != -1) {
             return existingId;
         }
+
+        Component<?> component = this.getComponentInstance(componentClass);
+        if (component == null) {
+            throw new IllegalArgumentException("Component class in the argument is not a component : " + componentClass.getName());
+        }
+        String simpleName = componentClass.getSimpleName();
+        String symbol = componentClass.getName();
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment symbolSegment = tempArena.allocateFrom(symbol);
+            long entityId = flecs_h.ecs_lookup_symbol(this.worldSeg, symbolSegment, false, false);
+
+            if (entityId == 0) {
+                MemorySegment nameSegment = tempArena.allocateFrom(simpleName);
+
+                MemorySegment entityDesc = ecs_entity_desc_t.allocate(tempArena);
+                ecs_entity_desc_t.name(entityDesc, nameSegment);
+                ecs_entity_desc_t.symbol(entityDesc, symbolSegment);
+                long scope = flecs_h.ecs_get_scope(this.worldSeg);
+                ecs_entity_desc_t.parent(entityDesc, scope);
+
+                entityId = flecs_h.ecs_entity_init(this.worldSeg, entityDesc);
+                if (scope != 0) {
+                    flecs_h.ecs_add_id(this.worldSeg, entityId, flecs_h.ecs_make_pair(Flecs.ChildOf, scope));
+                }
+            }
+
+            this.componentIds.put(componentClass, entityId);
+            this.componentClasses.put(entityId, componentClass);
+            return entityId;
+        }
+    }
+
+    public <T> long register(Class<T> componentClass) {
 
         Component<T> component = this.getComponentInstance(componentClass);
         if (component == null) {
@@ -74,6 +108,21 @@ public class ComponentRegistry {
 
                 MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
                 ecs_component_desc_t.entity(componentDesc, entityId);
+
+                MemorySegment typeInfo = ecs_component_desc_t.type(componentDesc);
+                ecs_type_info_t.size(typeInfo, (int) component.size());
+                ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
+
+                componentId = flecs_h.ecs_component_init(this.worldSeg, componentDesc);
+
+                if (componentId == 0) {
+                    throw new IllegalStateException("Failed to register component: " + symbol);
+                }
+
+                this.registerReflectionData(tempArena, componentId, component.layout());
+            } else if (!flecs_h.ecs_has_id(this.worldSeg, componentId, flecs_h.FLECS_IDEcsComponentID_())) {
+                MemorySegment componentDesc = ecs_component_desc_t.allocate(tempArena);
+                ecs_component_desc_t.entity(componentDesc, componentId);
 
                 MemorySegment typeInfo = ecs_component_desc_t.type(componentDesc);
                 ecs_type_info_t.size(typeInfo, (int) component.size());
