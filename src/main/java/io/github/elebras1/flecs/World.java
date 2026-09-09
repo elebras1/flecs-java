@@ -291,7 +291,7 @@ public class World {
         return id;
     }
 
-    public long getComponentId(Class<?> componentClass) {
+    public long id(Class<?> componentClass) {
         this.checkDestroyed();
         return this.componentRegistry.getComponentId(componentClass);
     }

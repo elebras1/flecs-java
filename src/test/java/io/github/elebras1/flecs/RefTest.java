@@ -31,7 +31,7 @@ class RefTest {
         Ref<Position> ref = entity.getRef(Position.class);
         assertNotNull(ref);
         assertEquals(entity.id(), ref.entity());
-        assertEquals(this.world.getComponentId(Position.class), ref.component());
+        assertEquals(this.world.id(Position.class), ref.component());
         ref.destroy();
     }
 
@@ -72,7 +72,7 @@ class RefTest {
         Ref<Velocity> ref = entity.getRef(Velocity.class, target);
         assertNotNull(ref);
         assertEquals(entity.id(), ref.entity());
-        assertEquals(this.world.pair(this.world.getComponentId(Velocity.class), target).id(), ref.component());
+        assertEquals(this.world.pair(this.world.id(Velocity.class), target).id(), ref.component());
 
         assertTrue(ref.has());
         Velocity v = ref.get();

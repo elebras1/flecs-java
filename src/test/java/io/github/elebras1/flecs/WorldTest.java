@@ -255,7 +255,7 @@ class WorldTest {
     void singleton() {
         Entity singleton = this.world.singleton(Position.class);
         assertNotNull(singleton);
-        assertEquals(this.world.getComponentId(Position.class), singleton.id());
+        assertEquals(this.world.id(Position.class), singleton.id());
     }
 
     @Test
@@ -309,8 +309,8 @@ class WorldTest {
         world2.component(Position.class);
         world2.component(Velocity.class);
 
-        long p1 = this.world.getComponentId(Position.class);
-        long p2 = world2.getComponentId(Position.class);
+        long p1 = this.world.id(Position.class);
+        long p2 = world2.id(Position.class);
         assertTrue(p1 != 0);
         assertTrue(p2 != 0);
 
@@ -327,7 +327,7 @@ class WorldTest {
 
     @Test
     void getRef() {
-        long componentId = this.world.getComponentId(Position.class);
+        long componentId = this.world.id(Position.class);
         Ref<Position> ref = this.world.getRef(Position.class);
         assertNotNull(ref);
         assertEquals(componentId, ref.component());
@@ -495,7 +495,7 @@ class WorldTest {
 
     @Test
     void getAliveWithComponentClassTest() {
-        long posId = this.world.getComponentId(Position.class);
+        long posId = this.world.id(Position.class);
         assertEquals(posId, this.world.getAlive(Position.class));
     }
 
@@ -538,7 +538,7 @@ class WorldTest {
 
     @Test
     void getWith() {
-        long positionId = this.world.getComponentId(Position.class);
+        long positionId = this.world.id(Position.class);
         assertEquals(0, this.world.getWith());
 
         this.world.setWith(positionId);

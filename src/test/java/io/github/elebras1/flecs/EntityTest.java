@@ -120,7 +120,7 @@ class EntityTest {
     @Test
     void dependsOnComponent() {
         Entity entity = this.world.obtainEntity(this.world.entity()).dependsOn(Position.class);
-        assertTrue(entity.has(Flecs.DependsOn, this.world.getComponentId(Position.class)));
+        assertTrue(entity.has(Flecs.DependsOn, this.world.id(Position.class)));
     }
 
     @Test
@@ -137,7 +137,7 @@ class EntityTest {
         long obj = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).id();
         Entity entity = this.world.obtainEntity(this.world.entity()).add(rel, obj);
 
-        long positionId = this.world.getComponentId(Position.class);
+        long positionId = this.world.id(Position.class);
         assertEquals(obj, entity.targetFor(rel, positionId));
     }
 
@@ -306,7 +306,7 @@ class EntityTest {
 
     @Test
     void owns() {
-        long compId = this.world.getComponentId(Position.class);
+        long compId = this.world.id(Position.class);
         Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
         assertTrue(entity.owns(Position.class));
         assertTrue(entity.owns(compId));
@@ -380,7 +380,7 @@ class EntityTest {
         Ref<Position> ref = entity.getRef(Position.class);
         assertNotNull(ref);
         assertEquals(entity.id(), ref.entity());
-        assertEquals(this.world.getComponentId(Position.class), ref.component());
+        assertEquals(this.world.id(Position.class), ref.component());
         assertTrue(ref.has());
         Position p = ref.get();
         assertNotNull(p);
@@ -552,7 +552,7 @@ class EntityTest {
         long target = this.world.entity();
         Entity entity = this.world.obtainEntity(this.world.entity())
                 .set(new Mass(10), target);
-        assertTrue(entity.has(this.world.getComponentId(Mass.class), target));
+        assertTrue(entity.has(this.world.id(Mass.class), target));
         Mass m = entity.get(Mass.class, target);
         assertNotNull(m);
         assertEquals(10.0f, m.value());

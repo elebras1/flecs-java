@@ -86,8 +86,8 @@ class SingletonTest {
     }
 
     private void setupMassSingleton(float value) {
-        this.world.obtainEntity(this.world.getComponentId(Mass.class)).add(Flecs.Singleton);
-        this.world.obtainEntity(this.world.getComponentId(Mass.class)).set(new Mass(value));
+        this.world.obtainEntity(this.world.id(Mass.class)).add(Flecs.Singleton);
+        this.world.obtainEntity(this.world.id(Mass.class)).set(new Mass(value));
     }
 
     @Test
@@ -260,7 +260,7 @@ class SingletonTest {
 
     @Test
     void getWithId() {
-        long positionId = this.world.getComponentId(Position.class);
+        long positionId = this.world.id(Position.class);
         this.world.obtainEntity(Flecs.World).set(new Position(10, 20));
 
         Position p = this.world.obtainEntity(Flecs.World).get(positionId);

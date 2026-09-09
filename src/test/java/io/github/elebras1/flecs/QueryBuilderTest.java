@@ -109,7 +109,7 @@ class QueryBuilderTest {
     void typePairTerm() {
         long target = this.world.entity();
         long e1 = this.world.obtainEntity(this.world.entity())
-                .add(this.world.getComponentId(Position.class), target).id();
+                .add(this.world.id(Position.class), target).id();
 
         Query query = this.world.query().with(Position.class, target).build();
         assertEquals(1, query.count());
