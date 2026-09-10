@@ -698,12 +698,21 @@ public class Entity extends EntityBase<Entity> {
         return this.target(relation.id(), index);
     }
 
+    public long target(Class<?> relation, int index) {
+        long relationId = this.world.componentRegistry().getComponentId(relation);
+        return this.target(relationId, index);
+    }
+
     public long target(long relationId) {
         return this.target(relationId, 0);
     }
 
     public long target(Entity relation) {
         return this.target(relation.id(), 0);
+    }
+
+    public long target(Class<?> relation) {
+        return this.target(relation, 0);
     }
 
     public int depth(long relationId) {

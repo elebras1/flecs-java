@@ -163,6 +163,15 @@ class EntityTest {
     }
 
     @Test
+    void targetByClass() {
+        Entity obj = this.world.obtainEntity(this.world.entity());
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(Mass.class, obj);
+
+        assertEquals(obj.id(), entity.target(Mass.class));
+        assertEquals(obj.id(), entity.target(Mass.class, 0));
+    }
+
+    @Test
     void addIf() {
         Entity entity = this.world.obtainEntity(this.world.entity());
         assertTrue(entity.addIf(true, Flecs.Prefab));
