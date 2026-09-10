@@ -40,10 +40,10 @@ class EntityTest {
     }
 
     @Test
-    void getBuiltinComponentInfo() {
+    void getBuiltinComponent() {
         Entity posEntity = this.world.obtainEntity(this.world.component(Position.class));
 
-        ComponentInfo c = posEntity.get(ComponentInfo.class);
+        FlecsComponent c = posEntity.get(FlecsComponent.class);
         assertNotNull(c);
         assertEquals(8, c.size());
         assertEquals(4, c.alignment());
@@ -56,10 +56,10 @@ class EntityTest {
         Entity posEntity = localWorld.obtainEntity(pos);
 
         assertEquals("Position", posEntity.name());
-        assertNull(posEntity.get(ComponentInfo.class));
+        assertNull(posEntity.get(FlecsComponent.class));
 
         localWorld.component(Position.class);
-        ComponentInfo c = posEntity.get(ComponentInfo.class);
+        FlecsComponent c = posEntity.get(FlecsComponent.class);
         assertNotNull(c);
         assertEquals(8, c.size());
 

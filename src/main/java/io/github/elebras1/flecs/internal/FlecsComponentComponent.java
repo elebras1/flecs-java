@@ -1,12 +1,12 @@
 package io.github.elebras1.flecs.internal;
 
 import io.github.elebras1.flecs.Component;
-import io.github.elebras1.flecs.ComponentInfo;
+import io.github.elebras1.flecs.FlecsComponent;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 
-public final class ComponentInfoComponent implements Component<ComponentInfo> {
+public final class FlecsComponentComponent implements Component<FlecsComponent> {
 
     private static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
         MemoryAccess.intLayout().withName("size"),
@@ -16,7 +16,7 @@ public final class ComponentInfoComponent implements Component<ComponentInfo> {
     private static final long OFFSET_ALIGNMENT = LAYOUT.byteOffset(MemoryLayout.PathElement.groupElement("alignment"));
 
     private static final class Holder {
-        static final ComponentInfoComponent INSTANCE = new ComponentInfoComponent();
+        static final FlecsComponentComponent INSTANCE = new FlecsComponentComponent();
     }
 
     @Override
@@ -25,24 +25,24 @@ public final class ComponentInfoComponent implements Component<ComponentInfo> {
     }
 
     @Override
-    public void write(MemorySegment segment, long offset, ComponentInfo data) {
+    public void write(MemorySegment segment, long offset, FlecsComponent data) {
         MemoryAccess.set(segment, offset + OFFSET_SIZE, data.size());
         MemoryAccess.set(segment, offset + OFFSET_ALIGNMENT, data.alignment());
     }
 
     @Override
-    public ComponentInfo read(MemorySegment segment, long offset) {
+    public FlecsComponent read(MemorySegment segment, long offset) {
         int size = MemoryAccess.getInt(segment, offset + OFFSET_SIZE);
         int alignment = MemoryAccess.getInt(segment, offset + OFFSET_ALIGNMENT);
-        return new ComponentInfo(size, alignment);
+        return new FlecsComponent(size, alignment);
     }
 
     @Override
-    public ComponentInfo[] createArray(int size) {
-        return new ComponentInfo[size];
+    public FlecsComponent[] createArray(int size) {
+        return new FlecsComponent[size];
     }
 
-    public static ComponentInfoComponent getInstance() {
+    public static FlecsComponentComponent getInstance() {
         return Holder.INSTANCE;
     }
 }
