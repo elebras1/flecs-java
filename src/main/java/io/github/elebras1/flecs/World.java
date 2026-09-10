@@ -296,10 +296,9 @@ public class World {
         return this.componentRegistry.getComponentId(componentClass);
     }
 
-    public Entity entity(Class<?> componentClass) {
+    public long entity(Class<?> componentClass) {
         this.checkDestroyed();
-        long entityId = this.componentRegistry.ensureEntity(componentClass);
-        return this.obtainEntity(entityId);
+        return this.componentRegistry.ensureEntity(componentClass);
     }
 
     public int count(long componentId) {

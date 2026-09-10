@@ -52,7 +52,8 @@ class EntityTest {
     @Test
     void entityForComponentDoesNotRegisterComponent() {
         World localWorld = new World();
-        Entity posEntity = localWorld.entity(Position.class);
+        long pos = localWorld.entity(Position.class);
+        Entity posEntity = localWorld.obtainEntity(pos);
 
         assertEquals("Position", posEntity.name());
         assertNull(posEntity.get(ComponentInfo.class));
