@@ -125,7 +125,7 @@ class SystemTest {
                 });
 
         assertTrue(sys.id() != 0);
-        assertEquals("MySystem", sys.entity().name());
+        assertEquals("MySystem", sys.name());
     }
 
     @Test

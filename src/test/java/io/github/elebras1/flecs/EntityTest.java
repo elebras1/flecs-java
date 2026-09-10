@@ -78,6 +78,13 @@ class EntityTest {
     }
 
     @Test
+    void prefab() {
+        long e = this.world.prefab();
+        assertTrue(e != 0);
+        assertTrue(this.world.obtainEntity(e).has(Flecs.Prefab));
+    }
+
+    @Test
     void newAdd() {
         Entity entity = this.world.obtainEntity(this.world.entity()).add(Position.class);
         assertTrue(entity.id() != 0);

@@ -118,7 +118,7 @@ class SystemBuilderTest {
                 });
 
         assertTrue(sys.id() != 0);
-        assertEquals("MySystem", sys.entity().name());
+        assertEquals("MySystem", sys.name());
     }
 
     @Test
@@ -239,5 +239,35 @@ class SystemBuilderTest {
         assertNull(sys.getCtx());
 
         sys.setGroup(1);
+    }
+
+    @Test
+    void systemWithNameAndComponents() {
+        FlecsSystem sys = this.world.system("MySystem", Position.class, Velocity.class)
+                .each(entityId -> {
+                });
+
+        assertTrue(sys.id() != 0);
+        assertEquals("MySystem", sys.name());
+    }
+
+    @Test
+    void addRemoveOnSystem() {
+        FlecsSystem sys = this.world.system("PhaseSystem")
+                .with(Position.class)
+                .each(entityId -> { });
+
+        sys.add(Flecs.OnUpdate);
+        assertTrue(sys.has(Flecs.OnUpdate));
+
+        sys.remove(Flecs.OnUpdate);
+        assertFalse(sys.has(Flecs.OnUpdate));
+
+        // Class-based overloads
+        sys.add(Mass.class);
+        assertTrue(sys.has(Mass.class));
+
+        sys.remove(Mass.class);
+        assertFalse(sys.has(Mass.class));
     }
 }

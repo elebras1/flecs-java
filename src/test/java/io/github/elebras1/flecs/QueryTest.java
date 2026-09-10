@@ -3,7 +3,9 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
+import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
+import io.github.elebras1.flecs.component.VelocityView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -469,6 +471,45 @@ class QueryTest {
         assertTrue(json.contains("\"results\""));
         assertTrue(json.contains("\"x\":1"));
         query.destroy();
+    }
+
+    @Test
+    void worldEach() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).set(new Velocity(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(30, 40)).set(new Velocity(3, 4));
+
+        List<String> values = new ArrayList<>();
+        this.world.each(Position.class, Velocity.class, (p, v) -> values.add(p.x() + "," + v.x()));
+
+        assertEquals(List.of("10.0,1.0", "30.0,3.0"), values);
+    }
+
+    @Test
+    void worldEachWithEntity() {
+        long e1 = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).id();
+        this.world.obtainEntity(this.world.entity()).set(new Velocity(1, 2));
+
+        List<Long> entities = new ArrayList<>();
+        this.world.each(Position.class, (entityId, p) -> entities.add(entityId));
+
+        assertEquals(List.of(e1), entities);
+    }
+
+    @Test
+    void worldEachView() {
+        long e = this.world.obtainEntity(this.world.entity())
+                .set(new Position(10, 20))
+                .set(new Velocity(1, 2))
+                .id();
+
+        this.world.eachView(Position.class, Velocity.class, (PositionView p, VelocityView v) -> {
+            p.x(p.x() + v.x());
+            p.y(p.y() + v.y());
+        });
+
+        Position p = this.world.obtainEntity(e).get(Position.class);
+        assertEquals(11.0f, p.x());
+        assertEquals(22.0f, p.y());
     }
 
 }

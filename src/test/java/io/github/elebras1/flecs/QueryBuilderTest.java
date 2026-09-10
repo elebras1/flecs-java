@@ -511,4 +511,14 @@ class QueryBuilderTest {
         assertEquals(2, count.get());
         query.destroy();
     }
+
+    @Test
+    void queryBuilderWithClasses() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).set(new Velocity(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(30, 40));
+
+        Query query = this.world.queryBuilder(Position.class, Velocity.class).build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
 }

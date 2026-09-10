@@ -5,64 +5,44 @@ import io.github.elebras1.flecs.internal.ParamRegistry;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
-public class FlecsSystem {
-
-    private final World world;
-    private final Entity entity;
+public class FlecsSystem extends Entity {
 
     FlecsSystem(World world, long entityId) {
-        this.world = world;
-        this.entity = world.obtainEntity(entityId);
+        super(world, entityId);
     }
 
     public void run() {
-        flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), 0.0f, MemorySegment.NULL);
+        flecs_h.ecs_run(this.world.worldSeg(), this.id, 0.0f, MemorySegment.NULL);
     }
 
     public void run(float deltaTime) {
-        flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), deltaTime, MemorySegment.NULL);
+        flecs_h.ecs_run(this.world.worldSeg(), this.id, deltaTime, MemorySegment.NULL);
     }
 
     public <T> void run(T param) {
-        long id = ParamRegistry.put(param);
+        long paramId = ParamRegistry.put(param);
         try {
-            flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), 0.0f, MemorySegment.ofAddress(id));
+            flecs_h.ecs_run(this.world.worldSeg(), this.id, 0.0f, MemorySegment.ofAddress(paramId));
         } finally {
-            ParamRegistry.remove(id);
+            ParamRegistry.remove(paramId);
         }
     }
 
     public <T> void run(float deltaTime, T param) {
-        long id = ParamRegistry.put(param);
+        long paramId = ParamRegistry.put(param);
         try {
-            flecs_h.ecs_run(this.world.worldSeg(), this.entity.id(), deltaTime, MemorySegment.ofAddress(id));
+            flecs_h.ecs_run(this.world.worldSeg(), this.id, deltaTime, MemorySegment.ofAddress(paramId));
         } finally {
-            ParamRegistry.remove(id);
+            ParamRegistry.remove(paramId);
         }
     }
 
-    public long id() {
-        return this.entity.id();
-    }
-
-    public Entity entity() {
-        return this.entity;
-    }
-
-    public void enable() {
-        flecs_h.ecs_enable(this.world.worldSeg(), this.entity.id(), true);
-    }
-
-    public void disable() {
-        flecs_h.ecs_enable(this.world.worldSeg(), this.entity.id(), false);
-    }
-
     public boolean isEnabled() {
-        return !this.entity.has(Flecs.Disabled);
+        return !this.has(Flecs.Disabled);
     }
 
     public Object getCtx() {
-        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.entity.id());
+        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.id);
         if (sysSeg == null || sysSeg.address() == 0) {
             return null;
         }
@@ -74,7 +54,7 @@ public class FlecsSystem {
     }
 
     public void setCtx(Object ctx) {
-        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.entity.id());
+        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.id);
         if (sysSeg != null && sysSeg.address() != 0) {
             MemorySegment oldCtx = ecs_system_t.ctx(sysSeg);
             if (oldCtx != null && oldCtx.address() != 0) {
@@ -93,12 +73,11 @@ public class FlecsSystem {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment desc = ecs_system_desc_t.allocate(arena);
             ecs_system_desc_t.ctx(desc, ctxPtr);
-            flecs_h.ecs_system_update(this.world.worldSeg(), this.entity.id(), desc);
+            flecs_h.ecs_system_update(this.world.worldSeg(), this.id, desc);
         }
     }
 
     public void setGroup(long groupId) {
-        flecs_h.ecs_system_set_group(this.world.worldSeg(), this.entity.id(), groupId);
+        flecs_h.ecs_system_set_group(this.world.worldSeg(), this.id, groupId);
     }
 }
-
