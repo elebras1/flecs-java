@@ -9,5 +9,6 @@ public class GenerateAll {
         CallbackGenerator.main(args);
         IterationBaseGenerator.main(args);
         EntityBaseGenerator.main(args);
+        WorldBaseGenerator.main(args);
     }
 }

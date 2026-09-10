@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-public class World {
+public class World extends WorldBase {
     public static final MemorySegment WHOLE_MEMORY;
     private final MemorySegment worldSeg;
     private final Arena arena;
@@ -274,6 +274,15 @@ public class World {
     public Query query(String expr) {
         this.checkDestroyed();
         return this.query().expr(expr).build();
+    }
+
+    public QueryBuilder queryBuilder(Class<?>... componentClasses) {
+        this.checkDestroyed();
+        QueryBuilder queryBuilder = new QueryBuilder(this);
+        for (Class<?> componentClass : componentClasses) {
+            queryBuilder.with(componentClass);
+        }
+        return queryBuilder;
     }
 
     public <T> long component(Class<T> componentClass) {
