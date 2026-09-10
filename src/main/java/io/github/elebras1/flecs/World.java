@@ -209,20 +209,14 @@ public class World extends WorldBase {
         return flecs_h.ecs_get_version(entityId);
     }
 
-    public void rangeNew(int min, int max) {
+    public EntityRange rangeNew(int min, int max) {
         this.checkDestroyed();
-        flecs_h.ecs_entity_range_new(this.worldSeg, min, max);
+        return new EntityRange(flecs_h.ecs_entity_range_new(this.worldSeg, min, max));
     }
 
-    public void rangeSet(int min, int max, int cur) {
+    public void rangeSet(EntityRange range) {
         this.checkDestroyed();
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment rangeSeg = ecs_entity_range_t.allocate(tempArena);
-            ecs_entity_range_t.min(rangeSeg, min);
-            ecs_entity_range_t.max(rangeSeg, max);
-            ecs_entity_range_t.cur(rangeSeg, cur);
-            flecs_h.ecs_entity_range_set(this.worldSeg, rangeSeg);
-        }
+        flecs_h.ecs_entity_range_set(this.worldSeg, range.seg());
     }
 
     public long stripGeneration(long entityId) {
@@ -231,16 +225,13 @@ public class World extends WorldBase {
     }
 
     public EntityRange rangeGet() {
+        this.checkDestroyed();
         MemorySegment rangeSeg = flecs_h.ecs_entity_range_get(this.worldSeg);
         if (rangeSeg.address() == 0) {
             return null;
         }
 
-        MemorySegment recycledSeg = ecs_entity_range_t.recycled(rangeSeg);
-        int count = ecs_vec_t.count(recycledSeg);
-        long[] recycled = ecs_vec_t.array(recycledSeg).reinterpret((long) count * ValueLayout.JAVA_LONG.byteSize()).toArray(ValueLayout.JAVA_LONG);
-
-        return new EntityRange(ecs_entity_range_t.min(rangeSeg), ecs_entity_range_t.max(rangeSeg), ecs_entity_range_t.cur(rangeSeg), recycled);
+        return new EntityRange(rangeSeg);
     }
 
     public long prefab() {

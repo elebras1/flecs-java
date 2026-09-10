@@ -229,10 +229,23 @@ class WorldTest {
 
     @Test
     void rangeSet() {
-        this.world.rangeSet(100, 200, 100);
+        EntityRange range = this.world.rangeNew(100, 200);
+        this.world.rangeSet(range);
+
+        assertEquals(100, range.min());
+        assertEquals(200, range.max());
 
         long e1 = this.world.entity();
-        assertTrue(e1 >= 100 && e1 <= 200);
+        assertEquals(100, e1);
+
+        this.world.obtainEntity(e1).destruct();
+
+        long e2 = this.world.entity();
+        assertEquals(100, this.world.stripGeneration(e2));
+
+        EntityRange active = this.world.rangeGet();
+        assertEquals(100, active.min());
+        assertEquals(200, active.max());
     }
 
     @Test
