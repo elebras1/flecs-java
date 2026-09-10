@@ -23,6 +23,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A> void each(Class<A> componentClassA, Component1WithIterCallback<A> callback) {
+        Query query = this.query(componentClassA);
+        try {
+            query.each(componentClassA, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, VA extends ComponentView> void eachView(Class<A> componentClassA, ComponentView1Callback<VA> callback) {
         Query query = this.query(componentClassA);
         try {
@@ -33,6 +42,15 @@ public abstract class WorldBase {
     }
 
     public <A, VA extends ComponentView> void eachView(Class<A> componentClassA, ComponentView1WithEntityCallback<VA> callback) {
+        Query query = this.query(componentClassA);
+        try {
+            query.eachView(componentClassA, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, VA extends ComponentView> void eachView(Class<A> componentClassA, ComponentView1WithIterCallback<VA> callback) {
         Query query = this.query(componentClassA);
         try {
             query.eachView(componentClassA, callback);
@@ -59,6 +77,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B> void each(Class<A> componentClassA, Class<B> componentClassB, Component2WithIterCallback<A, B> callback) {
+        Query query = this.query(componentClassA, componentClassB);
+        try {
+            query.each(componentClassA, componentClassB, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, VA extends ComponentView, VB extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, ComponentView2Callback<VA, VB> callback) {
         Query query = this.query(componentClassA, componentClassB);
         try {
@@ -69,6 +96,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, VA extends ComponentView, VB extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, ComponentView2WithEntityCallback<VA, VB> callback) {
+        Query query = this.query(componentClassA, componentClassB);
+        try {
+            query.eachView(componentClassA, componentClassB, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, VA extends ComponentView, VB extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, ComponentView2WithIterCallback<VA, VB> callback) {
         Query query = this.query(componentClassA, componentClassB);
         try {
             query.eachView(componentClassA, componentClassB, callback);
@@ -95,6 +131,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Component3WithIterCallback<A, B, C> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, ComponentView3Callback<VA, VB, VC> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC);
         try {
@@ -105,6 +150,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, ComponentView3WithEntityCallback<VA, VB, VC> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, ComponentView3WithIterCallback<VA, VB, VC> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, callback);
@@ -131,6 +185,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Component4WithIterCallback<A, B, C, D> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, ComponentView4Callback<VA, VB, VC, VD> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD);
         try {
@@ -141,6 +204,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, ComponentView4WithEntityCallback<VA, VB, VC, VD> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, ComponentView4WithIterCallback<VA, VB, VC, VD> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, callback);
@@ -167,6 +239,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Component5WithIterCallback<A, B, C, D, E> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, ComponentView5Callback<VA, VB, VC, VD, VE> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE);
         try {
@@ -177,6 +258,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, ComponentView5WithEntityCallback<VA, VB, VC, VD, VE> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, ComponentView5WithIterCallback<VA, VB, VC, VD, VE> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
@@ -203,6 +293,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Component6WithIterCallback<A, B, C, D, E, F> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, ComponentView6Callback<VA, VB, VC, VD, VE, VF> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF);
         try {
@@ -213,6 +312,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, ComponentView6WithEntityCallback<VA, VB, VC, VD, VE, VF> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, ComponentView6WithIterCallback<VA, VB, VC, VD, VE, VF> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
@@ -239,6 +347,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Component7WithIterCallback<A, B, C, D, E, F, G> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, ComponentView7Callback<VA, VB, VC, VD, VE, VF, VG> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG);
         try {
@@ -249,6 +366,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, ComponentView7WithEntityCallback<VA, VB, VC, VD, VE, VF, VG> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, ComponentView7WithIterCallback<VA, VB, VC, VD, VE, VF, VG> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
@@ -275,6 +401,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Component8WithIterCallback<A, B, C, D, E, F, G, H> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, ComponentView8Callback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH);
         try {
@@ -285,6 +420,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, ComponentView8WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, ComponentView8WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
@@ -311,6 +455,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Component9WithIterCallback<A, B, C, D, E, F, G, H, I> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, ComponentView9Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI);
         try {
@@ -321,6 +474,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, ComponentView9WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, ComponentView9WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
@@ -347,6 +509,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Component10WithIterCallback<A, B, C, D, E, F, G, H, I, J> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, ComponentView10Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ);
         try {
@@ -357,6 +528,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, ComponentView10WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, ComponentView10WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
@@ -383,6 +563,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Component11WithIterCallback<A, B, C, D, E, F, G, H, I, J, K> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, ComponentView11Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK);
         try {
@@ -393,6 +582,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, ComponentView11WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, ComponentView11WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
@@ -419,6 +617,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Component12WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, ComponentView12Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL);
         try {
@@ -429,6 +636,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, ComponentView12WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, ComponentView12WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
@@ -455,6 +671,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Component13WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, ComponentView13Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM);
         try {
@@ -465,6 +690,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, ComponentView13WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, ComponentView13WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
@@ -491,6 +725,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Component14WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, ComponentView14Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN);
         try {
@@ -501,6 +744,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, ComponentView14WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, ComponentView14WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
@@ -527,6 +779,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Component15WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, ComponentView15Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO);
         try {
@@ -537,6 +798,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, ComponentView15WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, ComponentView15WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
@@ -563,6 +833,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Component16WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, ComponentView16Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP);
         try {
@@ -573,6 +852,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, ComponentView16WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, ComponentView16WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
@@ -599,6 +887,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Component17WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, ComponentView17Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ);
         try {
@@ -609,6 +906,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, ComponentView17WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, ComponentView17WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
@@ -635,6 +941,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Component18WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, ComponentView18Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR);
         try {
@@ -645,6 +960,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, ComponentView18WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, ComponentView18WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
@@ -671,6 +995,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Component19WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, ComponentView19Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS);
         try {
@@ -681,6 +1014,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, ComponentView19WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, ComponentView19WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
@@ -707,6 +1049,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Component20WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, ComponentView20Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT);
         try {
@@ -717,6 +1068,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, ComponentView20WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, ComponentView20WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
@@ -743,6 +1103,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Component21WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, ComponentView21Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU);
         try {
@@ -753,6 +1122,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, ComponentView21WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, ComponentView21WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
@@ -779,6 +1157,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Component22WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, ComponentView22Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV);
         try {
@@ -789,6 +1176,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, ComponentView22WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, ComponentView22WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
@@ -815,6 +1211,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Component23WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, ComponentView23Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW);
         try {
@@ -825,6 +1230,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, ComponentView23WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, ComponentView23WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
@@ -851,6 +1265,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Component24WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, ComponentView24Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX);
         try {
@@ -861,6 +1284,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, ComponentView24WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, ComponentView24WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
@@ -887,6 +1319,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Component25WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, ComponentView25Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY);
         try {
@@ -897,6 +1338,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, ComponentView25WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, ComponentView25WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
@@ -923,6 +1373,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Component26WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, ComponentView26Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ);
         try {
@@ -933,6 +1392,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, ComponentView26WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, ComponentView26WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
@@ -959,6 +1427,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Component27WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, ComponentView27Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA);
         try {
@@ -969,6 +1446,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, ComponentView27WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, ComponentView27WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
@@ -995,6 +1481,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Component28WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, ComponentView28Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB);
         try {
@@ -1005,6 +1500,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, ComponentView28WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, ComponentView28WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
@@ -1031,6 +1535,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Component29WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, ComponentView29Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC);
         try {
@@ -1041,6 +1554,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, ComponentView29WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, ComponentView29WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
@@ -1067,6 +1589,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Component30WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, ComponentView30Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD);
         try {
@@ -1077,6 +1608,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, ComponentView30WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, ComponentView30WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
@@ -1103,6 +1643,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Component31WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, ComponentView31Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE);
         try {
@@ -1113,6 +1662,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, ComponentView31WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, ComponentView31WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
@@ -1139,6 +1697,15 @@ public abstract class WorldBase {
         }
     }
 
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> void each(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, Component32WithIterCallback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF);
+        try {
+            query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView, VAF extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, ComponentView32Callback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF);
         try {
@@ -1149,6 +1716,15 @@ public abstract class WorldBase {
     }
 
     public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView, VAF extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, ComponentView32WithEntityCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
+        Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF);
+        try {
+            query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
+        } finally {
+            query.destroy();
+        }
+    }
+
+    public <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AA, AB, AC, AD, AE, AF, VA extends ComponentView, VB extends ComponentView, VC extends ComponentView, VD extends ComponentView, VE extends ComponentView, VF extends ComponentView, VG extends ComponentView, VH extends ComponentView, VI extends ComponentView, VJ extends ComponentView, VK extends ComponentView, VL extends ComponentView, VM extends ComponentView, VN extends ComponentView, VO extends ComponentView, VP extends ComponentView, VQ extends ComponentView, VR extends ComponentView, VS extends ComponentView, VT extends ComponentView, VU extends ComponentView, VV extends ComponentView, VW extends ComponentView, VX extends ComponentView, VY extends ComponentView, VZ extends ComponentView, VAA extends ComponentView, VAB extends ComponentView, VAC extends ComponentView, VAD extends ComponentView, VAE extends ComponentView, VAF extends ComponentView> void eachView(Class<A> componentClassA, Class<B> componentClassB, Class<C> componentClassC, Class<D> componentClassD, Class<E> componentClassE, Class<F> componentClassF, Class<G> componentClassG, Class<H> componentClassH, Class<I> componentClassI, Class<J> componentClassJ, Class<K> componentClassK, Class<L> componentClassL, Class<M> componentClassM, Class<N> componentClassN, Class<O> componentClassO, Class<P> componentClassP, Class<Q> componentClassQ, Class<R> componentClassR, Class<S> componentClassS, Class<T> componentClassT, Class<U> componentClassU, Class<V> componentClassV, Class<W> componentClassW, Class<X> componentClassX, Class<Y> componentClassY, Class<Z> componentClassZ, Class<AA> componentClassAA, Class<AB> componentClassAB, Class<AC> componentClassAC, Class<AD> componentClassAD, Class<AE> componentClassAE, Class<AF> componentClassAF, ComponentView32WithIterCallback<VA, VB, VC, VD, VE, VF, VG, VH, VI, VJ, VK, VL, VM, VN, VO, VP, VQ, VR, VS, VT, VU, VV, VW, VX, VY, VZ, VAA, VAB, VAC, VAD, VAE, VAF> callback) {
         Query query = this.query(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF);
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);

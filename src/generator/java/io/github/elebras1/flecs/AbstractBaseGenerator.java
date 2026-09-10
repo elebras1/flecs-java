@@ -26,7 +26,7 @@ public abstract class AbstractBaseGenerator {
     protected static final String ECS_TABLE_DIFF_T_FQN = "io.github.elebras1.flecs.ecs_table_diff_t";
     protected static final String ECS_TYPE_T_FQN = "io.github.elebras1.flecs.ecs_type_t";
 
-    protected enum EntityMode { WITHOUT_ENTITY, WITH_ENTITY }
+    protected enum EntityMode { WITHOUT_ENTITY, WITH_ENTITY, WITH_ITER }
     protected enum ViewMode { COMPONENT, COMPONENT_VIEW }
 
     protected static String simpleName(String fqn) {
@@ -85,7 +85,11 @@ public abstract class AbstractBaseGenerator {
 
     protected static String callbackInterfaceName(int n, ViewMode vm, EntityMode em) {
         String base = vm == ViewMode.COMPONENT_VIEW ? "ComponentView" : "Component";
-        String suffix = em == EntityMode.WITH_ENTITY ? "WithEntityCallback" : "Callback";
+        String suffix = switch (em) {
+            case WITHOUT_ENTITY -> "Callback";
+            case WITH_ENTITY -> "WithEntityCallback";
+            case WITH_ITER -> "WithIterCallback";
+        };
         return base + n + suffix;
     }
 

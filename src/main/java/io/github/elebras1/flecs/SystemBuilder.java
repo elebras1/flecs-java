@@ -578,14 +578,20 @@ public class SystemBuilder extends SystemBuilderBase {
         return this.groupBy(entity.id(), groupByCallback);
     }
 
+    @Override
+    protected Iter iterFor(MemorySegment iterSegment) {
+        MemorySegment stageSeg = ecs_iter_t.world(iterSegment);
+        int stageId = flecs_h.ecs_stage_get_id(stageSeg);
+        Iter iter = this.iters[stageId];
+        iter.setIterSeg(iterSegment);
+        return iter;
+    }
+
     public FlecsSystem iter(IterCallback callback) {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
-            MemorySegment stageSeg = ecs_iter_t.world(iterSegment);
-            int stageId = flecs_h.ecs_stage_get_id(stageSeg);
-            Iter iter = this.iters[stageId];
-            iter.setIterSeg(iterSegment);
+            Iter iter = this.iterFor(iterSegment);
             iter.world().viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());

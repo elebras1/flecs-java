@@ -474,6 +474,25 @@ class QueryTest {
     }
 
     @Test
+    void eachViewWithIter() {
+        long e = this.world.obtainEntity(this.world.entity())
+                .set(new Position(10, 20))
+                .set(new Velocity(1, 2))
+                .id();
+
+        Query query = this.world.query(Position.class, Velocity.class);
+        List<String> values = new ArrayList<>();
+        query.eachView(Position.class, Velocity.class, (Iter it, int index, PositionView p, VelocityView v) -> {
+            p.x(p.x() + v.x());
+            values.add(it.entity(index) + "," + index);
+        });
+        query.destroy();
+
+        assertEquals(List.of(e + ",0"), values);
+        assertEquals(11.0f, this.world.obtainEntity(e).get(Position.class).x());
+    }
+
+    @Test
     void worldEach() {
         this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).set(new Velocity(1, 2));
         this.world.obtainEntity(this.world.entity()).set(new Position(30, 40)).set(new Velocity(3, 4));

@@ -105,6 +105,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         if (vm == ViewMode.COMPONENT_VIEW) {
             appendStatement(body, 3, "this.world.viewCache().resetCursors()");
         }
+        if (em == EntityMode.WITH_ITER) {
+            appendStatement(body, 3, "Iter iter = new Iter(iterSeg, this.world)");
+        }
 
         appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
         if (em == EntityMode.WITH_ENTITY) {
@@ -175,6 +178,8 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         body.newline();
         appendLine(body, 1, "protected abstract " + kind.returnType + " build();");
 
+        appendBuilderIterFor(body, kind);
+
         for (int n = 1; n <= MAX_COMPONENTS; n++) {
             for (ViewMode vm : ViewMode.values()) {
                 for (EntityMode em : EntityMode.values()) {
@@ -202,6 +207,11 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                 .build();
     }
 
+    private void appendBuilderIterFor(CodeBuilder body, BuilderKind kind) {
+        appendLine(body, 1, "protected abstract Iter iterFor(" + simpleName(MEMORY_SEGMENT_FQN) + " iterSegment);");
+        body.newline();
+    }
+
     private void appendBuilderEachMethod(CodeBuilder body, int n, ViewMode vm, EntityMode em, BuilderKind kind) {
         appendEachMethodSignature(body, n, vm, em, kind.returnType, "each");
         emitComponentLookups(body, 2, n, vm);
@@ -210,6 +220,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                 + ".allocate(iterSegment -> {");
         if (vm == ViewMode.COMPONENT_VIEW) {
             appendStatement(body, 3, "this.world.viewCache().resetCursors()");
+        }
+        if (em == EntityMode.WITH_ITER) {
+            appendStatement(body, 3, "Iter iter = this.iterFor(iterSegment)");
         }
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSegment)");
@@ -343,7 +356,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
     }
 
     private void emitEmptyTableGuard(CodeBuilder body, int level, EntityMode em, String iterVar) {
-        if (em == EntityMode.WITH_ENTITY) {
+        if (em != EntityMode.WITHOUT_ENTITY) {
             return;
         }
         String condition = "count == 0 && " + simpleName(ECS_ITER_T_FQN) + ".table(" + iterVar + ").address() == 0";
@@ -374,6 +387,8 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         String args = buildArgs(vm == ViewMode.COMPONENT_VIEW ? "componentView" : "componentInstance", n);
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, level, "callback.accept(entityId, " + args + ")");
+        } else if (em == EntityMode.WITH_ITER) {
+            appendStatement(body, level, "callback.accept(iter, i, " + args + ")");
         } else {
             appendStatement(body, level, "callback.accept(" + args + ")");
         }

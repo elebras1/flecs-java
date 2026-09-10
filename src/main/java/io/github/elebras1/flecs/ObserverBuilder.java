@@ -480,11 +480,17 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return ecs_observer_desc_t.flags_(this.desc);
     }
 
+    @Override
+    protected Iter iterFor(MemorySegment iterSegment) {
+        this.iter.setIterSeg(iterSegment);
+        return this.iter;
+    }
+
     public Observer iter(IterCallback callback) {
         this.iterCallback = callback;
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSeg -> {
-            this.iter.setIterSeg(iterSeg);
+            Iter iter = this.iterFor(iterSeg);
             this.world.viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());

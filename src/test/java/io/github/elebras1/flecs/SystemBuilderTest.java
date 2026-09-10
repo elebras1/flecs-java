@@ -4,6 +4,7 @@ import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
+import io.github.elebras1.flecs.component.VelocityView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -238,6 +239,27 @@ class SystemBuilderTest {
         assertNull(sys.getCtx());
 
         sys.setGroup(1);
+    }
+
+    @Test
+    void eachViewWithIterAndDeltaTime() {
+        long e = this.world.obtainEntity(this.world.entity())
+                .set(new Position(10, 20))
+                .set(new Velocity(1, 2))
+                .id();
+
+        this.world.system("Move", Position.class, Velocity.class)
+                .kind(Flecs.OnUpdate)
+                .eachView(Position.class, Velocity.class, (Iter it, int index, PositionView p, VelocityView v) -> {
+                    p.x(p.x() + v.x() * it.deltaTime());
+                    p.y(p.y() + v.y() * it.deltaTime());
+                });
+
+        this.world.progress(2.0f);
+
+        Position p = this.world.obtainEntity(e).get(Position.class);
+        assertEquals(12.0f, p.x());
+        assertEquals(24.0f, p.y());
     }
 
     @Test

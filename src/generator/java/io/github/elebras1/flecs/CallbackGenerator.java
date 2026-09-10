@@ -42,6 +42,9 @@ public class CallbackGenerator extends AbstractBaseGenerator {
         List<String> params = new ArrayList<>();
         if (em == EntityMode.WITH_ENTITY) {
             params.add("long entityId");
+        } else if (em == EntityMode.WITH_ITER) {
+            params.add("Iter iter");
+            params.add("int index");
         }
         String prefix = vm == ViewMode.COMPONENT_VIEW ? "componentView" : "component";
         for (int i = 0; i < n; i++) {
