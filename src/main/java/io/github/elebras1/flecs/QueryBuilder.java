@@ -224,7 +224,7 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder operator(int operator) {
+    public QueryBuilder oper(int operator) {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
@@ -236,31 +236,31 @@ public class QueryBuilder {
     }
 
     public QueryBuilder and() {
-        return this.operator(Flecs.And);
+        return this.oper(Flecs.And);
     }
 
     public QueryBuilder or() {
-        return this.operator(Flecs.Or);
+        return this.oper(Flecs.Or);
     }
 
     public QueryBuilder not() {
-        return this.operator(Flecs.Not);
+        return this.oper(Flecs.Not);
     }
 
     public QueryBuilder optional() {
-        return this.operator(Flecs.Optional);
+        return this.oper(Flecs.Optional);
     }
 
     public QueryBuilder andFrom() {
-        return this.operator(Flecs.AndFrom);
+        return this.oper(Flecs.AndFrom);
     }
 
     public QueryBuilder orFrom() {
-        return this.operator(Flecs.OrFrom);
+        return this.oper(Flecs.OrFrom);
     }
 
     public QueryBuilder notFrom() {
-        return this.operator(Flecs.NotFrom);
+        return this.oper(Flecs.NotFrom);
     }
 
     public QueryBuilder src(long entityId) {

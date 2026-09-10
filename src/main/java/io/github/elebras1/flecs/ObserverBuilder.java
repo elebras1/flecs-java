@@ -303,7 +303,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this;
     }
 
-    public ObserverBuilder operator(int operator) {
+    public ObserverBuilder oper(int operator) {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
@@ -316,31 +316,31 @@ public class ObserverBuilder extends ObserverBuilderBase {
     }
 
     public ObserverBuilder and() {
-        return this.operator(Flecs.And);
+        return this.oper(Flecs.And);
     }
 
     public ObserverBuilder or() {
-        return this.operator(Flecs.Or);
+        return this.oper(Flecs.Or);
     }
 
     public ObserverBuilder not() {
-        return this.operator(Flecs.Not);
+        return this.oper(Flecs.Not);
     }
 
     public ObserverBuilder optional() {
-        return this.operator(Flecs.Optional);
+        return this.oper(Flecs.Optional);
     }
 
     public ObserverBuilder andFrom() {
-        return this.operator(Flecs.AndFrom);
+        return this.oper(Flecs.AndFrom);
     }
 
     public ObserverBuilder orFrom() {
-        return this.operator(Flecs.OrFrom);
+        return this.oper(Flecs.OrFrom);
     }
 
     public ObserverBuilder notFrom() {
-        return this.operator(Flecs.NotFrom);
+        return this.oper(Flecs.NotFrom);
     }
 
     public ObserverBuilder up() {

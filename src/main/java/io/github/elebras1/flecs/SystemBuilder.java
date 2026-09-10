@@ -277,7 +277,7 @@ public class SystemBuilder extends SystemBuilderBase {
         return this;
     }
 
-    public SystemBuilder operator(int operator) {
+    public SystemBuilder oper(int operator) {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'operator' modifier to");
         }
@@ -290,31 +290,31 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder and() {
-        return this.operator(Flecs.And);
+        return this.oper(Flecs.And);
     }
 
     public SystemBuilder or() {
-        return this.operator(Flecs.Or);
+        return this.oper(Flecs.Or);
     }
 
     public SystemBuilder not() {
-        return this.operator(Flecs.Not);
+        return this.oper(Flecs.Not);
     }
 
     public SystemBuilder optional() {
-        return this.operator(Flecs.Optional);
+        return this.oper(Flecs.Optional);
     }
 
     public SystemBuilder andFrom() {
-        return this.operator(Flecs.AndFrom);
+        return this.oper(Flecs.AndFrom);
     }
 
     public SystemBuilder orFrom() {
-        return this.operator(Flecs.OrFrom);
+        return this.oper(Flecs.OrFrom);
     }
 
     public SystemBuilder notFrom() {
-        return this.operator(Flecs.NotFrom);
+        return this.oper(Flecs.NotFrom);
     }
 
     public SystemBuilder up() {
