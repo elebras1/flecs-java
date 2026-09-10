@@ -194,9 +194,10 @@ public class World extends WorldBase {
         return this.pair(firstId, second.id());
     }
 
-    public void makeAlive(long entityId) {
+    public long makeAlive(long entityId) {
         this.checkDestroyed();
         flecs_h.ecs_make_alive(this.worldSeg, entityId);
+        return entityId;
     }
 
     public void setVersion(long entityId) {
