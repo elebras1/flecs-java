@@ -155,7 +155,6 @@ class EntityTest {
     void setAlias() {
         Entity entity = this.world.obtainEntity(this.world.entity("B"));
         entity.setAlias("AliasB");
-        // aliases are indexed for lookup (no public getter in C++ either)
         assertEquals(entity.id(), this.world.lookup("AliasB"));
     }
 
@@ -663,7 +662,6 @@ class EntityTest {
         long prefab = this.world.entity("prefab");
         Entity child = this.world.obtainEntity(this.world.entity()).childOf(prefab);
 
-        // slot() adds SlotOf to the entity's ChildOf target
         child.slot();
         assertTrue(child.has(Flecs.SlotOf, prefab));
     }

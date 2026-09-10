@@ -49,7 +49,6 @@ class DocStatsTest {
 
     @Test
     void worldStatsSnapshot() {
-        // Create some entities and components so metrics are non-trivial.
         this.world.component(Position.class);
         for (int i = 0; i < 5; i++) {
             this.world.obtainEntity(this.world.entity()).set(new Position(i, i));

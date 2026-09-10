@@ -224,7 +224,6 @@ class WorldTest {
         this.world.destroy();
         assertTrue(ran.get());
 
-        // destroy() ran, re-create a world so the teardown stays safe
         this.world = new World();
     }
 
@@ -238,7 +237,6 @@ class WorldTest {
 
     @Test
     void stripGeneration() {
-        // generation bits live in bits 32-47: (gen << 32) | index
         long stripped = this.world.stripGeneration(0x1_0000_0010L);
         assertEquals(0x10, stripped);
     }
@@ -519,8 +517,6 @@ class WorldTest {
             }
         });
 
-        // Matches C++ world::each, which iterates entities.alive_count
-        // (alive entities only, flecs builtins included).
         assertEquals(0, deadIterCount.get());
         assertTrue(aliveIterCount.get() >= aliveCount);
     }

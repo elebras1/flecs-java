@@ -230,7 +230,6 @@ class SystemBuilderTest {
 
         assertEquals(ctx, sys.getCtx());
 
-        // Post-creation ctx update (C++ system::ctx() parity).
         Object ctx2 = new Object();
         sys.setCtx(ctx2);
         assertEquals(ctx2, sys.getCtx());
@@ -263,7 +262,6 @@ class SystemBuilderTest {
         sys.remove(Flecs.OnUpdate);
         assertFalse(sys.has(Flecs.OnUpdate));
 
-        // Class-based overloads
         sys.add(Mass.class);
         assertTrue(sys.has(Mass.class));
 

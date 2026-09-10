@@ -92,7 +92,6 @@ class PathsTest {
 
     @Test
     void path() {
-        // C++ default: sep = "::", init_sep = "::" (prefixes root-scoped paths)
         Entity e = this.world.obtainEntity(this.world.entity("foo::bar"));
         assertEquals("::foo::bar", e.path());
 

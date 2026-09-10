@@ -115,13 +115,11 @@ class RefTest {
         Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20), target);
         Ref<Position> ref = entity.getRef(Position.class, target);
 
-        // getMutView returns a live view into the paired (Position, target) data.
         PositionView view = ref.getMutView();
         assertNotNull(view);
         assertEquals(10.0f, view.x());
         assertEquals(20.0f, view.y());
 
-        // Mutations through the view are visible through the ref.
         view.x(50);
         view.y(60);
         Position p = ref.get();

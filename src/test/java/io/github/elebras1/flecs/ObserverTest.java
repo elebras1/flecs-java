@@ -399,7 +399,6 @@ class ObserverTest {
 
         assertEquals(ctx, observer.getCtx());
 
-        // Post-creation ctx update (C++ observer::ctx() parity).
         Object ctx2 = new Object();
         observer.setCtx(ctx2);
         assertEquals(ctx2, observer.getCtx());

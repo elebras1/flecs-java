@@ -368,7 +368,6 @@ class QueryBuilderTest {
             }
         });
 
-        // Breadth-first: Earth (depth 1) before Moon (depth 2).
         assertEquals(List.of("Earth", "Moon"), names);
         assertEquals(List.of(10.0f, 1.0f), parentXs);
         query.destroy();
@@ -404,8 +403,6 @@ class QueryBuilderTest {
         this.world.obtainEntity(this.world.entity("childOwn")).childOf(parent).set(new Position(1, 2));
         this.world.obtainEntity(this.world.entity("childShared")).childOf(parent);
 
-        // Up only: matches components found via traversal, ignores self-owned.
-        // Parent is excluded (its Position is self-owned, nothing to traverse).
         Query upOnly = this.world.query()
                 .with(Position.class).term().up()
                 .build();
@@ -419,7 +416,6 @@ class QueryBuilderTest {
         assertEquals(List.of("childOwn", "childShared"), upNames);
         upOnly.destroy();
 
-        // Self + up: matches self-owned and traversed components.
         Query selfUp = this.world.query()
                 .with(Position.class).term().self().up()
                 .build();
