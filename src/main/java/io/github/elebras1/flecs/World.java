@@ -1079,11 +1079,6 @@ public class World extends WorldBase {
     public Entity module(FlecsModule module) {
         this.checkDestroyed();
 
-        long scope = flecs_h.ecs_get_scope(this.worldSeg);
-        if (scope != 0 && scope == this.importingModule) {
-            return new Entity(this, scope);
-        }
-
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment nameSeg = arena.allocateFrom(module.name());
 
@@ -1091,7 +1086,12 @@ public class World extends WorldBase {
             ecs_component_desc_t.entity(descSeg, 0);
 
             long moduleEntity = flecs_h.ecs_module_init(this.worldSeg, nameSeg, descSeg);
+            if (moduleEntity == 0) {
+                throw new IllegalStateException("Failed to initialize module: " + module.name());
+            }
+
             flecs_h.ecs_set_scope(this.worldSeg, moduleEntity);
+            this.importingModule = moduleEntity;
 
             return new Entity(this, moduleEntity);
         }
@@ -1100,31 +1100,25 @@ public class World extends WorldBase {
     public Entity importModule(FlecsModule module) {
         this.checkDestroyed();
 
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment nameSeg = arena.allocateFrom(module.name());
-            int moduleCount = flecs_h.ecs_count_id(this.worldSeg, Flecs.Module);
-
-            MemorySegment descSeg = ecs_component_desc_t.allocate(arena);
-            ecs_component_desc_t.entity(descSeg, 0);
-            long moduleEntity = flecs_h.ecs_module_init(this.worldSeg, nameSeg, descSeg);
-            if (moduleEntity == 0) {
-                throw new IllegalStateException("Failed to initialize module: " + module.name());
-            }
-
-            if (flecs_h.ecs_count_id(this.worldSeg, Flecs.Module) == moduleCount) {
-                return new Entity(this, moduleEntity);
-            }
-
-            long previousScope = flecs_h.ecs_set_scope(this.worldSeg, moduleEntity);
-            this.importingModule = moduleEntity;
-            try {
-                module.initModule(this);
-            } finally {
-                this.importingModule = 0;
-                flecs_h.ecs_set_scope(this.worldSeg, previousScope);
-            }
-
+        long moduleEntity = this.lookup(module.name());
+        if (moduleEntity != 0 && flecs_h.ecs_has_id(this.worldSeg, moduleEntity, Flecs.Module)) {
             return new Entity(this, moduleEntity);
+        }
+
+        long previousScope = flecs_h.ecs_get_scope(this.worldSeg);
+        long previousImportingModule = this.importingModule;
+        try {
+            module.initModule(this);
+
+            if (this.importingModule == previousImportingModule) {
+                throw new IllegalStateException(
+                    "Module '" + module.name() + "' must call world.module(this) in initModule");
+            }
+
+            return new Entity(this, this.importingModule);
+        } finally {
+            this.importingModule = previousImportingModule;
+            flecs_h.ecs_set_scope(this.worldSeg, previousScope);
         }
     }
 
