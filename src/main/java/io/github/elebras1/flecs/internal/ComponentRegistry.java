@@ -32,6 +32,7 @@ public class ComponentRegistry {
 
     private void registerBuiltins() {
         this.registerBuiltin(FlecsComponent.class, flecs_h.FLECS_IDEcsComponentID_(), FlecsComponentComponent.getInstance());
+        this.registerBuiltin(FlecsParent.class, flecs_h.FLECS_IDEcsParentID_(), FlecsParentComponent.getInstance());
     }
 
     private void registerBuiltin(Class<?> componentClass, long componentId, Component<?> component) {
@@ -255,8 +256,19 @@ public class ComponentRegistry {
         return id;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> Component<T> getComponent(Class<T> componentClass) {
-        return ComponentMap.getInstance(componentClass);
+        Component<T> component = ComponentMap.getInstance(componentClass);
+        if (component != null) {
+            return component;
+        }
+
+        long componentId = this.componentIds.get(componentClass);
+        if (componentId > 0) {
+            return (Component<T>) this.components.get(componentId);
+        }
+
+        return null;
     }
 
     @SuppressWarnings("unchecked")

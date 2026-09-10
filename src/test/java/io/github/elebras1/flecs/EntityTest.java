@@ -50,6 +50,16 @@ class EntityTest {
     }
 
     @Test
+    void parentComponent() {
+        Entity parent = this.world.obtainEntity(this.world.entity());
+        Entity child = this.world.obtainEntity(this.world.entity(parent.id()));
+
+        FlecsParent p = child.get(FlecsParent.class);
+        assertNotNull(p);
+        assertEquals(parent.id(), p.value());
+    }
+
+    @Test
     void entityForComponentDoesNotRegisterComponent() {
         World localWorld = new World();
         long pos = localWorld.entity(Position.class);

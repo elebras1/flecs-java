@@ -52,6 +52,23 @@ class QueryTest {
     }
 
     @Test
+    void groupByParentDepth() {
+        Entity parent = this.world.obtainEntity(this.world.entity());
+        Entity child = this.world.obtainEntity(this.world.entity(parent.id()));
+        child.set(new Position(1, 2));
+
+        Query query = this.world.queryBuilder(Position.class, FlecsParent.class)
+                .groupBy(Flecs.ParentDepth)
+                .build();
+
+        AtomicInteger count = new AtomicInteger();
+        query.each(Position.class, FlecsParent.class, (position, parentComponent) -> count.incrementAndGet());
+        assertEquals(1, count.get());
+
+        query.destroy();
+    }
+
+    @Test
     void termEachId() {
         long foo = this.world.entity();
         this.world.obtainEntity(this.world.entity()).add(foo);

@@ -42,6 +42,8 @@ public final class Flecs {
 
     public static final long Constant = flecs_h.EcsConstant();
     public static final long ChildOf = flecs_h.EcsChildOf();
+    public static final long Parent = flecs_h.FLECS_IDEcsParentID_();
+    public static final long ParentDepth = flecs_h.EcsParentDepth();
     public static final long UnitPrefixes = flecs_h.EcsUnitPrefixes();
     public static final long Quantity = flecs_h.EcsQuantity();
     public static final long Metric = flecs_h.EcsMetric();
