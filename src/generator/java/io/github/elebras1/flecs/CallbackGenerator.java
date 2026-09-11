@@ -12,6 +12,7 @@ public class CallbackGenerator extends AbstractBaseGenerator {
 
     public List<SourceFile> generate() {
         List<SourceFile> files = new ArrayList<>();
+        files.add(generateIterWithIndexCallback());
         for (int n = 1; n <= MAX_COMPONENTS; n++) {
             for (ViewMode vm : ViewMode.values()) {
                 for (EntityMode em : EntityMode.values()) {
@@ -21,6 +22,17 @@ public class CallbackGenerator extends AbstractBaseGenerator {
             }
         }
         return files;
+    }
+
+    private SourceFile generateIterWithIndexCallback() {
+        CodeBuilder body = new CodeBuilder();
+        body.append("@FunctionalInterface").newline();
+        body.append("public interface IterWithIndexCallback {").newline();
+        appendLine(body, 1, "void accept(Iter iter, int index);");
+        body.append("}").newline();
+        return SourceFile.builder(GENERATED_PACKAGE, "IterWithIndexCallback")
+                .classBody(body.toString())
+                .build();
     }
 
     private SourceFile generateCallbackInterface(int n, ViewMode vm, EntityMode em) {

@@ -169,11 +169,25 @@ class ObserverTest {
         this.world.observer()
                 .with(Position.class)
                 .event(Flecs.OnAdd)
-                .each(ids::add);
+                .each((long entityId) -> ids.add(entityId));
 
         this.world.obtainEntity(e1).set(new Position(10, 20));
         assertEquals(List.of(e1), ids);
         assertEquals(1, ids.size());
+    }
+
+    @Test
+    void eachWithIterNoComponents() {
+        long e1 = this.world.entity();
+
+        List<Long> ids = new ArrayList<>();
+        this.world.observer()
+                .with(Position.class)
+                .event(Flecs.OnAdd)
+                .each((Iter it, int index) -> ids.add(it.entity(index)));
+
+        this.world.obtainEntity(e1).set(new Position(10, 20));
+        assertEquals(List.of(e1), ids);
     }
 
     @Test

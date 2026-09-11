@@ -28244,4 +28244,21 @@ public abstract class QueryBase {
         }
         return 0L;
     }
+
+    public void each(IterWithIndexCallback callback) {
+        this.checkDestroyed();
+        try (Arena tmpArena = Arena.ofConfined()) {
+            MemorySegment iterSeg = flecs_h.ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg);
+            if (iterSeg.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Iter iter = new Iter(iterSeg, this.world);
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                for (int i = 0; i < count; i++) {
+                    callback.accept(iter, i);
+                }
+            }
+        }
+    }
 }

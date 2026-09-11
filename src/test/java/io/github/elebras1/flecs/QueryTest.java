@@ -85,6 +85,27 @@ class QueryTest {
     }
 
     @Test
+    void eachWithIterNoComponents() {
+        long tag = this.world.entity();
+        this.world.obtainEntity(this.world.entity()).add(tag);
+        this.world.obtainEntity(this.world.entity()).add(tag);
+        this.world.obtainEntity(this.world.entity()).add(tag);
+
+        Query query = this.world.query().with(tag).build();
+
+        AtomicInteger count = new AtomicInteger();
+        List<Long> entities = new ArrayList<>();
+        query.each((Iter it, int index) -> {
+            entities.add(it.entity(index));
+            count.incrementAndGet();
+        });
+        assertEquals(3, count.get());
+        assertEquals(3, entities.stream().distinct().count());
+
+        query.destroy();
+    }
+
+    @Test
     void termEachPair() {
         long rel = this.world.entity();
         long obj = this.world.entity();

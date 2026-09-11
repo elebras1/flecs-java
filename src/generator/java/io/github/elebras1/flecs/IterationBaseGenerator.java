@@ -74,6 +74,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
             }
         }
 
+        body.newline();
+        appendQueryEachIterMethod(body);
+
         body.append("}").newline();
 
         return SourceFile.builder(GENERATED_PACKAGE, "QueryBase")
@@ -189,6 +192,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
             }
         }
 
+        body.newline();
+        appendBuilderEachIterMethod(body, kind);
+
         body.append("}").newline();
 
         return SourceFile.builder(GENERATED_PACKAGE, className)
@@ -240,6 +246,41 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendLine(body, 3, "}");
         appendLine(body, 2, "}, this.world.arena());");
 
+        appendStatement(body, 2, kind.descType + ".callback(this.desc, callbackStub)");
+        appendStatement(body, 2, "return build()");
+        appendLine(body, 1, "}");
+    }
+
+    private void appendQueryEachIterMethod(CodeBuilder body) {
+        appendLine(body, 1, "public void each(IterWithIndexCallback callback) {");
+        appendStatement(body, 2, "this.checkDestroyed()");
+        appendLine(body, 2, "try (" + simpleName(ARENA_FQN) + " tmpArena = " + simpleName(ARENA_FQN) + ".ofConfined()) {");
+        appendStatement(body, 3, simpleName(MEMORY_SEGMENT_FQN) + " iterSeg = " + simpleName(FLECS_H_FQN)
+                + ".ecs_query_iter(tmpArena, this.world.worldSeg(), this.querySeg)");
+        appendLine(body, 3, "if (iterSeg.address() == 0) {");
+        appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
+        appendLine(body, 3, "}");
+        appendStatement(body, 3, "Iter iter = new Iter(iterSeg, this.world)");
+        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
+        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
+        appendLine(body, 4, "for (int i = 0; i < count; i++) {");
+        appendStatement(body, 5, "callback.accept(iter, i)");
+        appendLine(body, 4, "}");
+        appendLine(body, 3, "}");
+        appendLine(body, 2, "}");
+        appendLine(body, 1, "}");
+    }
+
+    private void appendBuilderEachIterMethod(CodeBuilder body, BuilderKind kind) {
+        appendLine(body, 1, "public " + kind.returnType + " each(IterWithIndexCallback callback) {");
+        appendLine(body, 2, simpleName(MEMORY_SEGMENT_FQN) + " callbackStub = " + simpleName(ECS_ITER_ACTION_T_FQN)
+                + ".allocate(iterSegment -> {");
+        appendStatement(body, 3, "Iter iter = this.iterFor(iterSegment)");
+        appendStatement(body, 3, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
+        appendLine(body, 3, "for (int i = 0; i < count; i++) {");
+        appendStatement(body, 4, "callback.accept(iter, i)");
+        appendLine(body, 3, "}");
+        appendLine(body, 2, "}, this.world.arena());");
         appendStatement(body, 2, kind.descType + ".callback(this.desc, callbackStub)");
         appendStatement(body, 2, "return build()");
         appendLine(body, 1, "}");

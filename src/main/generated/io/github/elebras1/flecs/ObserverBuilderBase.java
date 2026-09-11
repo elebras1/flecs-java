@@ -20136,4 +20136,16 @@ public abstract class ObserverBuilderBase {
         ecs_observer_desc_t.callback(this.desc, callbackStub);
         return build();
     }
+
+    public Observer each(IterWithIndexCallback callback) {
+        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
+            Iter iter = this.iterFor(iterSegment);
+            int count = ecs_iter_t.count(iterSegment);
+            for (int i = 0; i < count; i++) {
+                callback.accept(iter, i);
+            }
+        }, this.world.arena());
+        ecs_observer_desc_t.callback(this.desc, callbackStub);
+        return build();
+    }
 }

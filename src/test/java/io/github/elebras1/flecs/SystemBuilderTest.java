@@ -40,7 +40,7 @@ class SystemBuilderTest {
         List<Long> ids = new ArrayList<>();
         FlecsSystem sys = this.world.system()
                 .with(Position.class)
-                .each(ids::add);
+                .each((long entityId) -> ids.add(entityId));
 
         assertEquals(0, ids.size());
         sys.run();
@@ -56,7 +56,7 @@ class SystemBuilderTest {
         FlecsSystem sys = this.world.system()
                 .with(Position.class)
                 .with(Velocity.class)
-                .each(ids::add);
+                .each((long entityId) -> ids.add(entityId));
 
         sys.run();
         assertEquals(List.of(e1), ids);
@@ -74,7 +74,7 @@ class SystemBuilderTest {
         List<Long> ids = new ArrayList<>();
         FlecsSystem sys = this.world.system()
                 .with(likes, bob)
-                .each(ids::add);
+                .each((long entityId) -> ids.add(entityId));
 
         sys.run();
         assertEquals(List.of(e1), ids);
@@ -89,7 +89,7 @@ class SystemBuilderTest {
         FlecsSystem sys = this.world.system()
                 .with(Position.class)
                 .with(Velocity.class).not()
-                .each(ids::add);
+                .each((long entityId) -> ids.add(entityId));
 
         sys.run();
         assertEquals(List.of(e1), ids);
@@ -168,6 +168,20 @@ class SystemBuilderTest {
         Position p = entity.get(Position.class);
         assertEquals(11.0f, p.x());
         assertEquals(21.0f, p.y());
+    }
+
+    @Test
+    void eachWithIterNoComponents() {
+        long e1 = this.world.obtainEntity(this.world.entity()).add(Position.class).id();
+        this.world.obtainEntity(this.world.entity()).add(Velocity.class);
+
+        List<Long> ids = new ArrayList<>();
+        FlecsSystem sys = this.world.system()
+                .with(Position.class)
+                .each((Iter it, int index) -> ids.add(it.entity(index)));
+
+        sys.run();
+        assertEquals(List.of(e1), ids);
     }
 
     @Test
