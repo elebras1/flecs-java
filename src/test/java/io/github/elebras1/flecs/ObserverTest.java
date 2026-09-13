@@ -417,4 +417,17 @@ class ObserverTest {
         observer.setCtx(ctx2);
         assertEquals(ctx2, observer.getCtx());
     }
+
+    @Test
+    void idFlags() {
+        long positionId = this.world.component(Position.class);
+        this.world.obtainEntity(positionId).add(Flecs.CanToggle);
+
+        Observer observer = this.world.observer()
+                .with(Position.class).idFlags(Flecs.Toggle)
+                .event(Flecs.OnSet)
+                .each(entityId -> { });
+
+        assertNotEquals(0, observer.id());
+    }
 }

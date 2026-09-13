@@ -304,4 +304,19 @@ class SystemBuilderTest {
         sys.remove(Mass.class);
         assertFalse(sys.has(Mass.class));
     }
+
+    @Test
+    void idFlags() {
+        long positionId = this.world.component(Position.class);
+        this.world.obtainEntity(positionId).add(Flecs.CanToggle);
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).disable(Position.class);
+
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem sys = this.world.system()
+                .with(Position.class).idFlags(Flecs.Toggle)
+                .each(entityId -> count.incrementAndGet());
+
+        sys.run();
+        assertEquals(1, count.get());
+    }
 }

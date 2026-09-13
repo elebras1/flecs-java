@@ -315,6 +315,18 @@ public class ObserverBuilder extends ObserverBuilderBase {
         return this;
     }
 
+    public ObserverBuilder idFlags(long flags) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'idFlags' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.id(termSeg, ecs_term_t.id(termSeg) | flags);
+
+        return this;
+    }
+
     public ObserverBuilder and() {
         return this.oper(Flecs.And);
     }

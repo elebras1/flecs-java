@@ -32,6 +32,8 @@ public final class Flecs {
     public static final long PairIsTag = flecs_h.EcsPairIsTag();
 
     public static final long CanToggle = flecs_h.EcsCanToggle();
+    public static final long Toggle = flecs_h.ECS_TOGGLE();
+    public static final long AutoOverride = flecs_h.ECS_AUTO_OVERRIDE();
     public static final long DontFragment = flecs_h.EcsDontFragment();
     public static final long Sparse = flecs_h.EcsSparse();
 

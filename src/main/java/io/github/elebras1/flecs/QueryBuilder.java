@@ -235,6 +235,17 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder idFlags(long flags) {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'idFlags' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        ecs_term_t.id(termSeg, ecs_term_t.id(termSeg) | flags);
+
+        return this;
+    }
+
     public QueryBuilder and() {
         return this.oper(Flecs.And);
     }

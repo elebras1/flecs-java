@@ -588,4 +588,19 @@ class QueryTest {
         assertEquals(22.0f, p.y());
     }
 
+    @Test
+    void idFlags() {
+        long positionId = this.world.component(Position.class);
+        this.world.obtainEntity(positionId).add(Flecs.CanToggle);
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        entity.disable(Position.class);
+
+        Query query = this.world.queryBuilder()
+                .with(Position.class).idFlags(Flecs.Toggle)
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
 }
