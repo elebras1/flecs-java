@@ -52,11 +52,30 @@ class EntityTest {
     @Test
     void parentComponent() {
         Entity parent = this.world.obtainEntity(this.world.entity());
-        Entity child = this.world.obtainEntity(this.world.entity(parent.id()));
+        Entity child = this.world.obtainEntity(this.world.entity(new FlecsParent(parent.id())));
 
         FlecsParent p = child.get(FlecsParent.class);
         assertNotNull(p);
         assertEquals(parent.id(), p.value());
+    }
+
+    @Test
+    void childOfAndParentStorage() {
+        long spaceship = this.world.entity();
+
+        Entity cockpit = this.world.obtainEntity(this.world.entity(spaceship));
+        Entity engine = this.world.obtainEntity(this.world.entity(new FlecsParent(spaceship)));
+
+        assertTrue(cockpit.has(Flecs.ChildOf, spaceship));
+        assertNull(cockpit.get(FlecsParent.class));
+        assertNotNull(engine.get(FlecsParent.class));
+
+        Entity engineering = this.world.obtainEntity(this.world.entity(new FlecsParent(spaceship)));
+        assertNotNull(engineering.get(FlecsParent.class));
+
+        engineering.childOf(spaceship);
+        assertNull(engineering.get(FlecsParent.class));
+        assertTrue(engineering.has(Flecs.ChildOf, spaceship));
     }
 
     @Test

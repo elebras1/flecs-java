@@ -54,7 +54,7 @@ class QueryTest {
     @Test
     void groupByParentDepth() {
         Entity parent = this.world.obtainEntity(this.world.entity());
-        Entity child = this.world.obtainEntity(this.world.entity(parent.id()));
+        Entity child = this.world.obtainEntity(this.world.entity(new FlecsParent(parent.id())));
         child.set(new Position(1, 2));
 
         Query query = this.world.queryBuilder(Position.class, FlecsParent.class)

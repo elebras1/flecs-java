@@ -74,7 +74,18 @@ public class World extends WorldBase {
 
     public long entity(long parentId) {
         this.checkDestroyed();
-        return flecs_h.ecs_new_w_parent(this.worldSeg, parentId, MemorySegment.NULL);
+        return this.entity(parentId, null);
+    }
+
+    public long entity(FlecsParent parent) {
+        this.checkDestroyed();
+        return flecs_h.ecs_new_w_parent(this.worldSeg, parent.value(), MemorySegment.NULL);
+    }
+
+    public long entity(FlecsParent parent, String name) {
+        this.checkDestroyed();
+        MemorySegment nameSegment = name == null ? MemorySegment.NULL : this.buffers.stringRing().set(name);
+        return flecs_h.ecs_new_w_parent(this.worldSeg, parent.value(), nameSegment);
     }
 
     public long entity(String name) {
@@ -93,8 +104,15 @@ public class World extends WorldBase {
 
     public long entity(long parentId, String name) {
         this.checkDestroyed();
-         MemorySegment nameSegment = name == null ? MemorySegment.NULL : this.buffers.stringRing().set(name);
-         return flecs_h.ecs_new_w_parent(this.worldSeg, parentId, nameSegment);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment nameSegment = name == null ? MemorySegment.NULL : arena.allocateFrom(name);
+            MemorySegment descSeg = ecs_entity_desc_t.allocate(arena);
+            ecs_entity_desc_t.name(descSeg, nameSegment);
+            ecs_entity_desc_t.parent(descSeg, parentId);
+
+            return flecs_h.ecs_entity_init(this.worldSeg, descSeg);
+        }
     }
 
     public Entity obtainEntity(long entityId) {
