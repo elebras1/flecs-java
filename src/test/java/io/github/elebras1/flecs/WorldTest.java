@@ -107,7 +107,7 @@ class WorldTest {
 
     @Test
     void testLookupWithSystemCreateBefore() {
-        this.world.enableRest((short) 27750);
+        this.world.set(new Rest().port(27750));
         this.world.component(Health.class);
 
         AtomicLong found = new AtomicLong(-1);
@@ -577,5 +577,19 @@ class WorldTest {
         this.world.script("ScriptEntityB {}").update(script);
         assertNotEquals(0, this.world.lookup("ScriptEntityB"));
         assertEquals(0, this.world.lookup("ScriptEntityA"));
+    }
+
+    @Test
+    void appRunFrames() {
+        this.world.app()
+                .frames(1)
+                .run();
+    }
+
+    @Test
+    void setRest() {
+        this.world.set(new Rest().port(27754));
+
+        assertNotNull(Flecs.Stats);
     }
 }

@@ -694,4 +694,44 @@ class EntityTest {
         assertEquals(10.0f, p.x());
         assertEquals(20.0f, p.y());
     }
+
+    @Test
+    void toJsonWithDesc() {
+        Entity entity = this.world.obtainEntity(this.world.entity("json_entity")).set(new Position(10, 20));
+
+        String json = entity.toJson(new EntityToJsonDesc()
+                .serializeEntityId(true)
+                .serializeTypeInfo(true));
+        assertNotNull(json);
+        assertTrue(json.contains("\"id\""));
+        assertTrue(json.contains("json_entity"));
+
+        assertEquals(entity.toJson(), entity.toJson(new EntityToJsonDesc()));
+    }
+
+    @Test
+    void componentToJsonAndFromJson() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+        long positionId = this.world.lookup("Position");
+
+        String json = entity.toJson(positionId);
+        assertNotNull(json);
+        assertTrue(json.contains("\"x\":10"));
+        assertNotNull(entity.toJson(Position.class));
+
+        entity.fromJson(Position.class, "{\"x\": 30.0, \"y\": 40.0}");
+        Position p = entity.get(Position.class);
+        assertNotNull(p);
+        assertEquals(30.0f, p.x());
+        assertEquals(40.0f, p.y());
+
+        entity.setJson(Position.class, "{\"x\": 50.0, \"y\": 60.0}");
+        p = entity.get(Position.class);
+        assertEquals(50.0f, p.x());
+        assertEquals(60.0f, p.y());
+
+        Entity created = this.world.obtainEntity(this.world.entity());
+        created.setJson(Position.class, "{\"x\": 1.0, \"y\": 2.0}");
+        assertNotNull(created.get(Position.class));
+    }
 }

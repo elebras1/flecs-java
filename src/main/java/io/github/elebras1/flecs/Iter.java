@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.internal.FlecsAllocator;
 import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
@@ -119,11 +120,28 @@ public class Iter {
     }
 
     public String toJson() {
-        MemorySegment jsonSeg = flecs_h.ecs_iter_to_json(this.iterSeg, MemorySegment.NULL);
-        if (jsonSeg.address() == 0) {
-            return null;
+        return this.toJson(null);
+    }
+
+    public String toJson(IterToJsonDesc desc) {
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment descSeg = MemorySegment.NULL;
+            if (desc != null) {
+                MemorySegment querySeg = ecs_iter_t.query(this.iterSeg);
+                if (querySeg != null && querySeg.address() != 0) {
+                    desc.query(querySeg);
+                }
+                descSeg = desc.allocate(tempArena);
+            }
+            MemorySegment jsonSeg = flecs_h.ecs_iter_to_json(this.iterSeg, descSeg);
+            if (jsonSeg.address() == 0) {
+                return null;
+            }
+
+            String json = jsonSeg.reinterpret(Long.MAX_VALUE).getString(0);
+            FlecsAllocator.free(jsonSeg);
+            return json;
         }
-        return jsonSeg.getString(0);
     }
 
     public Table otherTable() {

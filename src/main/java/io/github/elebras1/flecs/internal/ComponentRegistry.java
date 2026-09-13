@@ -33,6 +33,7 @@ public class ComponentRegistry {
     private void registerBuiltins() {
         this.registerBuiltin(FlecsComponent.class, flecs_h.FLECS_IDEcsComponentID_(), FlecsComponentComponent.getInstance());
         this.registerBuiltin(FlecsParent.class, flecs_h.FLECS_IDEcsParentID_(), FlecsParentComponent.getInstance());
+        this.registerBuiltin(Rest.class, flecs_h.FLECS_IDEcsRestID_(), RestComponent.getInstance());
     }
 
     private void registerBuiltin(Class<?> componentClass, long componentId, Component<?> component) {

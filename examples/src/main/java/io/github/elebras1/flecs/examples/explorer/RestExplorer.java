@@ -1,6 +1,8 @@
 package io.github.elebras1.flecs.examples.explorer;
 
 import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.Rest;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.PositionView;
@@ -16,8 +18,11 @@ public class RestExplorer {
         world.component(Position.class);
         world.component(Velocity.class);
 
-        // Enable the REST interface on port 27750.
-        world.enableRest((short) 27750);
+        // Optional, gather statistics for explorer.
+        world.importModule(Flecs.Stats);
+
+        // Creates REST server on default port (27750).
+        world.set(new Rest().port(27750));
         System.out.println("Open https://flecs.dev/explorer?remote=true");
 
         int numberEntities = 100000;
@@ -72,7 +77,6 @@ public class RestExplorer {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            world.disableRest();
             world.destroy();
         }
     }

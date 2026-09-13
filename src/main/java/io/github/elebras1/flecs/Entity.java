@@ -877,23 +877,48 @@ public class Entity extends EntityBase<Entity> {
 
     public String toJson(boolean serializeValues) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment descSeg = ecs_entity_to_json_desc_t.allocate(tempArena);
-            ecs_entity_to_json_desc_t.serialize_values(descSeg, serializeValues);
-            return this.toJsonDesc(descSeg);
+            return this.toJsonDesc(new EntityToJsonDesc().serializeValues(serializeValues).allocate(tempArena));
         }
     }
 
-    private String toJsonDesc(MemorySegment desc) {
+    public String toJson(EntityToJsonDesc desc) {
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment jsonSeg = flecs_h.ecs_entity_to_json(this.world.worldSeg(), this.id, desc);
-            if (jsonSeg.address() == 0) {
-                return null;
-            }
-
-            String json = jsonSeg.reinterpret(Long.MAX_VALUE).getString(0);
-            FlecsAllocator.free(jsonSeg);
-            return json;
+            return this.toJsonDesc(desc.allocate(tempArena));
         }
+    }
+
+    public String toJson(long componentId) {
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
+        if (address == 0) {
+            return null;
+        }
+
+        Component<?> component = this.world.componentRegistry().getComponentById(componentId);
+        MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
+        MemorySegment jsonSeg = flecs_h.ecs_ptr_to_json(this.world.worldSeg(), componentId, dataSeg);
+        if (jsonSeg.address() == 0) {
+            return null;
+        }
+
+        String json = jsonSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(jsonSeg);
+        return json;
+    }
+
+    public <T> String toJson(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.toJson(componentId);
+    }
+
+    private String toJsonDesc(MemorySegment desc) {
+        MemorySegment jsonSeg = flecs_h.ecs_entity_to_json(this.world.worldSeg(), this.id, desc);
+        if (jsonSeg.address() == 0) {
+            return null;
+        }
+
+        String json = jsonSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(jsonSeg);
+        return json;
     }
 
     public void fromJson(String json) {
@@ -908,6 +933,59 @@ public class Entity extends EntityBase<Entity> {
                 throw new RuntimeException("Failed to parse JSON into entity");
             }
         }
+    }
+
+    public void fromJson(long componentId, String json) {
+        if (json == null || json.isEmpty()) {
+            throw new IllegalArgumentException("JSON cannot be null or empty");
+        }
+
+        Component<?> component = this.world.componentRegistry().getComponentById(componentId);
+        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
+        if (address == 0) {
+            throw new IllegalStateException("Failed to get mutable component: " + componentId);
+        }
+
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
+            MemorySegment jsonSeg = tempArena.allocateFrom(json);
+            MemorySegment resultSeg = flecs_h.ecs_ptr_from_json(this.world.worldSeg(), componentId, dataSeg, jsonSeg, MemorySegment.NULL);
+            if (resultSeg.address() == 0) {
+                throw new RuntimeException("Failed to parse JSON into component");
+            }
+        }
+    }
+
+    public <T> void fromJson(Class<T> componentClass, String json) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        this.fromJson(componentId, json);
+    }
+
+    public void setJson(long componentId, String json) {
+        if (json == null || json.isEmpty()) {
+            throw new IllegalArgumentException("JSON cannot be null or empty");
+        }
+
+        Component<?> component = this.world.componentRegistry().getComponentById(componentId);
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentId, component.size());
+            if (dataSeg.address() == 0) {
+                throw new IllegalStateException("Failed to ensure component: " + componentId);
+            }
+
+            MemorySegment jsonSeg = tempArena.allocateFrom(json);
+            MemorySegment resultSeg = flecs_h.ecs_ptr_from_json(this.world.worldSeg(), componentId, dataSeg, jsonSeg, MemorySegment.NULL);
+            if (resultSeg.address() == 0) {
+                throw new RuntimeException("Failed to parse JSON into component");
+            }
+
+            flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
+        }
+    }
+
+    public <T> void setJson(Class<T> componentClass, String json) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        this.setJson(componentId, json);
     }
 
     public void each(LongConsumer callback) {

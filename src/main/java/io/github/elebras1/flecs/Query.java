@@ -3,6 +3,7 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.EntityCallback;
 import io.github.elebras1.flecs.callback.IterCallback;
 import io.github.elebras1.flecs.callback.RunCallback;
+import io.github.elebras1.flecs.internal.FlecsAllocator;
 import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
@@ -140,13 +141,27 @@ public class Query extends QueryBase {
     }
 
     public String toJson() {
+        return this.toJson(null);
+    }
+
+    public String toJson(IterToJsonDesc desc) {
         this.checkDestroyed();
         MemorySegment iterSeg = this.createIterSeg();
-        MemorySegment jsonSeg = flecs_h.ecs_iter_to_json(iterSeg, MemorySegment.NULL);
-        if (jsonSeg.address() == 0) {
-            return null;
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment descSeg = MemorySegment.NULL;
+            if (desc != null) {
+                desc.query(this.querySeg);
+                descSeg = desc.allocate(tempArena);
+            }
+            MemorySegment jsonSeg = flecs_h.ecs_iter_to_json(iterSeg, descSeg);
+            if (jsonSeg.address() == 0) {
+                return null;
+            }
+
+            String json = jsonSeg.reinterpret(Long.MAX_VALUE).getString(0);
+            FlecsAllocator.free(jsonSeg);
+            return json;
         }
-        return jsonSeg.getString(0);
     }
 
     public Object getCtx() {

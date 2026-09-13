@@ -1048,31 +1048,29 @@ public class World extends WorldBase {
         }
     }
 
-    public void enableRest() {
-        this.enableRest((short) 27750);
+    public AppBuilder app() {
+        this.checkDestroyed();
+        return new AppBuilder(this);
     }
 
-    public void enableRest(short port) {
+    @SuppressWarnings("unchecked")
+    public <T> World set(T value) {
+        this.checkDestroyed();
+        Class<T> componentClass = (Class<T>) value.getClass();
+        long componentId = this.componentRegistry().getComponentId(componentClass);
+        Component<T> component = this.componentRegistry().getComponent(componentClass);
+
+        MemorySegment dataSeg = this.getComponentBuffer(component.size());
+        component.write(dataSeg, 0, value);
+        flecs_h.ecs_set_id(this.worldSeg, Flecs.World, componentId, component.size(), dataSeg);
+
+        return this;
+    }
+
+    public void importModule(BuiltinModule module) {
         this.checkDestroyed();
         try (Arena arena = Arena.ofConfined()) {
-            importModule(arena, "FlecsDoc", flecs_h.FlecsDocImport$address());
-            importModule(arena, "FlecsRest", flecs_h.FlecsRestImport$address());
-            importModule(arena, "FlecsAlerts", flecs_h.FlecsAlertsImport$address());
-            importModule(arena, "FlecsStats", flecs_h.FlecsStatsImport$address());
-            importModule(arena, "FlecsMetrics", flecs_h.FlecsMetricsImport$address());
-
-            long restCompId = flecs_h.FLECS_IDEcsRestID_();
-            if (restCompId == 0) {
-                throw new IllegalStateException("Failed to find EcsRest component.");
-            }
-
-            MemorySegment restDataSeg = EcsRest.allocate(arena);
-            restDataSeg.fill((byte) 0);
-            EcsRest.port(restDataSeg, port);
-            EcsRest.ipaddr(restDataSeg, MemorySegment.NULL);
-            EcsRest.impl(restDataSeg, MemorySegment.NULL);
-
-            flecs_h.ecs_set_id(this.worldSeg, Flecs.World, restCompId, EcsRest.sizeof(), restDataSeg);
+            importModule(arena, module.name(), module.importFunction());
         }
     }
 
@@ -1128,17 +1126,6 @@ public class World extends WorldBase {
         if (moduleId == 0) {
             throw new IllegalStateException("Failed to import module: " + moduleName);
         }
-    }
-
-    public void disableRest() {
-        this.checkDestroyed();
-
-        long restCompId = flecs_h.FLECS_IDEcsRestID_();
-        if( restCompId == 0) {
-            throw new IllegalStateException("Failed to find EcsRest component.");
-        }
-
-        flecs_h.ecs_remove_id(this.worldSeg, Flecs.World, restCompId);
     }
 
     public boolean exists(long entityId) {

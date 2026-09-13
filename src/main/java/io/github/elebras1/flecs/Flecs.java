@@ -128,4 +128,9 @@ public final class Flecs {
     public static final long Period1m = flecs_h.EcsPeriod1m();
     public static final long Period1h = flecs_h.EcsPeriod1h();
     public static final long Period1d = flecs_h.EcsPeriod1d();
+
+    public static final BuiltinModule Doc = new BuiltinModule("FlecsDoc", flecs_h.FlecsDocImport$address());
+    public static final BuiltinModule Alerts = new BuiltinModule("FlecsAlerts", flecs_h.FlecsAlertsImport$address());
+    public static final BuiltinModule Stats = new BuiltinModule("FlecsStats", flecs_h.FlecsStatsImport$address());
+    public static final BuiltinModule Metrics = new BuiltinModule("FlecsMetrics", flecs_h.FlecsMetricsImport$address());
 }

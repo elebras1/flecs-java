@@ -512,6 +512,25 @@ class QueryTest {
     }
 
     @Test
+    void toJsonWithDesc() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        Query query = this.world.query(Position.class);
+
+        String json = query.toJson(new IterToJsonDesc()
+                .serializeTable(true)
+                .serializeEntityIds(true));
+        assertNotNull(json);
+        assertTrue(json.contains("\"results\""));
+        assertTrue(json.contains("\"components\""));
+
+        String planJson = query.toJson(new IterToJsonDesc()
+                .serializeQueryPlan(true));
+        assertNotNull(planJson);
+        assertTrue(planJson.contains("\"query_plan\""));
+        query.destroy();
+    }
+
+    @Test
     void eachViewWithIter() {
         long e = this.world.obtainEntity(this.world.entity())
                 .set(new Position(10, 20))
