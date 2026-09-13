@@ -430,4 +430,14 @@ class ObserverTest {
 
         assertNotEquals(0, observer.id());
     }
+
+    @Test
+    void filterTerm() {
+        Observer observer = this.world.observer(Position.class)
+                .with(Velocity.class).filter()
+                .event(Flecs.OnAdd)
+                .each(Position.class, (Iter it, int index, Position p) -> { });
+
+        assertNotEquals(0, observer.id());
+    }
 }

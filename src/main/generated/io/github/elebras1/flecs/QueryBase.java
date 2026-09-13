@@ -38,7 +38,7 @@ public abstract class QueryBase {
                 }
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
                     callback.accept(componentInstanceA);
                 }
             }
@@ -61,7 +61,7 @@ public abstract class QueryBase {
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
                     callback.accept(entityId, componentInstanceA);
                 }
             }
@@ -83,7 +83,7 @@ public abstract class QueryBase {
                 int count = ecs_iter_t.count(iterSeg);
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
                     callback.accept(iter, i, componentInstanceA);
                 }
             }
@@ -105,7 +105,7 @@ public abstract class QueryBase {
                 int count = ecs_iter_t.count(iterSeg);
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
                     if (predicate.test(componentInstanceA)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -242,8 +242,8 @@ public abstract class QueryBase {
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
                     callback.accept(componentInstanceA, componentInstanceB);
                 }
             }
@@ -270,8 +270,8 @@ public abstract class QueryBase {
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
                     callback.accept(entityId, componentInstanceA, componentInstanceB);
                 }
             }
@@ -297,8 +297,8 @@ public abstract class QueryBase {
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB);
                 }
             }
@@ -324,8 +324,8 @@ public abstract class QueryBase {
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
                     if (predicate.test(componentInstanceA, componentInstanceB)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -490,9 +490,9 @@ public abstract class QueryBase {
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC);
                 }
             }
@@ -523,9 +523,9 @@ public abstract class QueryBase {
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC);
                 }
             }
@@ -555,9 +555,9 @@ public abstract class QueryBase {
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC);
                 }
             }
@@ -587,9 +587,9 @@ public abstract class QueryBase {
                 boolean isSelfB = flecs_h.ecs_field_is_self(iterSeg, (byte) 1);
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -782,10 +782,10 @@ public abstract class QueryBase {
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD);
                 }
             }
@@ -820,10 +820,10 @@ public abstract class QueryBase {
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD);
                 }
             }
@@ -857,10 +857,10 @@ public abstract class QueryBase {
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD);
                 }
             }
@@ -894,10 +894,10 @@ public abstract class QueryBase {
                 boolean isSelfC = flecs_h.ecs_field_is_self(iterSeg, (byte) 2);
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -1118,11 +1118,11 @@ public abstract class QueryBase {
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE);
                 }
             }
@@ -1161,11 +1161,11 @@ public abstract class QueryBase {
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE);
                 }
             }
@@ -1203,11 +1203,11 @@ public abstract class QueryBase {
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE);
                 }
             }
@@ -1245,11 +1245,11 @@ public abstract class QueryBase {
                 boolean isSelfD = flecs_h.ecs_field_is_self(iterSeg, (byte) 3);
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -1498,12 +1498,12 @@ public abstract class QueryBase {
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF);
                 }
             }
@@ -1546,12 +1546,12 @@ public abstract class QueryBase {
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF);
                 }
             }
@@ -1593,12 +1593,12 @@ public abstract class QueryBase {
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF);
                 }
             }
@@ -1640,12 +1640,12 @@ public abstract class QueryBase {
                 boolean isSelfE = flecs_h.ecs_field_is_self(iterSeg, (byte) 4);
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -1922,13 +1922,13 @@ public abstract class QueryBase {
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG);
                 }
             }
@@ -1975,13 +1975,13 @@ public abstract class QueryBase {
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG);
                 }
             }
@@ -2027,13 +2027,13 @@ public abstract class QueryBase {
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG);
                 }
             }
@@ -2079,13 +2079,13 @@ public abstract class QueryBase {
                 boolean isSelfF = flecs_h.ecs_field_is_self(iterSeg, (byte) 5);
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -2390,14 +2390,14 @@ public abstract class QueryBase {
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH);
                 }
             }
@@ -2448,14 +2448,14 @@ public abstract class QueryBase {
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH);
                 }
             }
@@ -2505,14 +2505,14 @@ public abstract class QueryBase {
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH);
                 }
             }
@@ -2562,14 +2562,14 @@ public abstract class QueryBase {
                 boolean isSelfG = flecs_h.ecs_field_is_self(iterSeg, (byte) 6);
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -2902,15 +2902,15 @@ public abstract class QueryBase {
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI);
                 }
             }
@@ -2965,15 +2965,15 @@ public abstract class QueryBase {
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI);
                 }
             }
@@ -3027,15 +3027,15 @@ public abstract class QueryBase {
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI);
                 }
             }
@@ -3089,15 +3089,15 @@ public abstract class QueryBase {
                 boolean isSelfH = flecs_h.ecs_field_is_self(iterSeg, (byte) 7);
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -3458,16 +3458,16 @@ public abstract class QueryBase {
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ);
                 }
             }
@@ -3526,16 +3526,16 @@ public abstract class QueryBase {
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ);
                 }
             }
@@ -3593,16 +3593,16 @@ public abstract class QueryBase {
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ);
                 }
             }
@@ -3660,16 +3660,16 @@ public abstract class QueryBase {
                 boolean isSelfI = flecs_h.ecs_field_is_self(iterSeg, (byte) 8);
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -4058,17 +4058,17 @@ public abstract class QueryBase {
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK);
                 }
             }
@@ -4131,17 +4131,17 @@ public abstract class QueryBase {
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK);
                 }
             }
@@ -4203,17 +4203,17 @@ public abstract class QueryBase {
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK);
                 }
             }
@@ -4275,17 +4275,17 @@ public abstract class QueryBase {
                 boolean isSelfJ = flecs_h.ecs_field_is_self(iterSeg, (byte) 9);
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -4702,18 +4702,18 @@ public abstract class QueryBase {
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL);
                 }
             }
@@ -4780,18 +4780,18 @@ public abstract class QueryBase {
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL);
                 }
             }
@@ -4857,18 +4857,18 @@ public abstract class QueryBase {
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL);
                 }
             }
@@ -4934,18 +4934,18 @@ public abstract class QueryBase {
                 boolean isSelfK = flecs_h.ecs_field_is_self(iterSeg, (byte) 10);
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -5390,19 +5390,19 @@ public abstract class QueryBase {
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM);
                 }
             }
@@ -5473,19 +5473,19 @@ public abstract class QueryBase {
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM);
                 }
             }
@@ -5555,19 +5555,19 @@ public abstract class QueryBase {
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM);
                 }
             }
@@ -5637,19 +5637,19 @@ public abstract class QueryBase {
                 boolean isSelfL = flecs_h.ecs_field_is_self(iterSeg, (byte) 11);
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -6122,20 +6122,20 @@ public abstract class QueryBase {
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN);
                 }
             }
@@ -6210,20 +6210,20 @@ public abstract class QueryBase {
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN);
                 }
             }
@@ -6297,20 +6297,20 @@ public abstract class QueryBase {
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN);
                 }
             }
@@ -6384,20 +6384,20 @@ public abstract class QueryBase {
                 boolean isSelfM = flecs_h.ecs_field_is_self(iterSeg, (byte) 12);
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -6898,21 +6898,21 @@ public abstract class QueryBase {
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO);
                 }
             }
@@ -6991,21 +6991,21 @@ public abstract class QueryBase {
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO);
                 }
             }
@@ -7083,21 +7083,21 @@ public abstract class QueryBase {
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO);
                 }
             }
@@ -7175,21 +7175,21 @@ public abstract class QueryBase {
                 boolean isSelfN = flecs_h.ecs_field_is_self(iterSeg, (byte) 13);
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -7718,22 +7718,22 @@ public abstract class QueryBase {
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP);
                 }
             }
@@ -7816,22 +7816,22 @@ public abstract class QueryBase {
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP);
                 }
             }
@@ -7913,22 +7913,22 @@ public abstract class QueryBase {
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP);
                 }
             }
@@ -8010,22 +8010,22 @@ public abstract class QueryBase {
                 boolean isSelfO = flecs_h.ecs_field_is_self(iterSeg, (byte) 14);
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -8582,23 +8582,23 @@ public abstract class QueryBase {
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ);
                 }
             }
@@ -8685,23 +8685,23 @@ public abstract class QueryBase {
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ);
                 }
             }
@@ -8787,23 +8787,23 @@ public abstract class QueryBase {
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ);
                 }
             }
@@ -8889,23 +8889,23 @@ public abstract class QueryBase {
                 boolean isSelfP = flecs_h.ecs_field_is_self(iterSeg, (byte) 15);
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -9490,24 +9490,24 @@ public abstract class QueryBase {
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR);
                 }
             }
@@ -9598,24 +9598,24 @@ public abstract class QueryBase {
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR);
                 }
             }
@@ -9705,24 +9705,24 @@ public abstract class QueryBase {
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR);
                 }
             }
@@ -9812,24 +9812,24 @@ public abstract class QueryBase {
                 boolean isSelfQ = flecs_h.ecs_field_is_self(iterSeg, (byte) 16);
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -10442,25 +10442,25 @@ public abstract class QueryBase {
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS);
                 }
             }
@@ -10555,25 +10555,25 @@ public abstract class QueryBase {
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS);
                 }
             }
@@ -10667,25 +10667,25 @@ public abstract class QueryBase {
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS);
                 }
             }
@@ -10779,25 +10779,25 @@ public abstract class QueryBase {
                 boolean isSelfR = flecs_h.ecs_field_is_self(iterSeg, (byte) 17);
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -11438,26 +11438,26 @@ public abstract class QueryBase {
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT);
                 }
             }
@@ -11556,26 +11556,26 @@ public abstract class QueryBase {
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT);
                 }
             }
@@ -11673,26 +11673,26 @@ public abstract class QueryBase {
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT);
                 }
             }
@@ -11790,26 +11790,26 @@ public abstract class QueryBase {
                 boolean isSelfS = flecs_h.ecs_field_is_self(iterSeg, (byte) 18);
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -12478,27 +12478,27 @@ public abstract class QueryBase {
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU);
                 }
             }
@@ -12601,27 +12601,27 @@ public abstract class QueryBase {
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU);
                 }
             }
@@ -12723,27 +12723,27 @@ public abstract class QueryBase {
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU);
                 }
             }
@@ -12845,27 +12845,27 @@ public abstract class QueryBase {
                 boolean isSelfT = flecs_h.ecs_field_is_self(iterSeg, (byte) 19);
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -13562,28 +13562,28 @@ public abstract class QueryBase {
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV);
                 }
             }
@@ -13690,28 +13690,28 @@ public abstract class QueryBase {
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV);
                 }
             }
@@ -13817,28 +13817,28 @@ public abstract class QueryBase {
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV);
                 }
             }
@@ -13944,28 +13944,28 @@ public abstract class QueryBase {
                 boolean isSelfU = flecs_h.ecs_field_is_self(iterSeg, (byte) 20);
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -14690,29 +14690,29 @@ public abstract class QueryBase {
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW);
                 }
             }
@@ -14823,29 +14823,29 @@ public abstract class QueryBase {
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW);
                 }
             }
@@ -14955,29 +14955,29 @@ public abstract class QueryBase {
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW);
                 }
             }
@@ -15087,29 +15087,29 @@ public abstract class QueryBase {
                 boolean isSelfV = flecs_h.ecs_field_is_self(iterSeg, (byte) 21);
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -15862,30 +15862,30 @@ public abstract class QueryBase {
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX);
                 }
             }
@@ -16000,30 +16000,30 @@ public abstract class QueryBase {
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX);
                 }
             }
@@ -16137,30 +16137,30 @@ public abstract class QueryBase {
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX);
                 }
             }
@@ -16274,30 +16274,30 @@ public abstract class QueryBase {
                 boolean isSelfW = flecs_h.ecs_field_is_self(iterSeg, (byte) 22);
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -17078,31 +17078,31 @@ public abstract class QueryBase {
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY);
                 }
             }
@@ -17221,31 +17221,31 @@ public abstract class QueryBase {
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY);
                 }
             }
@@ -17363,31 +17363,31 @@ public abstract class QueryBase {
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY);
                 }
             }
@@ -17505,31 +17505,31 @@ public abstract class QueryBase {
                 boolean isSelfX = flecs_h.ecs_field_is_self(iterSeg, (byte) 23);
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -18338,32 +18338,32 @@ public abstract class QueryBase {
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ);
                 }
             }
@@ -18486,32 +18486,32 @@ public abstract class QueryBase {
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ);
                 }
             }
@@ -18633,32 +18633,32 @@ public abstract class QueryBase {
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ);
                 }
             }
@@ -18780,32 +18780,32 @@ public abstract class QueryBase {
                 boolean isSelfY = flecs_h.ecs_field_is_self(iterSeg, (byte) 24);
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -19642,33 +19642,33 @@ public abstract class QueryBase {
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA);
                 }
             }
@@ -19795,33 +19795,33 @@ public abstract class QueryBase {
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA);
                 }
             }
@@ -19947,33 +19947,33 @@ public abstract class QueryBase {
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA);
                 }
             }
@@ -20099,33 +20099,33 @@ public abstract class QueryBase {
                 boolean isSelfZ = flecs_h.ecs_field_is_self(iterSeg, (byte) 25);
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -20990,34 +20990,34 @@ public abstract class QueryBase {
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB);
                 }
             }
@@ -21148,34 +21148,34 @@ public abstract class QueryBase {
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB);
                 }
             }
@@ -21305,34 +21305,34 @@ public abstract class QueryBase {
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB);
                 }
             }
@@ -21462,34 +21462,34 @@ public abstract class QueryBase {
                 boolean isSelfAA = flecs_h.ecs_field_is_self(iterSeg, (byte) 26);
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -22382,35 +22382,35 @@ public abstract class QueryBase {
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC);
                 }
             }
@@ -22545,35 +22545,35 @@ public abstract class QueryBase {
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC);
                 }
             }
@@ -22707,35 +22707,35 @@ public abstract class QueryBase {
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC);
                 }
             }
@@ -22869,35 +22869,35 @@ public abstract class QueryBase {
                 boolean isSelfAB = flecs_h.ecs_field_is_self(iterSeg, (byte) 27);
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -23818,36 +23818,36 @@ public abstract class QueryBase {
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD);
                 }
             }
@@ -23986,36 +23986,36 @@ public abstract class QueryBase {
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD);
                 }
             }
@@ -24153,36 +24153,36 @@ public abstract class QueryBase {
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD);
                 }
             }
@@ -24320,36 +24320,36 @@ public abstract class QueryBase {
                 boolean isSelfAC = flecs_h.ecs_field_is_self(iterSeg, (byte) 28);
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -25298,37 +25298,37 @@ public abstract class QueryBase {
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE);
                 }
             }
@@ -25471,37 +25471,37 @@ public abstract class QueryBase {
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE);
                 }
             }
@@ -25643,37 +25643,37 @@ public abstract class QueryBase {
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE);
                 }
             }
@@ -25815,37 +25815,37 @@ public abstract class QueryBase {
                 boolean isSelfAD = flecs_h.ecs_field_is_self(iterSeg, (byte) 29);
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
@@ -26822,38 +26822,38 @@ public abstract class QueryBase {
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 boolean isSelfAF = flecs_h.ecs_field_is_self(iterSeg, (byte) 31);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
-                    AF componentInstanceAF = componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    AF componentInstanceAF = fieldAF.address() == 0 ? null : componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
                     callback.accept(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE, componentInstanceAF);
                 }
             }
@@ -27000,38 +27000,38 @@ public abstract class QueryBase {
                 boolean isSelfAF = flecs_h.ecs_field_is_self(iterSeg, (byte) 31);
                 for (int i = 0; i < count; i++) {
                     long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
-                    AF componentInstanceAF = componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    AF componentInstanceAF = fieldAF.address() == 0 ? null : componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
                     callback.accept(entityId, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE, componentInstanceAF);
                 }
             }
@@ -27177,38 +27177,38 @@ public abstract class QueryBase {
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 boolean isSelfAF = flecs_h.ecs_field_is_self(iterSeg, (byte) 31);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
-                    AF componentInstanceAF = componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    AF componentInstanceAF = fieldAF.address() == 0 ? null : componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
                     callback.accept(iter, i, componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE, componentInstanceAF);
                 }
             }
@@ -27354,38 +27354,38 @@ public abstract class QueryBase {
                 boolean isSelfAE = flecs_h.ecs_field_is_self(iterSeg, (byte) 30);
                 boolean isSelfAF = flecs_h.ecs_field_is_self(iterSeg, (byte) 31);
                 for (int i = 0; i < count; i++) {
-                    A componentInstanceA = componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
-                    B componentInstanceB = componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
-                    C componentInstanceC = componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
-                    D componentInstanceD = componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
-                    E componentInstanceE = componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
-                    F componentInstanceF = componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
-                    G componentInstanceG = componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
-                    H componentInstanceH = componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
-                    I componentInstanceI = componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
-                    J componentInstanceJ = componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
-                    K componentInstanceK = componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
-                    L componentInstanceL = componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
-                    M componentInstanceM = componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
-                    N componentInstanceN = componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
-                    O componentInstanceO = componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
-                    P componentInstanceP = componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
-                    Q componentInstanceQ = componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
-                    R componentInstanceR = componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
-                    S componentInstanceS = componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
-                    T componentInstanceT = componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
-                    U componentInstanceU = componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
-                    V componentInstanceV = componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
-                    W componentInstanceW = componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
-                    X componentInstanceX = componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
-                    Y componentInstanceY = componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
-                    Z componentInstanceZ = componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
-                    AA componentInstanceAA = componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
-                    AB componentInstanceAB = componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
-                    AC componentInstanceAC = componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
-                    AD componentInstanceAD = componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
-                    AE componentInstanceAE = componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
-                    AF componentInstanceAF = componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
+                    A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
+                    B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
+                    C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
+                    D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
+                    E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
+                    F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
+                    G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
+                    H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
+                    I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
+                    J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
+                    K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
+                    L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
+                    M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
+                    N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
+                    O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
+                    P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
+                    Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
+                    R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
+                    S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
+                    T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
+                    U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
+                    V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
+                    W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
+                    X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
+                    Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
+                    Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
+                    AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
+                    AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
+                    AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
+                    AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
+                    AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
+                    AF componentInstanceAF = fieldAF.address() == 0 ? null : componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE, componentInstanceAF)) {
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }

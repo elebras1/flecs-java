@@ -592,4 +592,25 @@ class WorldTest {
 
         assertNotNull(Flecs.Stats);
     }
+
+    @Test
+    void deferRunnable() {
+        AtomicInteger count = new AtomicInteger();
+        this.world.defer(() -> {
+            this.world.obtainEntity(this.world.entity()).add(Position.class);
+            count.incrementAndGet();
+        });
+        assertEquals(1, count.get());
+        assertEquals(1, this.world.count(Position.class));
+    }
+
+    @Test
+    void typedPrefab() {
+        long positionId = this.world.prefab(Position.class);
+        this.world.obtainEntity(positionId).set(new Position(1, 2));
+
+        Entity inst = this.world.obtainEntity(this.world.entity()).isA(Position.class);
+
+        assertTrue(inst.has(Flecs.IsA, positionId));
+    }
 }

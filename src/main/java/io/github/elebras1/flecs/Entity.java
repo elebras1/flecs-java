@@ -288,6 +288,11 @@ public class Entity extends EntityBase<Entity> {
         return this.add(Flecs.IsA, entity.id());
     }
 
+    public <T> Entity isA(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.isA(componentId);
+    }
+
     public Entity dependsOn(long entityId) {
         return this.add(Flecs.DependsOn, entityId);
     }
@@ -999,6 +1004,32 @@ public class Entity extends EntityBase<Entity> {
 
         for (int i = 0; i < count; i++) {
             callback.accept(ids.getAtIndex(ValueLayout.JAVA_LONG, i));
+        }
+    }
+
+    public void each(long relation, LongConsumer callback) {
+        this.each(relation, Flecs.Wildcard, id -> callback.accept(this.world.obtainId(id).second()));
+    }
+
+    public void each(long relation, long target, LongConsumer callback) {
+        MemorySegment typeSeg = flecs_h.ecs_get_type(this.world.worldSeg(), this.id);
+        if (typeSeg.address() == 0) {
+            return;
+        }
+
+        int count = ecs_type_t.count(typeSeg);
+        MemorySegment ids = ecs_type_t.array(typeSeg);
+
+        for (int i = 0; i < count; i++) {
+            long id = ids.getAtIndex(ValueLayout.JAVA_LONG, i);
+            Id typeId = this.world.obtainId(id);
+            if (!typeId.isPair() || typeId.first() != relation) {
+                continue;
+            }
+            if (target != Flecs.Wildcard && typeId.second() != target) {
+                continue;
+            }
+            callback.accept(id);
         }
     }
 

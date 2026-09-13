@@ -258,6 +258,13 @@ public class World extends WorldBase {
         return flecs_h.ecs_new_w_id(this.worldSeg, Flecs.Prefab);
     }
 
+    public long prefab(Class<?> componentClass) {
+        this.checkDestroyed();
+        long componentId = this.componentRegistry().register(componentClass);
+        flecs_h.ecs_add_id(this.worldSeg, componentId, Flecs.Prefab);
+        return componentId;
+    }
+
     public boolean progress(float deltaTime) {
         this.checkDestroyed();
         return flecs_h.ecs_progress(this.worldSeg, deltaTime);
@@ -441,6 +448,16 @@ public class World extends WorldBase {
     public void deferBegin() {
         this.checkDestroyed();
         flecs_h.ecs_defer_begin(this.worldSeg);
+    }
+
+    public void defer(Runnable callback) {
+        this.checkDestroyed();
+        flecs_h.ecs_defer_begin(this.worldSeg);
+        try {
+            callback.run();
+        } finally {
+            flecs_h.ecs_defer_end(this.worldSeg);
+        }
     }
 
     public void deferEnd() {

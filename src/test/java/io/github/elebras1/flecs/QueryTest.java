@@ -603,4 +603,91 @@ class QueryTest {
         query.destroy();
     }
 
+    @Test
+    void termFilter() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).set(new Velocity(3, 4));
+
+        Query query = this.world.queryBuilder(Position.class)
+                .with(Velocity.class).filter()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void scopeOperators() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).set(new Velocity(1, 2));
+
+        Query query = this.world.queryBuilder()
+                .with(Position.class)
+                .scopeOpen().not()
+                .with(Velocity.class).or()
+                .with(Mass.class)
+                .scopeClose()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void optionalComponentEach() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.queryBuilder(Position.class, Velocity.class)
+                .termAt(1).optional()
+                .build();
+
+        AtomicReference<Velocity> seen = new AtomicReference<>();
+        query.each(Position.class, Velocity.class, (position, velocity) -> seen.set(velocity));
+        assertNull(seen.get());
+        query.destroy();
+    }
+
+    @Test
+    void termSrcAndSecond() {
+        long locatedIn = this.world.entity();
+        long newYork = this.world.entity();
+        this.world.obtainEntity(this.world.entity()).add(locatedIn, newYork);
+
+        Query query = this.world.query()
+                .with(locatedIn).second("$Place")
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void termSrcByName() {
+        long game = this.world.entity("Game");
+        this.world.obtainEntity(game).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Velocity(1, 2));
+
+        Query query = this.world.queryBuilder(Velocity.class)
+                .with(Position.class).src("Game")
+                .build();
+        assertNotNull(query);
+        query.destroy();
+    }
+
+    @Test
+    void withNameAndSecond() {
+        long target = this.world.entity();
+
+        Query query = this.world.query()
+                .with("Position", target)
+                .build();
+        assertNotNull(query);
+        query.destroy();
+    }
+
+    @Test
+    void termFlagsIsName() {
+        Query query = this.world.queryBuilder()
+                .with(Flecs.PredEq).second("Position").flags(Flecs.IsName)
+                .build();
+        assertNotNull(query);
+        query.destroy();
+    }
+
 }

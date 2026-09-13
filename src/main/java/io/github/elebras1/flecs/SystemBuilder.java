@@ -12,7 +12,9 @@ public class SystemBuilder extends SystemBuilderBase {
     protected final Arena arena;
     private final Iter[] iters;
     private int termCount = 0;
+    private int selectedRef = 0;
     private IterCallback iterCallback;
+
     private RunCallback runCallback;
     private EntityCallback entityCallback;
     private long phase;
@@ -299,6 +301,140 @@ public class SystemBuilder extends SystemBuilderBase {
         ecs_term_t.id(termSeg, ecs_term_t.id(termSeg) | flags);
 
         return this;
+    }
+
+    public SystemBuilder filter() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'filter' modifier to");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+        ecs_term_t.inout(termSeg, (short) Flecs.InOutFilter);
+
+        return this;
+    }
+
+    public SystemBuilder src(long entityId) {
+        MemorySegment termSeg = this.termForConfiguration();
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, entityId);
+        this.selectedRef = TermRef.SRC;
+
+        return this;
+    }
+
+    public SystemBuilder src(Entity entity) {
+        return this.src(entity.id());
+    }
+
+    public <T> SystemBuilder src(Class<T> componentClass) {
+        long entityId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.src(entityId);
+    }
+
+    public SystemBuilder src(String name) {
+        MemorySegment termSeg = this.termForConfiguration();
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        this.applyNameOrVar(srcRefSeg, name);
+        this.selectedRef = TermRef.SRC;
+
+        return this;
+    }
+
+    public SystemBuilder second(long entityId) {
+        MemorySegment termSeg = this.secondTermForConfiguration();
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
+        ecs_term_ref_t.id(secondRefSeg, entityId);
+        this.selectedRef = TermRef.SECOND;
+
+        return this;
+    }
+
+    public SystemBuilder second(Entity entity) {
+        return this.second(entity.id());
+    }
+
+    public <T> SystemBuilder second(Class<T> componentClass) {
+        long entityId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.second(entityId);
+    }
+
+    public SystemBuilder second(String name) {
+        MemorySegment termSeg = this.secondTermForConfiguration();
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
+        this.applyNameOrVar(secondRefSeg, name);
+        this.selectedRef = TermRef.SECOND;
+
+        return this;
+    }
+
+    public SystemBuilder flags(long flags) {
+        MemorySegment termSeg = this.termForConfiguration();
+        MemorySegment refSeg = switch (this.selectedRef) {
+            case TermRef.FIRST -> ecs_term_t.first(termSeg);
+            case TermRef.SECOND -> ecs_term_t.second(termSeg);
+            default -> ecs_term_t.src(termSeg);
+        };
+        ecs_term_ref_t.id(refSeg, flags);
+
+        return this;
+    }
+
+    public SystemBuilder scopeOpen() {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        ecs_term_t.id(termSeg, Flecs.ScopeOpen);
+        ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
+
+        this.termCount++;
+        return this;
+    }
+
+    public SystemBuilder scopeClose() {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
+
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
+        ecs_term_t.id(termSeg, Flecs.ScopeClose);
+        ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
+
+        this.termCount++;
+        return this;
+    }
+
+    private MemorySegment termForConfiguration() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to configure");
+        }
+        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
+        return ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
+    }
+
+    private MemorySegment secondTermForConfiguration() {
+        MemorySegment termSeg = this.termForConfiguration();
+        long termId = ecs_term_t.id(termSeg);
+        if (termId != 0 && ecs_term_ref_t.id(ecs_term_t.first(termSeg)) == 0) {
+            ecs_term_ref_t.id(ecs_term_t.first(termSeg), termId);
+            ecs_term_t.id(termSeg, 0);
+        }
+        return termSeg;
+    }
+
+    private void applyNameOrVar(MemorySegment refSeg, String name) {
+        if (name.startsWith("$")) {
+            ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsVariable);
+            ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name.substring(1)));
+        } else {
+            ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsEntity);
+            ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name));
+        }
     }
 
     public SystemBuilder and() {

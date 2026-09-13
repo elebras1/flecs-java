@@ -114,6 +114,16 @@ public final class Flecs {
     public static final int OrFrom = flecs_h.EcsOrFrom();
     public static final int NotFrom = flecs_h.EcsNotFrom();
 
+    public static final long Self = flecs_h.EcsSelf();
+    public static final long IsEntity = flecs_h.EcsIsEntity();
+    public static final long IsVariable = flecs_h.EcsIsVariable();
+    public static final long IsName = flecs_h.EcsIsName();
+    public static final long ScopeOpen = flecs_h.EcsScopeOpen();
+    public static final long ScopeClose = flecs_h.EcsScopeClose();
+    public static final long PredEq = flecs_h.EcsPredEq();
+    public static final long PredMatch = flecs_h.EcsPredMatch();
+    public static final int InOutFilter = flecs_h.EcsInOutFilter();
+
     public static final int ObserverMatchPrefab = flecs_h.EcsObserverMatchPrefab();
     public static final int ObserverMatchDisabled = flecs_h.EcsObserverMatchDisabled();
     public static final int ObserverYieldOnCreate = flecs_h.EcsObserverYieldOnCreate();

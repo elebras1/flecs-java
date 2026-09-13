@@ -17,6 +17,8 @@ public class QueryBuilder {
     private final MemorySegment desc;
     private int termCount = 0;
     private int selectedTerm = -1;
+    private int selectedRef = 0;
+
 
     public QueryBuilder(World world) {
         this.world = world;
@@ -108,6 +110,28 @@ public class QueryBuilder {
     public <T> QueryBuilder with(Class<T> first, long second) {
         long firstId = this.world.componentRegistry().getComponentId(first);
         return this.with(firstId, second);
+    }
+
+    public QueryBuilder with(String first, long second) {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount);
+
+        MemorySegment firstTermRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(firstTermRefSeg, Flecs.IsEntity);
+        ecs_term_ref_t.name(firstTermRefSeg, this.arena.allocateFrom(first));
+
+        MemorySegment secondTermRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(secondTermRefSeg, second);
+
+        ecs_term_t.first(termSeg, firstTermRefSeg);
+        ecs_term_t.second(termSeg, secondTermRefSeg);
+
+        this.selectedRef = TermRef.SECOND;
+        this.termCount++;
+        return this;
     }
 
     public <T> QueryBuilder with(Class<T> first, Entity second) {
@@ -246,6 +270,118 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder filter() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to apply 'filter' modifier to");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+        ecs_term_t.inout(termSeg, (short) Flecs.InOutFilter);
+
+        return this;
+    }
+
+    public QueryBuilder src(String name) {
+        MemorySegment termSeg = this.termForConfiguration();
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        this.applyNameOrVar(srcRefSeg, name);
+        this.selectedRef = TermRef.SRC;
+
+        return this;
+    }
+
+    public QueryBuilder second(long entityId) {
+        MemorySegment termSeg = this.secondTermForConfiguration();
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
+        ecs_term_ref_t.id(secondRefSeg, entityId);
+        this.selectedRef = TermRef.SECOND;
+
+        return this;
+    }
+
+    public QueryBuilder second(Entity entity) {
+        return this.second(entity.id());
+    }
+
+    public <T> QueryBuilder second(Class<T> componentClass) {
+        long entityId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.second(entityId);
+    }
+
+    public QueryBuilder second(String name) {
+        MemorySegment termSeg = this.secondTermForConfiguration();
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
+        this.applyNameOrVar(secondRefSeg, name);
+        this.selectedRef = TermRef.SECOND;
+
+        return this;
+    }
+
+    public QueryBuilder flags(long flags) {
+        MemorySegment termSeg = this.termForConfiguration();
+        MemorySegment refSeg = switch (this.selectedRef) {
+            case TermRef.FIRST -> ecs_term_t.first(termSeg);
+            case TermRef.SECOND -> ecs_term_t.second(termSeg);
+            default -> ecs_term_t.src(termSeg);
+        };
+        ecs_term_ref_t.id(refSeg, flags);
+
+        return this;
+    }
+
+    public QueryBuilder scopeOpen() {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount);
+        ecs_term_t.id(termSeg, Flecs.ScopeOpen);
+        ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
+
+        this.termCount++;
+        return this;
+    }
+
+    public QueryBuilder scopeClose() {
+        if (this.termCount >= 32) {
+            throw new IllegalStateException("Maximum number of terms (32) reached");
+        }
+
+        MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.termCount);
+        ecs_term_t.id(termSeg, Flecs.ScopeClose);
+        ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
+
+        this.termCount++;
+        return this;
+    }
+
+    private MemorySegment termForConfiguration() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to configure");
+        }
+        return ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
+    }
+
+    private MemorySegment secondTermForConfiguration() {
+        MemorySegment termSeg = this.termForConfiguration();
+        long termId = ecs_term_t.id(termSeg);
+        if (termId != 0 && ecs_term_ref_t.id(ecs_term_t.first(termSeg)) == 0) {
+            ecs_term_ref_t.id(ecs_term_t.first(termSeg), termId);
+            ecs_term_t.id(termSeg, 0);
+        }
+        return termSeg;
+    }
+
+    private void applyNameOrVar(MemorySegment refSeg, String name) {
+        if (name.startsWith("$")) {
+            ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsVariable);
+            ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name.substring(1)));
+        } else {
+            ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsEntity);
+            ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name));
+        }
+    }
+
     public QueryBuilder and() {
         return this.oper(Flecs.And);
     }
@@ -282,12 +418,18 @@ public class QueryBuilder {
         MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
         MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
         ecs_term_ref_t.id(srcRefSeg, entityId);
+        this.selectedRef = TermRef.SRC;
 
         return this;
     }
 
     public QueryBuilder src(Entity entity) {
         return this.src(entity.id());
+    }
+
+    public <T> QueryBuilder src(Class<T> componentClass) {
+        long entityId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.src(entityId);
     }
 
     public QueryBuilder orderBy(long componentId) {

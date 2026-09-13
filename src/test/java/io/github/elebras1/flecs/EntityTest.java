@@ -753,4 +753,25 @@ class EntityTest {
         created.setJson(Position.class, "{\"x\": 1.0, \"y\": 2.0}");
         assertNotNull(created.get(Position.class));
     }
+
+    @Test
+    void eachRelation() {
+        long eats = this.world.entity();
+        long apples = this.world.entity();
+        long pears = this.world.entity();
+
+        Entity bob = this.world.obtainEntity(this.world.entity());
+        bob.add(eats, apples);
+        bob.add(eats, pears);
+
+        List<Long> targets = new ArrayList<>();
+        bob.each(eats, targets::add);
+        assertEquals(2, targets.size());
+        assertTrue(targets.contains(apples));
+        assertTrue(targets.contains(pears));
+
+        List<Long> ids = new ArrayList<>();
+        bob.each(eats, Flecs.Wildcard, ids::add);
+        assertEquals(2, ids.size());
+    }
 }

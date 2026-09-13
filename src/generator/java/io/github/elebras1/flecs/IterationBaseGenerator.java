@@ -419,7 +419,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
             if (vm == ViewMode.COMPONENT_VIEW) {
                 appendStatement(body, level, "componentView" + comp + ".setBaseAddress(base" + comp + " + (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
             } else {
-                appendStatement(body, level, comp + " componentInstance" + comp + " = component" + comp + ".read(field" + comp + ", (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
+                appendStatement(body, level, comp + " componentInstance" + comp + " = field" + comp + ".address() == 0 ? null : component" + comp + ".read(field" + comp + ", (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
             }
         }
     }
