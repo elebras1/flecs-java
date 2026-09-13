@@ -37,7 +37,7 @@ public class RelationBasics {
 
         // Print the type of the entity. The exact string depends on how the
         // Java binding formats component names (here fully-qualified names).
-        System.out.println("Bob's type: [" + bob.table().str() + "]");
+        System.out.println("Bob's type: [" + bob.table().toString() + "]");
 
         // Get first target of relationship.
         long first = bob.target(eatsId);

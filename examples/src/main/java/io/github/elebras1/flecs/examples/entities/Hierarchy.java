@@ -60,7 +60,7 @@ public class Hierarchy {
 
     private static void iterateTree(World world, Entity entity, Position parentPosition) {
         // Print hierarchical name of entity & the entity type.
-        String type = entity.table().str();
+        String type = entity.table().toString();
         System.out.println(entity.name() + " [" + type + "]");
 
         // Get entity position.

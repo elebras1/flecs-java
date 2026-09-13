@@ -209,7 +209,7 @@ class QueryBuilderTest {
         AtomicInteger invocations = new AtomicInteger();
         query.iter(it -> {
             Position p = it.field(Position.class, 0).get(0);
-            assertEquals(source.id(), it.fieldSource(0));
+            assertEquals(source.id(), it.src(0));
             assertEquals(10.0f, p.x());
             assertEquals(20.0f, p.y());
             invocations.incrementAndGet();

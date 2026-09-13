@@ -45,7 +45,7 @@ public class HelloWorld {
                 .add(eatsId, applesId);
 
         // Show us what you got.
-        System.out.println(bob.name() + "'s got [" + bob.table().str() + "]");
+        System.out.println(bob.name() + "'s got [" + bob.table().toString() + "]");
 
         // Run systems twice. Usually this function is called once per frame.
         world.progress(0.0f);

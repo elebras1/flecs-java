@@ -472,8 +472,8 @@ class EntityTest {
         Type type = entity.type();
         assertEquals(2, type.count());
         assertEquals(type.count(), type.array().length);
-        assertTrue(type.str().contains("Position"));
-        assertTrue(type.str().contains("Velocity"));
+        assertTrue(type.toString().contains("Position"));
+        assertTrue(type.toString().contains("Velocity"));
         assertTrue(type.get(0).id() != 0);
     }
 
@@ -773,5 +773,12 @@ class EntityTest {
         List<Long> ids = new ArrayList<>();
         bob.each(eats, Flecs.Wildcard, ids::add);
         assertEquals(2, ids.size());
+    }
+
+    @Test
+    void toStringTest() {
+        Entity entity = this.world.obtainEntity(this.world.entity("Bob"));
+
+        assertTrue(entity.toString().contains("Bob"));
     }
 }

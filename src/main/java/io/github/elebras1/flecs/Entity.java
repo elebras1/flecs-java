@@ -1051,10 +1051,9 @@ public class Entity extends EntityBase<Entity> {
 
     @Override
     public String toString() {
-        String name = this.name();
-        if (name != null) {
-            return String.format("Entity[%d, \"%s\"]", this.id, name);
-        }
-        return String.format("Entity[%d]", this.id);
+        MemorySegment strSeg = flecs_h.ecs_entity_str(this.world.worldSeg(), this.id);
+        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(strSeg);
+        return str;
     }
 }

@@ -187,4 +187,12 @@ public class Query extends QueryBase {
             this.arena.close();
         }
     }
+
+    @Override
+    public String toString() {
+        MemorySegment strSeg = flecs_h.ecs_query_str(this.querySeg);
+        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(strSeg);
+        return str;
+    }
 }

@@ -36,7 +36,7 @@ public class EntityBasics {
         alice.add(Walking.class);
 
         // Print all of the components the entity has.
-        System.out.println("[" + alice.table().str() + "]");
+        System.out.println("[" + alice.table().toString() + "]");
 
         // Remove tag.
         alice.remove(Walking.class);

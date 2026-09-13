@@ -283,7 +283,7 @@ class QueryTest {
         AtomicInteger withVelocity = new AtomicInteger();
         AtomicInteger withoutVelocity = new AtomicInteger();
         query.iter(it -> {
-            boolean velocitySet = it.isFieldSet(1);
+            boolean velocitySet = it.isSet(1);
             Field<Position> positions = it.field(Position.class, 0);
             for (int i = 0; i < it.count(); i++) {
                 if (velocitySet) {
@@ -337,7 +337,7 @@ class QueryTest {
         query.iter(it -> {
             Type type = it.type();
             assertTrue(type.count() >= 1);
-            assertTrue(type.str().contains("Position"));
+            assertTrue(type.toString().contains("Position"));
             for (int i = 0; i < it.count(); i++) {
                 ids.add(it.entityId(i));
             }
@@ -455,7 +455,7 @@ class QueryTest {
         Query query = this.world.query(Position.class);
         query.run(it -> {
             while (it.next()) {
-                assertTrue(it.isFieldSet(0));
+                assertTrue(it.isSet(0));
                 assertTrue(it.isSelf(0));
                 assertFalse(it.isReadonly(0));
             }
@@ -687,6 +687,34 @@ class QueryTest {
                 .with(Flecs.PredEq).second("Position").flags(Flecs.IsName)
                 .build();
         assertNotNull(query);
+        query.destroy();
+    }
+
+    @Test
+    void toStringTest() {
+        Query query = this.world.query(Position.class, Velocity.class);
+
+        assertTrue(query.toString().contains("Position"));
+        assertTrue(query.toString().contains("Velocity"));
+
+        query.destroy();
+    }
+
+    @Test
+    void iterToStringTest() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        AtomicReference<String> iterString = new AtomicReference<>();
+        query.run(it -> {
+            while (it.next()) {
+                iterString.set(it.toString());
+            }
+        });
+
+        assertNotNull(iterString.get());
+        assertTrue(iterString.get().contains("Position"));
+
         query.destroy();
     }
 

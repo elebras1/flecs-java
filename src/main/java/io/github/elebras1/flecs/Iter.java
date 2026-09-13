@@ -85,12 +85,12 @@ public class Iter {
         return field;
     }
 
-    public long fieldSource(int index) {
+    public long src(int index) {
         assert (index >= 0 && index < 32) : "The field index must be between 0 and 31.";
         return flecs_h.ecs_field_src(this.iterSeg, (byte) index);
     }
 
-    public boolean isFieldSet(int index) {
+    public boolean isSet(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         int setFields = ecs_iter_t.set_fields(this.iterSeg);
@@ -152,7 +152,7 @@ public class Iter {
         return new Table(this.world, tableSeg);
     }
 
-    public long termId(int index) {
+    public long id(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment ids = ecs_iter_t.ids(this.iterSeg);
@@ -163,7 +163,17 @@ public class Iter {
         return ids.getAtIndex(ValueLayout.JAVA_LONG, index);
     }
 
-    public int fieldSize(int index) {
+    public long pair() {
+        return this.pair(0);
+    }
+
+    public long pair(int index) {
+        long id = this.id(index);
+        assert (id & flecs_h.ECS_PAIR()) == flecs_h.ECS_PAIR() : "Field is not a pair: " + index;
+        return id;
+    }
+
+    public int size(int index) {
         assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
 
         MemorySegment sizes = ecs_iter_t.sizes(this.iterSeg);
@@ -259,5 +269,13 @@ public class Iter {
             flecs_h.ecs_table_unlock(this.world.worldSeg(), tableSeg);
         }
         flecs_h.ecs_iter_fini(this.iterSeg);
+    }
+
+    @Override
+    public String toString() {
+        MemorySegment strSeg = flecs_h.ecs_iter_str(this.iterSeg);
+        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(strSeg);
+        return str;
     }
 }

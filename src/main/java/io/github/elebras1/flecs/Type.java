@@ -49,7 +49,8 @@ public final class Type {
         return arraySeg.reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
     }
 
-    public String str() {
+    @Override
+    public String toString() {
         this.world.worldSeg();
         if (this.typeSeg.address() == 0) {
             return "";

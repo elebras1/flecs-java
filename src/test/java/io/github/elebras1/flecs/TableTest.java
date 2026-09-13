@@ -114,7 +114,7 @@ class TableTest {
         assertEquals(type.count(), type.array().length);
         assertTrue(type.get(0).id() != 0);
 
-        String str = table.str();
+        String str = table.toString();
         assertNotNull(str);
         assertTrue(str.contains("Position"));
         assertTrue(str.contains("Velocity"));

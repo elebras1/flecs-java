@@ -48,13 +48,13 @@ public class IterateComponents {
     private static void iterateComponents(World world, Entity entity) {
         // 1. The easiest way to print the components is to use the table string.
         Table table = entity.table();
-        System.out.println(table.str() + "\n");
+        System.out.println(table.toString() + "\n");
 
         // 2. To get individual component ids, use Entity.each.
         AtomicInteger i = new AtomicInteger();
         entity.each(idL -> {
             Id id = world.obtainId(idL);
-            System.out.println(i.getAndIncrement() + ": " + id.str());
+            System.out.println(i.getAndIncrement() + ": " + id.toString());
         });
         System.out.println();
 

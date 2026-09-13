@@ -15,13 +15,6 @@ public class Table {
         this.tableSeg = tableSeg;
     }
 
-    public String str() {
-        MemorySegment strSeg = flecs_h.ecs_table_str(this.world.worldSeg(), this.tableSeg);
-        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
-        FlecsAllocator.free(strSeg);
-        return str;
-    }
-
     void reset(MemorySegment tableSeg) {
         this.tableSeg = tableSeg;
     }
@@ -305,5 +298,13 @@ public class Table {
         V view = (V) this.world.viewCache().getComponentView(componentClass);
         view.setBaseAddress(slice.address());
         return view;
+    }
+
+    @Override
+    public String toString() {
+        MemorySegment strSeg = flecs_h.ecs_table_str(this.world.worldSeg(), this.tableSeg);
+        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
+        FlecsAllocator.free(strSeg);
+        return str;
     }
 }

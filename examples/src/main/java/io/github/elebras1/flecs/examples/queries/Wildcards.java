@@ -36,7 +36,7 @@ public class Wildcards {
             Field<Eats> eatsField = it.field(Eats.class, 0);
             for (int i = 0; i < it.count(); i++) {
                 Entity entity = world.obtainEntity(it.entity(i));
-                long pairId = it.termId(0);
+                long pairId = it.id(0);
                 long foodId = world.obtainId(pairId).second();
                 String foodName = world.obtainEntity(foodId).name();
                 System.out.println(entity.name() + " eats " + eatsField.get(i).amount() + " " + foodName);

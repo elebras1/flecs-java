@@ -5,11 +5,6 @@ import io.github.elebras1.flecs.internal.ParamRegistry;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
-/**
- * An observer is a callback that is invoked when one or more events match the
- * observer query. Observers are entities (mirrors {@code flecs::observer : entity}),
- * so an observer inherits the regular entity API (enable, disable, destruct, ...).
- */
 public class Observer extends Entity {
 
     Observer(World world, long observerId) {

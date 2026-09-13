@@ -38,11 +38,11 @@ public class PrefabOverride {
 
         // The instance has a private copy of Damage, but Attack and Defense are
         // shared from the prefab.
-        System.out.println(inst.table().str());
+        System.out.println(inst.table().toString());
 
         // Override Attack explicitly on the instance.
         inst.add(Attack.class);
-        System.out.println(inst.table().str());
+        System.out.println(inst.table().toString());
 
         // Values can be read whether they are inherited or overridden.
         System.out.println("attack: " + inst.get(Attack.class).value());
