@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,6 +34,14 @@ class ComponentLifecycleTest {
     @AfterEach
     void tearDown() {
         this.world.destroy();
+    }
+
+    private static Position[] transformed(Position[] src) {
+        Position[] dst = new Position[src.length];
+        for (int i = 0; i < src.length; i++) {
+            dst[i] = new Position(42, 43);
+        }
+        return dst;
     }
 
     @Test
@@ -72,6 +82,17 @@ class ComponentLifecycleTest {
         this.world.obtainEntity(this.world.entity()).add(Position.class);
         this.world.obtainEntity(this.world.entity()).add(Position.class);
         assertEquals(2, this.onAdd.get());
+    }
+
+    @Test
+    void onAddContextHook() {
+        AtomicLong seen = new AtomicLong();
+        this.world.component(Position.class, hooks ->
+                hooks.onAdd((it, components) -> seen.set(it.entityId(0))));
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        assertEquals(entity.id(), seen.get());
     }
 
     @Test
@@ -128,5 +149,137 @@ class ComponentLifecycleTest {
         assertEquals(10.0f, p.x());
         assertEquals(1, this.onAdd.get());
         assertEquals(1, this.onSet.get());
+    }
+
+    @Test
+    void onReplaceHook() {
+        AtomicReference<Position> prev = new AtomicReference<>();
+        AtomicReference<Position> next = new AtomicReference<>();
+        this.world.component(Position.class, hooks ->
+                hooks.onReplace((oldComponents, newComponents) -> {
+                    prev.set(oldComponents[0]);
+                    next.set(newComponents[0]);
+                }));
+
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        entity.set(new Position(10, 20));
+        entity.set(new Position(30, 40));
+
+        assertNotNull(prev.get());
+        assertNotNull(next.get());
+        assertEquals(10.0f, prev.get().x());
+        assertEquals(20.0f, prev.get().y());
+        assertEquals(30.0f, next.get().x());
+        assertEquals(40.0f, next.get().y());
+    }
+
+    @Test
+    void ctorValues() {
+        this.world.component(Position.class, hooks -> hooks.ctor(count -> {
+            Position[] positions = new Position[count];
+            for (int i = 0; i < count; i++) {
+                positions[i] = new Position(7, 8);
+            }
+            return positions;
+        }));
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(Position.class);
+        Position p = entity.get(Position.class);
+
+        assertNotNull(p);
+        assertEquals(7.0f, p.x());
+        assertEquals(8.0f, p.y());
+    }
+
+    @Test
+    void ctorDtorHooks() {
+        AtomicInteger ctor = new AtomicInteger();
+        AtomicInteger dtor = new AtomicInteger();
+        this.world.component(Position.class, hooks -> {
+            hooks.ctor(count -> {
+                ctor.addAndGet(count);
+                return null;
+            });
+            hooks.dtor(components -> dtor.addAndGet(components.length));
+        });
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        assertTrue(ctor.get() >= 1);
+
+        entity.remove(Position.class);
+        assertTrue(dtor.get() >= 1);
+    }
+
+    @Test
+    void moveHooks() {
+        AtomicInteger move = new AtomicInteger();
+        AtomicInteger moveCtor = new AtomicInteger();
+        this.world.component(Position.class, hooks -> {
+            hooks.move(src -> {
+                move.addAndGet(src.length);
+                return null;
+            });
+            hooks.moveCtor(src -> {
+                moveCtor.addAndGet(src.length);
+                return null;
+            });
+        });
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+        entity.add(Velocity.class);
+
+        assertTrue(move.get() + moveCtor.get() >= 1);
+    }
+
+    @Test
+    void copyValues() {
+        this.world.component(Position.class, hooks -> {
+            hooks.copy(ComponentLifecycleTest::transformed);
+            hooks.copyCtor(ComponentLifecycleTest::transformed);
+        });
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        Entity clone = this.world.obtainEntity(entity.clone(true));
+        Position p = clone.get(Position.class);
+
+        assertNotNull(p);
+        assertEquals(42.0f, p.x());
+        assertEquals(43.0f, p.y());
+    }
+
+    @Test
+    void copyHooks() {
+        AtomicInteger copy = new AtomicInteger();
+        AtomicInteger copyCtor = new AtomicInteger();
+        this.world.component(Position.class, hooks -> {
+            hooks.copy(src -> {
+                copy.addAndGet(src.length);
+                return null;
+            });
+            hooks.copyCtor(src -> {
+                copyCtor.addAndGet(src.length);
+                return null;
+            });
+        });
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+        entity.clone(true);
+
+        assertTrue(copy.get() + copyCtor.get() >= 1);
+    }
+
+    @Test
+    void hookFailureIsReported() {
+        this.world.component(Position.class, hooks -> hooks.onSet(components -> {
+            throw new IllegalStateException("hook failure");
+        }));
+
+        Entity entity = this.world.obtainEntity(this.world.entity());
+
+        IllegalStateException error = assertThrows(IllegalStateException.class, () -> {
+            entity.set(new Position(1, 2));
+            entity.get(Position.class);
+        });
+        assertTrue(error.getMessage().contains("on_set"));
     }
 }

@@ -1,6 +1,6 @@
 package io.github.elebras1.flecs.callback;
 
 @FunctionalInterface
-public interface CopyMoveCallback<T> {
-    T[] invoke(T[] src);
+public interface CtorCallback<T> {
+    T[] invoke(int count);
 }

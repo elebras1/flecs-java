@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class World extends WorldBase {
@@ -29,6 +30,7 @@ public class World extends WorldBase {
     private long importingModule;
     private long ctxId;
     private final Set<Long> trackedCtxIds;
+    private final AtomicReference<Throwable> hookFailure;
 
     static {
         FlecsLoader.load();
@@ -51,6 +53,7 @@ public class World extends WorldBase {
         this.importingModule = 0;
         this.owned = true;
         this.trackedCtxIds = ConcurrentHashMap.newKeySet();
+        this.hookFailure = new AtomicReference<>();
     }
 
     World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
@@ -65,6 +68,7 @@ public class World extends WorldBase {
         this.importingModule = 0;
         this.owned = false;
         this.trackedCtxIds = ConcurrentHashMap.newKeySet();
+        this.hookFailure = new AtomicReference<>();
     }
 
     public long entity() {
@@ -1038,7 +1042,15 @@ public class World extends WorldBase {
 
     MemorySegment worldSeg() {
         this.checkDestroyed();
+        Throwable failure = this.hookFailure.getAndSet(null);
+        if (failure != null) {
+            throw (failure instanceof RuntimeException runtimeException) ? runtimeException : new IllegalStateException(failure);
+        }
         return this.worldSeg;
+    }
+
+    void reportHookFailure(String hook, Throwable cause) {
+        this.hookFailure.compareAndSet(null, new IllegalStateException("Flecs component hook '" + hook + "' failed", cause));
     }
 
     public Arena arena() {

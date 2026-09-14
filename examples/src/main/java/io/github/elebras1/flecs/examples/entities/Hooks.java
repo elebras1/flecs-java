@@ -15,10 +15,12 @@ public class Hooks {
                     System.out.println("onAdd: " + components.length + " elements"));
             hooks.onSet((components) ->
                     System.out.println("onSet: " + components[0]));
-            hooks.ctor((components, count) ->
-                    System.out.println("ctor: " + count + " elements"));
-            hooks.dtor((components, count) ->
-                    System.out.println("dtor: " + count + " elements"));
+            hooks.ctor(count -> {
+                System.out.println("ctor: " + count + " elements");
+                return null;
+            });
+            hooks.dtor(components ->
+                    System.out.println("dtor: " + components.length + " elements"));
         });
 
         Entity ent = world.obtainEntity(world.entity("HookedEntity"));
