@@ -82,6 +82,10 @@ public class SystemBuilder extends SystemBuilderBase {
         return this;
     }
 
+    public SystemBuilder tickSource(Timer tickSource) {
+        return this.tickSource(tickSource.id());
+    }
+
     public SystemBuilder multiThreaded() {
         ecs_system_desc_t.multi_threaded(this.desc, true);
         return this;
@@ -274,13 +278,17 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder inOut() {
+        return this.inOut(Flecs.InOut);
+    }
+
+    public SystemBuilder inOut(int inout) {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.inout(termSeg, (short) Flecs.InOut);
+        ecs_term_t.inout(termSeg, (short) inout);
 
         return this;
     }

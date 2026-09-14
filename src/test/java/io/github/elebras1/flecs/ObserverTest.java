@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -438,5 +439,17 @@ class ObserverTest {
                 .each(Position.class, (Iter it, int index, Position p) -> { });
 
         assertNotEquals(0, observer.id());
+    }
+
+    @Test
+    void iterEvent() {
+        AtomicLong event = new AtomicLong();
+        this.world.observer(Position.class)
+                .event(Flecs.OnAdd)
+                .each(Position.class, (Iter it, int index, Position p) -> event.set(it.event()));
+
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        assertEquals(Flecs.OnAdd, event.get());
     }
 }

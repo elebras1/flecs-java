@@ -262,6 +262,16 @@ public class World extends WorldBase {
         return flecs_h.ecs_new_w_id(this.worldSeg, Flecs.Prefab);
     }
 
+    public long prefab(String name) {
+        this.checkDestroyed();
+        long prefabId = this.prefab();
+        try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment nameSeg = tempArena.allocateFrom(name);
+            flecs_h.ecs_set_name(this.worldSeg, prefabId, nameSeg);
+        }
+        return prefabId;
+    }
+
     public long prefab(Class<?> componentClass) {
         this.checkDestroyed();
         long componentId = this.componentRegistry().register(componentClass);
@@ -402,13 +412,18 @@ public class World extends WorldBase {
         return flecs_h.ecs_get_with(this.worldSeg);
     }
 
-    public int deleteEmptyTables(int limit) {
+    public int deleteEmptyTables(int clearGeneration, int deleteGeneration) {
+        return this.deleteEmptyTables(clearGeneration, deleteGeneration, 0.0, 0);
+    }
+
+    public int deleteEmptyTables(int clearGeneration, int deleteGeneration, double timeBudgetSeconds, int offset) {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemoryLayout memoryLayout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("limit"), ValueLayout.JAVA_INT.withName("flags"));
-            MemorySegment descSeg = tempArena.allocate(memoryLayout);
-            descSeg.set(ValueLayout.JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("limit")), limit);
-            descSeg.set(ValueLayout.JAVA_INT, memoryLayout.byteOffset(MemoryLayout.PathElement.groupElement("flags")), 0);
+            MemorySegment descSeg = ecs_delete_empty_tables_desc_t.allocate(tempArena);
+            ecs_delete_empty_tables_desc_t.clear_generation(descSeg, (short) clearGeneration);
+            ecs_delete_empty_tables_desc_t.delete_generation(descSeg, (short) deleteGeneration);
+            ecs_delete_empty_tables_desc_t.time_budget_seconds(descSeg, timeBudgetSeconds);
+            ecs_delete_empty_tables_desc_t.offset(descSeg, offset);
 
             return flecs_h.ecs_delete_empty_tables(this.worldSeg, descSeg);
         }

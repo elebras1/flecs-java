@@ -748,6 +748,30 @@ class QueryTest {
     }
 
     @Test
+    void accessModifiers() {
+        Query inout = this.world.query()
+                .with(Position.class)
+                .with(Velocity.class).inout(Flecs.In)
+                .build();
+        assertNotNull(inout);
+        inout.destroy();
+
+        Query in = this.world.query()
+                .with(Position.class)
+                .with(Velocity.class).in()
+                .build();
+        assertNotNull(in);
+        in.destroy();
+
+        Query out = this.world.query()
+                .with(Position.class)
+                .with(Velocity.class).out()
+                .build();
+        assertNotNull(out);
+        out.destroy();
+    }
+
+    @Test
     void queryMatchPrefab() {
         this.world.obtainEntity(this.world.prefab()).set(new Position(1, 2));
 

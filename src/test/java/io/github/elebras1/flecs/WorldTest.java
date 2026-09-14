@@ -582,6 +582,9 @@ class WorldTest {
     @Test
     void appRunFrames() {
         this.world.app()
+                .targetFps(60)
+                .deltaTime(0.016f)
+                .threads(1)
                 .frames(1)
                 .run();
     }
@@ -612,6 +615,27 @@ class WorldTest {
         Entity inst = this.world.obtainEntity(this.world.entity()).isA(Position.class);
 
         assertTrue(inst.has(Flecs.IsA, positionId));
+    }
+
+    @Test
+    void prefabWithName() {
+        long prefabId = this.world.prefab("SpaceShip");
+
+        Entity prefab = this.world.obtainEntity(prefabId);
+        assertEquals("SpaceShip", prefab.name());
+        assertTrue(prefab.has(Flecs.Prefab));
+    }
+
+    @Test
+    void prefabWithParentStorage() {
+        Entity parent = this.world.obtainEntity(this.world.prefab("SpaceShip"));
+        Entity child = this.world.obtainEntity(this.world.prefab())
+                .set(new FlecsParent(parent.id()))
+                .name("Cockpit");
+
+        assertNotNull(child.get(FlecsParent.class));
+        assertEquals(parent.id(), child.get(FlecsParent.class).value());
+        assertTrue(child.has(Flecs.Prefab));
     }
 
     @Test
@@ -655,5 +679,20 @@ class WorldTest {
     @Test
     void getPipelineDefault() {
         assertNotNull(this.world.getPipeline());
+    }
+
+    @Test
+    void deleteEmptyTables() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        entity.destruct();
+
+        long tablesBefore = this.world.stats().tableCount();
+        assertTrue(tablesBefore > 0);
+
+        for (int i = 0; i < 12; i++) {
+            this.world.deleteEmptyTables(0, 10, 0.0, 0);
+        }
+
+        assertTrue(this.world.stats().tableCount() < tablesBefore);
     }
 }

@@ -27,18 +27,10 @@ World world = new World();
 Entity player = world.obtainEntity(world.entity("Player"));
 player.set(new Position(0, 0)).set(new Velocity(1, 0));
 
-world.system("MoveSystem")
-    .with(Position.class)
-    .with(Velocity.class)
-    .iter(it -> {
-        Field<Position> positions = it.field(Position.class, 0);
-        Field<Velocity> velocities = it.field(Velocity.class, 1);
-        for (int i = 0; i < it.count(); i++) {
-            PositionView p = positions.getMutView(i);
-            VelocityView v = velocities.getMutView(i);
-            p.x(p.x() + v.dx() * it.deltaTime());
-            p.y(p.y() + v.dy() * it.deltaTime());
-        }
+world.system("MoveSystem", Position.class, Velocity.class)
+    .eachView(Position.class, Velocity.class, (PositionView p, VelocityView v) -> {
+        p.x(p.x() + v.dx() * world.deltaTime());
+        p.y(p.y() + v.dy() * world.deltaTime());
     });
 
 while (world.progress()) {}
@@ -54,8 +46,8 @@ If this project is useful to you, consider giving it a ⭐, it helps others find
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.13.0'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.13.0'
+    implementation 'io.github.elebras1:flecs-java:0.15.0'
+    annotationProcessor 'io.github.elebras1:flecs-java:0.15.0'
 }
 ```
 

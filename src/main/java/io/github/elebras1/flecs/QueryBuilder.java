@@ -244,12 +244,16 @@ public class QueryBuilder {
     }
 
     public QueryBuilder inout() {
+        return this.inout(Flecs.InOut);
+    }
+
+    public QueryBuilder inout(int inout) {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
         MemorySegment termSeg = ecs_query_desc_t.terms(this.desc, this.selectedTermIndex());
-        ecs_term_t.inout(termSeg, (short) Flecs.InOut);
+        ecs_term_t.inout(termSeg, (short) inout);
 
         return this;
     }

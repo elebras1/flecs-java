@@ -300,13 +300,17 @@ public class ObserverBuilder extends ObserverBuilderBase {
     }
 
     public ObserverBuilder inOut() {
+        return this.inOut(Flecs.InOut);
+    }
+
+    public ObserverBuilder inOut(int inout) {
         if (this.termCount == 0) {
             throw new IllegalStateException("No term to apply 'inout' modifier to");
         }
 
         MemorySegment queryDescSeg = ecs_observer_desc_t.query(this.desc);
         MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.inout(termSeg, (short) Flecs.InOut);
+        ecs_term_t.inout(termSeg, (short) inout);
 
         return this;
     }
