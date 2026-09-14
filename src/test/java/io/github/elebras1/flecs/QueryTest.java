@@ -721,4 +721,43 @@ class QueryTest {
         query.destroy();
     }
 
+    @Test
+    void iterAccessors() {
+        long rel = this.world.entity();
+        long target = this.world.entity();
+        this.world.obtainEntity(this.world.entity()).add(rel, target).set(new Position(1, 2));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(rel, Flecs.Wildcard)
+                .build();
+
+        AtomicInteger count = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                assertEquals(this.world.id(Position.class), it.id(0));
+                assertEquals(rel, this.world.obtainId(it.pair(1)).first());
+                assertEquals(target, this.world.obtainId(it.pair(1)).second());
+                assertTrue(it.size(0) > 0);
+                count.incrementAndGet();
+            }
+        });
+
+        assertEquals(1, count.get());
+        query.destroy();
+    }
+
+    @Test
+    void queryMatchPrefab() {
+        this.world.obtainEntity(this.world.prefab()).set(new Position(1, 2));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .queryFlags(Flecs.QueryMatchPrefab)
+                .build();
+
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
 }

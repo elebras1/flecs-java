@@ -122,7 +122,13 @@ public class SystemBuilder extends SystemBuilderBase {
 
         MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
         MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-        ecs_term_t.id(termSeg, componentId);
+        if ((componentId & flecs_h.ECS_ID_FLAGS_MASK()) != 0) {
+            ecs_term_t.id(termSeg, componentId);
+        } else {
+            MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+            ecs_term_ref_t.id(firstRefSeg, componentId);
+            ecs_term_t.first(termSeg, firstRefSeg);
+        }
 
         this.termCount++;
         return this;

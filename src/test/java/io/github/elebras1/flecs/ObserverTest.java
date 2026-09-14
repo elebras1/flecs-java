@@ -289,7 +289,6 @@ class ObserverTest {
                 .event(Flecs.OnAdd)
                 .with(Position.class)
                 .queryFlags(Flecs.QueryMatchEmptyTables)
-                .queryFlags(Flecs.QueryDetectChanges)
                 .cached()
                 .each(entityId -> count.incrementAndGet());
 

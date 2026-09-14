@@ -640,4 +640,20 @@ class WorldTest {
         this.world.setPipeline(pipeline);
         assertEquals(pipeline, this.world.getPipeline());
     }
+
+    @Test
+    void setPipelineWithId() {
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .build();
+
+        this.world.setPipeline(pipeline.id());
+
+        assertEquals(pipeline.id(), this.world.getPipeline().id());
+    }
+
+    @Test
+    void getPipelineDefault() {
+        assertNotNull(this.world.getPipeline());
+    }
 }
