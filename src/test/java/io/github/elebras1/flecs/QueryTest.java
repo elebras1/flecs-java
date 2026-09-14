@@ -705,15 +705,18 @@ class QueryTest {
         this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
 
         Query query = this.world.query(Position.class);
-        AtomicReference<String> iterString = new AtomicReference<>();
+        AtomicReference<String> beforeNext = new AtomicReference<>();
+        AtomicReference<String> afterNext = new AtomicReference<>();
         query.run(it -> {
+            beforeNext.set(it.toString());
             while (it.next()) {
-                iterString.set(it.toString());
+                afterNext.set(it.toString());
             }
         });
 
-        assertNotNull(iterString.get());
-        assertTrue(iterString.get().contains("Position"));
+        assertEquals("", beforeNext.get());
+        assertNotNull(afterNext.get());
+        assertTrue(afterNext.get().contains("Position"));
 
         query.destroy();
     }
