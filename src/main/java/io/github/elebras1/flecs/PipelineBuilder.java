@@ -9,7 +9,6 @@ public class PipelineBuilder {
     private final Arena arena;
     private final MemorySegment desc;
     private int termCount = 0;
-    private static final long TERM_SIZE = ecs_term_t.layout().byteSize();
 
     public PipelineBuilder(World world) {
         this.world = world;
@@ -28,31 +27,87 @@ public class PipelineBuilder {
         }
     }
 
-    public PipelineBuilder with(long phaseId) {
+    public PipelineBuilder with(long componentId) {
         if (this.termCount >= 32) {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
 
-        MemorySegment queryDesc = ecs_pipeline_desc_t.query(this.desc);
-        long termsOffset = ecs_query_desc_t.terms$offset();
-
-        if (this.termCount > 0) {
-            long prevTermOffset = termsOffset + ((this.termCount - 1) * TERM_SIZE);
-            MemorySegment prevTerm = queryDesc.asSlice(prevTermOffset, TERM_SIZE);
-            ecs_term_t.oper(prevTerm, (short) Flecs.Or);
-        }
-
-        long termOffset = termsOffset + (this.termCount * TERM_SIZE);
-        MemorySegment term = queryDesc.asSlice(termOffset, TERM_SIZE);
-        ecs_term_t.id(term, phaseId);
-
-
+        ecs_term_t.id(this.term(this.termCount), componentId);
         this.termCount++;
         return this;
     }
 
-    public PipelineBuilder with(Entity phase) {
-        return this.with(phase.id());
+    public PipelineBuilder with(Entity entity) {
+        return this.with(entity.id());
+    }
+
+    public <T> PipelineBuilder with(Class<T> componentClass) {
+        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        return this.with(componentId);
+    }
+
+    public PipelineBuilder without(long componentId) {
+        return this.with(componentId).not();
+    }
+
+    public PipelineBuilder without(Entity entity) {
+        return this.with(entity).not();
+    }
+
+    public <T> PipelineBuilder without(Class<T> componentClass) {
+        return this.with(componentClass).not();
+    }
+
+    public PipelineBuilder not() {
+        this.checkTerm();
+        ecs_term_t.oper(this.term(this.termCount - 1), (short) Flecs.Not);
+        return this;
+    }
+
+    public PipelineBuilder cascade() {
+        this.checkTerm();
+        MemorySegment termSeg = this.term(this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | Flecs.Cascade);
+        return this;
+    }
+
+    public PipelineBuilder cascade(long trav) {
+        this.cascade();
+        ecs_term_t.trav(this.term(this.termCount - 1), trav);
+        return this;
+    }
+
+    public PipelineBuilder cascade(Entity trav) {
+        return this.cascade(trav.id());
+    }
+
+    public <T> PipelineBuilder cascade(Class<T> trav) {
+        long travId = this.world.componentRegistry().getComponentId(trav);
+        return this.cascade(travId);
+    }
+
+    public PipelineBuilder up() {
+        this.checkTerm();
+        MemorySegment termSeg = this.term(this.termCount - 1);
+        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
+        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsUp());
+        return this;
+    }
+
+    public PipelineBuilder up(long trav) {
+        this.up();
+        ecs_term_t.trav(this.term(this.termCount - 1), trav);
+        return this;
+    }
+
+    public PipelineBuilder up(Entity trav) {
+        return this.up(trav.id());
+    }
+
+    public <T> PipelineBuilder up(Class<T> trav) {
+        long travId = this.world.componentRegistry().getComponentId(trav);
+        return this.up(travId);
     }
 
     public PipelineBuilder expr(String expr) {
@@ -88,5 +143,14 @@ public class PipelineBuilder {
         this.arena.close();
         return new Pipeline(pipelineId);
     }
-}
 
+    private MemorySegment term(int index) {
+        return ecs_query_desc_t.terms(ecs_pipeline_desc_t.query(this.desc), index);
+    }
+
+    private void checkTerm() {
+        if (this.termCount == 0) {
+            throw new IllegalStateException("No term to configure");
+        }
+    }
+}

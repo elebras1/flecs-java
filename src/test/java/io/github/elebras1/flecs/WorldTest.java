@@ -613,4 +613,31 @@ class WorldTest {
 
         assertTrue(inst.has(Flecs.IsA, positionId));
     }
+
+    @Test
+    void builtinPipeline() {
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Flecs.Phase).cascade(Flecs.DependsOn)
+                .without(Flecs.Disabled).up(Flecs.DependsOn)
+                .without(Flecs.Disabled).up(Flecs.ChildOf)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+    }
+
+    @Test
+    void customPipeline() {
+        long foo = this.world.entity("Foo");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(foo)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+        assertEquals(pipeline, this.world.getPipeline());
+    }
 }

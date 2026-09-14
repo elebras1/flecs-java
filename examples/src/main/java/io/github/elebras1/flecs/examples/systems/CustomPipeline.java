@@ -26,7 +26,7 @@ public class CustomPipeline {
                 .build();
 
         // Configure the world to use the custom pipeline.
-        world.setPipeline(customPipeline.id());
+        world.setPipeline(customPipeline);
 
         // Create a system that uses the custom tag as phase.
         world.system("PhysicsSystem")

@@ -633,9 +633,22 @@ public class World extends WorldBase {
         this.resetStages();
     }
 
+    public void setPipeline(Pipeline pipeline) {
+        this.setPipeline(pipeline.id());
+    }
+
     public void setPipeline(long pipelineId) {
         this.checkDestroyed();
         flecs_h.ecs_set_pipeline(this.worldSeg, pipelineId);
+    }
+
+    public Pipeline getPipeline() {
+        this.checkDestroyed();
+        long pipelineId = flecs_h.ecs_get_pipeline(this.worldSeg);
+        if (pipelineId == 0) {
+            return null;
+        }
+        return new Pipeline(pipelineId);
     }
 
     public long getMaxId() {
