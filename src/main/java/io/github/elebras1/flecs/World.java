@@ -648,7 +648,7 @@ public class World extends WorldBase {
         if (pipelineId == 0) {
             return null;
         }
-        return new Pipeline(pipelineId);
+        return new Pipeline(this, pipelineId);
     }
 
     public long getMaxId() {

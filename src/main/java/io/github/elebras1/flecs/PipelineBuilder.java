@@ -141,7 +141,7 @@ public class PipelineBuilder {
         }
 
         this.arena.close();
-        return new Pipeline(pipelineId);
+        return new Pipeline(this.world, pipelineId);
     }
 
     private MemorySegment term(int index) {
