@@ -35,7 +35,13 @@ public class AlertBuilder {
             throw new IllegalStateException("Maximum number of terms (32) reached");
         }
         MemorySegment termSeg = ecs_query_desc_t.terms(ecs_alert_desc_t.query(this.desc), this.termCount);
-        ecs_term_t.id(termSeg, componentId);
+        if ((componentId & flecs_h.ECS_ID_FLAGS_MASK()) != 0) {
+            ecs_term_t.id(termSeg, componentId);
+        } else {
+            MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+            ecs_term_ref_t.id(firstRefSeg, componentId);
+            ecs_term_t.first(termSeg, firstRefSeg);
+        }
         this.termCount++;
         return this;
     }
