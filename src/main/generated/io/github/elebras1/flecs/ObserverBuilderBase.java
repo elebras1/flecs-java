@@ -4,20 +4,22 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.Component;
 import io.github.elebras1.flecs.ComponentView;
 import io.github.elebras1.flecs.Observer;
+import io.github.elebras1.flecs.ObserverBuilder;
+import io.github.elebras1.flecs.QueryTermBuilder;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.ecs_iter_action_t;
 import io.github.elebras1.flecs.ecs_iter_t;
 import io.github.elebras1.flecs.ecs_observer_desc_t;
 import io.github.elebras1.flecs.flecs_h;
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-public abstract class ObserverBuilderBase {
-    protected final World world;
+public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuilder> {
     protected final MemorySegment desc;
 
-    protected ObserverBuilderBase(World world, MemorySegment desc) {
-        this.world = world;
+    protected ObserverBuilderBase(World world, Arena arena, MemorySegment desc) {
+        super(world, arena, ecs_observer_desc_t.query(desc));
         this.desc = desc;
     }
 

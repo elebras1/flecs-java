@@ -466,6 +466,19 @@ class QueryBuilderTest {
     }
 
     @Test
+    void inoutModifiers() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Query query = this.world.query()
+                .with(Position.class).inout()
+                .with(Position.class).inout(Flecs.In)
+                .with(Position.class).termAt(2).filter()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
     void queryCtx() {
         this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
 

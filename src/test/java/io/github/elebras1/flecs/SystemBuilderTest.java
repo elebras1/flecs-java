@@ -306,6 +306,22 @@ class SystemBuilderTest {
     }
 
     @Test
+    void termModifiers() {
+        long e1 = this.world.obtainEntity(this.world.entity()).add(Position.class).add(Velocity.class).id();
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        List<Long> ids = new ArrayList<>();
+        FlecsSystem sys = this.world.system()
+                .read(Position.class)
+                .termAt(0).inout(Flecs.Out)
+                .with(Velocity.class).inout()
+                .each((long entityId) -> ids.add(entityId));
+
+        sys.run();
+        assertEquals(List.of(e1), ids);
+    }
+
+    @Test
     void idFlags() {
         long positionId = this.world.component(Position.class);
         this.world.obtainEntity(positionId).add(Flecs.CanToggle);

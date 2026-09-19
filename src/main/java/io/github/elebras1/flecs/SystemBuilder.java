@@ -1,6 +1,8 @@
 package io.github.elebras1.flecs;
 
-import io.github.elebras1.flecs.callback.*;
+import io.github.elebras1.flecs.callback.EntityCallback;
+import io.github.elebras1.flecs.callback.IterCallback;
+import io.github.elebras1.flecs.callback.RunCallback;
 import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
@@ -9,26 +11,15 @@ import java.lang.foreign.ValueLayout;
 
 public class SystemBuilder extends SystemBuilderBase {
 
-    protected final Arena arena;
+    private final Arena arena;
     private final Iter[] iters;
-    private int termCount = 0;
-    private int selectedRef = 0;
     private IterCallback iterCallback;
-
     private RunCallback runCallback;
     private EntityCallback entityCallback;
     private long phase;
 
     public SystemBuilder(World world) {
-        Arena arena = Arena.ofConfined();
-        super(world, ecs_system_desc_t.allocate(arena));
-        this.arena = arena;
-        this.iters = new Iter[world.getStageCount()];
-        for(int i = 0; i < this.iters.length; i++) {
-            World worldStage = world.getStage(i);
-            this.iters[i] = new Iter(MemorySegment.NULL, worldStage);
-        }
-        this.phase = Flecs.OnUpdate;
+        this(world, Arena.ofConfined());
     }
 
     public SystemBuilder(World world, String name) {
@@ -40,31 +31,20 @@ public class SystemBuilder extends SystemBuilderBase {
         ecs_system_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.worldSeg(), entityDescTemp));
     }
 
+    private SystemBuilder(World world, Arena arena) {
+        super(world, arena, ecs_system_desc_t.allocate(arena));
+        this.arena = arena;
+        this.iters = new Iter[world.getStageCount()];
+        for(int i = 0; i < this.iters.length; i++) {
+            World worldStage = world.getStage(i);
+            this.iters[i] = new Iter(MemorySegment.NULL, worldStage);
+        }
+        this.phase = Flecs.OnUpdate;
+    }
+
     public SystemBuilder kind(long phase) {
         this.phase = phase;
         return this;
-    }
-
-    public SystemBuilder expr(String expr) {
-        MemorySegment exprSeg = this.arena.allocateFrom(expr);
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.expr(queryDescSeg, exprSeg);
-        return this;
-    }
-
-    public SystemBuilder queryFlags(int flag) {
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.flags(queryDescSeg, ecs_query_desc_t.flags(queryDescSeg) | flag);
-        return this;
-    }
-
-    public SystemBuilder cached() {
-        ecs_query_desc_t.cache_kind(ecs_system_desc_t.query(this.desc), Flecs.QueryCacheAuto);
-        return this;
-    }
-
-    public SystemBuilder detectChanges() {
-        return this.queryFlags(Flecs.QueryDetectChanges);
     }
 
     public SystemBuilder interval(float interval) {
@@ -119,472 +99,12 @@ public class SystemBuilder extends SystemBuilderBase {
         return this;
     }
 
-    public SystemBuilder with(long componentId) {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-        if ((componentId & flecs_h.ECS_ID_FLAGS_MASK()) != 0) {
-            ecs_term_t.id(termSeg, componentId);
-        } else {
-            MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
-            ecs_term_ref_t.id(firstRefSeg, componentId);
-            ecs_term_t.first(termSeg, firstRefSeg);
-        }
-
-        this.termCount++;
-        return this;
-    }
-
-    public SystemBuilder with(String componentName) {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-        MemorySegment termRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.name(termRefSeg, this.arena.allocateFrom(componentName));
-        ecs_term_t.first(termSeg, termRefSeg);
-
-        this.termCount++;
-        return this;
-    }
-
-    public SystemBuilder with(Entity entity) {
-        return with(entity.id());
-    }
-
-    public <T> SystemBuilder with(Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(componentId);
-    }
-
-    public SystemBuilder with(long first, long second) {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-
-        MemorySegment firstTermRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.id(firstTermRefSeg, first);
-
-        MemorySegment secondTermRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.id(secondTermRefSeg, second);
-
-        ecs_term_t.first(termSeg, firstTermRefSeg);
-        ecs_term_t.second(termSeg, secondTermRefSeg);
-
-        this.termCount++;
-        return this;
-    }
-
-    public SystemBuilder with(String first, String second) {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-
-        MemorySegment firstTermRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.name(firstTermRefSeg, this.arena.allocateFrom(first));
-
-        MemorySegment secondTermRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.name(secondTermRefSeg, this.arena.allocateFrom(second));
-
-        ecs_term_t.first(termSeg, firstTermRefSeg);
-        ecs_term_t.second(termSeg, secondTermRefSeg);
-
-        this.termCount++;
-        return this;
-    }
-
-    public <T> SystemBuilder with(Class<T> first, long second) {
-        long firstId = this.world.componentRegistry().getComponentId(first);
-        return this.with(firstId, second);
-    }
-
-    public <T> SystemBuilder with(Class<T> first, Entity second) {
-        long firstId = this.world.componentRegistry().getComponentId(first);
-        return this.with(firstId, second.id());
-    }
-
-    public <A, B> SystemBuilder with(Class<A> first, Class<B> second) {
-        long firstId = this.world.componentRegistry().getComponentId(first);
-        long secondId = this.world.componentRegistry().getComponentId(second);
-        return this.with(firstId, secondId);
-    }
-
-    public SystemBuilder without(long componentId) {
-        return this.with(componentId).not();
-    }
-
-    public SystemBuilder without(Entity entity) {
-        return this.without(entity.id());
-    }
-
-    public <T> SystemBuilder without(Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.without(componentId);
-    }
-
-    public SystemBuilder without(long first, long second) {
-        return this.with(first, second).not();
-    }
-
-    public <T> SystemBuilder without(Class<T> first, long second) {
-        long firstId = this.world.componentRegistry().getComponentId(first);
-        return this.without(firstId, second);
-    }
-
-    public <T> SystemBuilder without(Class<T> first, Entity second) {
-        long firstId = this.world.componentRegistry().getComponentId(first);
-        return this.without(firstId, second.id());
-    }
-
-    public <A, B> SystemBuilder without(Class<A> first, Class<B> second) {
-        long firstId = this.world.componentRegistry().getComponentId(first);
-        long secondId = this.world.componentRegistry().getComponentId(second);
-        return this.without(firstId, secondId);
-    }
-
-    public SystemBuilder in() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'in' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.inout(termSeg, (short) Flecs.In);
-
-        return this;
-    }
-
-    public SystemBuilder out() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'out' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.inout(termSeg, (short) Flecs.Out);
-
-        return this;
-    }
-
-    public SystemBuilder inOut() {
-        return this.inOut(Flecs.InOut);
-    }
-
-    public SystemBuilder inOut(int inout) {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'inout' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.inout(termSeg, (short) inout);
-
-        return this;
-    }
-
-    public SystemBuilder oper(int operator) {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'operator' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.oper(termSeg, (short) operator);
-
-        return this;
-    }
-
-    public SystemBuilder idFlags(long flags) {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'idFlags' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.id(termSeg, ecs_term_t.id(termSeg) | flags);
-
-        return this;
-    }
-
-    public SystemBuilder filter() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'filter' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.inout(termSeg, (short) Flecs.InOutFilter);
-
-        return this;
-    }
-
-    public SystemBuilder src(long entityId) {
-        MemorySegment termSeg = this.termForConfiguration();
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, entityId);
-        this.selectedRef = TermRef.SRC;
-
-        return this;
-    }
-
-    public SystemBuilder src(Entity entity) {
-        return this.src(entity.id());
-    }
-
-    public <T> SystemBuilder src(Class<T> componentClass) {
-        long entityId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.src(entityId);
-    }
-
-    public SystemBuilder src(String name) {
-        MemorySegment termSeg = this.termForConfiguration();
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        this.applyNameOrVar(srcRefSeg, name);
-        this.selectedRef = TermRef.SRC;
-
-        return this;
-    }
-
-    public SystemBuilder second(long entityId) {
-        MemorySegment termSeg = this.secondTermForConfiguration();
-        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
-        ecs_term_ref_t.id(secondRefSeg, entityId);
-        this.selectedRef = TermRef.SECOND;
-
-        return this;
-    }
-
-    public SystemBuilder second(Entity entity) {
-        return this.second(entity.id());
-    }
-
-    public <T> SystemBuilder second(Class<T> componentClass) {
-        long entityId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.second(entityId);
-    }
-
-    public SystemBuilder second(String name) {
-        MemorySegment termSeg = this.secondTermForConfiguration();
-        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
-        this.applyNameOrVar(secondRefSeg, name);
-        this.selectedRef = TermRef.SECOND;
-
-        return this;
-    }
-
-    public SystemBuilder flags(long flags) {
-        MemorySegment termSeg = this.termForConfiguration();
-        MemorySegment refSeg = switch (this.selectedRef) {
-            case TermRef.FIRST -> ecs_term_t.first(termSeg);
-            case TermRef.SECOND -> ecs_term_t.second(termSeg);
-            default -> ecs_term_t.src(termSeg);
-        };
-        ecs_term_ref_t.id(refSeg, flags);
-
-        return this;
-    }
-
-    public SystemBuilder scopeOpen() {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-        ecs_term_t.id(termSeg, Flecs.ScopeOpen);
-        ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
-
-        this.termCount++;
-        return this;
-    }
-
-    public SystemBuilder scopeClose() {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount);
-        ecs_term_t.id(termSeg, Flecs.ScopeClose);
-        ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
-
-        this.termCount++;
-        return this;
-    }
-
-    private MemorySegment termForConfiguration() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to configure");
-        }
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        return ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-    }
-
-    private MemorySegment secondTermForConfiguration() {
-        MemorySegment termSeg = this.termForConfiguration();
-        long termId = ecs_term_t.id(termSeg);
-        if (termId != 0 && ecs_term_ref_t.id(ecs_term_t.first(termSeg)) == 0) {
-            ecs_term_ref_t.id(ecs_term_t.first(termSeg), termId);
-            ecs_term_t.id(termSeg, 0);
-        }
-        return termSeg;
-    }
-
-    private void applyNameOrVar(MemorySegment refSeg, String name) {
-        if (name.startsWith("$")) {
-            ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsVariable);
-            ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name.substring(1)));
-        } else {
-            ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsEntity);
-            ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name));
-        }
-    }
-
-    public SystemBuilder and() {
-        return this.oper(Flecs.And);
-    }
-
-    public SystemBuilder or() {
-        return this.oper(Flecs.Or);
-    }
-
-    public SystemBuilder not() {
-        return this.oper(Flecs.Not);
-    }
-
-    public SystemBuilder optional() {
-        return this.oper(Flecs.Optional);
-    }
-
-    public SystemBuilder andFrom() {
-        return this.oper(Flecs.AndFrom);
-    }
-
-    public SystemBuilder orFrom() {
-        return this.oper(Flecs.OrFrom);
-    }
-
-    public SystemBuilder notFrom() {
-        return this.oper(Flecs.NotFrom);
-    }
-
-    public SystemBuilder up() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'up' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsUp());
-
-        return this;
-    }
-
-    public SystemBuilder up(long trav) {
-        this.up();
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.trav(termSeg, trav);
-
-        return this;
-    }
-
-    public SystemBuilder parent() {
-        return this.up();
-    }
-
-    public SystemBuilder cascade() {
-        this.up();
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsCascade());
-
-        return this;
-    }
-
-    public SystemBuilder cascade(long trav) {
-        this.cascade();
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.trav(termSeg, trav);
-
-        return this;
-    }
-
-    public SystemBuilder desc() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'desc' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsDesc());
-
-        return this;
-    }
-
-    public SystemBuilder trav(long trav) {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'trav' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        ecs_term_t.trav(termSeg, trav);
-
-        return this;
-    }
-
-    public SystemBuilder self() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'self' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsSelf());
-
-        return this;
-    }
-
-    public SystemBuilder var(String varName) {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'var' modifier to");
-        }
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        MemorySegment termSeg = ecs_query_desc_t.terms(queryDescSeg, this.termCount - 1);
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsIsVariable());
-        ecs_term_ref_t.name(srcRefSeg, this.arena.allocateFrom(varName));
-
-        return this;
-    }
-
     public SystemBuilder readWrite(long componentId) {
-        return this.with(componentId).inOut();
+        return this.with(componentId).inout();
     }
 
     public SystemBuilder readWrite(Entity entity) {
-        return this.with(entity.id()).inOut();
+        return this.with(entity.id()).inout();
     }
 
     public <T> SystemBuilder readWrite(Class<T> componentClass) {
@@ -616,128 +136,6 @@ public class SystemBuilder extends SystemBuilderBase {
     public <T> SystemBuilder read(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.read(componentId);
-    }
-
-    public SystemBuilder orderBy(long componentId) {
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.order_by(queryDescSeg, componentId);
-        return this;
-    }
-
-    public SystemBuilder orderBy(long componentId, ComparatorId comparator) {
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, _, idB, _) ->
-                comparator.compare(idA, idB), this.world.arena());
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.order_by_callback(queryDescSeg, callbackStub);
-
-        return this.orderBy(componentId);
-    }
-
-    public <T> SystemBuilder orderBy(long componentId, ComparatorComponent<T> comparator) {
-        Component<T> component = this.world.componentRegistry().getComponentById(componentId);
-        long componentSize = component.size();
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentAdressA, _, componentAdressB) -> {
-            if (componentAdressA == 0 || componentAdressB == 0) {
-                return 0;
-            }
-            MemorySegment segmentA = MemorySegment.ofAddress(componentAdressA).reinterpret(componentSize);
-            MemorySegment segmentB = MemorySegment.ofAddress(componentAdressB).reinterpret(componentSize);
-            return comparator.compare(component.read(segmentA, 0), component.read(segmentB, 0));
-        }, this.world.arena());
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.order_by_callback(queryDescSeg, callbackStub);
-
-        return this.orderBy(componentId);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V extends ComponentView> SystemBuilder orderBy(long componentId, ComparatorComponentView<V> comparator) {
-        Class<?> componentClass = this.world.componentRegistry().getComponentClassById(componentId);
-        MemorySegment callbackStub = ecs_order_by_action_t.allocate((_, componentAdressA, _, componentAdressB) -> {
-            V componentViewA = (V) this.world.viewCache().getComponentView(componentClass);
-            componentViewA.setBaseAddress(componentAdressA);
-            V componentViewB = (V) this.world.viewCache().getComponentView(componentClass);
-            componentViewB.setBaseAddress(componentAdressB);
-            return comparator.compare(componentViewA, componentViewB);
-        }, this.world.arena());
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.order_by_callback(queryDescSeg, callbackStub);
-
-        return this.orderBy(componentId);
-    }
-
-    public SystemBuilder orderBy(Entity entity) {
-        return this.orderBy(entity.id());
-    }
-
-    public SystemBuilder orderBy(Entity entity, ComparatorId comparator) {
-        return this.orderBy(entity.id(), comparator);
-    }
-
-    public <T> SystemBuilder orderBy(Entity entity, ComparatorComponent<T> comparator) {
-        return this.orderBy(entity.id(), comparator);
-    }
-
-    public <V extends ComponentView> SystemBuilder orderBy(Entity entity, ComparatorComponentView<V> comparator) {
-        return this.orderBy(entity.id(), comparator);
-    }
-
-    public SystemBuilder orderBy(Class<?> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.orderBy(componentId);
-    }
-
-    public SystemBuilder orderBy(Class<?> componentClass, ComparatorId comparator) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.orderBy(componentId, comparator);
-    }
-
-    public <T> SystemBuilder orderBy(Class<T> componentClass, ComparatorComponent<T> comparator) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.orderBy(componentId, comparator);
-    }
-
-    public <V extends ComponentView> SystemBuilder orderBy(Class<?> componentClass, ComparatorComponentView<V> comparator) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.orderBy(componentId, comparator);
-    }
-
-    public SystemBuilder groupBy(long groupId) {
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.group_by(queryDescSeg, groupId);
-        return this;
-    }
-
-    public SystemBuilder groupBy(long groupId, GroupByCallback groupByCallback) {
-        MemorySegment callbackStub = ecs_group_by_action_t.allocate((_, tableSeg, id, _) -> {
-            Table table = tableSeg.address() == 0 ? null : new Table(this.world, tableSeg);
-            return groupByCallback.accept(this.world, table, id);
-        }, this.world.arena());
-
-        MemorySegment queryDescSeg = ecs_system_desc_t.query(this.desc);
-        ecs_query_desc_t.group_by_callback(queryDescSeg, callbackStub);
-        return this.groupBy(groupId);
-    }
-
-    public SystemBuilder groupBy(Class<?> componentClass) {
-        long groupId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.groupBy(groupId);
-    }
-
-    public SystemBuilder groupBy(Class<?> componentClass, GroupByCallback groupByCallback) {
-        long groupId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.groupBy(groupId, groupByCallback);
-    }
-
-    public SystemBuilder groupBy(Entity entity) {
-        return this.groupBy(entity.id());
-    }
-
-    public SystemBuilder groupBy(Entity entity, GroupByCallback groupByCallback) {
-        return this.groupBy(entity.id(), groupByCallback);
     }
 
     @Override
@@ -820,4 +218,3 @@ public class SystemBuilder extends SystemBuilderBase {
         return new FlecsSystem(this.world, systemId);
     }
 }
-

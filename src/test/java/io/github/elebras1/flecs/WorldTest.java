@@ -666,6 +666,128 @@ class WorldTest {
     }
 
     @Test
+    void builtinPipelineWithPairTerm() {
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Flecs.Phase).cascade(Flecs.DependsOn)
+                .with(Flecs.DependsOn, Flecs.OnStart).trav(Flecs.DependsOn)
+                .without(Flecs.Disabled).up(Flecs.DependsOn)
+                .without(Flecs.Disabled).up(Flecs.ChildOf)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+    }
+
+    @Test
+    void pipelineWithPairMatchesSystems() {
+        long rel = this.world.entity("PairRel");
+        long target = this.world.entity("PairTgt");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(rel, target)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem system = this.world.system("PairSystem")
+                .with(Position.class)
+                .iter(it -> count.incrementAndGet());
+        system.add(rel, target);
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void pipelineWithSecondTerm() {
+        long rel = this.world.entity("SecondRel");
+        long target = this.world.entity("SecondTgt");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(rel)
+                .second(target)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem system = this.world.system("SecondSystem")
+                .with(Position.class)
+                .iter(it -> count.incrementAndGet());
+        system.add(rel, target);
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void pipelineWithoutTermSkipsSystems() {
+        long skip = this.world.entity("Skip");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .without(skip)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        this.world.system("SkippedSystem")
+                .with(Position.class)
+                .iter(it -> count.addAndGet(100))
+                .add(skip);
+        this.world.system("KeptSystem")
+                .with(Position.class)
+                .iter(it -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void pipelineTermSelection() {
+        long phase = this.world.entity("SelectedPhase");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(phase)
+                .termAt(1)
+                .self()
+                .inout(Flecs.InOutFilter)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        this.world.system("SelectedSystem")
+                .kind(phase)
+                .with(Position.class)
+                .iter(it -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
     void setPipelineWithId() {
         Pipeline pipeline = this.world.pipeline()
                 .with(Flecs.System)
