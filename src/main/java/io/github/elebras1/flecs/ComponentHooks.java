@@ -155,9 +155,9 @@ public class ComponentHooks<T> {
                 ecs_type_hooks_t.on_set(hooks, this.createIterHookStub(this.onSetCallback, "on_set", true));
             }
             if (this.onRemoveContextCallback != null) {
-                ecs_type_hooks_t.on_remove(hooks, this.createIterContextHookStub(this.onRemoveContextCallback, "on_remove", false));
+                ecs_type_hooks_t.on_remove(hooks, this.createIterContextHookStub(this.onRemoveContextCallback, "on_remove", true));
             } else if (this.onRemoveCallback != null) {
-                ecs_type_hooks_t.on_remove(hooks, this.createIterHookStub(this.onRemoveCallback, "on_remove", false));
+                ecs_type_hooks_t.on_remove(hooks, this.createIterHookStub(this.onRemoveCallback, "on_remove", true));
             }
             if (this.onReplaceContextCallback != null) {
                 ecs_type_hooks_t.on_replace(hooks, this.createReplaceContextHookStub(this.onReplaceContextCallback, "on_replace"));

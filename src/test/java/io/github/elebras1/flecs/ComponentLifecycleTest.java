@@ -96,6 +96,22 @@ class ComponentLifecycleTest {
     }
 
     @Test
+    void onRemoveCanMutate() {
+        AtomicReference<Position> seen = new AtomicReference<>();
+        this.world.component(Position.class, hooks -> {
+            hooks.onRemove(components -> components[0] = new Position(99, 98));
+            hooks.dtor(components -> seen.set(components[0]));
+        });
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        entity.remove(Position.class);
+
+        assertNotNull(seen.get());
+        assertEquals(99.0f, seen.get().x());
+        assertEquals(98.0f, seen.get().y());
+    }
+
+    @Test
     void chainedHooks() {
         Entity entity = this.world.obtainEntity(this.world.entity());
 
