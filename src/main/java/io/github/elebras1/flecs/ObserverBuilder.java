@@ -37,6 +37,8 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
         MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(this.arena);
         ecs_entity_desc_t.name(entityDescTemp, nameSegment);
+        ecs_entity_desc_t.sep(entityDescTemp, this.arena.allocateFrom("::"));
+        ecs_entity_desc_t.root_sep(entityDescTemp, this.arena.allocateFrom("::"));
         ecs_observer_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.worldSeg(), entityDescTemp));
     }
 

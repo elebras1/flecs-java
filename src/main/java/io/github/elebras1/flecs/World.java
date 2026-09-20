@@ -871,6 +871,9 @@ public class World extends WorldBase {
     }
 
     private void resetStages() {
+        if (this.stages == null) {
+            throw new IllegalStateException("Stage operations are not supported on a stage world");
+        }
         int stageCount = flecs_h.ecs_get_stage_count(this.worldSeg);
         World[] newStages = new World[stageCount];
         newStages[0] = this;
@@ -889,6 +892,9 @@ public class World extends WorldBase {
 
     public World getStage(int stageId) {
         this.checkDestroyed();
+        if (this.stages == null) {
+            throw new IllegalStateException("getStage() is not supported on a stage world");
+        }
         if( stageId < 0 || stageId >= this.getStageCount()) {
             throw new IllegalArgumentException("Invalid stage ID: " + stageId);
         }

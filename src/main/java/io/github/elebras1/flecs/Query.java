@@ -119,7 +119,8 @@ public class Query extends QueryBase {
             MemorySegment entities = ecs_iter_t.entities(iterSeg);
             if (count > 0) {
                 result[0] = entities.getAtIndex(ValueLayout.JAVA_LONG, 0);
-                break;
+                flecs_h.ecs_iter_fini(iterSeg);
+                return result[0];
             }
         }
         return result[0];
@@ -137,7 +138,9 @@ public class Query extends QueryBase {
         if (strSeg.address() == 0) {
             return "Invalid/empty query";
         }
-        return strSeg.getString(0);
+        String expr = strSeg.getString(0);
+        FlecsAllocator.free(strSeg);
+        return expr;
     }
 
     public String toJson() {

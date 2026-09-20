@@ -23,6 +23,8 @@ public class PipelineBuilder extends QueryTermBuilder<PipelineBuilder> {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entityDescTemp = ecs_entity_desc_t.allocate(tempArena);
             ecs_entity_desc_t.name(entityDescTemp, nameSegment);
+            ecs_entity_desc_t.sep(entityDescTemp, tempArena.allocateFrom("::"));
+            ecs_entity_desc_t.root_sep(entityDescTemp, tempArena.allocateFrom("::"));
             ecs_pipeline_desc_t.entity(this.desc, flecs_h.ecs_entity_init(world.worldSeg(), entityDescTemp));
         }
     }
