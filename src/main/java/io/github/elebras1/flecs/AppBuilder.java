@@ -6,7 +6,7 @@ import java.lang.foreign.MemorySegment;
 public final class AppBuilder {
 
     private final World world;
-    private float targetFps = 60;
+    private float targetFps;
     private float deltaTime;
     private int threads;
     private int frames;
@@ -16,6 +16,7 @@ public final class AppBuilder {
 
     AppBuilder(World world) {
         this.world = world;
+        this.targetFps = 60;
     }
 
     public AppBuilder targetFps(float targetFps) {
