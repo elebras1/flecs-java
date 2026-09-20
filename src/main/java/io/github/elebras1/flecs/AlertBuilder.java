@@ -3,21 +3,26 @@ package io.github.elebras1.flecs;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
-public class AlertBuilder {
+public class AlertBuilder extends QueryTermBuilder<AlertBuilder> {
 
     private static final int MAX_SEVERITY_FILTERS = 4;
 
-    private final World world;
     private final Arena arena;
     private final MemorySegment desc;
-    private int termCount;
     private int severityFilterCount;
 
     AlertBuilder(World world, String name) {
-        this.world = world;
-        this.arena = Arena.ofConfined();
-        this.desc = ecs_alert_desc_t.allocate(this.arena);
-        this.termCount = 0;
+        this(world, name, Arena.ofConfined());
+    }
+
+    private AlertBuilder(World world, String name, Arena arena) {
+        this(world, name, arena, ecs_alert_desc_t.allocate(arena));
+    }
+
+    private AlertBuilder(World world, String name, Arena arena, MemorySegment desc) {
+        super(world, arena, ecs_alert_desc_t.query(desc));
+        this.arena = arena;
+        this.desc = desc;
         this.severityFilterCount = 0;
 
         if (name != null) {
@@ -30,46 +35,9 @@ public class AlertBuilder {
         }
     }
 
-    public AlertBuilder with(long componentId) {
-        if (this.termCount >= 32) {
-            throw new IllegalStateException("Maximum number of terms (32) reached");
-        }
-        MemorySegment termSeg = ecs_query_desc_t.terms(ecs_alert_desc_t.query(this.desc), this.termCount);
-        if ((componentId & flecs_h.ECS_ID_FLAGS_MASK()) != 0) {
-            ecs_term_t.id(termSeg, componentId);
-        } else {
-            MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
-            ecs_term_ref_t.id(firstRefSeg, componentId);
-            ecs_term_t.first(termSeg, firstRefSeg);
-        }
-        this.termCount++;
-        return this;
-    }
-
-    public <T> AlertBuilder with(Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.with(componentId);
-    }
-
-    public AlertBuilder with(long first, long second) {
-        return this.with(flecs_h.ecs_make_pair(first, second));
-    }
-
-    public AlertBuilder without(long componentId) {
-        return this.with(componentId).not();
-    }
-
-    public <T> AlertBuilder without(Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.without(componentId);
-    }
-
-    public AlertBuilder not() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No term to apply 'not' modifier to");
-        }
-        MemorySegment termSeg = ecs_query_desc_t.terms(ecs_alert_desc_t.query(this.desc), this.termCount - 1);
-        ecs_term_t.oper(termSeg, (short) Flecs.Not);
+    @Override
+    public AlertBuilder var(String var) {
+        ecs_alert_desc_t.var_(this.desc, this.arena.allocateFrom(var));
         return this;
     }
 
@@ -93,6 +61,10 @@ public class AlertBuilder {
         return this;
     }
 
+    public <T> AlertBuilder severity(Class<T> severityClass) {
+        return severity(this.world.componentRegistry().getComponentId(severityClass));
+    }
+
     public AlertBuilder retainPeriod(float period) {
         ecs_alert_desc_t.retain_period(this.desc, period);
         return this;
@@ -112,6 +84,26 @@ public class AlertBuilder {
         return this;
     }
 
+    public <T> AlertBuilder member(Class<T> type, String member) {
+        return member(type, member, null);
+    }
+
+    public <T> AlertBuilder member(Class<T> type, String member, String var) {
+        long typeId = this.world.componentRegistry().getComponentId(type);
+        long memberId = flecs_h.ecs_lookup_path_w_sep(
+                this.world.worldSeg(),
+                typeId,
+                this.arena.allocateFrom(member),
+                this.arena.allocateFrom("::"),
+                this.arena.allocateFrom("::"),
+                false);
+        if (memberId == 0) {
+            throw new IllegalArgumentException("member not found: " + member);
+        }
+        ecs_alert_desc_t.var_(this.desc, var == null ? MemorySegment.NULL : this.arena.allocateFrom(var));
+        return member(memberId);
+    }
+
     public AlertBuilder member(long memberId) {
         ecs_alert_desc_t.member(this.desc, memberId);
         return this;
@@ -120,26 +112,6 @@ public class AlertBuilder {
     public AlertBuilder id(long id) {
         ecs_alert_desc_t.id(this.desc, id);
         return this;
-    }
-
-    public AlertBuilder var(String var) {
-        ecs_alert_desc_t.var_(this.desc, this.arena.allocateFrom(var));
-        return this;
-    }
-
-    public AlertBuilder queryFlags(int flag) {
-        MemorySegment queryDesc = ecs_alert_desc_t.query(this.desc);
-        ecs_query_desc_t.flags(queryDesc, ecs_query_desc_t.flags(queryDesc) | flag);
-        return this;
-    }
-
-    public AlertBuilder cached() {
-        ecs_query_desc_t.cache_kind(ecs_alert_desc_t.query(this.desc), Flecs.QueryCacheAuto);
-        return this;
-    }
-
-    public AlertBuilder detectChanges() {
-        return this.queryFlags(Flecs.QueryDetectChanges);
     }
 
     public Entity build() {

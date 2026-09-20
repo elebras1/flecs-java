@@ -158,6 +158,7 @@ public class ComponentRegistry {
 
         MemorySegment structDesc = ecs_struct_desc_t.allocate(tempArena);
         ecs_struct_desc_t.entity(structDesc, componentId);
+        ecs_struct_desc_t.create_member_entities(structDesc, true);
 
         MemorySegment members = ecs_struct_desc_t.members(structDesc);
         long memberDescSize = ecs_member_t.sizeof();

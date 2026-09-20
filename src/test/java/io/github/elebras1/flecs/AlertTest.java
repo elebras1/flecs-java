@@ -51,6 +51,53 @@ class AlertTest {
     }
 
     @Test
+    void alertWithPairTerm() {
+        this.world.alerts();
+        this.world.component(Position.class);
+        long target = this.world.entity("AlertTarget");
+
+        Entity alert = this.world.alert("pair_alert")
+                .with(Position.class)
+                .with(Position.class, target)
+                .with(target, target)
+                .termAt(1).self()
+                .message("Entity has Position")
+                .build();
+
+        assertTrue(alert.id() != 0);
+        assertEquals("pair_alert", alert.name());
+    }
+
+    @Test
+    void alertWithSeverityType() {
+        this.world.alerts();
+        this.world.component(Position.class);
+
+        Entity alert = this.world.alert("severity_alert")
+                .with(Position.class)
+                .severity(Position.class)
+                .message("Entity has Position")
+                .build();
+
+        assertNotEquals(0, alert.id());
+    }
+
+    @Test
+    void alertMemberLookup() {
+        this.world.alerts();
+        this.world.component(Position.class);
+
+        AlertBuilder bogus = this.world.alert("member_bogus").with(Position.class);
+        assertThrows(IllegalArgumentException.class, () -> bogus.member(Position.class, "does_not_exist"));
+
+        AlertBuilder builder = this.world.alert("member_alert")
+                .with(Position.class)
+                .severity(Flecs.AlertError)
+                .member(Position.class, "x", "$this");
+        assertThrows(IllegalStateException.class, builder::build);
+    }
+
+    @Test
     void alertWithQueryFlags() {
         this.world.alerts();
         this.world.component(Position.class);
