@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
+import io.github.elebras1.flecs.callback.ComparatorId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -622,7 +623,7 @@ class ObserverTest {
                 .event(Flecs.OnAdd)
                 .with(Position.class)
                 .with(Velocity.class)
-                .term().in()
+                .in()
                 .termAt(0).inout()
                 .each(entityId -> { });
         assertNotEquals(0, selected.id());
@@ -656,7 +657,7 @@ class ObserverTest {
         this.world.observer("TraversalTermObserver")
                 .event(Flecs.OnSet)
                 .with(Velocity.class)
-                .with(Velocity.class).term().up().trav(Flecs.ChildOf)
+                .with(Velocity.class).up().trav(Flecs.ChildOf)
                 .each(entityId -> count.incrementAndGet());
 
         earth.set(new Velocity(3, 4));
@@ -717,7 +718,7 @@ class ObserverTest {
         assertThrows(IllegalStateException.class, () -> this.world.observer("OrderByTermObserver")
                 .event(Flecs.OnAdd)
                 .with(Position.class)
-                .orderBy(Position.class)
+                .orderBy(Position.class, (ComparatorId) (a, b) -> Long.compare(a, b))
                 .each(entityId -> { }));
 
         assertThrows(IllegalStateException.class, () -> this.world.observer("GroupByTermObserver")

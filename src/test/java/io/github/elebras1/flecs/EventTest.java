@@ -211,6 +211,36 @@ class EventTest {
     }
 
     @Test
+    void payloadNotCorruptedByReentrantMutation() {
+        long positionId = this.world.component(Position.class);
+        Entity e1 = this.world.obtainEntity(this.world.entity());
+
+        AtomicReference<Position> seen = new AtomicReference<>();
+
+        this.world.observer()
+                .event(positionId)
+                .with(Flecs.Any)
+                .iter(it -> {
+                    it.payload(Position.class);
+                    this.world.obtainEntity(this.world.entity()).set(new Position(42, 43));
+                });
+
+        this.world.observer()
+                .event(positionId)
+                .with(Flecs.Any)
+                .iter(it -> seen.set(it.payload(Position.class)));
+
+        this.world.event(Position.class)
+                .entity(e1)
+                .payload(new Position(10, 20))
+                .emit();
+
+        assertNotNull(seen.get());
+        assertEquals(10.0f, seen.get().x());
+        assertEquals(20.0f, seen.get().y());
+    }
+
+    @Test
     void entityEmitPayload() {
         long positionId = this.world.component(Position.class);
         Entity e1 = this.world.obtainEntity(this.world.entity()).add(Position.class);

@@ -94,7 +94,7 @@ public class EventBuilder {
             if (this.payload != null) {
                 @SuppressWarnings("rawtypes")
                 Component component = this.world.componentRegistry().getComponent(this.payload.getClass());
-                MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
+                MemorySegment dataSeg = tempArena.allocate(component.layout());
                 component.write(dataSeg, 0, this.payload);
                 ecs_event_desc_t.param(descSeg, dataSeg);
             }

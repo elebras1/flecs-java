@@ -266,11 +266,10 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     }
 
     public S term() {
-        if (this.termCount == 0) {
-            throw new IllegalStateException("No terms in builder");
+        if (this.termCount > 0 && !flecs_h.ecs_term_is_initialized(term(this.termCount - 1))) {
+            throw new IllegalStateException("term() called without initializing the previous term");
         }
-        this.selectedTerm = this.termCount - 1;
-        this.selectedRef = TermRef.SRC;
+        newTerm();
         return builder();
     }
 
@@ -558,17 +557,13 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         return builder();
     }
 
-    public S orderBy(long componentId) {
-        ecs_query_desc_t.order_by(this.queryDesc, componentId);
-        return builder();
-    }
-
     public S orderBy(long componentId, ComparatorId comparator) {
         MemorySegment callbackStub = ecs_order_by_action_t.allocate((idA, _, idB, _) ->
                 comparator.compare(idA, idB), this.world.arena());
 
+        ecs_query_desc_t.order_by(this.queryDesc, componentId);
         ecs_query_desc_t.order_by_callback(this.queryDesc, callbackStub);
-        return orderBy(componentId);
+        return builder();
     }
 
     public <T> S orderBy(long componentId, ComparatorComponent<T> comparator) {
@@ -583,8 +578,9 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
             return comparator.compare(component.read(segmentA, 0), component.read(segmentB, 0));
         }, this.world.arena());
 
+        ecs_query_desc_t.order_by(this.queryDesc, componentId);
         ecs_query_desc_t.order_by_callback(this.queryDesc, callbackStub);
-        return orderBy(componentId);
+        return builder();
     }
 
     @SuppressWarnings("unchecked")
@@ -598,12 +594,9 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
             return comparator.compare(componentViewA, componentViewB);
         }, this.world.arena());
 
+        ecs_query_desc_t.order_by(this.queryDesc, componentId);
         ecs_query_desc_t.order_by_callback(this.queryDesc, callbackStub);
-        return orderBy(componentId);
-    }
-
-    public S orderBy(Entity entity) {
-        return orderBy(entity.id());
+        return builder();
     }
 
     public S orderBy(Entity entity, ComparatorId comparator) {
@@ -616,10 +609,6 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
     public <V extends ComponentView> S orderBy(Entity entity, ComparatorComponentView<V> comparator) {
         return orderBy(entity.id(), comparator);
-    }
-
-    public S orderBy(Class<?> componentClass) {
-        return orderBy(this.world.componentRegistry().getComponentId(componentClass));
     }
 
     public S orderBy(Class<?> componentClass, ComparatorId comparator) {

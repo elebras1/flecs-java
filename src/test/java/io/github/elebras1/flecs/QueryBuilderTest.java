@@ -247,6 +247,25 @@ class QueryBuilderTest {
     }
 
     @Test
+    void termAdvancesToNewTerm() {
+        long rel = this.world.entity();
+        long tgt = this.world.entity();
+        this.world.obtainEntity(this.world.entity()).add(rel, tgt);
+
+        Query q = this.world.query()
+                .with(Flecs.Any)
+                .term().first(rel).second(tgt)
+                .build();
+
+        assertEquals(1, q.count());
+    }
+
+    @Test
+    void termRejectsUninitializedPreviousTerm() {
+        assertThrows(IllegalStateException.class, () -> this.world.query().term().term());
+    }
+
+    @Test
     void orderBy() {
         this.world.obtainEntity(this.world.entity()).set(new Position(3, 0));
         this.world.obtainEntity(this.world.entity()).set(new Position(1, 0));
@@ -419,7 +438,7 @@ class QueryBuilderTest {
         this.world.obtainEntity(this.world.entity("childShared")).childOf(parent);
 
         Query upOnly = this.world.query()
-                .with(Position.class).term().up()
+                .with(Position.class).up()
                 .build();
         List<String> upNames = new ArrayList<>();
         upOnly.iter(it -> {
@@ -432,7 +451,7 @@ class QueryBuilderTest {
         upOnly.destroy();
 
         Query selfUp = this.world.query()
-                .with(Position.class).term().self().up()
+                .with(Position.class).self().up()
                 .build();
         List<String> selfNames = new ArrayList<>();
         selfUp.iter(it -> {

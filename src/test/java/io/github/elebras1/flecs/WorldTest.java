@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.*;
 import io.github.elebras1.flecs.internal.RestComponent;
+import io.github.elebras1.flecs.callback.ComparatorId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -948,7 +949,7 @@ class WorldTest {
                 .with(Position.class).self()
                 .with(rel).second(target)
                 .termAt(1).cascade(Flecs.DependsOn).desc()
-                .with(Velocity.class).term().up().trav(Flecs.DependsOn)
+                .with(Velocity.class).up().trav(Flecs.DependsOn)
                 .without(Mass.class).parent()
                 .build();
 
@@ -1063,7 +1064,7 @@ class WorldTest {
         Pipeline ordered = this.world.pipeline()
                 .with(Flecs.System)
                 .with(Position.class)
-                .orderBy(Position.class)
+                .orderBy(Position.class, (ComparatorId) (a, b) -> Long.compare(a, b))
                 .build();
 
         assertNotEquals(0, ordered.id());
