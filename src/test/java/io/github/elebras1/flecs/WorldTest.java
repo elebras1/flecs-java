@@ -5,6 +5,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -788,6 +790,248 @@ class WorldTest {
     }
 
     @Test
+    void pipelineWithNameTermOverloads() {
+        long tag = this.world.entity("PipelineTag");
+        long rel = this.world.entity("PipelineRel");
+        long target = this.world.entity("PipelineTarget");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with("PipelineTag")
+                .with("PipelineRel", "PipelineTarget")
+                .with("PipelineTarget", target)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem matching = this.world.system("NameTermSystem")
+                .with(Position.class)
+                .iter(it -> count.addAndGet(100));
+        matching.add(tag).add(rel, target).add(target, target);
+
+        this.world.system("NameTermSystemPartial")
+                .with(Position.class)
+                .iter(it -> count.addAndGet(1000))
+                .add(tag);
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(100, count.get());
+    }
+
+    @Test
+    void pipelineWithClassTermOverloads() {
+        long target = this.world.entity("ClassPairTarget");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class, target)
+                .with(Velocity.class, this.world.obtainEntity(target))
+                .with(Position.class, Velocity.class)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem matching = this.world.system("ClassTermSystem")
+                .with(Position.class)
+                .iter(it -> count.incrementAndGet());
+        matching.add(Position.class, target);
+        matching.add(Velocity.class, this.world.obtainEntity(target));
+        matching.add(this.world.id(Position.class), this.world.id(Velocity.class));
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void pipelineWithoutTermOverloads() {
+        long tag = this.world.entity("SkipTag");
+        long rel = this.world.entity("SkipRel");
+        long target = this.world.entity("SkipTarget");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .without("SkipTag")
+                .without(rel, target)
+                .without(Position.class, target)
+                .without(Velocity.class, this.world.obtainEntity(target))
+                .without(Position.class, Velocity.class)
+                .without(Position.class, "SkipTarget")
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        this.world.setPipeline(pipeline);
+
+        AtomicInteger count = new AtomicInteger();
+        this.world.system("SkippedSystem")
+                .with(Position.class)
+                .iter(it -> count.addAndGet(1000))
+                .add(tag);
+        this.world.system("KeptSystem")
+                .with(Position.class)
+                .iter(it -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.progress(0.016f);
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void pipelineTermTraversalModifiers() {
+        long rel = this.world.entity("TraversalRel");
+        long target = this.world.entity("TraversalTarget");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class).self()
+                .with(rel).second(target)
+                .termAt(1).cascade(Flecs.DependsOn).desc()
+                .with(Velocity.class).term().up().trav(Flecs.DependsOn)
+                .without(Mass.class).parent()
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+    }
+
+    @Test
+    void pipelineTermVariable() {
+        long rel = this.world.entity("VarRel");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(rel).var("PipelineTarget")
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+    }
+
+    @Test
+    void pipelineTermSourceAndFlags() {
+        long source = this.world.entity("TermSource");
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class).src(source)
+                .with(Velocity.class).in()
+                .with(Mass.class).out()
+                .with(Position.class).inout()
+                .with(Velocity.class).inout(Flecs.InOutFilter)
+                .with(Mass.class).filter()
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        Pipeline flags = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Flecs.PredEq).second("Position").flags(Flecs.IsName)
+                .build();
+
+        assertNotEquals(0, flags.id());
+
+        Pipeline idFlags = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class).idFlags(Flecs.Toggle)
+                .build();
+
+        assertNotEquals(0, idFlags.id());
+    }
+
+    @Test
+    void pipelineOperatorsAndScopes() {
+        long prefab = this.world.prefab("OperatorPrefab");
+        this.world.obtainEntity(prefab).set(new Position(1, 2));
+
+        Pipeline andFrom = this.world.pipeline()
+                .with(Flecs.System)
+                .with(prefab).andFrom()
+                .build();
+
+        assertNotEquals(0, andFrom.id());
+
+        Pipeline orFrom = this.world.pipeline()
+                .with(Flecs.System)
+                .with(prefab).orFrom()
+                .build();
+
+        assertNotEquals(0, orFrom.id());
+
+        Pipeline notFrom = this.world.pipeline()
+                .with(Flecs.System)
+                .with(prefab).notFrom()
+                .build();
+
+        assertNotEquals(0, notFrom.id());
+
+        Pipeline scoped = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class)
+                .scopeOpen().not()
+                .with(Velocity.class).or()
+                .with(Mass.class)
+                .scopeClose()
+                .build();
+
+        assertNotEquals(0, scoped.id());
+
+        Pipeline optional = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class).and()
+                .with(Velocity.class).optional()
+                .build();
+
+        assertNotEquals(0, optional.id());
+    }
+
+    @Test
+    void pipelineQueryOptions() {
+        long region = this.world.entity("PipelineRegion");
+        Object ctx = new Object();
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class)
+                .cached()
+                .queryFlags(Flecs.QueryMatchEmptyTables)
+                .groupBy(region)
+                .ctx(ctx)
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+
+        Pipeline ordered = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class)
+                .orderBy(Position.class)
+                .build();
+
+        assertNotEquals(0, ordered.id());
+    }
+
+    @Test
+    void pipelineRejectsChangeDetectionAndExpr() {
+        assertThrows(IllegalStateException.class, () -> this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class)
+                .detectChanges()
+                .build());
+
+        assertThrows(IllegalStateException.class, () -> this.world.pipeline()
+                .expr("System")
+                .build());
+    }
+
+    @Test
     void setPipelineWithId() {
         Pipeline pipeline = this.world.pipeline()
                 .with(Flecs.System)
@@ -816,5 +1060,157 @@ class WorldTest {
         }
 
         assertTrue(this.world.stats().tableCount() < tablesBefore);
+    }
+
+    @Test
+    void pipelineTermStringVariables() {
+        long rel = this.world.entity("PipelineStringVarRel");
+        long target = this.world.entity("PipelineStringVarTarget");
+
+        Pipeline variable = this.world.pipeline()
+                .with(Flecs.System)
+                .with("$PipelineVar")
+                .build();
+        assertNotEquals(0, variable.id());
+
+        Pipeline pair = this.world.pipeline()
+                .with(Flecs.System)
+                .with("$PipelineRel", target)
+                .build();
+        assertNotEquals(0, pair.id());
+
+        Pipeline secondVar = this.world.pipeline()
+                .with(Flecs.System)
+                .with(rel).second("$PipelineTarget")
+                .build();
+        assertNotEquals(0, secondVar.id());
+
+        Pipeline firstVar = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class).with("$PipelineFirst")
+                .build();
+        assertNotEquals(0, firstVar.id());
+
+        Pipeline secondString = this.world.pipeline()
+                .with(Flecs.System)
+                .with(rel, "$PipelineTarget")
+                .build();
+        assertNotEquals(0, secondString.id());
+    }
+
+    @Test
+    void pipelineGroupByCtx() {
+        long region = this.world.entity("PipelineGroupRegion");
+        long region1 = this.world.entity("PipelineGroupRegion1");
+        this.world.obtainEntity(this.world.entity()).add(region, region1).set(new Position(1, 2));
+
+        Object ctx = new Object();
+
+        Pipeline pipeline = this.world.pipeline()
+                .with(Flecs.System)
+                .with(Position.class)
+                .groupBy(region)
+                .groupByCtx(ctx)
+                .onGroupCreate((world, groupId, received) -> {
+                    assertSame(ctx, received);
+                    return null;
+                })
+                .onGroupDelete((world, groupId, groupCtx, received) -> assertSame(ctx, received))
+                .cached()
+                .build();
+
+        assertNotEquals(0, pipeline.id());
+    }
+
+    @Test
+    void queryGroupByCtx() {
+        long rel = this.world.entity("WorldGroupRel");
+        long tgtA = this.world.entity("WorldGroupTgtA");
+        long tgtB = this.world.entity("WorldGroupTgtB");
+        long tgtC = this.world.entity("WorldGroupTgtC");
+
+        this.world.obtainEntity(this.world.entity()).add(rel, tgtA);
+        this.world.obtainEntity(this.world.entity()).add(rel, tgtB);
+        this.world.obtainEntity(this.world.entity()).add(rel, tgtC);
+
+        Object ctx = new Object();
+        Map<Long, Object> groupCtxs = new HashMap<>();
+        AtomicInteger created = new AtomicInteger();
+        AtomicInteger deleted = new AtomicInteger();
+
+        Query query = this.world.query()
+                .with(rel, Flecs.Wildcard)
+                .groupBy(rel)
+                .groupByCtx(ctx)
+                .onGroupCreate((world, groupId, received) -> {
+                    assertSame(ctx, received);
+                    created.incrementAndGet();
+                    Object groupCtx = new Object();
+                    groupCtxs.put(groupId, groupCtx);
+                    return groupCtx;
+                })
+                .onGroupDelete((world, groupId, groupCtx, received) -> {
+                    assertSame(ctx, received);
+                    assertSame(groupCtxs.get(groupId), groupCtx);
+                    deleted.incrementAndGet();
+                })
+                .cached()
+                .build();
+
+        assertEquals(3, query.count());
+        assertTrue(created.get() >= 3);
+
+        query.destroy();
+        assertEquals(created.get(), deleted.get());
+    }
+
+    @Test
+    void queryGroupByActionReceivesCtx() {
+        long rel = this.world.entity("WorldGroupActionRel");
+        long tgtA = this.world.entity("WorldGroupActionTgtA");
+
+        this.world.obtainEntity(this.world.entity()).add(rel, tgtA);
+
+        Object ctx = new Object();
+        AtomicInteger groupByCalls = new AtomicInteger();
+
+        Query query = this.world.query()
+                .with(rel, Flecs.Wildcard)
+                .groupBy(rel, (world, table, id, received) -> {
+                    assertSame(ctx, received);
+                    groupByCalls.incrementAndGet();
+                    return id;
+                })
+                .groupByCtx(ctx)
+                .cached()
+                .build();
+
+        assertEquals(1, query.count());
+        assertTrue(groupByCalls.get() >= 1);
+        query.destroy();
+    }
+
+    @Test
+    void queryGroupByCtxFree() {
+        long rel = this.world.entity("WorldGroupFreeRel");
+        long tgt = this.world.entity("WorldGroupFreeTgt");
+        this.world.obtainEntity(this.world.entity()).add(rel, tgt);
+
+        Object ctx = new Object();
+        AtomicInteger freed = new AtomicInteger();
+
+        Query query = this.world.query()
+                .with(rel, Flecs.Wildcard)
+                .groupBy(rel)
+                .groupByCtx(ctx, received -> {
+                    assertSame(ctx, received);
+                    freed.incrementAndGet();
+                })
+                .cached()
+                .build();
+
+        assertEquals(1, query.count());
+        query.destroy();
+        assertEquals(1, freed.get());
     }
 }

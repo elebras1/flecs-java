@@ -107,6 +107,7 @@ public final class Flecs {
     public static final int In = flecs_h.EcsIn();
     public static final int Out = flecs_h.EcsOut();
     public static final int InOut = flecs_h.EcsInOut();
+    public static final int InOutNone = flecs_h.EcsInOutNone();
     public static final int And = flecs_h.EcsAnd();
     public static final int Or = flecs_h.EcsOr();
     public static final int Not = flecs_h.EcsNot();

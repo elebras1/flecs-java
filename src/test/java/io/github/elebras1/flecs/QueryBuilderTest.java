@@ -92,6 +92,21 @@ class QueryBuilderTest {
     }
 
     @Test
+    void idWithFlagsTerm() {
+        long positionId = this.world.component(Position.class);
+        this.world.obtainEntity(positionId).add(Flecs.CanToggle);
+
+        Entity disabled = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+        disabled.disable(Position.class);
+
+        Query query = this.world.query().with(Flecs.Toggle | positionId).build();
+        assertEquals(1, query.count());
+        assertEquals(disabled.id(), query.first());
+        query.destroy();
+    }
+
+    @Test
     void idPairWildcardTerm() {
         long likes = this.world.entity();
         long apples = this.world.entity();
@@ -453,13 +468,77 @@ class QueryBuilderTest {
     }
 
     @Test
+    void varFirstWithPrefixedName() {
+        long positionId = this.world.componentRegistry().getComponentId(Position.class);
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Query query = this.world.query()
+                .with(Position.class).with("$Var")
+                .build();
+
+        AtomicInteger invocations = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                assertEquals(1, it.count());
+                assertEquals(positionId, it.getVar("Var"));
+                invocations.incrementAndGet();
+            }
+        });
+        assertEquals(1, invocations.get());
+        query.destroy();
+    }
+
+    @Test
+    void varSecondWithPrefixedName() {
+        long rel = this.world.entity("VarPrefixedRel");
+        long target = this.world.entity("VarPrefixedTarget");
+        this.world.obtainEntity(this.world.entity()).add(rel, target);
+
+        Query query = this.world.query()
+                .with(rel).second("$Var")
+                .build();
+
+        AtomicInteger invocations = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                assertEquals(target, it.getVar("Var"));
+                invocations.incrementAndGet();
+            }
+        });
+        assertEquals(1, invocations.get());
+        query.destroy();
+    }
+
+    @Test
+    void termWithSecondVarString() {
+        long rel = this.world.entity("VarStringRel");
+        long target = this.world.entity("VarStringTarget");
+        this.world.obtainEntity(this.world.entity()).add(rel, target);
+
+        Query query = this.world.query()
+                .with(rel, "$Var")
+                .build();
+
+        AtomicInteger invocations = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                assertEquals(target, it.getVar("Var"));
+                invocations.incrementAndGet();
+            }
+        });
+        assertEquals(1, invocations.get());
+        query.destroy();
+    }
+
+    @Test
     void readWriteModifiers() {
         this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
 
         Query query = this.world.query()
+                .with(Position.class)
                 .with(Position.class).read()
                 .with(Position.class).readWrite()
-                .termAt(1).write()
+                .termAt(2).write()
                 .build();
         assertEquals(1, query.count());
         query.destroy();
@@ -529,5 +608,119 @@ class QueryBuilderTest {
         Query query = this.world.queryBuilder(Position.class, Velocity.class).build();
         assertEquals(1, query.count());
         query.destroy();
+    }
+
+    @Test
+    void exprCannotBeCalledTwice() {
+        QueryBuilder builder = this.world.query()
+                .with(Position.class)
+                .expr("Position($this)");
+        try {
+            assertThrows(IllegalStateException.class, () -> builder.expr("Velocity($this)"));
+        } finally {
+            builder.close();
+        }
+    }
+
+    @Test
+    void inoutNoneModifier() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Position.class).termAt(1).inoutNone()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void cacheKind() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .cacheKind(Flecs.QueryCacheAuto)
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+    }
+
+    @Test
+    void termRefBuilderMethods() {
+        long rel = this.world.entity("RefBuilderRel");
+        long target = this.world.entity("RefBuilderTarget");
+        this.world.obtainEntity(this.world.entity()).add(rel, target).set(new Position(10, 20));
+
+        Query viaSecondName = this.world.query()
+                .with(Position.class)
+                .with(rel).second().name("RefBuilderTarget")
+                .build();
+        assertEquals(1, viaSecondName.count());
+        viaSecondName.destroy();
+
+        Query viaFirstSecond = this.world.query()
+                .with(rel).first(rel).second(target)
+                .build();
+        assertEquals(1, viaFirstSecond.count());
+        viaFirstSecond.destroy();
+
+        Query viaEntity = this.world.query()
+                .with(rel).second().entity(target)
+                .build();
+        assertEquals(1, viaEntity.count());
+        viaEntity.destroy();
+    }
+
+    @Test
+    void typedTermAt() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).set(new Velocity(1, 2));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Velocity.class)
+                .termAt(Velocity.class).out()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+
+        QueryBuilder builder = this.world.query().with(Position.class);
+        try {
+            assertThrows(IllegalArgumentException.class, () -> builder.termAt(0, Velocity.class));
+        } finally {
+            builder.close();
+        }
+    }
+
+    @Test
+    void groupByCtxAndCallbacks() {
+        long region = this.world.entity("GroupCtxRegion");
+        long region1 = this.world.entity("GroupCtxRegion1");
+        this.world.obtainEntity(this.world.entity()).add(region, region1).set(new Position(1, 2));
+
+        Object ctx = new Object();
+        AtomicInteger created = new AtomicInteger();
+        AtomicInteger deleted = new AtomicInteger();
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .groupBy(region)
+                .groupByCtx(ctx)
+                .onGroupCreate((world, groupId, received) -> {
+                    assertSame(ctx, received);
+                    created.incrementAndGet();
+                    return null;
+                })
+                .onGroupDelete((world, groupId, groupCtx, received) -> {
+                    assertSame(ctx, received);
+                    deleted.incrementAndGet();
+                })
+                .cached()
+                .build();
+        assertEquals(1, query.count());
+        query.destroy();
+
+        assertTrue(created.get() >= 1);
+        assertTrue(deleted.get() >= 1);
     }
 }

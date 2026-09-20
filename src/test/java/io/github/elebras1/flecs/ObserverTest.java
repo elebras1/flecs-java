@@ -452,4 +452,352 @@ class ObserverTest {
 
         assertEquals(Flecs.OnAdd, event.get());
     }
+
+    @Test
+    void termIdAndPairOverloads() {
+        long tag = this.world.entity("ObserverTag");
+        long rel = this.world.entity("ObserverRel");
+        long target = this.world.entity("ObserverTarget");
+
+        AtomicInteger count = new AtomicInteger();
+
+        this.world.observer("TagTermObserver")
+                .event(Flecs.OnAdd)
+                .with(tag)
+                .each(entityId -> count.addAndGet(1));
+        this.world.observer("EntityTermObserver")
+                .event(Flecs.OnAdd)
+                .with(this.world.obtainEntity(tag))
+                .each(entityId -> count.addAndGet(2));
+        this.world.observer("NameTermObserver")
+                .event(Flecs.OnAdd)
+                .with("ObserverTag")
+                .each(entityId -> count.addAndGet(4));
+        this.world.observer("PairTermObserver")
+                .event(Flecs.OnAdd)
+                .with(rel, target)
+                .each(entityId -> count.addAndGet(8));
+        this.world.observer("NamePairTermObserver")
+                .event(Flecs.OnAdd)
+                .with("ObserverRel", "ObserverTarget")
+                .each(entityId -> count.addAndGet(16));
+
+        this.world.obtainEntity(this.world.entity()).add(tag);
+        this.world.obtainEntity(this.world.entity()).add(rel, target);
+
+        assertEquals(31, count.get());
+    }
+
+    @Test
+    void termClassPairOverloads() {
+        long target = this.world.entity("ObserverClassTarget");
+
+        AtomicInteger count = new AtomicInteger();
+
+        this.world.observer("ClassTargetTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class, target)
+                .each(entityId -> count.addAndGet(1));
+        this.world.observer("ClassEntityTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Velocity.class, this.world.obtainEntity(target))
+                .each(entityId -> count.addAndGet(2));
+        this.world.observer("NameTargetTermObserver")
+                .event(Flecs.OnAdd)
+                .with("ObserverClassTarget", target)
+                .each(entityId -> count.addAndGet(4));
+        this.world.observer("ClassClassTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class, Velocity.class)
+                .each(entityId -> count.addAndGet(8));
+
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        entity.add(Position.class, target);
+        entity.add(Velocity.class, target);
+        entity.add(target, target);
+        entity.add(this.world.id(Position.class), this.world.id(Velocity.class));
+
+        assertEquals(15, count.get());
+    }
+
+    @Test
+    void termWithoutOverloads() {
+        long tag = this.world.entity("ObserverSkipTag");
+        Entity skipEntity = this.world.obtainEntity(this.world.entity());
+        this.world.obtainEntity(this.world.entity("ObserverSkipName"));
+        long rel = this.world.entity("ObserverSkipRel");
+        long target = this.world.entity("ObserverSkipTarget");
+
+        AtomicInteger count = new AtomicInteger();
+
+        this.world.observer("WithoutTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .without(tag)
+                .without(skipEntity)
+                .without(Velocity.class)
+                .without("ObserverSkipName")
+                .without(rel, target)
+                .without("ObserverSkipRel", "ObserverSkipTarget")
+                .without(Velocity.class, target)
+                .without(Velocity.class, skipEntity)
+                .without(Velocity.class, "ObserverSkipName")
+                .without(Position.class, Velocity.class)
+                .each(entityId -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        assertEquals(1, count.get());
+
+        Entity skipped = this.world.obtainEntity(this.world.entity());
+        skipped.add(tag);
+        skipped.set(new Position(1, 2));
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void termModifiers() {
+        long skip = this.world.entity("ObserverModifierSkip");
+
+        AtomicInteger count = new AtomicInteger();
+
+        this.world.observer("ModifierTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).self().in()
+                .with(Velocity.class).termAt(1).out()
+                .without(skip)
+                .each(entityId -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        assertEquals(0, count.get());
+
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        entity.set(new Position(1, 2));
+        entity.set(new Velocity(1, 2));
+        assertEquals(1, count.get());
+
+        Entity excluded = this.world.obtainEntity(this.world.entity());
+        excluded.add(skip);
+        excluded.set(new Position(1, 2));
+        excluded.set(new Velocity(1, 2));
+        assertEquals(1, count.get());
+
+        Observer aliases = this.world.observer("ModifierAliasObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).read()
+                .with(Velocity.class).write().readWrite().inout().inout(Flecs.InOutFilter).filter()
+                .each(entityId -> { });
+        assertNotEquals(0, aliases.id());
+
+        Observer operators = this.world.observer("OperatorObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).and()
+                .with(Velocity.class).optional()
+                .each(entityId -> { });
+        assertNotEquals(0, operators.id());
+    }
+
+    @Test
+    void termSelectionAndSource() {
+        long rel = this.world.entity("ObserverSecondRel");
+        long target = this.world.entity("ObserverSecondTarget");
+        long source = this.world.entity("ObserverSource");
+
+        AtomicInteger count = new AtomicInteger();
+
+        this.world.observer("SecondTermObserver")
+                .event(Flecs.OnAdd)
+                .with(rel).second(target)
+                .each(entityId -> count.incrementAndGet());
+
+        this.world.obtainEntity(this.world.entity()).add(rel, target);
+        assertEquals(1, count.get());
+
+        Observer secondByName = this.world.observer("SecondTermByNameObserver")
+                .event(Flecs.OnAdd)
+                .with(rel).second("ObserverSecondTarget")
+                .each(entityId -> { });
+        assertNotEquals(0, secondByName.id());
+
+        Observer selected = this.world.observer("SelectedTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .with(Velocity.class)
+                .term().in()
+                .termAt(0).inout()
+                .each(entityId -> { });
+        assertNotEquals(0, selected.id());
+
+        Observer sourced = this.world.observer("SourceTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).src(source)
+                .each(entityId -> { });
+        assertNotEquals(0, sourced.id());
+
+        Observer sourcedByName = this.world.observer("SourceTermByNameObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).src("ObserverSource")
+                .each(entityId -> { });
+        assertNotEquals(0, sourcedByName.id());
+
+        Observer flagged = this.world.observer("FlaggedTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Flecs.PredEq).second("Position").flags(Flecs.IsName)
+                .each(entityId -> { });
+        assertNotEquals(0, flagged.id());
+    }
+
+    @Test
+    void termTraversalModifiers() {
+        Entity sun = this.world.obtainEntity(this.world.entity("ObserverSun")).set(new Velocity(1, 2));
+        Entity earth = this.world.obtainEntity(this.world.entity("ObserverEarth")).childOf(sun);
+
+        AtomicInteger count = new AtomicInteger();
+
+        this.world.observer("TraversalTermObserver")
+                .event(Flecs.OnSet)
+                .with(Velocity.class)
+                .with(Velocity.class).term().up().trav(Flecs.ChildOf)
+                .each(entityId -> count.incrementAndGet());
+
+        earth.set(new Velocity(3, 4));
+        assertEquals(1, count.get());
+
+        Observer variable = this.world.observer("VariableTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).var("ObserverVariable")
+                .each(entityId -> { });
+        assertNotEquals(0, variable.id());
+    }
+
+    @Test
+    void termOperators() {
+        long prefab = this.world.prefab("ObserverPrefab");
+        this.world.obtainEntity(prefab).set(new Position(1, 2));
+
+        Observer andFrom = this.world.observer("AndFromTermObserver")
+                .event(Flecs.OnAdd)
+                .with(prefab).andFrom()
+                .each(entityId -> { });
+        assertNotEquals(0, andFrom.id());
+
+        Observer orFrom = this.world.observer("OrFromTermObserver")
+                .event(Flecs.OnAdd)
+                .with(prefab).orFrom()
+                .each(entityId -> { });
+        assertNotEquals(0, orFrom.id());
+
+        Observer notFrom = this.world.observer("NotFromTermObserver")
+                .event(Flecs.OnAdd)
+                .with(prefab).notFrom()
+                .each(entityId -> { });
+        assertNotEquals(0, notFrom.id());
+    }
+
+    @Test
+    void termQueryOptions() {
+        Observer expr = this.world.observer("ExprTermObserver")
+                .event(Flecs.OnAdd)
+                .expr("Position")
+                .each(entityId -> { });
+        assertNotEquals(0, expr.id());
+
+        Observer options = this.world.observer("OptionsTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .cached()
+                .queryFlags(Flecs.QueryMatchEmptyTables)
+                .each(entityId -> { });
+        assertNotEquals(0, options.id());
+    }
+
+    @Test
+    void termFeaturesUnsupportedByObserverQueries() {
+        long region = this.world.entity("ObserverRegion");
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer("OrderByTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .orderBy(Position.class)
+                .each(entityId -> { }));
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer("GroupByTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .groupBy(region)
+                .each(entityId -> { }));
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer("DetectChangesTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .detectChanges()
+                .each(entityId -> { }));
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer("CascadeTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class).cascade()
+                .each(entityId -> { }));
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer("ScopeTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .scopeOpen().not()
+                .with(Velocity.class).or()
+                .with(Position.class)
+                .scopeClose()
+                .each(entityId -> { }));
+
+        assertThrows(IllegalStateException.class, () -> this.world.observer("GroupByCtxTermObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .groupBy(region)
+                .groupByCtx(new Object())
+                .each(entityId -> { }));
+    }
+
+    @Test
+    void termStringVariables() {
+        long rel = this.world.entity("ObserverStringVarRel");
+        long target = this.world.entity("ObserverStringVarTarget");
+
+        Observer variable = this.world.observer("StringVarObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .with("$ObserverVar")
+                .each(entityId -> { });
+        assertNotEquals(0, variable.id());
+
+        Observer pair = this.world.observer("StringVarPairObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .with("$ObserverRel", target)
+                .each(entityId -> { });
+        assertNotEquals(0, pair.id());
+
+        Observer secondVar = this.world.observer("StringVarSecondObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .with(rel).second("$ObserverTarget")
+                .each(entityId -> { });
+        assertNotEquals(0, secondVar.id());
+
+        Observer secondString = this.world.observer("StringVarSecondStringObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .with(rel, "$ObserverTarget")
+                .each(entityId -> { });
+        assertNotEquals(0, secondString.id());
+    }
+
+    @Test
+    void groupByCtxWithoutGroupBy() {
+        Object ctx = new Object();
+
+        Observer observer = this.world.observer("GroupCtxObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .groupByCtx(ctx)
+                .each(entityId -> { });
+
+        assertNotEquals(0, observer.id());
+    }
 }

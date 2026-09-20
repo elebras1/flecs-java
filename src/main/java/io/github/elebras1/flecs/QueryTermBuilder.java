@@ -4,9 +4,15 @@ import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.callback.ComparatorComponentView;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import io.github.elebras1.flecs.callback.GroupByCallback;
+import io.github.elebras1.flecs.callback.GroupByContextCallback;
+import io.github.elebras1.flecs.callback.GroupCreateCallback;
+import io.github.elebras1.flecs.callback.GroupDeleteCallback;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.util.function.Consumer;
 
 public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
@@ -15,7 +21,8 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     private final MemorySegment queryDesc;
     private int termCount;
     private int selectedTerm = -1;
-    private int selectedRef;
+    private int selectedRef = TermRef.SRC;
+    private boolean exprSet;
 
     protected QueryTermBuilder(World world, Arena arena, MemorySegment queryDesc) {
         this.world = world;
@@ -33,9 +40,13 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         return builder();
     }
 
-    public S cached() {
-        ecs_query_desc_t.cache_kind(this.queryDesc, Flecs.QueryCacheAuto);
+    public S cacheKind(int kind) {
+        ecs_query_desc_t.cache_kind(this.queryDesc, kind);
         return builder();
+    }
+
+    public S cached() {
+        return cacheKind(Flecs.QueryCacheAuto);
     }
 
     public S detectChanges() {
@@ -43,7 +54,11 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     }
 
     public S expr(String expr) {
+        if (this.exprSet) {
+            throw new IllegalStateException("expr() called more than once");
+        }
         ecs_query_desc_t.expr(this.queryDesc, this.arena.allocateFrom(expr));
+        this.exprSet = true;
         return builder();
     }
 
@@ -64,7 +79,7 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     public S with(String componentName) {
         MemorySegment termSeg = newTerm();
         MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.name(firstRefSeg, this.arena.allocateFrom(componentName));
+        applyNameOrVar(firstRefSeg, componentName);
         ecs_term_t.first(termSeg, firstRefSeg);
 
         return builder();
@@ -97,10 +112,10 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         MemorySegment termSeg = newTerm();
 
         MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.name(firstRefSeg, this.arena.allocateFrom(first));
+        applyNameOrVar(firstRefSeg, first);
 
         MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.name(secondRefSeg, this.arena.allocateFrom(second));
+        applyNameOrVar(secondRefSeg, second);
 
         ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_t.second(termSeg, secondRefSeg);
@@ -116,8 +131,7 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         MemorySegment termSeg = newTerm();
 
         MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
-        ecs_term_ref_t.id(firstRefSeg, Flecs.IsEntity);
-        ecs_term_ref_t.name(firstRefSeg, this.arena.allocateFrom(first));
+        applyNameOrVar(firstRefSeg, first);
 
         MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
         ecs_term_ref_t.id(secondRefSeg, second);
@@ -125,7 +139,20 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_t.second(termSeg, secondRefSeg);
 
-        this.selectedRef = TermRef.SECOND;
+        return builder();
+    }
+
+    public S with(long first, String second) {
+        MemorySegment termSeg = newTerm();
+
+        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(firstRefSeg, first);
+
+        MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
+        applyNameOrVar(secondRefSeg, second);
+
+        ecs_term_t.first(termSeg, firstRefSeg);
+        ecs_term_t.second(termSeg, secondRefSeg);
 
         return builder();
     }
@@ -145,8 +172,6 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
         ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_t.second(termSeg, secondRefSeg);
-
-        this.selectedRef = TermRef.SECOND;
 
         return builder();
     }
@@ -202,6 +227,41 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
             throw new IndexOutOfBoundsException("Invalid term index: " + index);
         }
         this.selectedTerm = index;
+        this.selectedRef = TermRef.SRC;
+        return builder();
+    }
+
+    public <T> S termAt(Class<T> componentClass) {
+        long termId = this.world.componentRegistry().getComponentId(componentClass);
+        for (int i = 0; i < this.termCount; i++) {
+            MemorySegment termSeg = term(i);
+            long curTermId = ecs_term_t.id(termSeg);
+            long curTermPair = flecs_h.ecs_make_pair(
+                    ecs_term_ref_t.id(ecs_term_t.first(termSeg)),
+                    ecs_term_ref_t.id(ecs_term_t.second(termSeg)));
+
+            if ((termId == curTermId || (curTermId != 0 && termId == flecs_h.ecs_get_typeid(this.world.worldSeg(), curTermId))) ||
+                (termId == curTermPair || (curTermPair != 0 && termId == flecs_h.ecs_get_typeid(this.world.worldSeg(), curTermPair)))) {
+                return termAt(i);
+            }
+        }
+        throw new IllegalArgumentException("term not found");
+    }
+
+    public <T> S termAt(int index, Class<T> componentClass) {
+        termAt(index);
+
+        long termId = this.world.componentRegistry().getComponentId(componentClass);
+        MemorySegment termSeg = termForConfiguration();
+        long curTermId = ecs_term_t.id(termSeg);
+        long curTermPair = flecs_h.ecs_make_pair(
+                ecs_term_ref_t.id(ecs_term_t.first(termSeg)),
+                ecs_term_ref_t.id(ecs_term_t.second(termSeg)));
+
+        if (!((termId == curTermId || (curTermId != 0 && termId == flecs_h.ecs_get_typeid(this.world.worldSeg(), curTermId))) ||
+              (termId == curTermPair || (curTermPair != 0 && termId == flecs_h.ecs_get_typeid(this.world.worldSeg(), curTermPair))))) {
+            throw new IllegalArgumentException("term type mismatch");
+        }
         return builder();
     }
 
@@ -210,6 +270,7 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
             throw new IllegalStateException("No terms in builder");
         }
         this.selectedTerm = this.termCount - 1;
+        this.selectedRef = TermRef.SRC;
         return builder();
     }
 
@@ -230,16 +291,30 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         return builder();
     }
 
+    public S inoutNone() {
+        return inout(Flecs.InOutNone);
+    }
+
+    public S inoutStage(int inout) {
+        MemorySegment termSeg = configuredTerm("inoutStage");
+        ecs_term_t.inout(termSeg, (short) inout);
+        if (ecs_term_t.oper(termSeg) != Flecs.Not) {
+            this.selectedRef = TermRef.SRC;
+            ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
+        }
+        return builder();
+    }
+
     public S read() {
-        return in();
+        return inoutStage(Flecs.In);
     }
 
     public S write() {
-        return out();
+        return inoutStage(Flecs.Out);
     }
 
     public S readWrite() {
-        return inout();
+        return inoutStage(Flecs.InOut);
     }
 
     public S filter() {
@@ -285,10 +360,15 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         return builder();
     }
 
-    public S src(long entityId) {
-        MemorySegment srcRefSeg = ecs_term_t.src(termForConfiguration());
-        ecs_term_ref_t.id(srcRefSeg, entityId);
+    public S src() {
+        termForConfiguration();
         this.selectedRef = TermRef.SRC;
+        return builder();
+    }
+
+    public S src(long entityId) {
+        src();
+        ecs_term_ref_t.id(currentTermRef("src"), entityId);
         return builder();
     }
 
@@ -301,16 +381,46 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     }
 
     public S src(String name) {
-        MemorySegment srcRefSeg = ecs_term_t.src(termForConfiguration());
-        applyNameOrVar(srcRefSeg, name);
-        this.selectedRef = TermRef.SRC;
+        src();
+        applyNameOrVar(currentTermRef("src"), name);
+        return builder();
+    }
+
+    public S first() {
+        termForConfiguration();
+        this.selectedRef = TermRef.FIRST;
+        return builder();
+    }
+
+    public S first(long entityId) {
+        first();
+        ecs_term_ref_t.id(currentTermRef("first"), entityId);
+        return builder();
+    }
+
+    public S first(Entity entity) {
+        return first(entity.id());
+    }
+
+    public <T> S first(Class<T> componentClass) {
+        return first(this.world.componentRegistry().getComponentId(componentClass));
+    }
+
+    public S first(String name) {
+        first();
+        applyNameOrVar(currentTermRef("first"), name);
+        return builder();
+    }
+
+    public S second() {
+        termForConfiguration();
+        this.selectedRef = TermRef.SECOND;
         return builder();
     }
 
     public S second(long entityId) {
-        MemorySegment secondRefSeg = ecs_term_t.second(secondTermForConfiguration());
-        ecs_term_ref_t.id(secondRefSeg, entityId);
-        this.selectedRef = TermRef.SECOND;
+        second();
+        ecs_term_ref_t.id(currentTermRef("second"), entityId);
         return builder();
     }
 
@@ -323,38 +433,51 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     }
 
     public S second(String name) {
-        MemorySegment secondRefSeg = ecs_term_t.second(secondTermForConfiguration());
-        applyNameOrVar(secondRefSeg, name);
-        this.selectedRef = TermRef.SECOND;
+        second();
+        applyNameOrVar(currentTermRef("second"), name);
+        return builder();
+    }
+
+    public S id(long entityId) {
+        ecs_term_ref_t.id(currentTermRef("id"), entityId);
+        return builder();
+    }
+
+    public S entity(long entityId) {
+        ecs_term_ref_t.id(currentTermRef("entity"), entityId | Flecs.IsEntity);
+        return builder();
+    }
+
+    public S name(String name) {
+        MemorySegment refSeg = currentTermRef("name");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | Flecs.IsEntity);
+        ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(name));
         return builder();
     }
 
     public S flags(long flags) {
-        MemorySegment termSeg = termForConfiguration();
-        MemorySegment refSeg = switch (this.selectedRef) {
-            case TermRef.FIRST -> ecs_term_t.first(termSeg);
-            case TermRef.SECOND -> ecs_term_t.second(termSeg);
-            default -> ecs_term_t.src(termSeg);
-        };
-        ecs_term_ref_t.id(refSeg, flags);
+        ecs_term_ref_t.id(currentTermRef("flags"), flags);
         return builder();
     }
 
     public S self() {
-        MemorySegment srcRefSeg = ecs_term_t.src(configuredTerm("self"));
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsSelf());
+        MemorySegment refSeg = currentTermRef("self");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | flecs_h.EcsSelf());
         return builder();
     }
 
     public S up() {
-        MemorySegment srcRefSeg = ecs_term_t.src(configuredTerm("up"));
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsUp());
+        assertSrcRef("up traversal can only be applied to term source");
+        MemorySegment refSeg = currentTermRef("up");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | flecs_h.EcsUp());
         return builder();
     }
 
     public S up(long trav) {
         up();
-        ecs_term_t.trav(configuredTerm("up"), trav);
+        if (trav != 0) {
+            ecs_term_t.trav(configuredTerm("up"), trav);
+        }
         return builder();
     }
 
@@ -372,17 +495,16 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
     public S cascade() {
         up();
-
-        MemorySegment termSeg = configuredTerm("cascade");
-        MemorySegment srcRefSeg = ecs_term_t.src(termSeg);
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsCascade());
-
+        MemorySegment refSeg = currentTermRef("cascade");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | flecs_h.EcsCascade());
         return builder();
     }
 
     public S cascade(long trav) {
         cascade();
-        ecs_term_t.trav(configuredTerm("cascade"), trav);
+        if (trav != 0) {
+            ecs_term_t.trav(configuredTerm("cascade"), trav);
+        }
         return builder();
     }
 
@@ -395,33 +517,43 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     }
 
     public S desc() {
-        MemorySegment srcRefSeg = ecs_term_t.src(configuredTerm("desc"));
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsDesc());
+        MemorySegment refSeg = currentTermRef("desc");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | flecs_h.EcsDesc());
         return builder();
     }
 
     public S trav(long trav) {
+        return trav(trav, 0);
+    }
+
+    public S trav(long trav, long flags) {
         ecs_term_t.trav(configuredTerm("trav"), trav);
+        MemorySegment refSeg = currentTermRef("trav");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | flags);
         return builder();
     }
 
     public S var(String varName) {
-        MemorySegment srcRefSeg = ecs_term_t.src(configuredTerm("var"));
-        ecs_term_ref_t.id(srcRefSeg, ecs_term_ref_t.id(srcRefSeg) | flecs_h.EcsIsVariable());
-        ecs_term_ref_t.name(srcRefSeg, this.arena.allocateFrom(varName));
+        MemorySegment refSeg = currentTermRef("var");
+        ecs_term_ref_t.id(refSeg, ecs_term_ref_t.id(refSeg) | flecs_h.EcsIsVariable());
+        ecs_term_ref_t.name(refSeg, this.arena.allocateFrom(varName));
         return builder();
     }
 
     public S scopeOpen() {
         MemorySegment termSeg = newTerm();
-        ecs_term_t.id(termSeg, Flecs.ScopeOpen);
+        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(firstRefSeg, Flecs.ScopeOpen);
+        ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
         return builder();
     }
 
     public S scopeClose() {
         MemorySegment termSeg = newTerm();
-        ecs_term_t.id(termSeg, Flecs.ScopeClose);
+        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        ecs_term_ref_t.id(firstRefSeg, Flecs.ScopeClose);
+        ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
         return builder();
     }
@@ -504,6 +636,7 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
     public S groupBy(long groupId) {
         ecs_query_desc_t.group_by(this.queryDesc, groupId);
+        ecs_query_desc_t.group_by_callback(this.queryDesc, MemorySegment.NULL);
         return builder();
     }
 
@@ -513,8 +646,21 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
             return groupByCallback.accept(this.world, table, id);
         }, this.world.arena());
 
+        groupBy(groupId);
         ecs_query_desc_t.group_by_callback(this.queryDesc, callbackStub);
-        return groupBy(groupId);
+        return builder();
+    }
+
+    public S groupBy(long groupId, GroupByContextCallback groupByCallback) {
+        MemorySegment callbackStub = ecs_group_by_action_t.allocate((_, tableSeg, id, ctxSeg) -> {
+            Table table = tableSeg.address() == 0 ? null : new Table(this.world, tableSeg);
+            Object ctx = ctxSeg.address() == 0 ? null : ParamRegistry.get(ctxSeg.address());
+            return groupByCallback.accept(this.world, table, id, ctx);
+        }, this.world.arena());
+
+        groupBy(groupId);
+        ecs_query_desc_t.group_by_callback(this.queryDesc, callbackStub);
+        return builder();
     }
 
     public S groupBy(Class<?> componentClass) {
@@ -522,6 +668,10 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     }
 
     public S groupBy(Class<?> componentClass, GroupByCallback groupByCallback) {
+        return groupBy(this.world.componentRegistry().getComponentId(componentClass), groupByCallback);
+    }
+
+    public S groupBy(Class<?> componentClass, GroupByContextCallback groupByCallback) {
         return groupBy(this.world.componentRegistry().getComponentId(componentClass), groupByCallback);
     }
 
@@ -533,10 +683,82 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         return groupBy(entity.id(), groupByCallback);
     }
 
+    public S groupBy(Entity entity, GroupByContextCallback groupByCallback) {
+        return groupBy(entity.id(), groupByCallback);
+    }
+
+    public S groupByCtx(Object ctx) {
+        return groupByCtx(ctx, null);
+    }
+
+    public S groupByCtx(Object ctx, Consumer<Object> ctxFree) {
+        long offset = ecs_query_desc_t.group_by_ctx$offset();
+        MemorySegment prev = this.queryDesc.get(ValueLayout.ADDRESS, offset);
+        if (prev != null && prev.address() != 0) {
+            ParamRegistry.remove(prev.address());
+            this.world.untrackCtx(prev.address());
+        }
+
+        if (ctx == null) {
+            this.queryDesc.set(ValueLayout.ADDRESS, offset, MemorySegment.NULL);
+        } else {
+            long id = ParamRegistry.put(ctx);
+            this.queryDesc.set(ValueLayout.ADDRESS, offset, MemorySegment.ofAddress(id));
+            this.world.trackCtx(id);
+        }
+
+        MemorySegment freeStub = MemorySegment.NULL;
+        if (ctxFree != null) {
+            freeStub = ecs_ctx_free_t.allocate(ctxSeg -> {
+                Object received = ctxSeg.address() == 0 ? null : ParamRegistry.get(ctxSeg.address());
+                if (ctxSeg.address() != 0) {
+                    ParamRegistry.remove(ctxSeg.address());
+                    this.world.untrackCtx(ctxSeg.address());
+                }
+                ctxFree.accept(received);
+            }, this.world.arena());
+        }
+        ecs_query_desc_t.group_by_ctx_free(this.queryDesc, freeStub);
+        return builder();
+    }
+
+    public S onGroupCreate(GroupCreateCallback callback) {
+        MemorySegment callbackStub = ecs_group_create_action_t.allocate((_, groupId, ctxSeg) -> {
+            Object ctx = ctxSeg.address() == 0 ? null : ParamRegistry.get(ctxSeg.address());
+            Object groupCtx = callback.accept(this.world, groupId, ctx);
+            if (groupCtx == null) {
+                return MemorySegment.NULL;
+            }
+            long id = ParamRegistry.put(groupCtx);
+            this.world.trackCtx(id);
+            return MemorySegment.ofAddress(id);
+        }, this.world.arena());
+
+        ecs_query_desc_t.on_group_create(this.queryDesc, callbackStub);
+        return builder();
+    }
+
+    public S onGroupDelete(GroupDeleteCallback callback) {
+        MemorySegment callbackStub = ecs_group_delete_action_t.allocate((_, groupId, groupCtxSeg, ctxSeg) -> {
+            Object groupCtx = groupCtxSeg.address() == 0 ? null : ParamRegistry.get(groupCtxSeg.address());
+            Object ctx = ctxSeg.address() == 0 ? null : ParamRegistry.get(ctxSeg.address());
+            callback.accept(this.world, groupId, groupCtx, ctx);
+            if (groupCtxSeg.address() != 0) {
+                ParamRegistry.remove(groupCtxSeg.address());
+                this.world.untrackCtx(groupCtxSeg.address());
+            }
+        }, this.world.arena());
+
+        ecs_query_desc_t.on_group_delete(this.queryDesc, callbackStub);
+        return builder();
+    }
+
     private MemorySegment newTerm() {
         if (this.termCount >= flecs_h.FLECS_TERM_COUNT_MAX()) {
             throw new IllegalStateException("Maximum number of terms (" + flecs_h.FLECS_TERM_COUNT_MAX() + ") reached");
         }
+        this.selectedTerm = -1;
+        this.selectedRef = TermRef.SRC;
         return ecs_query_desc_t.terms(this.queryDesc, this.termCount++);
     }
 
@@ -562,14 +784,19 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         return term(selectedTermIndex());
     }
 
-    private MemorySegment secondTermForConfiguration() {
-        MemorySegment termSeg = termForConfiguration();
-        long termId = ecs_term_t.id(termSeg);
-        if (termId != 0 && ecs_term_ref_t.id(ecs_term_t.first(termSeg)) == 0) {
-            ecs_term_ref_t.id(ecs_term_t.first(termSeg), termId);
-            ecs_term_t.id(termSeg, 0);
+    private MemorySegment currentTermRef(String modifier) {
+        MemorySegment termSeg = configuredTerm(modifier);
+        return switch (this.selectedRef) {
+            case TermRef.FIRST -> ecs_term_t.first(termSeg);
+            case TermRef.SECOND -> ecs_term_t.second(termSeg);
+            default -> ecs_term_t.src(termSeg);
+        };
+    }
+
+    private void assertSrcRef(String message) {
+        if (this.selectedRef != TermRef.SRC) {
+            throw new IllegalStateException(message);
         }
-        return termSeg;
     }
 
     private void applyNameOrVar(MemorySegment refSeg, String name) {
