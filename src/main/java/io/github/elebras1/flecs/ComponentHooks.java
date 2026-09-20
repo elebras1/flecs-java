@@ -247,13 +247,12 @@ public class ComponentHooks<T> {
                 return;
             }
 
-            MemorySegment fieldSeg = this.fieldSegment(iter, 0);
-            T[] components = this.readComponentArray(fieldSeg, count);
+            T[] components = this.readFieldComponents(iter, 0, count);
 
             callback.invoke(components);
 
             if (writeBack) {
-                this.writeComponentArray(fieldSeg, components, count);
+                this.writeFieldComponents(iter, 0, components, count);
             }
         } catch (Throwable e) {
             report(hookName, e);
@@ -268,13 +267,12 @@ public class ComponentHooks<T> {
                 return;
             }
 
-            MemorySegment fieldSeg = this.fieldSegment(iter, 0);
-            T[] components = this.readComponentArray(fieldSeg, count);
+            T[] components = this.readFieldComponents(iter, 0, count);
 
             callback.invoke(this.instantiateIter(iter), components);
 
             if (writeBack) {
-                this.writeComponentArray(fieldSeg, components, count);
+                this.writeFieldComponents(iter, 0, components, count);
             }
         } catch (Throwable e) {
             report(hookName, e);
@@ -289,14 +287,12 @@ public class ComponentHooks<T> {
                 return;
             }
 
-            MemorySegment oldSeg = this.fieldSegment(iter, 0);
-            MemorySegment newSeg = this.fieldSegment(iter, 1);
-            T[] oldComponents = this.readComponentArray(oldSeg, count);
-            T[] newComponents = this.readComponentArray(newSeg, count);
+            T[] oldComponents = this.readFieldComponents(iter, 0, count);
+            T[] newComponents = this.readFieldComponents(iter, 1, count);
 
             callback.invoke(oldComponents, newComponents);
 
-            this.writeComponentArray(newSeg, newComponents, count);
+            this.writeFieldComponents(iter, 1, newComponents, count);
         } catch (Throwable e) {
             report(hookName, e);
         }
@@ -310,14 +306,12 @@ public class ComponentHooks<T> {
                 return;
             }
 
-            MemorySegment oldSeg = this.fieldSegment(iter, 0);
-            MemorySegment newSeg = this.fieldSegment(iter, 1);
-            T[] oldComponents = this.readComponentArray(oldSeg, count);
-            T[] newComponents = this.readComponentArray(newSeg, count);
+            T[] oldComponents = this.readFieldComponents(iter, 0, count);
+            T[] newComponents = this.readFieldComponents(iter, 1, count);
 
             callback.invoke(this.instantiateIter(iter), oldComponents, newComponents);
 
-            this.writeComponentArray(newSeg, newComponents, count);
+            this.writeFieldComponents(iter, 1, newComponents, count);
         } catch (Throwable e) {
             report(hookName, e);
         }
@@ -374,6 +368,50 @@ public class ComponentHooks<T> {
         Iter iter = new Iter(iterSeg, this.world);
         iter.setIterSeg(iterSeg);
         return iter;
+    }
+
+    private boolean isRowField(MemorySegment iterSeg, int fieldIndex) {
+        return (ecs_iter_t.row_fields(iterSeg) & (1 << fieldIndex)) != 0;
+    }
+
+    private T[] readFieldComponents(MemorySegment iterSeg, int fieldIndex, int count) {
+        T[] array = this.component.createArray(Math.max(count, 0));
+        if (count <= 0 || this.component.size() == 0) {
+            return array;
+        }
+
+        if (this.isRowField(iterSeg, fieldIndex)) {
+            for (int i = 0; i < count; i++) {
+                MemorySegment rowSeg = flecs_h.ecs_field_at_w_size(iterSeg, this.component.size(), (byte) fieldIndex, i);
+                if (rowSeg.address() != 0) {
+                    array[i] = this.component.read(rowSeg, 0);
+                }
+            }
+            return array;
+        }
+
+        return this.readComponentArray(this.fieldSegment(iterSeg, fieldIndex), count);
+    }
+
+    private void writeFieldComponents(MemorySegment iterSeg, int fieldIndex, T[] components, int count) {
+        if (count <= 0 || this.component.size() == 0) {
+            return;
+        }
+
+        if (this.isRowField(iterSeg, fieldIndex)) {
+            for (int i = 0; i < count && i < components.length; i++) {
+                if (components[i] == null) {
+                    continue;
+                }
+                MemorySegment rowSeg = flecs_h.ecs_field_at_w_size(iterSeg, this.component.size(), (byte) fieldIndex, i);
+                if (rowSeg.address() != 0) {
+                    this.component.write(rowSeg, 0, components[i]);
+                }
+            }
+            return;
+        }
+
+        this.writeComponentArray(this.fieldSegment(iterSeg, fieldIndex), components, count);
     }
 
     private MemorySegment fieldSegment(MemorySegment iterSeg, int fieldIndex) {

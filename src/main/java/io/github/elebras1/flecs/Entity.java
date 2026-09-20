@@ -602,7 +602,7 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public Observer observe(long eventId, Runnable callback) {
-        return this.world.observer()
+        Observer observer = this.world.observer()
                 .event(eventId)
                 .with(Flecs.Any)
                 .each((entityId) -> {
@@ -610,11 +610,13 @@ public class Entity extends EntityBase<Entity> {
                         callback.run();
                     }
                 });
+        observer.add(Flecs.ChildOf, this.id);
+        return observer;
     }
 
     public <T> Observer observe(Class<T> eventClass, Consumer<T> callback) {
         long eventId = this.world.componentRegistry().getComponentId(eventClass);
-        return this.world.observer()
+        Observer observer = this.world.observer()
                 .event(eventId)
                 .with(Flecs.Any)
                 .iter((it) -> {
@@ -627,6 +629,8 @@ public class Entity extends EntityBase<Entity> {
                         }
                     }
                 });
+        observer.add(Flecs.ChildOf, this.id);
+        return observer;
     }
 
     public void emit(long eventId) {
@@ -947,18 +951,20 @@ public class Entity extends EntityBase<Entity> {
         }
 
         Component<?> component = this.world.componentRegistry().getComponentById(componentId);
-        long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
-        if (address == 0) {
-            throw new IllegalStateException("Failed to get mutable component: " + componentId);
-        }
-
+        long typeId = flecs_h.ecs_get_typeid(this.world.worldSeg(), componentId);
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
+            MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentId, component.size());
+            if (dataSeg.address() == 0) {
+                throw new IllegalStateException("Failed to ensure component: " + componentId);
+            }
+
             MemorySegment jsonSeg = tempArena.allocateFrom(json);
-            MemorySegment resultSeg = flecs_h.ecs_ptr_from_json(this.world.worldSeg(), componentId, dataSeg, jsonSeg, MemorySegment.NULL);
+            MemorySegment resultSeg = flecs_h.ecs_ptr_from_json(this.world.worldSeg(), typeId, dataSeg, jsonSeg, MemorySegment.NULL);
             if (resultSeg.address() == 0) {
                 throw new RuntimeException("Failed to parse JSON into component");
             }
+
+            flecs_h.ecs_modified_id(this.world.worldSeg(), this.id, componentId);
         }
     }
 
@@ -979,8 +985,9 @@ public class Entity extends EntityBase<Entity> {
                 throw new IllegalStateException("Failed to ensure component: " + componentId);
             }
 
+            long typeId = flecs_h.ecs_get_typeid(this.world.worldSeg(), componentId);
             MemorySegment jsonSeg = tempArena.allocateFrom(json);
-            MemorySegment resultSeg = flecs_h.ecs_ptr_from_json(this.world.worldSeg(), componentId, dataSeg, jsonSeg, MemorySegment.NULL);
+            MemorySegment resultSeg = flecs_h.ecs_ptr_from_json(this.world.worldSeg(), typeId, dataSeg, jsonSeg, MemorySegment.NULL);
             if (resultSeg.address() == 0) {
                 throw new RuntimeException("Failed to parse JSON into component");
             }

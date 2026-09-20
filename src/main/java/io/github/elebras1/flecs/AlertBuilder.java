@@ -78,7 +78,7 @@ public class AlertBuilder extends QueryTermBuilder<AlertBuilder> {
         ecs_alert_severity_filter_t.severity(filter, severityId);
         ecs_alert_severity_filter_t.with(filter, withId);
         if (var != null) {
-            ecs_alert_severity_filter_t.var_(filter, this.arena.allocateFrom(var));
+            ecs_alert_severity_filter_t.var_(filter, this.world.arena().allocateFrom(var));
         }
         this.severityFilterCount++;
         return this;
@@ -100,7 +100,7 @@ public class AlertBuilder extends QueryTermBuilder<AlertBuilder> {
         if (memberId == 0) {
             throw new IllegalArgumentException("member not found: " + member);
         }
-        ecs_alert_desc_t.var_(this.desc, var == null ? MemorySegment.NULL : this.arena.allocateFrom(var));
+        ecs_alert_desc_t.var_(this.desc, var == null ? MemorySegment.NULL : this.world.arena().allocateFrom(var));
         return member(memberId);
     }
 
