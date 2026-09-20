@@ -346,6 +346,7 @@ public class Entity extends EntityBase<Entity> {
             this.add(entityId);
             return true;
         }
+        this.remove(entityId);
         return false;
     }
 
@@ -851,7 +852,7 @@ public class Entity extends EntityBase<Entity> {
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment iterSeg = flecs_h.ecs_children_w_rel(tempArena, this.world.worldSeg(), relationId, this.id);
 
-            while (flecs_h.ecs_each_next(iterSeg)) {
+            while (flecs_h.ecs_children_next(iterSeg)) {
                 int count = ecs_iter_t.count(iterSeg);
                 MemorySegment entitiesSeg = ecs_iter_t.entities(iterSeg);
 

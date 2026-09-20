@@ -6,6 +6,7 @@ import io.github.elebras1.flecs.internal.FlecsLoader;
 import io.github.elebras1.flecs.internal.ParamRegistry;
 import io.github.elebras1.flecs.internal.buffer.FlecsBuffers;
 
+import io.github.elebras1.flecs.internal.FlecsAllocator;
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -114,6 +115,8 @@ public class World extends WorldBase {
             MemorySegment descSeg = ecs_entity_desc_t.allocate(arena);
             ecs_entity_desc_t.name(descSeg, nameSegment);
             ecs_entity_desc_t.parent(descSeg, parentId);
+            ecs_entity_desc_t.sep(descSeg, arena.allocateFrom("::"));
+            ecs_entity_desc_t.root_sep(descSeg, arena.allocateFrom("::"));
 
             return flecs_h.ecs_entity_init(this.worldSeg, descSeg);
         }
@@ -264,11 +267,8 @@ public class World extends WorldBase {
 
     public long prefab(String name) {
         this.checkDestroyed();
-        long prefabId = this.prefab();
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment nameSeg = tempArena.allocateFrom(name);
-            flecs_h.ecs_set_name(this.worldSeg, prefabId, nameSeg);
-        }
+        long prefabId = this.entity(name);
+        flecs_h.ecs_add_id(this.worldSeg, prefabId, Flecs.Prefab);
         return prefabId;
     }
 
@@ -693,14 +693,13 @@ public class World extends WorldBase {
         this.checkDestroyed();
         try (Arena tempArena = Arena.ofConfined()) {
             MemorySegment entitiesSeg = flecs_h.ecs_get_entities(tempArena, this.worldSeg);
-            int count = entitiesSeg.get(ValueLayout.JAVA_INT, ValueLayout.ADDRESS.byteSize());
+            int aliveCount = ecs_entities_t.alive_count(entitiesSeg);
 
-            long[] entities = new long[0];
-            if (count > 0) {
-                return ecs_entities_t.ids(entitiesSeg).reinterpret((long) count * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
+            if (aliveCount > 0) {
+                return ecs_entities_t.ids(entitiesSeg).reinterpret((long) aliveCount * Long.BYTES).toArray(ValueLayout.JAVA_LONG);
             }
 
-            return entities;
+            return new long[0];
         }
     }
 
@@ -737,9 +736,9 @@ public class World extends WorldBase {
         flecs_h.ecs_dim(this.worldSeg, numberEntities);
     }
 
-    public void frameBegin(float deltaTime) {
+    public float frameBegin(float deltaTime) {
         this.checkDestroyed();
-        flecs_h.ecs_frame_begin(this.worldSeg, deltaTime);
+        return flecs_h.ecs_frame_begin(this.worldSeg, deltaTime);
     }
 
     public void frameEnd() {
@@ -752,9 +751,9 @@ public class World extends WorldBase {
         flecs_h.ecs_quit(this.worldSeg);
     }
 
-    public void shouldQuit() {
+    public boolean shouldQuit() {
         this.checkDestroyed();
-        flecs_h.ecs_should_quit(this.worldSeg);
+        return flecs_h.ecs_should_quit(this.worldSeg);
     }
 
     public void measureFrameTime(boolean enable) {
@@ -1096,7 +1095,9 @@ public class World extends WorldBase {
                 return null;
             }
 
-            return jsonSeg.getString(0);
+            String json = jsonSeg.getString(0);
+            FlecsAllocator.free(jsonSeg);
+            return json;
         }
     }
 
@@ -1310,14 +1311,18 @@ public class World extends WorldBase {
                     statsCounterValue(ecs_world_stats_t.frame.systems_ran(ecs_world_stats_t.frame(statsSeg)), t),
                     statsCounterValue(ecs_world_stats_t.frame.observers_ran(ecs_world_stats_t.frame(statsSeg)), t),
                     statsCounterValue(ecs_world_stats_t.frame.event_emit_count(ecs_world_stats_t.frame(statsSeg)), t),
-                    statsGaugeAvg(ecs_world_stats_t.performance.delta_time(ecs_world_stats_t.performance(statsSeg)), t),
-                    statsGaugeAvg(ecs_world_stats_t.performance.fps(ecs_world_stats_t.performance(statsSeg)), t)
+                    statsGaugeAvgFloat(ecs_world_stats_t.performance.delta_time(ecs_world_stats_t.performance(statsSeg)), t),
+                    statsGaugeAvgFloat(ecs_world_stats_t.performance.fps(ecs_world_stats_t.performance(statsSeg)), t)
             );
         }
     }
 
     private long statsGaugeAvg(MemorySegment metric, long t) {
         return (long) ecs_gauge_t.avg(ecs_metric_t.gauge(metric), t);
+    }
+
+    private float statsGaugeAvgFloat(MemorySegment metric, long t) {
+        return (float) ecs_gauge_t.avg(ecs_metric_t.gauge(metric), t);
     }
 
     private double statsCounterValue(MemorySegment metric, long t) {

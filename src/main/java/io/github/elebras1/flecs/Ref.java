@@ -37,6 +37,9 @@ public class Ref<T> {
 
     public T get() {
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
+        if (address == 0) {
+            return null;
+        }
         MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(this.component.size());
         return this.component.read(dataSeg, 0);
     }
