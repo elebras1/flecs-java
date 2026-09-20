@@ -34,6 +34,26 @@ class SystemTest {
     }
 
     @Test
+    void timerApi() {
+        FlecsSystem system = this.world.system("Timed", Position.class)
+                .each(Position.class, p -> { });
+
+        system.interval(1.0f);
+        assertEquals(1.0f, system.interval());
+
+        system.timeout(2.0f);
+        assertEquals(2.0f, system.timeout());
+
+        Timer timer = this.world.timer();
+        assertDoesNotThrow(() -> {
+            system.rate(2);
+            system.tickSource(timer);
+            system.start();
+            system.stop();
+        });
+    }
+
+    @Test
     void iter() {
         Entity entity = this.world.obtainEntity(this.world.entity())
                 .set(new Position(10, 20))

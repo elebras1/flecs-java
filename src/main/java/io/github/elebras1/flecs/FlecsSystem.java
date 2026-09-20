@@ -77,6 +77,46 @@ public class FlecsSystem extends Entity {
         }
     }
 
+    public FlecsSystem interval(float interval) {
+        flecs_h.ecs_set_interval(this.world.worldSeg(), this.id, interval);
+        return this;
+    }
+
+    public float interval() {
+        return flecs_h.ecs_get_interval(this.world.worldSeg(), this.id);
+    }
+
+    public FlecsSystem timeout(float timeout) {
+        flecs_h.ecs_set_timeout(this.world.worldSeg(), this.id, timeout);
+        return this;
+    }
+
+    public float timeout() {
+        return flecs_h.ecs_get_timeout(this.world.worldSeg(), this.id);
+    }
+
+    public FlecsSystem rate(int rate) {
+        flecs_h.ecs_set_rate(this.world.worldSeg(), this.id, rate, 0);
+        return this;
+    }
+
+    public FlecsSystem tickSource(long tickSourceId) {
+        flecs_h.ecs_set_tick_source(this.world.worldSeg(), this.id, tickSourceId);
+        return this;
+    }
+
+    public FlecsSystem tickSource(Entity tickSource) {
+        return this.tickSource(tickSource.id());
+    }
+
+    public void start() {
+        flecs_h.ecs_start_timer(this.world.worldSeg(), this.id);
+    }
+
+    public void stop() {
+        flecs_h.ecs_stop_timer(this.world.worldSeg(), this.id);
+    }
+
     public void setGroup(long groupId) {
         flecs_h.ecs_system_set_group(this.world.worldSeg(), this.id, groupId);
     }
