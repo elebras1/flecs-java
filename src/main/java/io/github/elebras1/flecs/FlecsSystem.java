@@ -117,6 +117,14 @@ public class FlecsSystem extends Entity {
         flecs_h.ecs_stop_timer(this.world.worldSeg(), this.id);
     }
 
+    public void runWorker(int stageCurrent, int stageCount) {
+        flecs_h.ecs_run_worker(this.world.worldSeg(), this.id, stageCurrent, stageCount, 0.0f, MemorySegment.NULL);
+    }
+
+    public void runWorker(int stageCurrent, int stageCount, float deltaTime) {
+        flecs_h.ecs_run_worker(this.world.worldSeg(), this.id, stageCurrent, stageCount, deltaTime, MemorySegment.NULL);
+    }
+
     public void setGroup(long groupId) {
         flecs_h.ecs_system_set_group(this.world.worldSeg(), this.id, groupId);
     }

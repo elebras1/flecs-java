@@ -54,6 +54,17 @@ class SystemTest {
     }
 
     @Test
+    void runWorker() {
+        AtomicInteger runs = new AtomicInteger();
+        FlecsSystem system = this.world.system("Worker", Position.class)
+                .each(Position.class, p -> runs.incrementAndGet());
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        system.runWorker(0, 1);
+        assertEquals(1, runs.get());
+    }
+
+    @Test
     void iter() {
         Entity entity = this.world.obtainEntity(this.world.entity())
                 .set(new Position(10, 20))

@@ -37,7 +37,14 @@ public class Id {
     public long second() {
         assert isPair() : "Invalid pair : " + this.id;
         long raw = (this.id & flecs_h.ECS_COMPONENT_MASK()) & 0xFFFFFFFFL;
+        if (isValuePair()) {
+            return raw;
+        }
         return flecs_h.ecs_get_alive(this.world.worldSeg(), raw);
+    }
+
+    public boolean isValuePair() {
+        return (this.id & flecs_h.ECS_ID_FLAGS_MASK()) == flecs_h.ECS_VALUE_PAIR();
     }
 
     public long addFlags(long flags) {

@@ -108,6 +108,7 @@ public final class Flecs {
     public static final int Out = flecs_h.EcsOut();
     public static final int InOut = flecs_h.EcsInOut();
     public static final int InOutNone = flecs_h.EcsInOutNone();
+    public static final int InOutDefault = flecs_h.EcsInOutDefault();
     public static final int And = flecs_h.EcsAnd();
     public static final int Or = flecs_h.EcsOr();
     public static final int Not = flecs_h.EcsNot();
@@ -117,12 +118,17 @@ public final class Flecs {
     public static final int NotFrom = flecs_h.EcsNotFrom();
 
     public static final long Self = flecs_h.EcsSelf();
+    public static final long Up = flecs_h.EcsUp();
+    public static final long Trav = flecs_h.EcsTrav();
+    public static final long Desc = flecs_h.EcsDesc();
+    public static final long TraverseFlags = flecs_h.EcsTraverseFlags();
     public static final long IsEntity = flecs_h.EcsIsEntity();
     public static final long IsVariable = flecs_h.EcsIsVariable();
     public static final long IsName = flecs_h.EcsIsName();
     public static final long ScopeOpen = flecs_h.EcsScopeOpen();
     public static final long ScopeClose = flecs_h.EcsScopeClose();
     public static final long PredEq = flecs_h.EcsPredEq();
+    public static final long PredLookup = flecs_h.EcsPredLookup();
     public static final long PredMatch = flecs_h.EcsPredMatch();
     public static final int InOutFilter = flecs_h.EcsInOutFilter();
 
