@@ -1337,15 +1337,6 @@ public class World extends WorldBase {
 
     public void destroy() {
         if (!this.destroyed) {
-            for (long id : this.trackedCtxIds) {
-                ParamRegistry.remove(id);
-            }
-            this.trackedCtxIds.clear();
-            if (this.ctxId != 0) {
-                ParamRegistry.remove(this.ctxId);
-                this.ctxId = 0;
-            }
-
             if (this.owned && this.worldSeg != null && this.worldSeg.address() != 0) {
                 flecs_h.ecs_fini(this.worldSeg);
                 for(World stage : this.stages) {
@@ -1353,6 +1344,15 @@ public class World extends WorldBase {
                         stage.arena.close();
                     }
                 }
+            }
+
+            for (long id : this.trackedCtxIds) {
+                ParamRegistry.remove(id);
+            }
+            this.trackedCtxIds.clear();
+            if (this.ctxId != 0) {
+                ParamRegistry.remove(this.ctxId);
+                this.ctxId = 0;
             }
 
             this.buffers.close();

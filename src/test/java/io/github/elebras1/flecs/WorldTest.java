@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -593,6 +594,29 @@ class WorldTest {
         } finally {
             Files.deleteIfExists(file);
         }
+    }
+
+    @Test
+    void ctxFreeOnWorldDestroy() {
+        World world2 = new World();
+        long rel = world2.entity();
+        long tgt = world2.entity();
+        world2.obtainEntity(world2.entity()).add(rel, tgt);
+
+        AtomicReference<Object> received = new AtomicReference<>();
+        Object ctx = new Object();
+
+        Query query = world2.query()
+                .with(rel, Flecs.Wildcard)
+                .groupBy(rel)
+                .groupByCtx(ctx, received::set)
+                .cached()
+                .build();
+        assertEquals(1, query.count());
+
+        world2.destroy();
+
+        assertSame(ctx, received.get());
     }
 
     @Test
