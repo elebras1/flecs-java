@@ -92,7 +92,13 @@ public class MetricBuilder {
 
     private long lookupChild(long entityId, String name) {
         try (Arena tempArena = Arena.ofConfined()) {
-            return flecs_h.ecs_lookup_child(this.world.worldSeg(), entityId, tempArena.allocateFrom(name));
+            return flecs_h.ecs_lookup_path_w_sep(
+                    this.world.worldSeg(),
+                    entityId,
+                    tempArena.allocateFrom(name),
+                    tempArena.allocateFrom("::"),
+                    tempArena.allocateFrom("::"),
+                    false);
         }
     }
 }

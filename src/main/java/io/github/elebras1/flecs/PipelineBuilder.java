@@ -47,6 +47,10 @@ public class PipelineBuilder extends QueryTermBuilder<PipelineBuilder> {
             this.world.untrackCtx(prev.address());
         }
 
+        if (ctx == null) {
+            queryDesc.set(ValueLayout.ADDRESS, offset, MemorySegment.NULL);
+            return this;
+        }
         long id = ParamRegistry.put(ctx);
         queryDesc.set(ValueLayout.ADDRESS, offset, MemorySegment.ofAddress(id));
         this.world.trackCtx(id);

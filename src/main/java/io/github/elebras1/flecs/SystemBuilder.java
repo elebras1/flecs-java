@@ -93,6 +93,10 @@ public class SystemBuilder extends SystemBuilderBase {
             this.world.untrackCtx(prev.address());
         }
 
+        if (ctx == null) {
+            ecs_system_desc_t.ctx(this.desc, MemorySegment.NULL);
+            return this;
+        }
         long id = ParamRegistry.put(ctx);
         ecs_system_desc_t.ctx(this.desc, MemorySegment.ofAddress(id));
         this.world.trackCtx(id);
@@ -100,11 +104,11 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder readWrite(long componentId) {
-        return this.with(componentId).inout();
+        return this.with(componentId).inoutStage(Flecs.InOut);
     }
 
     public SystemBuilder readWrite(Entity entity) {
-        return this.with(entity.id()).inout();
+        return this.with(entity.id()).inoutStage(Flecs.InOut);
     }
 
     public <T> SystemBuilder readWrite(Class<T> componentClass) {
@@ -113,11 +117,11 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder write(long componentId) {
-        return this.with(componentId).out();
+        return this.with(componentId).inoutStage(Flecs.Out);
     }
 
     public SystemBuilder write(Entity entity) {
-        return this.with(entity.id()).out();
+        return this.with(entity.id()).inoutStage(Flecs.Out);
     }
 
     public <T> SystemBuilder write(Class<T> componentClass) {
@@ -126,7 +130,7 @@ public class SystemBuilder extends SystemBuilderBase {
     }
 
     public SystemBuilder read(long componentId) {
-        return this.with(componentId).in();
+        return this.with(componentId).inoutStage(Flecs.In);
     }
 
     public SystemBuilder read(Entity entity) {

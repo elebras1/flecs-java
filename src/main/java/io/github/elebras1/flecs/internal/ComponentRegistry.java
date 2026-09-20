@@ -312,8 +312,8 @@ public class ComponentRegistry {
     private static long resolveFlecsPrimitive(MemoryLayout elementLayout) {
         return switch (elementLayout) {
             case ValueLayout.OfBoolean _ -> flecs_h.FLECS_IDecs_bool_tID_();
-            case ValueLayout.OfByte _ -> flecs_h.FLECS_IDecs_byte_tID_();
-            case ValueLayout.OfChar _ -> flecs_h.FLECS_IDecs_char_tID_();
+            case ValueLayout.OfByte _ -> flecs_h.FLECS_IDecs_i8_tID_();
+            case ValueLayout.OfChar _ -> flecs_h.FLECS_IDecs_u16_tID_();
             case ValueLayout.OfShort _ -> flecs_h.FLECS_IDecs_i16_tID_();
             case ValueLayout.OfInt _ -> flecs_h.FLECS_IDecs_i32_tID_();
             case ValueLayout.OfLong _ -> flecs_h.FLECS_IDecs_i64_tID_();

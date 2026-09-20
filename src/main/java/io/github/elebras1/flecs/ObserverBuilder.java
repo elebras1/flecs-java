@@ -63,6 +63,10 @@ public class ObserverBuilder extends ObserverBuilderBase {
             this.world.untrackCtx(prev.address());
         }
 
+        if (ctx == null) {
+            ecs_observer_desc_t.ctx(this.desc, MemorySegment.NULL);
+            return this;
+        }
         long id = ParamRegistry.put(ctx);
         ecs_observer_desc_t.ctx(this.desc, MemorySegment.ofAddress(id));
         this.world.trackCtx(id);

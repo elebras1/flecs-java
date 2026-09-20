@@ -35,6 +35,10 @@ public class QueryBuilder extends QueryTermBuilder<QueryBuilder> {
             this.world.untrackCtx(prev.address());
         }
 
+        if (ctx == null) {
+            this.desc.set(ValueLayout.ADDRESS, offset, MemorySegment.NULL);
+            return this;
+        }
         long id = ParamRegistry.put(ctx);
         this.desc.set(ValueLayout.ADDRESS, offset, MemorySegment.ofAddress(id));
         this.world.trackCtx(id);
