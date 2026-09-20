@@ -5,6 +5,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -579,6 +581,18 @@ class WorldTest {
         this.world.script("ScriptEntityB {}").update(script);
         assertNotEquals(0, this.world.lookup("ScriptEntityB"));
         assertEquals(0, this.world.lookup("ScriptEntityA"));
+    }
+
+    @Test
+    void scriptFromFilename() throws Exception {
+        Path file = Files.createTempFile("flecs-script", ".flecs");
+        Files.writeString(file, "FilenameEntityA {}");
+        try {
+            this.world.script(null).filename(file.toString()).run();
+            assertNotEquals(0, this.world.lookup("FilenameEntityA"));
+        } finally {
+            Files.deleteIfExists(file);
+        }
     }
 
     @Test

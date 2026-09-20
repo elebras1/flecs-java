@@ -9,32 +9,33 @@ import java.nio.file.Path;
 public class ScriptBuilder {
     private final World world;
     private final String name;
+    private final String filename;
     private final String code;
 
     public ScriptBuilder(World world, String code) {
-        this(world, null, code);
+        this(world, null, null, code);
     }
 
-    private ScriptBuilder(World world, String name, String code) {
+    private ScriptBuilder(World world, String name, String filename, String code) {
         this.world = world;
         this.name = name;
+        this.filename = filename;
         this.code = code;
     }
 
     public ScriptBuilder name(String name) {
-        return new ScriptBuilder(this.world, name, this.code);
+        return new ScriptBuilder(this.world, name, this.filename, this.code);
     }
 
     public ScriptBuilder code(String code) {
-        return new ScriptBuilder(this.world, this.name, code);
+        return new ScriptBuilder(this.world, this.name, this.filename, code);
     }
 
     public ScriptBuilder filename(String path) {
         try {
             if(path.toLowerCase().endsWith(".flecs")) {
                 String loadedCode = Files.readString(Path.of(path));
-                String scriptName = (this.name != null) ? this.name : path;
-                return new ScriptBuilder(this.world, scriptName, loadedCode);
+                return new ScriptBuilder(this.world, this.name, path, loadedCode);
             }
             throw new IllegalArgumentException("Unsupported script file extension: " + path);
         } catch (IOException e) {
@@ -45,10 +46,12 @@ public class ScriptBuilder {
     public long run() {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment desc = ecs_script_desc_t.allocate(arena);
-            if (this.name != null) {
+            if (this.filename != null) {
+                ecs_script_desc_t.filename(desc, arena.allocateFrom(this.filename));
+            } else if (this.name != null) {
                 ecs_script_desc_t.filename(desc, arena.allocateFrom(this.name));
             }
-            if (this.code != null) {
+            if (this.code != null && this.filename == null) {
                 ecs_script_desc_t.code(desc, arena.allocateFrom(this.code));
             }
 
