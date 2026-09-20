@@ -2,17 +2,17 @@ package io.github.elebras1.flecs;
 
 public final class Rest {
 
-    private short port;
+    private int port;
 
     public Rest() {
     }
 
     public Rest port(int port) {
-        this.port = (short) port;
+        this.port = port;
         return this;
     }
 
-    public short port() {
+    public int port() {
         return this.port;
     }
 }

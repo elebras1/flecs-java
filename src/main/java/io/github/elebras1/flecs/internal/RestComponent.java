@@ -30,14 +30,14 @@ public final class RestComponent implements Component<Rest> {
 
     @Override
     public void write(MemorySegment segment, long offset, Rest data) {
-        MemoryAccess.set(segment, offset + OFFSET_PORT, data.port());
+        segment.set(ValueLayout.JAVA_SHORT, offset + OFFSET_PORT, (short) data.port());
         segment.set(ValueLayout.JAVA_LONG, offset + OFFSET_IPADDR, 0L);
         segment.set(ValueLayout.JAVA_LONG, offset + OFFSET_IMPL, 0L);
     }
 
     @Override
     public Rest read(MemorySegment segment, long offset) {
-        return new Rest().port(MemoryAccess.getShort(segment, offset + OFFSET_PORT));
+        return new Rest().port(Short.toUnsignedInt(segment.get(ValueLayout.JAVA_SHORT, offset + OFFSET_PORT)));
     }
 
     @Override

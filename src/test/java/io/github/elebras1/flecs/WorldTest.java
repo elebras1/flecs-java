@@ -1,10 +1,13 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.*;
+import io.github.elebras1.flecs.internal.RestComponent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
@@ -617,6 +620,16 @@ class WorldTest {
         world2.destroy();
 
         assertSame(ctx, received.get());
+    }
+
+    @Test
+    void restPortUnsigned() throws Exception {
+        RestComponent component = RestComponent.getInstance();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segment = arena.allocate(component.layout());
+            component.write(segment, 0, new Rest().port(60000));
+            assertEquals(60000, component.read(segment, 0).port());
+        }
     }
 
     @Test
