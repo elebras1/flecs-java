@@ -462,6 +462,14 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T get(long componentId) {
+        T value = this.tryGet(componentId);
+        if (value == null) {
+            throw new IllegalStateException("Entity " + this.id + " does not have component " + componentId);
+        }
+        return value;
+    }
+
+    public <T> T tryGet(long componentId) {
         Component<T> component = this.world.componentRegistry().getComponentById(componentId);
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
 
@@ -475,11 +483,27 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T get(Class<T> componentClass) {
+        T value = this.tryGet(componentClass);
+        if (value == null) {
+            throw new IllegalStateException("Entity " + this.id + " does not have component " + componentClass.getSimpleName());
+        }
+        return value;
+    }
+
+    public <T> T tryGet(Class<T> componentClass) {
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.get(componentId);
+        return this.tryGet(componentId);
     }
 
     public <T> T get(Class<T> componentClass, long target) {
+        T value = this.tryGet(componentClass, target);
+        if (value == null) {
+            throw new IllegalStateException("Entity " + this.id + " does not have component " + componentClass.getSimpleName() + "(" + target + ")");
+        }
+        return value;
+    }
+
+    public <T> T tryGet(Class<T> componentClass, long target) {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
@@ -494,11 +518,22 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T get(Class<T> componentClass, Class<?> targetClass) {
-        long targetId = this.world.componentRegistry().getComponentId(targetClass);
-        return this.get(componentClass, targetId);
+        return this.get(componentClass, this.world.componentRegistry().getComponentId(targetClass));
+    }
+
+    public <T> T tryGet(Class<T> componentClass, Class<?> targetClass) {
+        return this.tryGet(componentClass, this.world.componentRegistry().getComponentId(targetClass));
     }
 
     public <T> T getSecond(Class<T> componentClass, long relationId) {
+        T value = this.tryGetSecond(componentClass, relationId);
+        if (value == null) {
+            throw new IllegalStateException("Entity " + this.id + " does not have component " + componentClass.getSimpleName() + " (second of " + relationId + ")");
+        }
+        return value;
+    }
+
+    public <T> T tryGetSecond(Class<T> componentClass, long relationId) {
         Component<T> component = this.world.componentRegistry().getComponent(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         long pairId = flecs_h.ecs_make_pair(relationId, componentId);
@@ -513,8 +548,11 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T getSecond(Class<T> componentClass, Class<?> relationClass) {
-        long relationId = this.world.componentRegistry().getComponentId(relationClass);
-        return this.getSecond(componentClass, relationId);
+        return this.getSecond(componentClass, this.world.componentRegistry().getComponentId(relationClass));
+    }
+
+    public <T> T tryGetSecond(Class<T> componentClass, Class<?> relationClass) {
+        return this.tryGetSecond(componentClass, this.world.componentRegistry().getComponentId(relationClass));
     }
 
     public Entity modified(long componentId) {
@@ -544,8 +582,16 @@ public class Entity extends EntityBase<Entity> {
         return this.modified(firstId, secondId);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends ComponentView> T getMutView(Class<?> componentClass) {
+        T view = this.tryGetMutView(componentClass);
+        if (view == null) {
+            throw new IllegalStateException("Entity " + this.id + " does not have component " + componentClass.getSimpleName());
+        }
+        return view;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ComponentView> T tryGetMutView(Class<?> componentClass) {
         ComponentView view = this.world.viewCache().getComponentView(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
 
@@ -560,8 +606,16 @@ public class Entity extends EntityBase<Entity> {
         return (T) view;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getMutView(Class<?> componentClass, long target) {
+        T view = this.tryGetMutView(componentClass, target);
+        if (view == null) {
+            throw new IllegalStateException("Entity " + this.id + " does not have component " + componentClass.getSimpleName() + "(" + target + ")");
+        }
+        return view;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T tryGetMutView(Class<?> componentClass, long target) {
         ComponentView view = this.world.viewCache().getComponentView(componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
@@ -622,7 +676,7 @@ public class Entity extends EntityBase<Entity> {
                 .iter((it) -> {
                     for (int i = 0; i < it.count(); i++) {
                         if (it.entityId(i) == this.id) {
-                            T eventData = this.get(eventClass);
+                            T eventData = this.tryGet(eventClass);
                             if (eventData != null) {
                                 callback.accept(eventData);
                             }

@@ -67,14 +67,14 @@ class EntityTest {
         Entity engine = this.world.obtainEntity(this.world.entity(new FlecsParent(spaceship)));
 
         assertTrue(cockpit.has(Flecs.ChildOf, spaceship));
-        assertNull(cockpit.get(FlecsParent.class));
+        assertNull(cockpit.tryGet(FlecsParent.class));
         assertNotNull(engine.get(FlecsParent.class));
 
         Entity engineering = this.world.obtainEntity(this.world.entity(new FlecsParent(spaceship)));
         assertNotNull(engineering.get(FlecsParent.class));
 
         engineering.childOf(spaceship);
-        assertNull(engineering.get(FlecsParent.class));
+        assertNull(engineering.tryGet(FlecsParent.class));
         assertTrue(engineering.has(Flecs.ChildOf, spaceship));
     }
 
@@ -85,7 +85,7 @@ class EntityTest {
         Entity posEntity = localWorld.obtainEntity(pos);
 
         assertEquals("Position", posEntity.name());
-        assertNull(posEntity.get(FlecsComponent.class));
+        assertNull(posEntity.tryGet(FlecsComponent.class));
 
         localWorld.component(Position.class);
         FlecsComponent c = posEntity.get(FlecsComponent.class);
@@ -299,7 +299,7 @@ class EntityTest {
     @Test
     void getNotFound() {
         Entity entity = this.world.obtainEntity(this.world.entity());
-        assertNull(entity.get(Position.class));
+        assertNull(entity.tryGet(Position.class));
     }
 
     @Test
