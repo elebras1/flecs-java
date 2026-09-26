@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
+import io.github.elebras1.flecs.component.Movement;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
@@ -244,6 +245,19 @@ class QueryBuilderTest {
         this.world.obtainEntity(this.world.entity()).add(Position.class);
         assertEquals(3, query.count());
         query.destroy();
+    }
+
+    @Test
+    void memberIdTerm() {
+        long left = this.world.entity();
+        long right = this.world.entity();
+        this.world.obtainEntity(this.world.entity()).set(new Movement(left));
+        this.world.obtainEntity(this.world.entity()).set(new Movement(right));
+
+        assertNotEquals(0, this.world.lookup("Movement::value"));
+
+        Query q = this.world.query().with("Movement.value", left).build();
+        assertEquals(1, q.count());
     }
 
     @Test
