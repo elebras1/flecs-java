@@ -187,17 +187,19 @@ public class SystemBuilder extends SystemBuilderBase {
     public FlecsSystem each(EntityCallback callback) {
         this.entityCallback = callback;
 
-        MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSeg -> {
-            int count = ecs_iter_t.count(iterSeg);
-            MemorySegment entitiesSeg = ecs_iter_t.entities(iterSeg);
+        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                MemorySegment entitiesSeg = ecs_iter_t.entities(iterSeg);
 
-            for (int i = 0; i < count; i++) {
-                long entityId = entitiesSeg.getAtIndex(ValueLayout.JAVA_LONG, i);
-                callback.accept(entityId);
+                for (int i = 0; i < count; i++) {
+                    long entityId = entitiesSeg.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    callback.accept(entityId);
+                }
             }
         }, this.world.arena());
 
-        ecs_system_desc_t.callback(this.desc, callbackStub);
+        ecs_system_desc_t.run(this.desc, callbackStub);
 
         return build();
     }
