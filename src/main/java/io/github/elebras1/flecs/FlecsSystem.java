@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.callback.IterCallback;
 import io.github.elebras1.flecs.internal.ParamRegistry;
 
 import java.lang.foreign.Arena;
@@ -123,6 +124,34 @@ public class FlecsSystem extends Entity {
 
     public void runWorker(int stageCurrent, int stageCount, float deltaTime) {
         flecs_h.ecs_run_worker(this.world.worldSeg(), this.id, stageCurrent, stageCount, deltaTime, MemorySegment.NULL);
+    }
+
+    public Query query() {
+        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.id);
+        if (sysSeg == null || sysSeg.address() == 0) {
+            throw new IllegalStateException("Entity is not a system: " + this.id);
+        }
+        return new Query(this.world, ecs_system_t.query(sysSeg));
+    }
+
+    public FlecsSystem runEach(IterCallback callback) {
+        MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                Iter iter = new Iter(iterSeg, this.world);
+                iter.setIterSeg(iterSeg);
+                callback.accept(iter);
+            }
+        }, this.world.arena());
+        this.updateRunCallback(callbackStub);
+        return this;
+    }
+
+    private void updateRunCallback(MemorySegment callbackStub) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment desc = ecs_system_desc_t.allocate(arena);
+            ecs_system_desc_t.run(desc, callbackStub);
+            flecs_h.ecs_system_update(this.world.worldSeg(), this.id, desc);
+        }
     }
 
     public void setGroup(long groupId) {

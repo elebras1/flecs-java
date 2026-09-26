@@ -107,6 +107,7 @@ public abstract class QueryBase {
                 for (int i = 0; i < count; i++) {
                     A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
                     if (predicate.test(componentInstanceA)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -213,6 +214,7 @@ public abstract class QueryBase {
                 for (int i = 0; i < count; i++) {
                     componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
                     if (predicate.test(componentViewA)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -327,6 +329,7 @@ public abstract class QueryBase {
                     A componentInstanceA = fieldA.address() == 0 ? null : componentA.read(fieldA, (long) (isSelfA ? i : 0) * sizeA);
                     B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
                     if (predicate.test(componentInstanceA, componentInstanceB)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -457,6 +460,7 @@ public abstract class QueryBase {
                     componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
                     componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
                     if (predicate.test(componentViewA, componentViewB)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -591,6 +595,7 @@ public abstract class QueryBase {
                     B componentInstanceB = fieldB.address() == 0 ? null : componentB.read(fieldB, (long) (isSelfB ? i : 0) * sizeB);
                     C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -745,6 +750,7 @@ public abstract class QueryBase {
                     componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
                     componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
                     if (predicate.test(componentViewA, componentViewB, componentViewC)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -899,6 +905,7 @@ public abstract class QueryBase {
                     C componentInstanceC = fieldC.address() == 0 ? null : componentC.read(fieldC, (long) (isSelfC ? i : 0) * sizeC);
                     D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -1077,6 +1084,7 @@ public abstract class QueryBase {
                     componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
                     componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -1251,6 +1259,7 @@ public abstract class QueryBase {
                     D componentInstanceD = fieldD.address() == 0 ? null : componentD.read(fieldD, (long) (isSelfD ? i : 0) * sizeD);
                     E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -1453,6 +1462,7 @@ public abstract class QueryBase {
                     componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
                     componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -1647,6 +1657,7 @@ public abstract class QueryBase {
                     E componentInstanceE = fieldE.address() == 0 ? null : componentE.read(fieldE, (long) (isSelfE ? i : 0) * sizeE);
                     F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -1873,6 +1884,7 @@ public abstract class QueryBase {
                     componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
                     componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -2087,6 +2099,7 @@ public abstract class QueryBase {
                     F componentInstanceF = fieldF.address() == 0 ? null : componentF.read(fieldF, (long) (isSelfF ? i : 0) * sizeF);
                     G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -2337,6 +2350,7 @@ public abstract class QueryBase {
                     componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
                     componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -2571,6 +2585,7 @@ public abstract class QueryBase {
                     G componentInstanceG = fieldG.address() == 0 ? null : componentG.read(fieldG, (long) (isSelfG ? i : 0) * sizeG);
                     H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -2845,6 +2860,7 @@ public abstract class QueryBase {
                     componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
                     componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -3099,6 +3115,7 @@ public abstract class QueryBase {
                     H componentInstanceH = fieldH.address() == 0 ? null : componentH.read(fieldH, (long) (isSelfH ? i : 0) * sizeH);
                     I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -3397,6 +3414,7 @@ public abstract class QueryBase {
                     componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
                     componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -3671,6 +3689,7 @@ public abstract class QueryBase {
                     I componentInstanceI = fieldI.address() == 0 ? null : componentI.read(fieldI, (long) (isSelfI ? i : 0) * sizeI);
                     J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -3993,6 +4012,7 @@ public abstract class QueryBase {
                     componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
                     componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -4287,6 +4307,7 @@ public abstract class QueryBase {
                     J componentInstanceJ = fieldJ.address() == 0 ? null : componentJ.read(fieldJ, (long) (isSelfJ ? i : 0) * sizeJ);
                     K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -4633,6 +4654,7 @@ public abstract class QueryBase {
                     componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
                     componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -4947,6 +4969,7 @@ public abstract class QueryBase {
                     K componentInstanceK = fieldK.address() == 0 ? null : componentK.read(fieldK, (long) (isSelfK ? i : 0) * sizeK);
                     L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -5317,6 +5340,7 @@ public abstract class QueryBase {
                     componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
                     componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -5651,6 +5675,7 @@ public abstract class QueryBase {
                     L componentInstanceL = fieldL.address() == 0 ? null : componentL.read(fieldL, (long) (isSelfL ? i : 0) * sizeL);
                     M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -6045,6 +6070,7 @@ public abstract class QueryBase {
                     componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
                     componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -6399,6 +6425,7 @@ public abstract class QueryBase {
                     M componentInstanceM = fieldM.address() == 0 ? null : componentM.read(fieldM, (long) (isSelfM ? i : 0) * sizeM);
                     N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -6817,6 +6844,7 @@ public abstract class QueryBase {
                     componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
                     componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -7191,6 +7219,7 @@ public abstract class QueryBase {
                     N componentInstanceN = fieldN.address() == 0 ? null : componentN.read(fieldN, (long) (isSelfN ? i : 0) * sizeN);
                     O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -7633,6 +7662,7 @@ public abstract class QueryBase {
                     componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
                     componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -8027,6 +8057,7 @@ public abstract class QueryBase {
                     O componentInstanceO = fieldO.address() == 0 ? null : componentO.read(fieldO, (long) (isSelfO ? i : 0) * sizeO);
                     P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -8493,6 +8524,7 @@ public abstract class QueryBase {
                     componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
                     componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -8907,6 +8939,7 @@ public abstract class QueryBase {
                     P componentInstanceP = fieldP.address() == 0 ? null : componentP.read(fieldP, (long) (isSelfP ? i : 0) * sizeP);
                     Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -9397,6 +9430,7 @@ public abstract class QueryBase {
                     componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
                     componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -9831,6 +9865,7 @@ public abstract class QueryBase {
                     Q componentInstanceQ = fieldQ.address() == 0 ? null : componentQ.read(fieldQ, (long) (isSelfQ ? i : 0) * sizeQ);
                     R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -10345,6 +10380,7 @@ public abstract class QueryBase {
                     componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
                     componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -10799,6 +10835,7 @@ public abstract class QueryBase {
                     R componentInstanceR = fieldR.address() == 0 ? null : componentR.read(fieldR, (long) (isSelfR ? i : 0) * sizeR);
                     S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -11337,6 +11374,7 @@ public abstract class QueryBase {
                     componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
                     componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -11811,6 +11849,7 @@ public abstract class QueryBase {
                     S componentInstanceS = fieldS.address() == 0 ? null : componentS.read(fieldS, (long) (isSelfS ? i : 0) * sizeS);
                     T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -12373,6 +12412,7 @@ public abstract class QueryBase {
                     componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
                     componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -12867,6 +12907,7 @@ public abstract class QueryBase {
                     T componentInstanceT = fieldT.address() == 0 ? null : componentT.read(fieldT, (long) (isSelfT ? i : 0) * sizeT);
                     U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -13453,6 +13494,7 @@ public abstract class QueryBase {
                     componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
                     componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -13967,6 +14009,7 @@ public abstract class QueryBase {
                     U componentInstanceU = fieldU.address() == 0 ? null : componentU.read(fieldU, (long) (isSelfU ? i : 0) * sizeU);
                     V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -14577,6 +14620,7 @@ public abstract class QueryBase {
                     componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
                     componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -15111,6 +15155,7 @@ public abstract class QueryBase {
                     V componentInstanceV = fieldV.address() == 0 ? null : componentV.read(fieldV, (long) (isSelfV ? i : 0) * sizeV);
                     W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -15745,6 +15790,7 @@ public abstract class QueryBase {
                     componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
                     componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -16299,6 +16345,7 @@ public abstract class QueryBase {
                     W componentInstanceW = fieldW.address() == 0 ? null : componentW.read(fieldW, (long) (isSelfW ? i : 0) * sizeW);
                     X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -16957,6 +17004,7 @@ public abstract class QueryBase {
                     componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
                     componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -17531,6 +17579,7 @@ public abstract class QueryBase {
                     X componentInstanceX = fieldX.address() == 0 ? null : componentX.read(fieldX, (long) (isSelfX ? i : 0) * sizeX);
                     Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -18213,6 +18262,7 @@ public abstract class QueryBase {
                     componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
                     componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -18807,6 +18857,7 @@ public abstract class QueryBase {
                     Y componentInstanceY = fieldY.address() == 0 ? null : componentY.read(fieldY, (long) (isSelfY ? i : 0) * sizeY);
                     Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -19513,6 +19564,7 @@ public abstract class QueryBase {
                     componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
                     componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -20127,6 +20179,7 @@ public abstract class QueryBase {
                     Z componentInstanceZ = fieldZ.address() == 0 ? null : componentZ.read(fieldZ, (long) (isSelfZ ? i : 0) * sizeZ);
                     AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -20857,6 +20910,7 @@ public abstract class QueryBase {
                     componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
                     componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -21491,6 +21545,7 @@ public abstract class QueryBase {
                     AA componentInstanceAA = fieldAA.address() == 0 ? null : componentAA.read(fieldAA, (long) (isSelfAA ? i : 0) * sizeAA);
                     AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -22245,6 +22300,7 @@ public abstract class QueryBase {
                     componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
                     componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -22899,6 +22955,7 @@ public abstract class QueryBase {
                     AB componentInstanceAB = fieldAB.address() == 0 ? null : componentAB.read(fieldAB, (long) (isSelfAB ? i : 0) * sizeAB);
                     AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -23677,6 +23734,7 @@ public abstract class QueryBase {
                     componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
                     componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -24351,6 +24409,7 @@ public abstract class QueryBase {
                     AC componentInstanceAC = fieldAC.address() == 0 ? null : componentAC.read(fieldAC, (long) (isSelfAC ? i : 0) * sizeAC);
                     AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -25153,6 +25212,7 @@ public abstract class QueryBase {
                     componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
                     componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -25847,6 +25907,7 @@ public abstract class QueryBase {
                     AD componentInstanceAD = fieldAD.address() == 0 ? null : componentAD.read(fieldAD, (long) (isSelfAD ? i : 0) * sizeAD);
                     AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -26673,6 +26734,7 @@ public abstract class QueryBase {
                     componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
                     componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -27387,6 +27449,7 @@ public abstract class QueryBase {
                     AE componentInstanceAE = fieldAE.address() == 0 ? null : componentAE.read(fieldAE, (long) (isSelfAE ? i : 0) * sizeAE);
                     AF componentInstanceAF = fieldAF.address() == 0 ? null : componentAF.read(fieldAF, (long) (isSelfAF ? i : 0) * sizeAF);
                     if (predicate.test(componentInstanceA, componentInstanceB, componentInstanceC, componentInstanceD, componentInstanceE, componentInstanceF, componentInstanceG, componentInstanceH, componentInstanceI, componentInstanceJ, componentInstanceK, componentInstanceL, componentInstanceM, componentInstanceN, componentInstanceO, componentInstanceP, componentInstanceQ, componentInstanceR, componentInstanceS, componentInstanceT, componentInstanceU, componentInstanceV, componentInstanceW, componentInstanceX, componentInstanceY, componentInstanceZ, componentInstanceAA, componentInstanceAB, componentInstanceAC, componentInstanceAD, componentInstanceAE, componentInstanceAF)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }
@@ -28237,6 +28300,7 @@ public abstract class QueryBase {
                     componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
                     componentViewAF.setBaseAddress(baseAF + (long) (isSelfAF ? i : 0) * sizeAF);
                     if (predicate.test(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE, componentViewAF)) {
+                        flecs_h.ecs_iter_fini(iterSeg);
                         return entities.getAtIndex(ValueLayout.JAVA_LONG, i);
                     }
                 }

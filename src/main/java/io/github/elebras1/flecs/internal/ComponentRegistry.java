@@ -52,6 +52,11 @@ public class ComponentRegistry {
         if (component == null) {
             throw new IllegalArgumentException("Component class in the argument is not a component : " + componentClass.getName());
         }
+
+        if (component.size() != 0) {
+            return this.register(componentClass);
+        }
+
         String simpleName = componentClass.getSimpleName();
         String symbol = componentClass.getName();
 

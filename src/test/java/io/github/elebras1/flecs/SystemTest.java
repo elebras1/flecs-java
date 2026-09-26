@@ -54,6 +54,25 @@ class SystemTest {
     }
 
     @Test
+    void updateCallbacks() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        AtomicInteger count = new AtomicInteger();
+
+        FlecsSystem system = this.world.system("UpdateRunEach", Position.class)
+                .each(Position.class, p -> count.addAndGet(100));
+        this.world.progress();
+        assertEquals(100, count.get());
+
+        assertNotNull(system.query());
+        assertEquals(1, system.query().count());
+
+        system.runEach(it -> count.set(1));
+        this.world.progress();
+        assertEquals(1, count.get());
+
+    }
+
+    @Test
     void runWorker() {
         AtomicInteger runs = new AtomicInteger();
         FlecsSystem system = this.world.system("Worker", Position.class)

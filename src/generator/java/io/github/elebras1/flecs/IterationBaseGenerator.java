@@ -168,6 +168,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
 
         String args = buildArgs(vm == ViewMode.COMPONENT_VIEW ? "componentView" : "componentInstance", n);
         appendLine(body, 5, "if (predicate.test(" + args + ")) {");
+        appendStatement(body, 6, simpleName(FLECS_H_FQN) + ".ecs_iter_fini(iterSeg)");
         appendStatement(body, 6, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
         appendLine(body, 5, "}");
 

@@ -79,15 +79,12 @@ class EntityTest {
     }
 
     @Test
-    void entityForComponentDoesNotRegisterComponent() {
+    void entityForComponentRegistersComponent() {
         World localWorld = new World();
         long pos = localWorld.entity(Position.class);
         Entity posEntity = localWorld.obtainEntity(pos);
 
         assertEquals("Position", posEntity.name());
-        assertNull(posEntity.tryGet(FlecsComponent.class));
-
-        localWorld.component(Position.class);
         FlecsComponent c = posEntity.get(FlecsComponent.class);
         assertNotNull(c);
         assertEquals(8, c.size());
