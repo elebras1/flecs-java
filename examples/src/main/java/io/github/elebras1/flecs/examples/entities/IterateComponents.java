@@ -27,20 +27,18 @@ public class IterateComponents {
         world.component(Apples.class);
 
         // Build Bob with Position, Velocity, Human and a (Eats, Apples) pair.
-        long eatsId = world.component(Eats.class);
-        long applesId = world.component(Apples.class);
         Entity bob = world.obtainEntity(world.entity())
                 .set(new Position(10, 20))
                 .set(new Velocity(1, 1))
                 .add(Human.class)
-                .add(eatsId, applesId);
+                .add(Eats.class, Apples.class);
 
         System.out.println("Entity's components:");
         iterateComponents(world, bob);
 
         // We can use the same function to iterate the components of a component.
         System.out.println("Position's components:");
-        iterateComponents(world, world.obtainEntity(world.component(Position.class)));
+        iterateComponents(world, world.obtainEntity(world.entity(Position.class)));
 
         world.destroy();
     }

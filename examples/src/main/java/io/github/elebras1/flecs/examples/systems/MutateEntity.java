@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.EntityView;
-import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Timeout;
 import io.github.elebras1.flecs.examples.components.TimeoutView;
@@ -25,17 +25,13 @@ public class MutateEntity {
         world.system("Expire")
                 .kind(Flecs.OnUpdate)
                 .with(Timeout.class)
-                .iter(it -> {
-                    Field<Timeout> timeouts = it.field(Timeout.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        TimeoutView timeout = timeouts.getMutView(i);
-                        timeout.value(timeout.value() - it.deltaTime());
-                        if (timeout.value() <= 0) {
-                            long entityId = it.entity(i);
-                            EntityView entity = it.world().obtainEntityView(entityId);
-                            System.out.println("Expire: " + entity.name() + " deleted!");
-                            entity.destruct();
-                        }
+                .eachView(Timeout.class, (Iter it, int index, TimeoutView timeout) -> {
+                    timeout.value(timeout.value() - it.deltaTime());
+                    if (timeout.value() <= 0) {
+                        long entityId = it.entity(index);
+                        EntityView entity = it.world().obtainEntityView(entityId);
+                        System.out.println("Expire: " + entity.name() + " deleted!");
+                        entity.destruct();
                     }
                 });
 
@@ -43,14 +39,9 @@ public class MutateEntity {
         world.system("PrintExpire")
                 .kind(Flecs.OnUpdate)
                 .with(Timeout.class)
-                .iter(it -> {
-                    Field<Timeout> timeouts = it.field(Timeout.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        long entityId = it.entity(i);
-                        Timeout timeout = timeouts.get(i);
-                        EntityView entity = it.world().obtainEntityView(entityId);
-                        System.out.printf(Locale.US, "PrintExpire: %s has %.2f seconds left%n", entity.name(), timeout.value());
-                    }
+                .eachView(Timeout.class, (long entityId, TimeoutView timeout) -> {
+                    EntityView entity = world.obtainEntityView(entityId);
+                    System.out.printf(Locale.US, "PrintExpire: %s has %.2f seconds left%n", entity.name(), timeout.value());
                 });
 
         // Observer that triggers when Timeout is actually removed.

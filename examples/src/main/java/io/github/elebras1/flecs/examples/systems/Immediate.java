@@ -18,13 +18,13 @@ public class Immediate {
 
     public static void main(String[] args) {
         World world = new World();
-        long waiterId = world.component(Waiter.class);
-        long plateId = world.component(Plate.class);
+        world.component(Waiter.class);
+        world.component(Plate.class);
 
         // Create a query that finds all waiters without a plate.
         Query qWaiter = world.query()
                 .with(Waiter.class)
-                .without(plateId, Flecs.Wildcard)
+                .without(Plate.class, Flecs.Wildcard)
                 .build();
 
         // System that assigns plates to waiters. By making this system immediate,
@@ -32,37 +32,35 @@ public class Immediate {
         // that we won't assign plates to the same waiter more than once.
         world.system("AssignPlate")
                 .with(Plate.class)
-                .without(waiterId, Flecs.Wildcard)
+                .without(Waiter.class, Flecs.Wildcard)
                 .immediate()
-                .iter(it -> {
-                    for (int i = 0; i < it.count(); i++) {
-                        EntityView plate = world.obtainEntityView(it.entity(i));
+                .each(entityId -> {
+                    EntityView plate = world.obtainEntityView(entityId);
 
-                        // Find an available waiter.
-                        long waiterRaw = qWaiter.first();
-                        if (waiterRaw == 0) {
-                            // No available waiters.
-                            continue;
-                        }
-                        EntityView waiter = world.obtainEntityView(waiterRaw);
-
-                        // Suspend deferring so the waiter gets the plate
-                        // immediately. Even in an immediate system, deferring is
-                        // still enabled by default, as adding/removing
-                        // components to the entities being iterated would
-                        // interfere with the system iterator.
-                        world.deferSuspend();
-                        waiter.add(plateId, plate.id());
-                        world.deferResume();
-
-                        // Now that deferring is resumed, also add the waiter to
-                        // the plate. We can't do this while deferring is
-                        // suspended because the plate is the entity we're
-                        // iterating.
-                        plate.add(waiterId, waiter.id());
-
-                        System.out.println("Assigned " + waiter.name() + " to " + plate.name() + "!");
+                    // Find an available waiter.
+                    long waiterRaw = qWaiter.first();
+                    if (waiterRaw == 0) {
+                        // No available waiters.
+                        return;
                     }
+                    EntityView waiter = world.obtainEntityView(waiterRaw);
+
+                    // Suspend deferring so the waiter gets the plate
+                    // immediately. Even in an immediate system, deferring is
+                    // still enabled by default, as adding/removing
+                    // components to the entities being iterated would
+                    // interfere with the system iterator.
+                    world.deferSuspend();
+                    waiter.add(Plate.class, plate);
+                    world.deferResume();
+
+                    // Now that deferring is resumed, also add the waiter to
+                    // the plate. We can't do this while deferring is
+                    // suspended because the plate is the entity we're
+                    // iterating.
+                    plate.add(Waiter.class, waiter);
+
+                    System.out.println("Assigned " + waiter.name() + " to " + plate.name() + "!");
                 });
 
         // Create a few waiters and plates.
@@ -75,8 +73,8 @@ public class Immediate {
         world.obtainEntity(world.entity("plate_3")).add(Plate.class);
 
         // waiter_1 already has a plate (plate_2).
-        waiter1.add(plateId, plate2.id());
-        plate2.add(waiterId, waiter1.id());
+        waiter1.add(Plate.class, plate2);
+        plate2.add(Waiter.class, waiter1);
 
         // Run systems.
         world.progress();

@@ -28,6 +28,8 @@ public class SyncPoint {
         world.system("SetVelocity")
                 .kind(Flecs.OnUpdate)
                 .with(Position.class)
+                .inoutNone()
+                .write(Velocity.class)
                 .iter(it -> {
                     for (int i = 0; i < it.count(); i++) {
                         long entityId = it.entity(i);

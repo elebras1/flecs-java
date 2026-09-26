@@ -1,6 +1,6 @@
 package io.github.elebras1.flecs.examples.observers;
 
-import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.Flecs;
@@ -24,12 +24,8 @@ public class YieldExisting {
                 .event(Flecs.OnSet)
                 .with(Position.class)
                 .yieldExisting()
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        Position p = positions.get(i);
-                        System.out.println(" - OnSet: Position: " + world.obtainEntity(it.entity(i)).name() + ": {" + p.x() + ", " + p.y() + "}");
-                    }
+                .each(Position.class, (Iter it, int index, Position p) -> {
+                    System.out.println(" - OnSet: Position: " + world.obtainEntity(it.entity(index)).name() + ": {" + p.x() + ", " + p.y() + "}");
                 });
 
         world.destroy();

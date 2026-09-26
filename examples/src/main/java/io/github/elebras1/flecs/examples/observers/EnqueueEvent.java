@@ -1,7 +1,7 @@
 package io.github.elebras1.flecs.examples.observers;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 
@@ -19,22 +19,18 @@ public class EnqueueEvent {
         world.observer()
                 .event(myEvent)
                 .with(Position.class)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
+                .each(Position.class, (Iter it, int index, Position p) -> {
                     String eventName = world.obtainEntity(it.event()).name();
-                    for (int i = 0; i < it.count(); i++) {
-                        Position p = positions.get(i);
-                        System.out.println(" - " + eventName + ": Position: " + world.obtainEntity(it.entity(i)).name() + ": {" + p.x() + ", " + p.y() + "}");
-                    }
+                    System.out.println(" - " + eventName + ": Position: " + world.obtainEntity(it.entity(index)).name() + ": {" + p.x() + ", " + p.y() + "}");
                 });
 
         Entity e = world.obtainEntity(world.entity("e"))
                 .set(new Position(10, 20));
 
-        // Emitting an event while deferred places it in the command queue.
+        // Enqueuing an event while deferred places it in the command queue.
         world.deferBegin();
         System.out.println("Event enqueued!");
-        e.emit(myEvent, Position.class);
+        e.enqueue(myEvent, Position.class);
         world.deferEnd();
 
         world.destroy();

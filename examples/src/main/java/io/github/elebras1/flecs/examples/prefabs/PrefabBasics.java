@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs.examples.prefabs;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Defense;
 import io.github.elebras1.flecs.Flecs;
@@ -23,13 +22,12 @@ public class PrefabBasics {
         // pair to the component entity.
 
         // Create a SpaceShip prefab with a Defense component.
-        Entity spaceShip = world.obtainEntity(world.entity("SpaceShip"))
-                .add(Flecs.Prefab)
+        Entity spaceShip = world.obtainEntity(world.prefab("SpaceShip"))
                 .set(new Defense(50));
 
         // Create a prefab instance.
         Entity inst = world.obtainEntity(world.entity("my_spaceship"))
-                .isA(spaceShip.id());
+                .isA(spaceShip);
 
         // Because of the IsA relationship, the instance now shares the Defense
         // component with the prefab, and can be retrieved as a regular component.
@@ -43,13 +41,10 @@ public class PrefabBasics {
         System.out.println("defense after set: " + dInstAfter.value());
 
         // Prefab components can be iterated like regular components.
-        Query query = world.query().with(Defense.class).build();
-        query.each(entityId -> {
+        world.each(Defense.class, (entityId, defense) -> {
             Entity entity = world.obtainEntity(entityId);
-            Defense d = entity.get(Defense.class);
-            System.out.println((entity.name() != null ? entity.name() : "") + ": " + d.value());
+            System.out.println((entity.name() != null ? entity.path() : "") + ": " + defense.value());
         });
-        query.destroy();
 
         world.destroy();
     }
@@ -57,5 +52,5 @@ public class PrefabBasics {
     // Output:
     // defense: 50.0
     // defense after set: 100.0
-    // my_spaceship: 100.0
+    // ::my_spaceship: 100.0
 }

@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs.examples.observers;
 
+import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Velocity;
@@ -20,15 +21,13 @@ public class Monitor {
                 .event(Flecs.Monitor)
                 .with(Position.class)
                 .with(Velocity.class)
-                .iter(it -> {
+                .each(Position.class, Velocity.class, (Iter it, int index, Position p, Velocity v) -> {
                     long event = it.event();
-                    for (int i = 0; i < it.count(); i++) {
-                        String name = world.obtainEntity(it.entity(i)).name();
-                        if (event == Flecs.OnAdd) {
-                            System.out.println(" - Enter: Velocity: " + name);
-                        } else if (event == Flecs.OnRemove) {
-                            System.out.println(" - Leave: Position: " + name);
-                        }
+                    String name = world.obtainEntity(it.entity(index)).name();
+                    if (event == Flecs.OnAdd) {
+                        System.out.println(" - Enter: Velocity: " + name);
+                    } else if (event == Flecs.OnRemove) {
+                        System.out.println(" - Leave: Position: " + name);
                     }
                 });
 

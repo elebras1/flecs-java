@@ -1079,7 +1079,7 @@ public class Entity extends EntityBase<Entity> {
         for (int i = 0; i < count; i++) {
             long id = ids.getAtIndex(ValueLayout.JAVA_LONG, i);
             Id typeId = this.world.obtainId(id);
-            if (!typeId.isPair() || typeId.first() != relation) {
+            if (!typeId.isPair() || (relation != Flecs.Wildcard && typeId.first() != relation)) {
                 continue;
             }
             if (target != Flecs.Wildcard && typeId.second() != target) {

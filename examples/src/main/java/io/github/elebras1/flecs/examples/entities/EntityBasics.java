@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs.examples.entities;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Walking;
@@ -42,12 +41,10 @@ public class EntityBasics {
         alice.remove(Walking.class);
 
         // Iterate all entities with Position.
-        Query query = world.query().with(Position.class).build();
-        query.each(Position.class, (entityId, pos) -> {
+        world.each(Position.class, (entityId, pos) -> {
             Entity entity = world.obtainEntity(entityId);
             System.out.println(entity.name() + ": {" + pos.x() + ", " + pos.y() + "}");
         });
-        query.destroy();
 
         world.destroy();
     }

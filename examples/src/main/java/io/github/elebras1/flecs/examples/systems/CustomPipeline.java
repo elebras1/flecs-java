@@ -1,28 +1,22 @@
 package io.github.elebras1.flecs.examples.systems;
 
-import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Pipeline;
 import io.github.elebras1.flecs.World;
+import io.github.elebras1.flecs.examples.components.Physics;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.Flecs;
 
 public class CustomPipeline {
 
-    // Custom tag used to identify systems that belong to this pipeline.
-    public static class Physics {
-    }
-
     static void main(String[] args) {
         World world = new World();
         world.component(Position.class);
-
-        Entity physics = world.obtainEntity(world.entity("Physics"));
+        long physicsId = world.component(Physics.class);
 
         // Create a custom pipeline that matches systems tagged with Physics.
-        long systemTag = Flecs.System;
         Pipeline customPipeline = world.pipeline("CustomPipeline")
-                .with(systemTag)
-                .with(physics)
+                .with(Flecs.System)
+                .with(Physics.class)
                 .build();
 
         // Configure the world to use the custom pipeline.
@@ -30,7 +24,7 @@ public class CustomPipeline {
 
         // Create a system that uses the custom tag as phase.
         world.system("PhysicsSystem")
-                .kind(physics.id())
+                .kind(physicsId)
                 .with(Position.class)
                 .iter(it -> System.out.println("[Physics] " + it.count() + " entities"));
 

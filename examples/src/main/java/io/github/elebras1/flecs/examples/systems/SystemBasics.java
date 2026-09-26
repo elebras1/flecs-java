@@ -6,6 +6,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
+import io.github.elebras1.flecs.examples.components.VelocityView;
 
 public class SystemBasics {
 
@@ -19,17 +20,12 @@ public class SystemBasics {
         FlecsSystem moveSystem = world.system("MoveSystem")
                 .with(Position.class)
                 .with(Velocity.class)
-                .each(Position.class, (entityId, pos) -> {
-                    // Note: this simple callback only receives Position.
-                    // The Velocity component is read from the entity directly.
+                .eachView(Position.class, Velocity.class, (long entityId, PositionView pos, VelocityView vel) -> {
+                    pos.x(pos.x() + vel.dx());
+                    pos.y(pos.y() + vel.dy());
+
                     EntityView entity = world.obtainEntityView(entityId);
-                    Velocity vel = entity.get(Velocity.class);
-                    entity.insert(Position.class, (PositionView posView) -> {
-                        posView.x(pos.x() + vel.dx());
-                        posView.y(pos.y() + vel.dy());
-                    });
-                    Position newPos = entity.get(Position.class);
-                    System.out.println(entity.name() + ": {" + newPos.x() + ", " + newPos.y() + "}");
+                    System.out.println(entity.name() + ": {" + pos.x() + ", " + pos.y() + "}");
                 });
 
         // Create a few test entities for a Position, Velocity query.

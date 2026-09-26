@@ -1,7 +1,7 @@
 package io.github.elebras1.flecs.examples.queries;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.Field;
+import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Apples;
@@ -32,15 +32,11 @@ public class Wildcards {
         // Query that matches the (Eats, *) wildcard pair.
         Query query = world.query().with(Eats.class, Flecs.Wildcard).build();
 
-        query.iter(it -> {
-            Field<Eats> eatsField = it.field(Eats.class, 0);
-            for (int i = 0; i < it.count(); i++) {
-                Entity entity = world.obtainEntity(it.entity(i));
-                long pairId = it.id(0);
-                long foodId = world.obtainId(pairId).second();
-                String foodName = world.obtainEntity(foodId).name();
-                System.out.println(entity.name() + " eats " + eatsField.get(i).amount() + " " + foodName);
-            }
+        query.each(Eats.class, (Iter it, int index, Eats eats) -> {
+            Entity entity = world.obtainEntity(it.entity(index));
+            long foodId = world.obtainId(it.pair(0)).second();
+            String foodName = world.obtainEntity(foodId).name();
+            System.out.println(entity.name() + " eats " + eats.amount() + " " + foodName);
         });
 
         query.destroy();

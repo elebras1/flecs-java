@@ -9,9 +9,8 @@ import io.github.elebras1.flecs.Flecs;
 
 /**
  * Shows how to annotate a system that deletes entities so that the scheduler
- * can insert the correct sync points. The C++ version uses a wildcard write
- * annotation; this Java port marks the matched Position component as written,
- * which has the same effect of forcing a sync point.
+ * can insert the correct sync points. A wildcard write annotation indicates
+ * that any component could be modified by the system.
  */
 public class SyncPointDelete {
 
@@ -36,12 +35,12 @@ public class SyncPointDelete {
                 });
 
         // Delete entities when p.x >= 3. The deletion is a structural change
-        // that removes Position, so mark Position as written. This forces the
-        // scheduler to insert a sync point before the following system.
+        // that can remove any component, so mark the wildcard as written. This
+        // forces the scheduler to insert a sync point before the next system.
         world.system("DeleteEntity")
                 .kind(Flecs.OnUpdate)
                 .with(Position.class)
-                .out()
+                .write(Flecs.Wildcard)
                 .iter(it -> {
                     Field<Position> positions = it.field(Position.class, 0);
                     for (int i = 0; i < it.count(); i++) {

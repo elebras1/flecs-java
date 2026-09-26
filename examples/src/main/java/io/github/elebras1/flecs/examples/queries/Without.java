@@ -3,6 +3,7 @@ package io.github.elebras1.flecs.examples.queries;
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
+import io.github.elebras1.flecs.examples.components.Npc;
 import io.github.elebras1.flecs.examples.components.Position;
 
 public class Without {
@@ -10,9 +11,7 @@ public class Without {
     static void main(String[] args) {
         World world = new World();
         world.component(Position.class);
-
-        // Tag used to exclude entities from the query.
-        long npcTag = world.entity("Npc");
+        world.component(Npc.class);
 
         // Create a few test entities for the Position query.
         world.obtainEntity(world.entity("e1")).set(new Position(10, 20));
@@ -21,12 +20,12 @@ public class Without {
         // This entity will not match because it has the Npc tag.
         world.obtainEntity(world.entity("e3"))
                 .set(new Position(10, 20))
-                .add(npcTag);
+                .add(Npc.class);
 
         // Query for entities with Position but without Npc.
         Query query = world.query()
                 .with(Position.class)
-                .without(npcTag)
+                .without(Npc.class)
                 .build();
 
         query.each(Position.class, (entityId, pos) -> {

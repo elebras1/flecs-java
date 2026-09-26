@@ -6,7 +6,9 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Apples;
 import io.github.elebras1.flecs.examples.components.Eats;
 import io.github.elebras1.flecs.examples.components.Position;
+import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
+import io.github.elebras1.flecs.examples.components.VelocityView;
 import io.github.elebras1.flecs.Flecs;
 
 public class HelloWorld {
@@ -21,28 +23,18 @@ public class HelloWorld {
         world.component(Apples.class);
 
         // Register a system that updates Position from Velocity.
-        world.system("MoveSystem")
-                .with(Position.class)
-                .with(Velocity.class)
+        world.system("MoveSystem", Position.class, Velocity.class)
                 .kind(Flecs.OnUpdate)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    Field<Velocity> velocities = it.field(Velocity.class, 1);
-                    for (int i = 0; i < it.count(); i++) {
-                        Position pos = positions.get(i);
-                        Velocity vel = velocities.get(i);
-                        Entity entity = world.obtainEntity(it.entity(i));
-                        entity.set(new Position(pos.x() + vel.dx(), pos.y() + vel.dy()));
-                    }
+                .eachView(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+                    pos.x(pos.x() + vel.dx());
+                    pos.y(pos.y() + vel.dy());
                 });
 
         // Create an entity named Bob, add Position, Velocity and the (Eats, Apples) pair.
-        long eatsId = world.component(Eats.class);
-        long applesId = world.component(Apples.class);
         Entity bob = world.obtainEntity(world.entity("Bob"))
                 .set(new Position(0, 0))
                 .set(new Velocity(1, 2))
-                .add(eatsId, applesId);
+                .add(Eats.class, Apples.class);
 
         // Show us what you got.
         System.out.println(bob.name() + "'s got [" + bob.table().toString() + "]");

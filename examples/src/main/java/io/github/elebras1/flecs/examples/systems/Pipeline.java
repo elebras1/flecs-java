@@ -1,11 +1,11 @@
 package io.github.elebras1.flecs.examples.systems;
 
 import io.github.elebras1.flecs.EntityView;
-import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
+import io.github.elebras1.flecs.examples.components.VelocityView;
 import io.github.elebras1.flecs.Flecs;
 
 /**
@@ -26,29 +26,18 @@ public class Pipeline {
                 .with(Position.class)
                 .with(Velocity.class)
                 .kind(Flecs.OnUpdate)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    Field<Velocity> velocities = it.field(Velocity.class, 1);
-                    for (int i = 0; i < it.count(); i++) {
-                        PositionView p = positions.getMutView(i);
-                        Velocity v = velocities.get(i);
-                        p.x(p.x() + v.dx());
-                        p.y(p.y() + v.dy());
-                    }
+                .eachView(Position.class, Velocity.class, (PositionView p, VelocityView v) -> {
+                    p.x(p.x() + v.dx());
+                    p.y(p.y() + v.dy());
                 });
 
         // Create a system for printing the entity position.
         world.system("PrintPosition")
                 .with(Position.class)
                 .kind(Flecs.PostUpdate)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        long entityId = it.entity(i);
-                        Position p = positions.get(i);
-                        EntityView entity = world.obtainEntityView(entityId);
-                        System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
-                    }
+                .eachView(Position.class, (long entityId, PositionView p) -> {
+                    EntityView entity = world.obtainEntityView(entityId);
+                    System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
                 });
 
         // Create a few test entities for a Position, Velocity query.

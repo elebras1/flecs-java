@@ -2,7 +2,6 @@ package io.github.elebras1.flecs.examples.systems;
 
 import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.World;
-import io.github.elebras1.flecs.examples.components.DummyTag;
 import io.github.elebras1.flecs.Flecs;
 
 /**
@@ -14,36 +13,29 @@ public class CustomPhases {
 
     static void main(String[] args) {
         World world = new World();
-        world.component(DummyTag.class);
-
-        // Dummy entity so that no-term systems are scheduled.
-        world.obtainEntity(world.entity("Dummy")).add(DummyTag.class);
 
         // Create two custom phases that branch off of EcsOnUpdate. Note that
         // the phases have the Phase tag, which is necessary for the builtin
         // pipeline to discover which systems it should run.
         Entity physics = world.obtainEntity(world.entity("Physics"));
         physics.add(Flecs.Phase);
-        physics.add(Flecs.DependsOn, Flecs.OnUpdate);
+        physics.dependsOn(Flecs.OnUpdate);
 
         Entity collisions = world.obtainEntity(world.entity("Collisions"));
         collisions.add(Flecs.Phase);
-        collisions.add(Flecs.DependsOn, physics.id());
+        collisions.dependsOn(physics);
 
         // Create 3 dummy systems.
         world.system("CollisionSystem")
                 .kind(collisions.id())
-                .with(DummyTag.class)
                 .run(it -> System.out.println("system CollisionSystem"));
 
         world.system("PhysicsSystem")
                 .kind(physics.id())
-                .with(DummyTag.class)
                 .run(it -> System.out.println("system PhysicsSystem"));
 
         world.system("GameSystem")
                 .kind(Flecs.OnUpdate)
-                .with(DummyTag.class)
                 .run(it -> System.out.println("system GameSystem"));
 
         // Run the pipeline once.

@@ -33,6 +33,17 @@ class SystemBuilderTest {
     }
 
     @Test
+    void readWriteTermMatches() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).set(new Velocity(3, 4));
+        AtomicInteger count = new AtomicInteger();
+        FlecsSystem system = this.world.system("RW", Position.class)
+                .write(Velocity.class)
+                .each(Position.class, (entityId, p) -> count.incrementAndGet());
+        this.world.progress();
+        assertEquals(1, count.get());
+    }
+
+    @Test
     void oneType() {
         long e1 = this.world.obtainEntity(this.world.entity()).add(Position.class).id();
         this.world.obtainEntity(this.world.entity()).add(Velocity.class);

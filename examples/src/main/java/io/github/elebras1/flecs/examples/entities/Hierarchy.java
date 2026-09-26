@@ -24,32 +24,30 @@ public class Hierarchy {
                 .add(Star.class)
                 .set(new Position(1, 1));
 
-        long previousScope = world.setScope(sun.id());
-        world.obtainEntity(world.entity("Mercury"))
+        world.obtainEntity(world.entity(sun.id(), "Mercury"))
                 .add(Planet.class)
                 .set(new Position(1, 1));
 
-        world.obtainEntity(world.entity("Venus"))
+        world.obtainEntity(world.entity(sun.id(), "Venus"))
                 .add(Planet.class)
                 .set(new Position(2, 2));
 
-        Entity earth = world.obtainEntity(world.entity("Earth"))
+        Entity earth = world.obtainEntity(world.entity(sun.id(), "Earth"))
                 .add(Planet.class)
                 .set(new Position(3, 3));
 
         // Create Moon as a child of Earth.
-        world.setScope(earth.id());
-        Entity moon = world.obtainEntity(world.entity("Moon"))
+        Entity moon = world.obtainEntity(world.entity(earth.id(), "Moon"))
                 .add(Moon.class)
                 .set(new Position(0.1f, 0.1f));
-        world.setScope(previousScope);
 
         // Is the Moon a child of Earth?
         System.out.println("Child of Earth? " + (moon.has(Flecs.ChildOf, earth.id()) ? 1 : 0));
         System.out.println();
 
-        // The moon entity was already obtained while creating it.
-        System.out.println("Moon found: " + moon.name());
+        // Lookup the moon by name.
+        Entity foundMoon = world.obtainEntity(world.lookup("Sun::Earth::Moon"));
+        System.out.println("Moon found: " + foundMoon.path());
         System.out.println();
 
         // Do a depth-first walk of the tree.
@@ -61,7 +59,7 @@ public class Hierarchy {
     private static void iterateTree(World world, Entity entity, Position parentPosition) {
         // Print hierarchical name of entity & the entity type.
         String type = entity.table().toString();
-        System.out.println(entity.name() + " [" + type + "]");
+        System.out.println(entity.path() + " [" + type + "]");
 
         // Get entity position.
         Position p = entity.get(Position.class);
@@ -78,20 +76,20 @@ public class Hierarchy {
     // Output:
     // Child of Earth? 1
     //
-    // Moon found: Moon
+    // Moon found: ::Sun::Earth::Moon
     //
-    // Sun [Position, Star, (Identifier,Name)]
+    // ::Sun [Position, Star, (Identifier,Name)]
     // {1.0, 1.0}
     //
-    // Mercury [Position, Planet, (Identifier,Name), (ChildOf,Sun)]
+    // ::Sun::Mercury [Position, Planet, (Identifier,Name), (ChildOf,Sun)]
     // {2.0, 2.0}
     //
-    // Venus [Position, Planet, (Identifier,Name), (ChildOf,Sun)]
+    // ::Sun::Venus [Position, Planet, (Identifier,Name), (ChildOf,Sun)]
     // {3.0, 3.0}
     //
-    // Earth [Position, Planet, (Identifier,Name), (ChildOf,Sun)]
+    // ::Sun::Earth [Position, Planet, (Identifier,Name), (ChildOf,Sun)]
     // {4.0, 4.0}
     //
-    // Moon [Position, Moon, (Identifier,Name), (ChildOf,Sun.Earth)]
+    // ::Sun::Earth::Moon [Position, Moon, (Identifier,Name), (ChildOf,Sun.Earth)]
     // {4.1, 4.1}
 }

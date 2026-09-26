@@ -30,7 +30,7 @@ public class QueryBasics {
         world.obtainEntity(world.entity("Obstacle"))
                 .set(new Position(20, 20));
 
-        Query query = world.query().with(Position.class).with(Velocity.class).build();
+        Query query = world.query().with(Position.class).with(Velocity.class).cached().build();
         System.out.println("Entities with Position and Velocity: " + query.count());
 
         query.each(Position.class, (entityId, pos) -> {

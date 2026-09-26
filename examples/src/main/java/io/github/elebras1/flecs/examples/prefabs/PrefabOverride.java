@@ -26,15 +26,14 @@ public class PrefabOverride {
         world.obtainEntity(defenseId).add(Flecs.OnInstantiate, Flecs.Inherit);
 
         // Create a SpaceShip prefab.
-        Entity spaceShip = world.obtainEntity(world.entity("SpaceShip"))
-                .add(Flecs.Prefab)
+        Entity spaceShip = world.obtainEntity(world.prefab("SpaceShip"))
                 .set(new Attack(75))
                 .set(new Defense(100))
                 .set(new Damage(50));
 
         // Create a prefab instance.
         Entity inst = world.obtainEntity(world.entity("my_spaceship"))
-                .isA(spaceShip.id());
+                .isA(spaceShip);
 
         // The instance has a private copy of Damage, but Attack and Defense are
         // shared from the prefab.

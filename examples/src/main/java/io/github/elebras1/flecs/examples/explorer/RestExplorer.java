@@ -2,7 +2,6 @@ package io.github.elebras1.flecs.examples.explorer;
 
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.Flecs;
-import io.github.elebras1.flecs.Rest;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.PositionView;
@@ -13,7 +12,7 @@ import java.util.Random;
 
 public class RestExplorer {
 
-    static void main(String[] args) throws InterruptedException {
+    static void main(String[] args) {
         World world = new World();
         world.component(Position.class);
         world.component(Velocity.class);
@@ -21,8 +20,6 @@ public class RestExplorer {
         // Optional, gather statistics for explorer.
         world.importModule(Flecs.Stats);
 
-        // Creates REST server on default port (27750).
-        world.set(new Rest().port(27750));
         System.out.println("Open https://flecs.dev/explorer?remote=true");
 
         int numberEntities = 100000;
@@ -68,17 +65,9 @@ public class RestExplorer {
 
         System.out.println("Loop running...");
 
-        // The explorer runs until it is interrupted (e.g. Ctrl+C).
-        float deltaTime = 0.016f;
-        try {
-            while (world.progress(deltaTime)) {
-                Thread.sleep(16);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } finally {
-            world.destroy();
-        }
+        // Creates the REST server on port 27750 and runs the application until
+        // it is interrupted (e.g. Ctrl+C).
+        world.app().enableRest((short) 27750).run();
     }
 
     // Output:

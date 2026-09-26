@@ -17,8 +17,7 @@ public class ExclusiveRelations {
 
         // Register Platoon as an exclusive relationship. This ensures that an entity
         // can only belong to a single platoon.
-        long platoonId = world.component(Platoon.class);
-        world.obtainEntity(platoonId).add(Flecs.Exclusive);
+        world.obtainEntity(world.component(Platoon.class)).add(Flecs.Exclusive);
 
         // Create two platoons.
         long platoon1 = world.entity();
@@ -28,19 +27,19 @@ public class ExclusiveRelations {
         Entity unit = world.obtainEntity(world.entity());
 
         // Add unit to platoon 1.
-        unit.add(platoonId, platoon1);
+        unit.add(Platoon.class, platoon1);
 
         // Log platoon of unit.
-        System.out.println("Unit in platoon 1: " + (unit.has(platoonId, platoon1)));
-        System.out.println("Unit in platoon 2: " + (unit.has(platoonId, platoon2)));
+        System.out.println("Unit in platoon 1: " + (unit.has(Platoon.class, platoon1)));
+        System.out.println("Unit in platoon 2: " + (unit.has(Platoon.class, platoon2)));
         System.out.println();
 
         // Add unit to platoon 2. Because Platoon is exclusive, this removes the
         // first pair and adds the second one in a single operation.
-        unit.add(platoonId, platoon2);
+        unit.add(Platoon.class, platoon2);
 
-        System.out.println("Unit in platoon 1: " + (unit.has(platoonId, platoon1)));
-        System.out.println("Unit in platoon 2: " + (unit.has(platoonId, platoon2)));
+        System.out.println("Unit in platoon 1: " + (unit.has(Platoon.class, platoon1)));
+        System.out.println("Unit in platoon 2: " + (unit.has(Platoon.class, platoon2)));
 
         world.destroy();
     }

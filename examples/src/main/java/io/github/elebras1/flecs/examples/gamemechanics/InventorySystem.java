@@ -5,15 +5,21 @@ import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Active;
 import io.github.elebras1.flecs.examples.components.Amount;
+import io.github.elebras1.flecs.examples.components.AmountView;
 import io.github.elebras1.flecs.examples.components.Armor;
 import io.github.elebras1.flecs.examples.components.Attack;
 import io.github.elebras1.flecs.examples.components.Coin;
 import io.github.elebras1.flecs.examples.components.Container;
 import io.github.elebras1.flecs.examples.components.ContainedBy;
 import io.github.elebras1.flecs.examples.components.Health;
+import io.github.elebras1.flecs.examples.components.HealthView;
 import io.github.elebras1.flecs.examples.components.Inventory;
 import io.github.elebras1.flecs.examples.components.Item;
 import io.github.elebras1.flecs.examples.components.Sword;
+import io.github.elebras1.flecs.examples.components.WoodenSword;
+import io.github.elebras1.flecs.examples.components.IronSword;
+import io.github.elebras1.flecs.examples.components.WoodenArmor;
+import io.github.elebras1.flecs.examples.components.IronArmor;
 import io.github.elebras1.flecs.Flecs;
 
 /**
@@ -73,7 +79,7 @@ public class InventorySystem {
         if (entity.has(Container.class)) {
             return entity;
         }
-        long inventory = entity.target(inventoryId, 0);
+        long inventory = entity.target(Inventory.class);
         return inventory != 0 ? world.obtainEntity(inventory) : entity;
     }
 
@@ -95,42 +101,41 @@ public class InventorySystem {
     }
 
     private static void transferItem(World world, long containedById, Entity container, Entity item, long swordId, long armorId, long coinId) {
-        Amount amount = item.get(Amount.class);
+        Amount amount = item.tryGet(Amount.class);
         if (amount != null) {
             long kindId = itemKindId(world, item.id(), swordId, armorId, coinId);
             long existingId = findItemWithKind(world, container.id(), kindId, false, swordId, armorId, coinId);
             if (existingId != 0) {
                 Entity existing = world.obtainEntity(existingId);
-                Amount existingAmount = existing.get(Amount.class);
-                int newValue = existingAmount != null ? existingAmount.value() + amount.value() : amount.value();
-                existing.set(new Amount(newValue));
+                existing.insert(Amount.class, (AmountView existingAmount) ->
+                        existingAmount.value(existingAmount.value() + amount.value()));
                 item.destruct();
                 return;
             }
         }
-        item.add(containedById, container.id());
+        item.add(ContainedBy.class, container);
     }
 
     private static void transferItems(World world, long containedById, long inventoryId, Entity dst, Entity src, long swordId, long armorId, long coinId) {
         System.out.println(">> Transfer items from " + src.name() + " to " + dst.name() + "\n");
 
-        world.deferBegin();
-        Entity dstContainer = getContainer(world, inventoryId, dst);
-        Entity srcContainer = getContainer(world, inventoryId, src);
+        world.defer(() -> {
+            Entity dstContainer = getContainer(world, inventoryId, dst);
+            Entity srcContainer = getContainer(world, inventoryId, src);
 
-        Query q = world.query().with(ContainedBy.class, srcContainer.id()).build();
-        q.each(itemId -> {
-            Entity item = world.obtainEntity(itemId);
-            transferItem(world, containedById, dstContainer, item, swordId, armorId, coinId);
+            Query q = world.query().with(ContainedBy.class, srcContainer.id()).build();
+            q.each(itemId -> {
+                Entity item = world.obtainEntity(itemId);
+                transferItem(world, containedById, dstContainer, item, swordId, armorId, coinId);
+            });
+            q.destroy();
         });
-        q.destroy();
-        world.deferEnd();
     }
 
     private static void attack(World world, long inventoryId, Entity player, Entity weapon, long swordId, long armorId) {
         System.out.println(">> " + player.name() + " is attacked with a " + itemName(world, weapon.id()) + "!");
 
-        Attack attack = weapon.get(Attack.class);
+        Attack attack = weapon.tryGet(Attack.class);
         if (attack == null) {
             System.out.println(" - the weapon is a dud");
             return;
@@ -142,7 +147,7 @@ public class InventorySystem {
         long armorIdFound = findItemWithKind(world, playerContainer.id(), armorId, true, swordId, armorId, 0);
         if (armorIdFound != 0) {
             Entity armor = world.obtainEntity(armorIdFound);
-            Health armorHealth = armor.get(Health.class);
+            HealthView armorHealth = armor.tryGetMutView(Health.class);
             if (armorHealth == null) {
                 System.out.println(" - the " + itemName(world, armor.id()) + " armor is a dud");
             } else {
@@ -154,7 +159,7 @@ public class InventorySystem {
                     System.out.println(" - " + itemName(world, armor.id()) + " is destroyed!");
                     armor.destruct();
                 } else {
-                    armor.set(new Health(remaining));
+                    armorHealth.value(remaining);
                     System.out.println(" - " + itemName(world, armor.id()) + " has " + remaining + " health left after taking " + attackValue + " damage");
                     attackValue = 0;
                 }
@@ -163,27 +168,27 @@ public class InventorySystem {
             System.out.println(" - " + player.name() + " fights without armor!");
         }
 
-        Health weaponHealth = weapon.get(Health.class);
+        HealthView weaponHealth = weapon.tryGetMutView(Health.class);
         if (weaponHealth != null) {
             int remaining = weaponHealth.value() - 1;
             if (remaining <= 0) {
                 System.out.println(" - " + itemName(world, weapon.id()) + " is destroyed!");
                 weapon.destruct();
             } else {
-                weapon.set(new Health(remaining));
+                weaponHealth.value(remaining);
                 System.out.println(" - " + itemName(world, weapon.id()) + " has " + remaining + " uses left");
             }
         }
 
         if (attackValue > 0) {
-            Health playerHealth = player.get(Health.class);
+            HealthView playerHealth = player.tryGetMutView(Health.class);
             if (playerHealth != null) {
                 int remaining = playerHealth.value() - attackValue;
                 if (remaining <= 0) {
                     System.out.println(" - " + player.name() + " died!");
                     player.destruct();
                 } else {
-                    player.set(new Health(remaining));
+                    playerHealth.value(remaining);
                     System.out.println(" - " + player.name() + " has " + remaining + " health left after taking " + attackValue + " damage");
                 }
             }
@@ -201,7 +206,7 @@ public class InventorySystem {
         Query q = world.query().with(ContainedBy.class, actualContainer.id()).build();
         q.each(itemId -> {
             Entity item = world.obtainEntity(itemId);
-            Amount amount = item.get(Amount.class);
+            Amount amount = item.tryGet(Amount.class);
             int amountValue = amount != null ? amount.value() : 1;
 
             String name = itemName(world, itemId);
@@ -236,48 +241,48 @@ public class InventorySystem {
         world.obtainEntity(containedById).add(Flecs.Exclusive);
 
         // Item kinds inherit from Item.
-        world.obtainEntity(swordId).add(Flecs.IsA, itemId);
-        world.obtainEntity(armorId).add(Flecs.IsA, itemId);
-        world.obtainEntity(coinId).add(Flecs.IsA, itemId);
+        world.obtainEntity(swordId).isA(itemId);
+        world.obtainEntity(armorId).isA(itemId);
+        world.obtainEntity(coinId).isA(itemId);
 
         // Register prefabs.
-        long woodenSword = world.prefab();
-        world.obtainEntity(woodenSword).name("WoodenSword")
+        long woodenSword = world.prefab(WoodenSword.class);
+        world.obtainEntity(woodenSword)
                 .add(Sword.class)
                 .set(new Attack(1))
                 .set(new Health(5))
                 .autoOverride(Health.class);
 
-        long ironSword = world.prefab();
-        world.obtainEntity(ironSword).name("IronSword")
+        long ironSword = world.prefab(IronSword.class);
+        world.obtainEntity(ironSword)
                 .add(Sword.class)
                 .set(new Attack(2))
                 .set(new Health(10))
                 .autoOverride(Health.class);
 
-        long woodenArmor = world.prefab();
-        world.obtainEntity(woodenArmor).name("WoodenArmor")
+        long woodenArmor = world.prefab(WoodenArmor.class);
+        world.obtainEntity(woodenArmor)
                 .add(Armor.class)
                 .set(new Health(10))
                 .autoOverride(Health.class);
 
-        long ironArmor = world.prefab();
-        world.obtainEntity(ironArmor).name("IronArmor")
+        long ironArmor = world.prefab(IronArmor.class);
+        world.obtainEntity(ironArmor)
                 .add(Armor.class)
                 .set(new Health(20))
                 .autoOverride(Health.class);
 
         // Create a loot box with items.
         Entity chest = world.obtainEntity(world.entity("Chest")).add(Container.class);
-        world.obtainEntity(world.entity()).isA(ironSword).add(containedById, chest.id());
-        world.obtainEntity(world.entity()).isA(woodenArmor).add(containedById, chest.id());
+        world.obtainEntity(world.entity()).isA(ironSword).add(ContainedBy.class, chest);
+        world.obtainEntity(world.entity()).isA(woodenArmor).add(ContainedBy.class, chest);
         world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(30))
-                .add(containedById, chest.id());
+                .add(ContainedBy.class, chest);
 
         // Create a player with an inventory containing some coins.
         Entity playerInventory = world.obtainEntity(world.entity()).add(Container.class);
         world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(20))
-                .add(containedById, playerInventory.id());
+                .add(ContainedBy.class, playerInventory);
 
         Entity player = world.obtainEntity(world.entity("Player"))
                 .set(new Health(10))

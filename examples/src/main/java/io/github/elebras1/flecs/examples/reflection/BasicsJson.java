@@ -19,18 +19,15 @@ public class BasicsJson {
                 .set(new Position(10, 20));
 
         // Convert the Position component to a JSON string.
-        Position p = e.get(Position.class);
-        System.out.println("{\"x\":" + p.x() + ", \"y\":" + p.y() + "}");
+        System.out.println(e.toJson(Position.class));
 
-        // Convert the whole world to JSON. This example shows the available
-        // world-level serializer.
-        String json = world.toJson();
-        System.out.println(json);
+        // Convert the entity to JSON.
+        System.out.println(e.toJson());
 
         world.destroy();
     }
 
-    // Output (the exact world JSON may contain additional metadata):
-    // {"x":10.0, "y":20.0}
-    // {"results":[{"name":"Position", ...}, {"name":"ent", ...}]}
+    // Output (the exact entity JSON may contain additional metadata):
+    // {"x":10, "y":20}
+    // {"name":"ent", "components":{"Position":{"x":10, "y":20}}}
 }

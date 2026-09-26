@@ -15,6 +15,8 @@ public class Hooks {
                     System.out.println("onAdd: " + components.length + " elements"));
             hooks.onSet((components) ->
                     System.out.println("onSet: " + components[0]));
+            hooks.onRemove((components) ->
+                    System.out.println("onRemove: " + components.length + " elements"));
             hooks.ctor(count -> {
                 System.out.println("ctor: " + count + " elements");
                 return null;
@@ -42,7 +44,7 @@ public class Hooks {
     // onAdd: 1 elements
     // onSet: Position[x=1.5, y=2.5]
     // Current: Position[x=1.5, y=2.5]
-    // ctor: 1 elements
     // onSet: Position[x=3.0, y=4.0]
+    // onRemove: 1 elements
     // dtor: 1 elements
 }

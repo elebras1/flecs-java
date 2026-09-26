@@ -40,11 +40,8 @@ public class MultipleQueries {
         Query flowers = world.query().with(Position.class).with(Flower.class).cached().build();
 
         // Find the closest in range flower for each bee.
-        // The Java binding currently requires systems to have at least one
-        // matching term to be scheduled, so we provide a dummy Position term.
         world.system("FlowersAndTheBees")
                 .kind(Flecs.OnUpdate)
-                .with(Position.class)
                 .run(it -> {
                     bees.iter(beeIt -> {
                         for (int b = 0; b < beeIt.count(); b++) {
@@ -67,7 +64,6 @@ public class MultipleQueries {
         // Find bees that picked the same flower.
         world.system("BumpingBees")
                 .kind(Flecs.OnUpdate)
-                .with(Position.class)
                 .run(it -> {
                     bees.iter(beeIt -> {
                         for (int i = 0; i < beeIt.count(); i++) {
@@ -105,9 +101,6 @@ public class MultipleQueries {
                     .set(new Position(randf(rand, 20), randf(rand, 20)))
                     .set(new Flower());
         }
-
-        // Dummy entity so the first system has a matching term and runs.
-        world.obtainEntity(world.entity("Dummy")).set(new Position(0, 0));
 
         world.progress(0.016f);
 

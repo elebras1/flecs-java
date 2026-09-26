@@ -22,6 +22,7 @@ public class RelationComponent {
         World world = new World();
 
         long gigawattsId = world.component(Gigawatts.class);
+        long requiresId = world.component(Requires.class);
         long positionId = world.component(Position.class);
         long mustHaveId = world.component(MustHave.class);
 
@@ -32,10 +33,11 @@ public class RelationComponent {
         Requires r1 = e1.get(Requires.class, gigawattsId);
         System.out.println("requires: " + r1.amount());
 
-        // The Java binding's set(T, target) always stores the component type of
-        // T as the first element of the pair. To demonstrate the same payload in
-        // both orientations we reuse the component-first pair above.
-        System.out.println("requires: " + r1.amount());
+        // The component can be either the first or second part of a pair:
+        Entity e2 = world.obtainEntity(world.entity())
+                .setSecond(Requires.class, gigawattsId, (RequiresView view) -> view.amount(1.21));
+        Requires r2 = e2.getSecond(Requires.class, gigawattsId);
+        System.out.println("requires: " + r2.amount());
 
         // If both parts of a pair are components, the pair stores a value of the
         // first element.
@@ -52,7 +54,7 @@ public class RelationComponent {
         // Print the component type used by each pair.
         Id requiresPair = world.pair(Requires.class, gigawattsId);
         System.out.println(world.obtainEntity(requiresPair.typeId()).name());
-        System.out.println(world.obtainEntity(requiresPair.typeId()).name());
+        System.out.println(world.obtainEntity(world.pair(Gigawatts.class, requiresId).typeId()).name());
         System.out.println(world.obtainEntity(world.pair(Expires.class, positionId).typeId()).name());
         System.out.println(world.pair(MustHave.class, positionId).typeId());
 
@@ -74,7 +76,7 @@ public class RelationComponent {
     // requires: 1.21
     // expires: 0.5
     // Requires
-    // Requires
+    // Gigawatts
     // Expires
     // 0
     // requires 1.21 gigawatts

@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs.examples.gamemechanics;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.Pipeline;
 import io.github.elebras1.flecs.World;
@@ -10,6 +9,7 @@ import io.github.elebras1.flecs.examples.components.Button;
 import io.github.elebras1.flecs.examples.components.Character;
 import io.github.elebras1.flecs.examples.components.GameScene;
 import io.github.elebras1.flecs.examples.components.Health;
+import io.github.elebras1.flecs.examples.components.HealthView;
 import io.github.elebras1.flecs.examples.components.MenuScene;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.SceneRoot;
@@ -24,9 +24,7 @@ import io.github.elebras1.flecs.Flecs;
 public class SceneManagement {
 
     private static void resetScene(World world, long sceneRootId) {
-        world.deferBegin();
-        world.obtainEntity(sceneRootId).children(id -> world.obtainEntity(id).destruct());
-        world.deferEnd();
+        world.defer(() -> world.obtainEntity(sceneRootId).children(id -> world.obtainEntity(id).destruct()));
     }
 
     private static void menuScene(Iter it, long menuSceneId, long sceneRootId) {
@@ -67,18 +65,19 @@ public class SceneManagement {
         world.obtainEntity(activeSceneId).add(Flecs.Exclusive);
 
         // Each scene gets a pipeline that runs the associated systems plus all
-        // other scene-agnostic systems. Use the fully qualified name for the
-        // built-in System tag so the query expression can resolve it.
+        // other scene-agnostic systems. Use without() for the other scene so
+        // that every system without a scene attached to it is included.
         Pipeline menu = world.pipeline()
-                .expr("flecs.system.System, !GameScene")
+                .with(Flecs.System)
+                .without(GameScene.class)
                 .build();
         Pipeline game = world.pipeline()
-                .expr("flecs.system.System, !MenuScene")
+                .with(Flecs.System)
+                .without(MenuScene.class)
                 .build();
 
         // Store pipeline ids on the world so observers can retrieve them.
-        world.obtainEntity(Flecs.World)
-                .set(new MenuScene(menu.id()))
+        world.set(new MenuScene(menu.id()))
                 .set(new GameScene(game.id()));
 
         // Observer for switching to the menu scene.
@@ -96,41 +95,25 @@ public class SceneManagement {
 
     private static void initSystems(World world, long menuSceneId, long gameSceneId) {
         // Runs every frame regardless of the current scene.
-        world.system("Print Position")
+        world.system("Print Position", Position.class)
                 .kind(Flecs.OnUpdate)
-                .with(Position.class)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        Entity entity = world.obtainEntity(it.entity(i));
-                        Position p = positions.get(i);
-                        System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
-                    }
+                .each(Position.class, (entityId, p) -> {
+                    Entity entity = world.obtainEntity(entityId);
+                    System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
                 });
 
         // Runs only when the game scene is active.
-        world.system("Characters Lose Health")
+        world.system("Characters Lose Health", Health.class)
                 .kind(gameSceneId)
-                .with(Health.class)
-                .iter(it -> {
-                    Field<Health> healths = it.field(Health.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        Health h = healths.get(i);
-                        System.out.println(h.value() + " health remaining");
-                        healths.set(i, new Health(h.value() - 1));
-                    }
+                .eachView(Health.class, (HealthView h) -> {
+                    System.out.println(h.value() + " health remaining");
+                    h.value(h.value() - 1);
                 });
 
         // Runs only when the menu scene is active.
-        world.system("Print Menu Button Text")
+        world.system("Print Menu Button Text", Button.class)
                 .kind(menuSceneId)
-                .with(Button.class)
-                .iter(it -> {
-                    Field<Button> buttons = it.field(Button.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        System.out.println("Button says \"" + buttons.get(i).text() + "\"");
-                    }
-                });
+                .each(Button.class, (Button b) -> System.out.println("Button says \"" + b.text() + "\""));
     }
 
     public static void main(String[] args) {
@@ -149,21 +132,21 @@ public class SceneManagement {
         initSystems(world, menuSceneId, gameSceneId);
 
         // Start in the menu scene.
-        world.obtainEntity(Flecs.World).add(activeSceneId, menuSceneId);
+        world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
         world.progress();
 
         // Switch to game scene and run a few frames.
-        world.obtainEntity(Flecs.World).add(activeSceneId, gameSceneId);
+        world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
         world.progress();
         world.progress();
         world.progress();
 
         // Switch back to menu.
-        world.obtainEntity(Flecs.World).add(activeSceneId, menuSceneId);
+        world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
         world.progress();
 
         // Switch back to game and run a few frames.
-        world.obtainEntity(Flecs.World).add(activeSceneId, gameSceneId);
+        world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
         world.progress();
         world.progress();
         world.progress();
