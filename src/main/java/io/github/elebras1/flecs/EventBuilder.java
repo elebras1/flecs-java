@@ -94,6 +94,12 @@ public class EventBuilder {
             if (this.payload != null) {
                 @SuppressWarnings("rawtypes")
                 Component component = this.world.componentRegistry().getComponent(this.payload.getClass());
+                if (deferred && flecs_h.ecs_has_id(this.world.worldSeg(), this.eventId, flecs_h.FLECS_IDEcsComponentID_())) {
+                    Component<?> eventComponent = this.world.componentRegistry().getComponentById(this.eventId);
+                    if (eventComponent.size() != component.size()) {
+                        throw new IllegalArgumentException("Event payload size (" + component.size() + ") does not match event type size (" + eventComponent.size() + ")");
+                    }
+                }
                 MemorySegment dataSeg = tempArena.allocate(component.layout());
                 component.write(dataSeg, 0, this.payload);
                 ecs_event_desc_t.param(descSeg, dataSeg);

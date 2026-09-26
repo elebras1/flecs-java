@@ -659,11 +659,8 @@ public class Entity extends EntityBase<Entity> {
         Observer observer = this.world.observer()
                 .event(eventId)
                 .with(Flecs.Any)
-                .each((entityId) -> {
-                    if (entityId == this.id) {
-                        callback.run();
-                    }
-                });
+                .src(this.id)
+                .iter(it -> callback.run());
         observer.add(Flecs.ChildOf, this.id);
         return observer;
     }
@@ -673,14 +670,11 @@ public class Entity extends EntityBase<Entity> {
         Observer observer = this.world.observer()
                 .event(eventId)
                 .with(Flecs.Any)
-                .iter((it) -> {
-                    for (int i = 0; i < it.count(); i++) {
-                        if (it.entityId(i) == this.id) {
-                            T eventData = this.tryGet(eventClass);
-                            if (eventData != null) {
-                                callback.accept(eventData);
-                            }
-                        }
+                .src(this.id)
+                .iter(it -> {
+                    T payload = it.payload(eventClass);
+                    if (payload != null) {
+                        callback.accept(payload);
                     }
                 });
         observer.add(Flecs.ChildOf, this.id);

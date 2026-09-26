@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -238,6 +239,16 @@ class EventTest {
         assertNotNull(seen.get());
         assertEquals(10.0f, seen.get().x());
         assertEquals(20.0f, seen.get().y());
+    }
+
+    @Test
+    void enqueueRejectsMismatchedPayload() {
+        long positionId = this.world.component(Position.class);
+        this.world.component(Mass.class);
+        Entity e1 = this.world.obtainEntity(this.world.entity());
+
+        assertThrows(IllegalArgumentException.class, () ->
+                this.world.event(positionId).entity(e1).payload(new Mass(1)).enqueue());
     }
 
     @Test
