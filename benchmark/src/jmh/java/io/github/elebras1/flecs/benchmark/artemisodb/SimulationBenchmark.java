@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5, time = 1)
 @Measurement(iterations = 5, time = 1)
 @State(Scope.Benchmark)
-public class QueryBenchmark {
+public class SimulationBenchmark {
 
     @Param({"1000", "10000", "100000"})
     public int n;
@@ -36,34 +36,28 @@ public class QueryBenchmark {
     private World ecsWorld;
     private ComponentMapper<Position> mPosition;
     private ComponentMapper<Velocity> mVelocity;
-    private EntitySubscription positionSubscription;
-    private EntitySubscription positionVelocitySubscription;
-    private EntitySubscription positionTagSubscription;
+    private EntitySubscription movement;
+    private int[] pool;
+    private int[] created;
+    private int cursor;
 
     @Setup(Level.Iteration)
     public void setup() {
         this.ecsWorld = new World(new WorldConfiguration());
         this.mPosition = this.ecsWorld.getMapper(Position.class);
         this.mVelocity = this.ecsWorld.getMapper(Velocity.class);
-        ComponentMapper<Tag> mTag = this.ecsWorld.getMapper(Tag.class);
+        this.pool = new int[this.n];
         for (int i = 0; i < this.n; i++) {
             int entityId = this.ecsWorld.create();
-            Position position = this.mPosition.create(entityId);
-            position.x = 1.0f;
-            position.y = 2.0f;
-            Velocity velocity = this.mVelocity.create(entityId);
-            velocity.dx = 0.5f;
-            velocity.dy = 0.25f;
-            mTag.create(entityId);
+            this.mPosition.create(entityId);
+            this.mVelocity.create(entityId);
+            this.pool[i] = entityId;
         }
         this.ecsWorld.process();
-
-        this.positionSubscription =
-                this.ecsWorld.getAspectSubscriptionManager().get(Aspect.all(Position.class));
-        this.positionVelocitySubscription =
-                this.ecsWorld.getAspectSubscriptionManager().get(Aspect.all(Position.class, Velocity.class));
-        this.positionTagSubscription =
-                this.ecsWorld.getAspectSubscriptionManager().get(Aspect.all(Position.class, Tag.class));
+        this.movement = this.ecsWorld.getAspectSubscriptionManager()
+                .get(Aspect.all(Position.class, Velocity.class));
+        this.created = new int[this.n / 10];
+        this.cursor = 0;
     }
 
     @TearDown(Level.Iteration)
@@ -72,40 +66,40 @@ public class QueryBenchmark {
     }
 
     @Benchmark
-    public double query1Read() {
+    public double mixedSimulation() {
+        int tenth = this.n / 10;
         double checksum = 0.0;
-        IntBag entities = this.positionSubscription.getEntities();
-        int[] ids = entities.getData();
-        for (int i = 0, s = entities.size(); i < s; i++) {
-            checksum += this.mPosition.get(ids[i]).x;
-        }
-        return checksum / this.n;
-    }
 
-    @Benchmark
-    public double query2ReadWrite() {
-        double checksum = 0.0;
-        IntBag entities = this.positionVelocitySubscription.getEntities();
+        for (int i = 0; i < tenth; i++) {
+            int entityId = this.ecsWorld.create();
+            Position position = this.mPosition.create(entityId);
+            position.x = 1.0f;
+            position.y = 2.0f;
+            Velocity velocity = this.mVelocity.create(entityId);
+            velocity.dx = 0.5f;
+            velocity.dy = 0.25f;
+            this.created[i] = entityId;
+        }
+        this.ecsWorld.process();
+
+        IntBag entities = this.movement.getEntities();
         int[] ids = entities.getData();
         for (int i = 0, s = entities.size(); i < s; i++) {
             Position position = this.mPosition.get(ids[i]);
             Velocity velocity = this.mVelocity.get(ids[i]);
             position.x += velocity.dx;
             position.y += velocity.dy;
-            checksum += position.x;
+            checksum += position.x + position.y;
         }
+
+        for (int i = 0; i < tenth; i++) {
+            int slot = (this.cursor + i) % this.n;
+            this.ecsWorld.delete(this.pool[slot]);
+            this.pool[slot] = this.created[i];
+        }
+        this.ecsWorld.process();
+        this.cursor = (this.cursor + tenth) % this.n;
+
         return checksum / this.n;
     }
-
-    @Benchmark
-    public double queryFiltered() {
-        double checksum = 0.0;
-        IntBag entities = this.positionTagSubscription.getEntities();
-        int[] ids = entities.getData();
-        for (int i = 0, s = entities.size(); i < s; i++) {
-            checksum += this.mPosition.get(ids[i]).x;
-        }
-        return checksum / this.n;
-    }
-
 }

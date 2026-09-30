@@ -1,53 +1,84 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
 
-#define _POSIX_C_SOURCE 199309L
+#define _POSIX_C_SOURCE 200809L
 
 #include <flecs.h>
+#include <stdatomic.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
-#define BENCH_ITERATIONS 100000
-#define BENCH_RUNS 50
+#define BENCH_IMPL "flecs-c"
+#ifdef BENCH_QUICK
 #define BENCH_WARMUP_RUNS 5
+#define BENCH_MEASURED_RUNS 7
+#else
+#define BENCH_WARMUP_RUNS 10
+#define BENCH_MEASURED_RUNS 20
+#endif
+#define BENCH_SEED 42u
+
+typedef struct {
+    float x;
+    float y;
+} Position;
+
+typedef struct {
+    float dx;
+    float dy;
+} Velocity;
+
+typedef struct {
+} BenchTag;
 
 typedef struct {
     int value;
 } Health;
 
-typedef struct {
-    int color;
-    int factionDriftingSpeed;
-    int stability;
-} Ideology;
-
+extern ECS_COMPONENT_DECLARE(Position);
+extern ECS_COMPONENT_DECLARE(Velocity);
+extern ECS_TAG_DECLARE(Tag);
 extern ECS_COMPONENT_DECLARE(Health);
-extern ECS_COMPONENT_DECLARE(Ideology);
+
+extern _Atomic unsigned long long bench_checksum;
+
+void bench_sink_u64(unsigned long long value);
+
+static inline uint32_t bench_f32_bits(float value) {
+    uint32_t bits;
+    memcpy(&bits, &value, sizeof(bits));
+    return bits;
+}
+
+static inline void bench_sink_f32(float value) {
+    bench_sink_u64((unsigned long long)bench_f32_bits(value));
+}
 
 typedef struct {
     const char *name;
-    double avg_us;
-    double per_op_us;
-    double stddev_us;
-    double error_us;
-    int runs;
-    int iterations;
-} BenchmarkResult;
+    int n;
+    void (*setup)(void *ctx);
+    void (*before_run)(void *ctx);
+    void (*run)(void *ctx);
+    void (*after_run)(void *ctx);
+    void (*fini)(void *ctx);
+    void *ctx;
+} Benchmark;
 
-double benchmark_time_us(void);
-void benchmark_print(const BenchmarkResult *result);
+void bench_run_benchmark(const Benchmark *benchmark);
 
+ecs_world_t *bench_world_new(void);
+void bench_shuffle(int *order, int n, unsigned seed);
 
-void benchmark_run(
-    const char *name,
-    void (*setup)(void *ctx),
-    void (*teardown)(void *ctx),
-    void (*fn)(void *ctx),
-    void *ctx,
-    BenchmarkResult *out
-);
+typedef struct {
+    const char *name;
+    void (*run)(int n);
+} BenchEntry;
 
-ecs_world_t *benchmark_world_new(void);
-
-void benchmark_world_populate(ecs_world_t *world, int count);
+extern const BenchEntry tier1_benchmarks[];
+extern const int tier1_benchmark_count;
+extern const BenchEntry tier2_benchmarks[];
+extern const int tier2_benchmark_count;
 
 #endif

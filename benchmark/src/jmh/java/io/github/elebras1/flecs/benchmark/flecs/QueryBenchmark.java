@@ -1,61 +1,116 @@
 package io.github.elebras1.flecs.benchmark.flecs;
 
-import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
 
 import java.util.concurrent.TimeUnit;
 
-@State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Fork(2)
+@Warmup(iterations = 5, time = 1)
+@Measurement(iterations = 5, time = 1)
+@State(Scope.Benchmark)
 public class QueryBenchmark {
 
-    private World ecsWorld;
-    private Query query;
+    @Param({"1000", "10000", "100000"})
+    public int n;
 
-    @Setup(Level.Trial)
+    private World world;
+    private Query query1;
+    private Query query2;
+    private Query queryFiltered;
+    private double checksum;
+
+    @Setup(Level.Iteration)
     public void setup() {
-        this.ecsWorld = new World();
-        this.ecsWorld.component(Health.class);
-        this.ecsWorld.component(Ideology.class);
-        for (int i = 0; i < 100_000; i++) {
-            long entityId = this.ecsWorld.entity();
-            Entity entity = this.ecsWorld.obtainEntity(entityId);
-            entity.set(new Health(100));
-            entity.set(new Ideology(0xFF0000, 10, 50));
+        this.world = new World();
+        this.world.component(Position.class);
+        this.world.component(Velocity.class);
+        this.world.component(Tag.class);
+        for (int i = 0; i < this.n; i++) {
+            this.world.obtainEntityView(this.world.entity())
+                    .insert(Position.class, (PositionView position) -> {
+                        position.x(1.0f);
+                        position.y(2.0f);
+                    })
+                    .insert(Velocity.class, (VelocityView velocity) -> {
+                        velocity.dx(0.5f);
+                        velocity.dy(0.25f);
+                    })
+                    .add(Tag.class);
         }
-        this.query = this.ecsWorld.query().with(Health.class).with(Ideology.class).build();
+        this.query1 = this.world.query().with(Position.class).build();
+        this.query2 = this.world.query().with(Position.class).with(Velocity.class).build();
+        this.queryFiltered = this.world.query().with(Position.class).with(Tag.class).build();
     }
 
-    @TearDown(Level.Trial)
+    @TearDown(Level.Iteration)
     public void tearDown() {
-        if (this.query != null) {
-            this.query.destroy();
+        if (this.query1 != null) {
+            this.query1.destroy();
+            this.query1 = null;
         }
-        if (this.ecsWorld != null) {
-            this.ecsWorld.destroy();
+        if (this.query2 != null) {
+            this.query2.destroy();
+            this.query2 = null;
+        }
+        if (this.queryFiltered != null) {
+            this.queryFiltered.destroy();
+            this.queryFiltered = null;
+        }
+        if (this.world != null) {
+            this.world.destroy();
+            this.world = null;
         }
     }
 
     @Benchmark
-    @OperationsPerInvocation(100_000)
-    public void query(Blackhole bh) {
-        this.query.eachView(Health.class, Ideology.class, (HealthView healthView, IdeologyView ideologyView) -> {
-            int v1 = healthView.value() + 1;
-            healthView.value(v1);
+    public double query1Read() {
+        this.checksum = 0.0;
+        this.query1.eachView(Position.class, (PositionView position) -> this.checksum += position.x());
+        return this.checksum / this.n;
+    }
 
-            int v2 = ideologyView.color() + 1;
-            ideologyView.color(v2);
-
-            int v3 = ideologyView.factionDriftingSpeed() + 1;
-            ideologyView.factionDriftingSpeed(v3);
-
-            bh.consume(v1);
-            bh.consume(v2);
-            bh.consume(v3);
+    @Benchmark
+    public double query2ReadWrite() {
+        this.checksum = 0.0;
+        this.query2.eachView(Position.class, Velocity.class, (PositionView position, VelocityView velocity) -> {
+            position.x(position.x() + velocity.dx());
+            position.y(position.y() + velocity.dy());
+            this.checksum += position.x();
         });
+        return this.checksum / this.n;
+    }
+
+    @Benchmark
+    public double queryFiltered() {
+        this.checksum = 0.0;
+        this.queryFiltered.eachView(Position.class, (PositionView position) -> this.checksum += position.x());
+        return this.checksum / this.n;
+    }
+
+    @Benchmark
+    public double queryCreate() {
+        long checksum = 0L;
+        for (int i = 0; i < this.n; i++) {
+            Query query = this.world.query().with(Position.class).with(Velocity.class).build();
+            checksum++;
+            query.destroy();
+        }
+        return (double) checksum / this.n;
     }
 }

@@ -11,7 +11,9 @@ plugins {
 }
 
 group = "io.github.elebras1"
-version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: project.findProperty("version") as String? ?: "0.1-SNAPSHOT"
+version = System.getenv("GITHUB_REF_NAME")?.takeIf { it.isNotBlank() }?.removePrefix("v")
+    ?: (project.findProperty("version") as? String)?.takeIf { it != "unspecified" }
+    ?: "0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -72,6 +74,8 @@ val archFlag = when (nativeArch) {
     "linux-aarch64", "windows-aarch64", "macos-aarch64" -> "-march=armv8-a"
     else -> "-march=native"
 }
+
+extra["archFlag"] = archFlag
 
 val downloadFlecs by tasks.registering {
     description = "Download Flecs release from GitHub"

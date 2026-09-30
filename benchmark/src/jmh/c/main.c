@@ -1,42 +1,25 @@
 #include "benchmark.h"
-#include "entity_creation_benchmark.h"
-#include "query_benchmark.h"
-#include "entity_remove_benchmark.h"
 
+#include <locale.h>
 #include <stdio.h>
-#include <time.h>
 
-static void print_header(void) {
-    time_t now = time(NULL);
-    char buf[32];
-    printf("  Runs       : %d  |  Warmup: %d  |  Iterations: %d\n");
+static void bench_run_entries(const BenchEntry *entries, int count, int n) {
+    for (int i = 0; i < count; i++) {
+        entries[i].run(n);
+    }
 }
 
 int main(void) {
-    print_header();
+    setlocale(LC_NUMERIC, "C");
 
-    BenchmarkResult result;
+    static const int counts[] = { 1000, 10000, 100000 };
 
-    benchmark_create(&result);
-    benchmark_print(&result);
+    for (int i = 0; i < (int)(sizeof(counts) / sizeof(counts[0])); i++) {
+        bench_run_entries(tier1_benchmarks, tier1_benchmark_count, counts[i]);
+        bench_run_entries(tier2_benchmarks, tier2_benchmark_count, counts[i]);
+    }
 
-    benchmark_create_with_2_components(&result);
-    benchmark_print(&result);
-
-    benchmark_create_with_2_components_from_prefab(&result);
-    benchmark_print(&result);
-
-    benchmark_query(&result);
-    benchmark_print(&result);
-
-    benchmark_destruct_with_2_components(&result);
-    benchmark_print(&result);
-
-    benchmark_remove_1_components(&result);
-    benchmark_print(&result);
-
-    benchmark_remove_2_components(&result);
-    benchmark_print(&result);
-
+    printf("DONE\n");
+    fflush(stdout);
     return 0;
 }
