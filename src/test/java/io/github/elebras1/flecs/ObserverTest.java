@@ -1,6 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Position;
+import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import org.junit.jupiter.api.AfterEach;
@@ -800,5 +801,47 @@ class ObserverTest {
                 .each(entityId -> { });
 
         assertNotEquals(0, observer.id());
+    }
+
+    @Test
+    void multiThreadedEachViewDoesNotShareViews() throws Exception {
+        int n = 100_000;
+        int threads = 4;
+        this.world.setThreads(threads);
+
+        long[] ids = this.world.entityBulk(n);
+
+        AtomicInteger calls = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .eachView(Position.class, (PositionView position) -> {
+                    position.x(position.x() + 1.0f);
+                    calls.incrementAndGet();
+                });
+
+        this.world.readonlyBegin(true);
+        Thread[] workers = new Thread[threads];
+        for (int t = 0; t < threads; t++) {
+            World stage = this.world.getStage(t);
+            int from = t * n / threads;
+            int to = (t + 1) * n / threads;
+            workers[t] = new Thread(() -> {
+                for (int i = from; i < to; i++) {
+                    stage.obtainEntity(ids[i]).add(Position.class);
+                }
+            });
+            workers[t].start();
+        }
+        for (Thread worker : workers) {
+            worker.join();
+        }
+        this.world.readonlyEnd();
+
+        assertEquals(n, calls.get());
+        for (long id : ids) {
+            Position position = this.world.obtainEntity(id).get(Position.class);
+            assertEquals(1.0f, position.x(), 0.0f, "entity " + id);
+        }
     }
 }

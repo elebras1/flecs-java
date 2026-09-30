@@ -113,7 +113,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         appendLine(body, 3, "}");
 
-        emitComponentLookups(body, 3, n, vm);
+        emitComponentLookups(body, 3, n, vm, false);
 
         if (vm == ViewMode.COMPONENT_VIEW) {
             appendStatement(body, 3, "this.world.viewCache().resetCursors()");
@@ -152,7 +152,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         appendLine(body, 3, "}");
 
-        emitComponentLookups(body, 3, n, vm);
+        emitComponentLookups(body, 3, n, vm, false);
 
         if (vm == ViewMode.COMPONENT_VIEW) {
             appendStatement(body, 3, "this.world.viewCache().resetCursors()");
@@ -238,20 +238,33 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
 
     private void appendBuilderEachMethod(CodeBuilder body, int n, ViewMode vm, EntityMode em, BuilderKind kind) {
         boolean runEach = kind == BuilderKind.SYSTEM;
+        boolean stageScopedViews = runEach && vm == ViewMode.COMPONENT_VIEW;
         String actionType = runEach ? ECS_RUN_ACTION_T_FQN : ECS_ITER_ACTION_T_FQN;
         int bodyIndent = runEach ? 4 : 3;
         int loopIndent = bodyIndent + 1;
 
         appendEachMethodSignature(body, n, vm, em, kind.returnType, "each");
-        emitComponentLookups(body, 2, n, vm);
+        emitComponentLookups(body, 2, n, vm, stageScopedViews);
 
         appendLine(body, 2, simpleName(MEMORY_SEGMENT_FQN) + " callbackStub = " + simpleName(actionType)
                 + ".allocate(iterSegment -> {");
         if (runEach) {
+            if (stageScopedViews) {
+                appendStatement(body, 3, simpleName(WORLD_FQN) + " stageWorld = this.iterFor(iterSegment).world()");
+            }
             appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSegment)) {");
         }
         if (vm == ViewMode.COMPONENT_VIEW) {
-            appendStatement(body, bodyIndent, "this.world.viewCache().resetCursors()");
+            String cacheOwner = stageScopedViews ? "stageWorld" : "this.world";
+            appendStatement(body, bodyIndent, cacheOwner + ".viewCache().resetCursors()");
+            if (stageScopedViews) {
+                for (int i = 0; i < n; i++) {
+                    String comp = letter(i);
+                    String view = "V" + comp;
+                    appendStatement(body, bodyIndent, view + " componentView" + comp + " = (" + view
+                            + ") stageWorld.viewCache().getComponentView(componentClass" + comp + ")");
+                }
+            }
         }
         if (em == EntityMode.WITH_ITER) {
             appendStatement(body, bodyIndent, "Iter iter = this.iterFor(iterSegment)");
@@ -405,7 +418,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendLine(body, 1, signature.toString());
     }
 
-    private void emitComponentLookups(CodeBuilder body, int level, int n, ViewMode vm) {
+    private void emitComponentLookups(CodeBuilder body, int level, int n, ViewMode vm, boolean stageScopedViews) {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             if (vm == ViewMode.COMPONENT_VIEW) {
@@ -416,7 +429,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                         + " = this.world.componentRegistry().getComponent(componentClass" + comp + ")");
             }
         }
-        if (vm == ViewMode.COMPONENT_VIEW) {
+        if (vm == ViewMode.COMPONENT_VIEW && !stageScopedViews) {
             for (int i = 0; i < n; i++) {
                 String comp = letter(i);
                 String view = "V" + comp;

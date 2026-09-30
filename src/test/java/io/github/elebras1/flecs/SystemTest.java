@@ -5,6 +5,7 @@ import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
+import io.github.elebras1.flecs.component.VelocityView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -314,5 +315,37 @@ class SystemTest {
         assertTrue(timer.isAlive());
         timer.stop();
         assertTrue(timer.isAlive());
+    }
+
+    @Test
+    void multiThreadedEachViewWritesEveryEntity() {
+        int n = 200_000;
+        int steps = 10;
+        this.world.setThreads(4);
+
+        long[] ids = this.world.entityBulk(n, Position.class, Velocity.class);
+        for (long id : ids) {
+            VelocityView velocity = this.world.obtainEntityView(id).getMutView(Velocity.class);
+            velocity.x(1.0f);
+            velocity.y(1.0f);
+        }
+
+        this.world.system("MoveAll", Position.class, Velocity.class)
+                .kind(Flecs.OnUpdate)
+                .multiThreaded(true)
+                .eachView(Position.class, Velocity.class, (PositionView position, VelocityView velocity) -> {
+                    position.x(position.x() + velocity.x());
+                    position.y(position.y() + velocity.y());
+                });
+
+        for (int step = 0; step < steps; step++) {
+            this.world.progress();
+        }
+
+        for (long id : ids) {
+            Position position = this.world.obtainEntity(id).get(Position.class);
+            assertEquals(steps, position.x(), 0.0f, "entity " + id + " x");
+            assertEquals(steps, position.y(), 0.0f, "entity " + id + " y");
+        }
     }
 }
