@@ -25,7 +25,7 @@ public class FlecsSystem extends Entity {
             return;
         }
         MemorySegment ctxSeg = ecs_system_t.ctx(sysSeg);
-        if (ctxSeg != null && ctxSeg.address() != 0) {
+        if (ctxSeg != null && ctxSeg.address() != 0 && ctxSeg.address() != ParamRegistry.NO_CTX) {
             ParamRegistry.remove(ctxSeg.address());
             this.world.untrackCtx(ctxSeg.address());
         }
@@ -67,7 +67,7 @@ public class FlecsSystem extends Entity {
             return null;
         }
         MemorySegment ctxSeg = ecs_system_t.ctx(sysSeg);
-        if (ctxSeg == null || ctxSeg.address() == 0) {
+        if (ctxSeg == null || ctxSeg.address() == 0 || ctxSeg.address() == ParamRegistry.NO_CTX) {
             return null;
         }
         return ParamRegistry.get(ctxSeg.address());
@@ -77,13 +77,13 @@ public class FlecsSystem extends Entity {
         MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.id);
         if (sysSeg != null && sysSeg.address() != 0) {
             MemorySegment oldCtx = ecs_system_t.ctx(sysSeg);
-            if (oldCtx != null && oldCtx.address() != 0) {
+            if (oldCtx != null && oldCtx.address() != 0 && oldCtx.address() != ParamRegistry.NO_CTX) {
                 ParamRegistry.remove(oldCtx.address());
                 this.world.untrackCtx(oldCtx.address());
             }
         }
 
-        MemorySegment ctxPtr = MemorySegment.NULL;
+        MemorySegment ctxPtr = MemorySegment.ofAddress(ParamRegistry.NO_CTX);
         if (ctx != null) {
             long id = ParamRegistry.put(ctx);
             ctxPtr = MemorySegment.ofAddress(id);

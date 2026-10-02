@@ -4,10 +4,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class ParamRegistry {
+    public static final long NO_CTX;
     private static final AtomicLong COUNTER;
     private static final ConcurrentHashMap<Long, Object> TABLE;
 
     static {
+        NO_CTX  = Long.MAX_VALUE;
         COUNTER = new AtomicLong(1);
         TABLE = new ConcurrentHashMap<>();
     }

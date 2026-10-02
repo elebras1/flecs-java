@@ -822,6 +822,26 @@ class ObserverTest {
     }
 
     @Test
+    void setCtxNullClearsObserverCtx() {
+        Observer observer = this.world.observer("CtxObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .each(entityId -> { });
+
+        observer.setCtx(new Object());
+        MemorySegment obsSeg = flecs_h.ecs_observer_get(this.world.worldSeg(), observer.id());
+        long oldCtxId = ecs_observer_t.ctx(obsSeg).address();
+        assertNotNull(ParamRegistry.get(oldCtxId));
+
+        observer.setCtx(null);
+
+        assertNull(observer.getCtx());
+        assertNull(ParamRegistry.get(oldCtxId));
+        obsSeg = flecs_h.ecs_observer_get(this.world.worldSeg(), observer.id());
+        assertEquals(ParamRegistry.NO_CTX, ecs_observer_t.ctx(obsSeg).address());
+    }
+
+    @Test
     void multiThreadedEachViewDoesNotShareViews() throws Exception {
         int n = 100_000;
         int threads = 4;

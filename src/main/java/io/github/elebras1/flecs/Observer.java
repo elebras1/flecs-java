@@ -24,7 +24,7 @@ public class Observer extends Entity {
             return;
         }
         MemorySegment ctxSeg = ecs_observer_t.ctx(obsSeg);
-        if (ctxSeg != null && ctxSeg.address() != 0) {
+        if (ctxSeg != null && ctxSeg.address() != 0 && ctxSeg.address() != ParamRegistry.NO_CTX) {
             ParamRegistry.remove(ctxSeg.address());
             this.world.untrackCtx(ctxSeg.address());
         }
@@ -36,7 +36,7 @@ public class Observer extends Entity {
             return null;
         }
         MemorySegment ctxSeg = ecs_observer_t.ctx(obsSeg);
-        if (ctxSeg == null || ctxSeg.address() == 0) {
+        if (ctxSeg == null || ctxSeg.address() == 0 || ctxSeg.address() == ParamRegistry.NO_CTX) {
             return null;
         }
         return ParamRegistry.get(ctxSeg.address());
@@ -45,7 +45,7 @@ public class Observer extends Entity {
     public void setCtx(Object ctx) {
         this.removeCtxEntry();
 
-        MemorySegment ctxPtr = MemorySegment.NULL;
+        MemorySegment ctxPtr = MemorySegment.ofAddress(ParamRegistry.NO_CTX);
         if (ctx != null) {
             long id = ParamRegistry.put(ctx);
             ctxPtr = MemorySegment.ofAddress(id);

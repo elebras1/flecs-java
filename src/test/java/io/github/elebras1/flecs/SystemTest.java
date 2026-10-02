@@ -334,6 +334,24 @@ class SystemTest {
     }
 
     @Test
+    void setCtxNullClearsSystemCtx() {
+        FlecsSystem system = this.world.system("CtxSystem", Position.class)
+                .each(Position.class, p -> { });
+
+        system.setCtx(new Object());
+        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), system.id());
+        long oldCtxId = ecs_system_t.ctx(sysSeg).address();
+        assertNotNull(ParamRegistry.get(oldCtxId));
+
+        system.setCtx(null);
+
+        assertNull(system.getCtx());
+        assertNull(ParamRegistry.get(oldCtxId));
+        sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), system.id());
+        assertEquals(ParamRegistry.NO_CTX, ecs_system_t.ctx(sysSeg).address());
+    }
+
+    @Test
     void multiThreadedEachViewWritesEveryEntity() {
         int n = 200_000;
         int steps = 10;
