@@ -262,7 +262,7 @@ public class Iter {
         }
     }
 
-    public void destroy() {
+    public void destruct() {
         int flags = ecs_iter_t.flags(this.iterSeg);
         MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
         if((flags & flecs_h.EcsIterIsValid()) != 0 && tableSeg.address() != 0) {

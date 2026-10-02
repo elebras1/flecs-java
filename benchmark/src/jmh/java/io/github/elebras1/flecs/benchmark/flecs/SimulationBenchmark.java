@@ -50,11 +50,10 @@ public class SimulationBenchmark {
     @TearDown(Level.Iteration)
     public void tearDown() {
         if (this.movement != null) {
-            this.movement.destroy();
             this.movement = null;
         }
         if (this.world != null) {
-            this.world.destroy();
+            this.world.close();
             this.world = null;
         }
     }

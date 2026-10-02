@@ -12,23 +12,23 @@ import io.github.elebras1.flecs.Flecs;
 public class YieldExisting {
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
+        try (World world = new World()) {
+            world.component(Position.class);
 
-        // Create entities before the observer exists.
-        world.obtainEntity(world.entity("e1")).set(new Position(10, 20));
-        world.obtainEntity(world.entity("e2")).set(new Position(20, 30));
+            // Create entities before the observer exists.
+            world.obtainEntity(world.entity("e1")).set(new Position(10, 20));
+            world.obtainEntity(world.entity("e2")).set(new Position(20, 30));
 
-        // Create an observer that fires once for every existing match.
-        world.observer()
-                .event(Flecs.OnSet)
-                .with(Position.class)
-                .yieldExisting()
-                .each(Position.class, (Iter it, int index, Position p) -> {
-                    System.out.println(" - OnSet: Position: " + world.obtainEntity(it.entity(index)).name() + ": {" + p.x() + ", " + p.y() + "}");
-                });
+            // Create an observer that fires once for every existing match.
+            world.observer()
+                    .event(Flecs.OnSet)
+                    .with(Position.class)
+                    .yieldExisting()
+                    .each(Position.class, (Iter it, int index, Position p) -> {
+                        System.out.println(" - OnSet: Position: " + world.obtainEntity(it.entity(index)).name() + ": {" + p.x() + ", " + p.y() + "}");
+                    });
 
-        world.destroy();
+        }
     }
 
     // Output:

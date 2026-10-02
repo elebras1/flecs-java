@@ -4,10 +4,12 @@ import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.callback.ComparatorId;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +32,7 @@ class ObserverTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -801,6 +803,22 @@ class ObserverTest {
                 .each(entityId -> { });
 
         assertNotEquals(0, observer.id());
+    }
+
+    @Test
+    void destructRemovesObserverCtxEntry() {
+        Observer observer = this.world.observer("CtxObserver")
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .each(entityId -> { });
+
+        observer.setCtx(new Object());
+        MemorySegment obsSeg = flecs_h.ecs_observer_get(this.world.worldSeg(), observer.id());
+        long ctxId = ecs_observer_t.ctx(obsSeg).address();
+        assertNotNull(ParamRegistry.get(ctxId));
+
+        observer.destruct();
+        assertNull(ParamRegistry.get(ctxId));
     }
 
     @Test

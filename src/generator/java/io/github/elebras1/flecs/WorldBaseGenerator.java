@@ -86,7 +86,7 @@ public class WorldBaseGenerator extends AbstractBaseGenerator {
         appendLine(body, 2, "try {");
         appendStatement(body, 3, "query." + methodName + "(" + join(compArgs) + ", callback)");
         appendLine(body, 2, "} finally {");
-        appendStatement(body, 3, "query.destroy()");
+        appendStatement(body, 3, "query.destruct()");
         appendLine(body, 2, "}");
         appendLine(body, 1, "}");
     }

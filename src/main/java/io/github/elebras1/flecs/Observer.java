@@ -14,6 +14,7 @@ public class Observer extends Entity {
     @Override
     public void destruct() {
         this.removeCtxEntry();
+        this.world.unregisterObserverCallbacks(this.id);
         super.destruct();
     }
 

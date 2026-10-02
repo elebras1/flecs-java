@@ -117,41 +117,41 @@ public class SceneManagement {
     }
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(ActiveScene.class);
-        long sceneRootId = world.component(SceneRoot.class);
-        long menuSceneId = world.component(MenuScene.class);
-        long gameSceneId = world.component(GameScene.class);
-        world.component(Character.class);
-        world.component(Health.class);
-        world.component(Position.class);
-        world.component(Button.class);
+        try (World world = new World()) {
+            world.component(ActiveScene.class);
+            long sceneRootId = world.component(SceneRoot.class);
+            long menuSceneId = world.component(MenuScene.class);
+            long gameSceneId = world.component(GameScene.class);
+            world.component(Character.class);
+            world.component(Health.class);
+            world.component(Position.class);
+            world.component(Button.class);
 
-        long activeSceneId = world.component(ActiveScene.class);
-        initScenes(world, activeSceneId, sceneRootId, menuSceneId, gameSceneId);
-        initSystems(world, menuSceneId, gameSceneId);
+            long activeSceneId = world.component(ActiveScene.class);
+            initScenes(world, activeSceneId, sceneRootId, menuSceneId, gameSceneId);
+            initSystems(world, menuSceneId, gameSceneId);
 
-        // Start in the menu scene.
-        world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
-        world.progress();
+            // Start in the menu scene.
+            world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
+            world.progress();
 
-        // Switch to game scene and run a few frames.
-        world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
-        world.progress();
-        world.progress();
-        world.progress();
+            // Switch to game scene and run a few frames.
+            world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
+            world.progress();
+            world.progress();
+            world.progress();
 
-        // Switch back to menu.
-        world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
-        world.progress();
+            // Switch back to menu.
+            world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
+            world.progress();
 
-        // Switch back to game and run a few frames.
-        world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
-        world.progress();
-        world.progress();
-        world.progress();
+            // Switch back to game and run a few frames.
+            world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
+            world.progress();
+            world.progress();
+            world.progress();
 
-        world.destroy();
+        }
     }
 
     // Output:

@@ -15,71 +15,71 @@ import io.github.elebras1.flecs.Flecs;
 public class SyncPointDelete {
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        world.component(Velocity.class);
+        try (World world = new World()) {
+            world.component(Position.class);
+            world.component(Velocity.class);
 
-        // Basic move system.
-        world.system("Move")
-                .kind(Flecs.OnUpdate)
-                .with(Position.class)
-                .with(Velocity.class)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    Field<Velocity> velocities = it.field(Velocity.class, 1);
-                    for (int i = 0; i < it.count(); i++) {
-                        Position p = positions.get(i);
-                        Velocity v = velocities.get(i);
-                        positions.set(i, new Position(p.x() + v.dx(), p.y() + v.dy()));
-                    }
-                });
-
-        // Delete entities when p.x >= 3. The deletion is a structural change
-        // that can remove any component, so mark the wildcard as written. This
-        // forces the scheduler to insert a sync point before the next system.
-        world.system("DeleteEntity")
-                .kind(Flecs.OnUpdate)
-                .with(Position.class)
-                .write(Flecs.Wildcard)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        Position p = positions.get(i);
-                        if (p.x() >= 3) {
-                            Entity entity = world.obtainEntity(it.entity(i));
-                            System.out.println("Delete entity " + entity.name());
-                            entity.destruct();
+            // Basic move system.
+            world.system("Move")
+                    .kind(Flecs.OnUpdate)
+                    .with(Position.class)
+                    .with(Velocity.class)
+                    .iter(it -> {
+                        Field<Position> positions = it.field(Position.class, 0);
+                        Field<Velocity> velocities = it.field(Velocity.class, 1);
+                        for (int i = 0; i < it.count(); i++) {
+                            Position p = positions.get(i);
+                            Velocity v = velocities.get(i);
+                            positions.set(i, new Position(p.x() + v.dx(), p.y() + v.dy()));
                         }
-                    }
-                });
+                    });
 
-        // Print resulting Position.
-        world.system("PrintPosition")
-                .kind(Flecs.OnUpdate)
-                .with(Position.class)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        Entity entity = world.obtainEntity(it.entity(i));
-                        Position p = positions.get(i);
-                        System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
-                    }
-                });
+            // Delete entities when p.x >= 3. The deletion is a structural change
+            // that can remove any component, so mark the wildcard as written. This
+            // forces the scheduler to insert a sync point before the next system.
+            world.system("DeleteEntity")
+                    .kind(Flecs.OnUpdate)
+                    .with(Position.class)
+                    .write(Flecs.Wildcard)
+                    .iter(it -> {
+                        Field<Position> positions = it.field(Position.class, 0);
+                        for (int i = 0; i < it.count(); i++) {
+                            Position p = positions.get(i);
+                            if (p.x() >= 3) {
+                                Entity entity = world.obtainEntity(it.entity(i));
+                                System.out.println("Delete entity " + entity.name());
+                                entity.destruct();
+                            }
+                        }
+                    });
 
-        world.obtainEntity(world.entity("e1"))
-                .set(new Position(0, 0))
-                .set(new Velocity(1, 2));
+            // Print resulting Position.
+            world.system("PrintPosition")
+                    .kind(Flecs.OnUpdate)
+                    .with(Position.class)
+                    .iter(it -> {
+                        Field<Position> positions = it.field(Position.class, 0);
+                        for (int i = 0; i < it.count(); i++) {
+                            Entity entity = world.obtainEntity(it.entity(i));
+                            Position p = positions.get(i);
+                            System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
+                        }
+                    });
 
-        world.obtainEntity(world.entity("e2"))
-                .set(new Position(1, 2))
-                .set(new Velocity(1, 2));
+            world.obtainEntity(world.entity("e1"))
+                    .set(new Position(0, 0))
+                    .set(new Velocity(1, 2));
 
-        // Run until all entities are deleted.
-        while (world.count(Position.class) > 0) {
-            world.progress();
+            world.obtainEntity(world.entity("e2"))
+                    .set(new Position(1, 2))
+                    .set(new Velocity(1, 2));
+
+            // Run until all entities are deleted.
+            while (world.count(Position.class) > 0) {
+                world.progress();
+            }
+
         }
-
-        world.destroy();
     }
 
     // Output:

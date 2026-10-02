@@ -12,36 +12,36 @@ import io.github.elebras1.flecs.Flecs;
 public class CustomPhases {
 
     static void main(String[] args) {
-        World world = new World();
+        try (World world = new World()) {
 
-        // Create two custom phases that branch off of EcsOnUpdate. Note that
-        // the phases have the Phase tag, which is necessary for the builtin
-        // pipeline to discover which systems it should run.
-        Entity physics = world.obtainEntity(world.entity("Physics"));
-        physics.add(Flecs.Phase);
-        physics.dependsOn(Flecs.OnUpdate);
+            // Create two custom phases that branch off of EcsOnUpdate. Note that
+            // the phases have the Phase tag, which is necessary for the builtin
+            // pipeline to discover which systems it should run.
+            Entity physics = world.obtainEntity(world.entity("Physics"));
+            physics.add(Flecs.Phase);
+            physics.dependsOn(Flecs.OnUpdate);
 
-        Entity collisions = world.obtainEntity(world.entity("Collisions"));
-        collisions.add(Flecs.Phase);
-        collisions.dependsOn(physics);
+            Entity collisions = world.obtainEntity(world.entity("Collisions"));
+            collisions.add(Flecs.Phase);
+            collisions.dependsOn(physics);
 
-        // Create 3 dummy systems.
-        world.system("CollisionSystem")
-                .kind(collisions.id())
-                .run(it -> System.out.println("system CollisionSystem"));
+            // Create 3 dummy systems.
+            world.system("CollisionSystem")
+                    .kind(collisions.id())
+                    .run(it -> System.out.println("system CollisionSystem"));
 
-        world.system("PhysicsSystem")
-                .kind(physics.id())
-                .run(it -> System.out.println("system PhysicsSystem"));
+            world.system("PhysicsSystem")
+                    .kind(physics.id())
+                    .run(it -> System.out.println("system PhysicsSystem"));
 
-        world.system("GameSystem")
-                .kind(Flecs.OnUpdate)
-                .run(it -> System.out.println("system GameSystem"));
+            world.system("GameSystem")
+                    .kind(Flecs.OnUpdate)
+                    .run(it -> System.out.println("system GameSystem"));
 
-        // Run the pipeline once.
-        world.progress(0.016f);
+            // Run the pipeline once.
+            world.progress(0.016f);
 
-        world.destroy();
+        }
     }
 
     // Output:

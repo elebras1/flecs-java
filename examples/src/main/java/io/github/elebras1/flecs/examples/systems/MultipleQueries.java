@@ -28,85 +28,83 @@ public class MultipleQueries {
     }
 
     static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        world.component(Bee.class);
-        world.component(Flower.class);
+        try (World world = new World()) {
+            world.component(Position.class);
+            world.component(Bee.class);
+            world.component(Flower.class);
 
-        // Create two queries. Since they'll stick around until the end of the
-        // ECS world, give them a name which makes them easier to find in the
-        // explorer. Named queries default to cached.
-        Query bees = world.query().with(Position.class).with(Bee.class).cached().build();
-        Query flowers = world.query().with(Position.class).with(Flower.class).cached().build();
+            // Create two queries. Since they'll stick around until the end of the
+            // ECS world, give them a name which makes them easier to find in the
+            // explorer. Named queries default to cached.
+            Query bees = world.query().with(Position.class).with(Bee.class).cached().build();
+            Query flowers = world.query().with(Position.class).with(Flower.class).cached().build();
 
-        // Find the closest in range flower for each bee.
-        world.system("FlowersAndTheBees")
-                .kind(Flecs.OnUpdate)
-                .run(it -> {
-                    bees.iter(beeIt -> {
-                        for (int b = 0; b < beeIt.count(); b++) {
-                            final int beeIndex = b;
-                            long beeId = beeIt.entity(beeIndex);
-                            Position pBee = beeIt.field(Position.class, 0).get(beeIndex);
+            // Find the closest in range flower for each bee.
+            world.system("FlowersAndTheBees")
+                    .kind(Flecs.OnUpdate)
+                    .run(it -> {
+                        bees.iter(beeIt -> {
+                            for (int b = 0; b < beeIt.count(); b++) {
+                                final int beeIndex = b;
+                                long beeId = beeIt.entity(beeIndex);
+                                Position pBee = beeIt.field(Position.class, 0).get(beeIndex);
 
-                            SearchResult result = findClosestFlower(pBee, flowers);
+                                SearchResult result = findClosestFlower(pBee, flowers);
 
-                            if (result.flower != 0) {
-                                beeIt.field(Bee.class, 1).set(beeIndex, new Bee(result.flower));
-                                Entity beeEntity = world.obtainEntity(beeId);
-                                Entity flowerEntity = world.obtainEntity(result.flower);
-                                System.out.println("Bee " + beeEntity.name() + " picked flower " + flowerEntity.name());
-                            }
-                        }
-                    });
-                });
-
-        // Find bees that picked the same flower.
-        world.system("BumpingBees")
-                .kind(Flecs.OnUpdate)
-                .run(it -> {
-                    bees.iter(beeIt -> {
-                        for (int i = 0; i < beeIt.count(); i++) {
-                            final int idx = i;
-                            long bee1 = beeIt.entity(idx);
-                            Bee b1 = beeIt.field(Bee.class, 1).get(idx);
-                            if (b1.flower() == 0) {
-                                continue;
-                            }
-
-                            bees.iter(otherBeeIt -> {
-                                for (int j = 0; j < otherBeeIt.count(); j++) {
-                                    long bee2 = otherBeeIt.entity(j);
-                                    Bee b2 = otherBeeIt.field(Bee.class, 1).get(j);
-                                    if (bee1 > bee2 && b2.flower() != 0 && b1.flower() == b2.flower()) {
-                                        Entity e1 = world.obtainEntity(bee1);
-                                        Entity e2 = world.obtainEntity(bee2);
-                                        System.out.println("Bee " + e1.name() + " and bee " + e2.name() + " bumped into each other");
-                                    }
+                                if (result.flower != 0) {
+                                    beeIt.field(Bee.class, 1).set(beeIndex, new Bee(result.flower));
+                                    Entity beeEntity = world.obtainEntity(beeId);
+                                    Entity flowerEntity = world.obtainEntity(result.flower);
+                                    System.out.println("Bee " + beeEntity.name() + " picked flower " + flowerEntity.name());
                                 }
-                            });
-                        }
+                            }
+                        });
                     });
-                });
 
-        // Create flowers and bees.
-        Random rand = new Random();
-        for (int i = 0; i < 5; i++) {
-            world.obtainEntity(world.entity("Bee_" + i))
-                    .set(new Position(randf(rand, 20), randf(rand, 20)))
-                    .set(new Bee(0));
+            // Find bees that picked the same flower.
+            world.system("BumpingBees")
+                    .kind(Flecs.OnUpdate)
+                    .run(it -> {
+                        bees.iter(beeIt -> {
+                            for (int i = 0; i < beeIt.count(); i++) {
+                                final int idx = i;
+                                long bee1 = beeIt.entity(idx);
+                                Bee b1 = beeIt.field(Bee.class, 1).get(idx);
+                                if (b1.flower() == 0) {
+                                    continue;
+                                }
+
+                                bees.iter(otherBeeIt -> {
+                                    for (int j = 0; j < otherBeeIt.count(); j++) {
+                                        long bee2 = otherBeeIt.entity(j);
+                                        Bee b2 = otherBeeIt.field(Bee.class, 1).get(j);
+                                        if (bee1 > bee2 && b2.flower() != 0 && b1.flower() == b2.flower()) {
+                                            Entity e1 = world.obtainEntity(bee1);
+                                            Entity e2 = world.obtainEntity(bee2);
+                                            System.out.println("Bee " + e1.name() + " and bee " + e2.name() + " bumped into each other");
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+            // Create flowers and bees.
+            Random rand = new Random();
+            for (int i = 0; i < 5; i++) {
+                world.obtainEntity(world.entity("Bee_" + i))
+                        .set(new Position(randf(rand, 20), randf(rand, 20)))
+                        .set(new Bee(0));
+            }
+            for (int i = 0; i < 10; i++) {
+                world.obtainEntity(world.entity("Flower_" + i))
+                        .set(new Position(randf(rand, 20), randf(rand, 20)))
+                        .set(new Flower());
+            }
+
+            world.progress(0.016f);
+
         }
-        for (int i = 0; i < 10; i++) {
-            world.obtainEntity(world.entity("Flower_" + i))
-                    .set(new Position(randf(rand, 20), randf(rand, 20)))
-                    .set(new Flower());
-        }
-
-        world.progress(0.016f);
-
-        bees.destroy();
-        flowers.destroy();
-        world.destroy();
     }
 
     private static SearchResult findClosestFlower(Position beePos, Query flowers) {

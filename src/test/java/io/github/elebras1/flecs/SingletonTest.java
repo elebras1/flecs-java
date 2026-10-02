@@ -27,7 +27,7 @@ class SingletonTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -82,7 +82,6 @@ class SingletonTest {
         });
 
         assertEquals(List.of(10.0f, 20.0f, 10.0f, 20.0f), values);
-        query.destroy();
     }
 
     private void setupMassSingleton(float value) {
@@ -163,7 +162,6 @@ class SingletonTest {
         query.each(Mass.class, m -> values.add(m.value()));
 
         assertEquals(List.of(1.5f), values);
-        query.destroy();
     }
 
     @Test
@@ -175,7 +173,6 @@ class SingletonTest {
         query.each(Mass.class, (entityId, m) -> entities.add(entityId));
 
         assertTrue(entities.isEmpty());
-        query.destroy();
     }
 
     @Test
@@ -189,7 +186,6 @@ class SingletonTest {
         query.each(Position.class, Mass.class, (p, m) -> values.add(m.value()));
 
         assertEquals(List.of(1.5f, 1.5f), values);
-        query.destroy();
     }
 
     @Test
@@ -204,7 +200,6 @@ class SingletonTest {
         });
 
         assertEquals(List.of(1.5f), values);
-        query.destroy();
     }
 
     @Test
@@ -221,7 +216,6 @@ class SingletonTest {
         });
 
         assertEquals(List.of(1.5f), values);
-        query.destroy();
     }
 
     @Test

@@ -8,45 +8,45 @@ import io.github.elebras1.flecs.examples.components.Walking;
 public class EntityBasics {
 
     static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        world.component(Walking.class);
+        try (World world = new World()) {
+            world.component(Position.class);
+            world.component(Walking.class);
 
-        // Create an entity with name Bob.
-        Entity bob = world.obtainEntity(world.entity("Bob"))
-                // The set operation finds or creates a component, and sets it.
-                .set(new Position(10, 20))
-                // The add operation adds a component without setting a value. This is
-                // useful for tags, or when adding a component with its default value.
-                .add(Walking.class);
+            // Create an entity with name Bob.
+            Entity bob = world.obtainEntity(world.entity("Bob"))
+                    // The set operation finds or creates a component, and sets it.
+                    .set(new Position(10, 20))
+                    // The add operation adds a component without setting a value. This is
+                    // useful for tags, or when adding a component with its default value.
+                    .add(Walking.class);
 
-        // Get the value for the Position component.
-        Position c = bob.get(Position.class);
-        System.out.println("{" + c.x() + ", " + c.y() + "}");
+            // Get the value for the Position component.
+            Position c = bob.get(Position.class);
+            System.out.println("{" + c.x() + ", " + c.y() + "}");
 
-        // Overwrite the value of the Position component.
-        bob.set(new Position(20, 30));
+            // Overwrite the value of the Position component.
+            bob.set(new Position(20, 30));
 
-        // Create another named entity.
-        Entity alice = world.obtainEntity(world.entity("Alice"))
-                .set(new Position(10, 20));
+            // Create another named entity.
+            Entity alice = world.obtainEntity(world.entity("Alice"))
+                    .set(new Position(10, 20));
 
-        // Add a tag after entity is created.
-        alice.add(Walking.class);
+            // Add a tag after entity is created.
+            alice.add(Walking.class);
 
-        // Print all of the components the entity has.
-        System.out.println("[" + alice.table().toString() + "]");
+            // Print all of the components the entity has.
+            System.out.println("[" + alice.table().toString() + "]");
 
-        // Remove tag.
-        alice.remove(Walking.class);
+            // Remove tag.
+            alice.remove(Walking.class);
 
-        // Iterate all entities with Position.
-        world.each(Position.class, (entityId, pos) -> {
-            Entity entity = world.obtainEntity(entityId);
-            System.out.println(entity.name() + ": {" + pos.x() + ", " + pos.y() + "}");
-        });
+            // Iterate all entities with Position.
+            world.each(Position.class, (entityId, pos) -> {
+                Entity entity = world.obtainEntity(entityId);
+                System.out.println(entity.name() + ": {" + pos.x() + ", " + pos.y() + "}");
+            });
 
-        world.destroy();
+        }
     }
 
     // Output:

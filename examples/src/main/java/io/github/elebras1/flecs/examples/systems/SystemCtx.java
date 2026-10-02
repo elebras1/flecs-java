@@ -26,76 +26,76 @@ public class SystemCtx {
     }
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        world.component(Radius.class);
+        try (World world = new World()) {
+            world.component(Position.class);
+            world.component(Radius.class);
 
-        Query qCollide = world.query()
-                .with(Position.class)
-                .with(Radius.class)
-                .build();
+            Query qCollide = world.query()
+                    .with(Position.class)
+                    .with(Radius.class)
+                    .build();
 
-        // The captured query is the Java equivalent of the C++ system context.
-        FlecsSystem collideSystem = world.system("Collide")
-                .with(Position.class)
-                .with(Radius.class)
-                .iter(it -> {
-                    Field<Position> positions = it.field(Position.class, 0);
-                    Field<Radius> radii = it.field(Radius.class, 1);
+            // The captured query is the Java equivalent of the C++ system context.
+            FlecsSystem collideSystem = world.system("Collide")
+                    .with(Position.class)
+                    .with(Radius.class)
+                    .iter(it -> {
+                        Field<Position> positions = it.field(Position.class, 0);
+                        Field<Radius> radii = it.field(Radius.class, 1);
 
-                    for (int i = 0; i < it.count(); i++) {
-                        long e1 = it.entity(i);
-                        Position p1 = positions.get(i);
-                        Radius r1 = radii.get(i);
+                        for (int i = 0; i < it.count(); i++) {
+                            long e1 = it.entity(i);
+                            Position p1 = positions.get(i);
+                            Radius r1 = radii.get(i);
 
-                        qCollide.iter(otherIt -> {
-                            Field<Position> otherPositions = otherIt.field(Position.class, 0);
-                            Field<Radius> otherRadii = otherIt.field(Radius.class, 1);
+                            qCollide.iter(otherIt -> {
+                                Field<Position> otherPositions = otherIt.field(Position.class, 0);
+                                Field<Radius> otherRadii = otherIt.field(Radius.class, 1);
 
-                            for (int j = 0; j < otherIt.count(); j++) {
-                                long e2 = otherIt.entity(j);
+                                for (int j = 0; j < otherIt.count(); j++) {
+                                    long e2 = otherIt.entity(j);
 
-                                // Don't collide with self.
-                                if (e1 == e2) {
-                                    continue;
+                                    // Don't collide with self.
+                                    if (e1 == e2) {
+                                        continue;
+                                    }
+
+                                    // Prevent collisions from being detected twice
+                                    // with the entities reversed.
+                                    if (e1 > e2) {
+                                        continue;
+                                    }
+
+                                    Position p2 = otherPositions.get(j);
+                                    Radius r2 = otherRadii.get(j);
+
+                                    // Check for collision.
+                                    float dx = p2.x() - p1.x();
+                                    float dy = p2.y() - p1.y();
+                                    float dSqr = dx * dx + dy * dy;
+                                    float rSqr = sqr(r1.value() + r2.value());
+
+                                    if (rSqr > dSqr) {
+                                        System.out.println(e1 + " and " + e2
+                                                + " collided!");
+                                    }
                                 }
+                            });
+                        }
+                    });
 
-                                // Prevent collisions from being detected twice
-                                // with the entities reversed.
-                                if (e1 > e2) {
-                                    continue;
-                                }
+            // Create a few test entities.
+            Random random = new Random(42);
+            for (int i = 0; i < 10; i++) {
+                world.obtainEntity(world.entity())
+                        .set(new Position(randf(random, 100), randf(random, 100)))
+                        .set(new Radius(randf(random, 10) + 1));
+            }
 
-                                Position p2 = otherPositions.get(j);
-                                Radius r2 = otherRadii.get(j);
+            // Run the system.
+            collideSystem.run();
 
-                                // Check for collision.
-                                float dx = p2.x() - p1.x();
-                                float dy = p2.y() - p1.y();
-                                float dSqr = dx * dx + dy * dy;
-                                float rSqr = sqr(r1.value() + r2.value());
-
-                                if (rSqr > dSqr) {
-                                    System.out.println(e1 + " and " + e2
-                                            + " collided!");
-                                }
-                            }
-                        });
-                    }
-                });
-
-        // Create a few test entities.
-        Random random = new Random(42);
-        for (int i = 0; i < 10; i++) {
-            world.obtainEntity(world.entity())
-                    .set(new Position(randf(random, 100), randf(random, 100)))
-                    .set(new Radius(randf(random, 10) + 1));
         }
-
-        // Run the system.
-        collideSystem.run();
-
-        world.destroy();
     }
 
     // Output (entity ids are non-deterministic):

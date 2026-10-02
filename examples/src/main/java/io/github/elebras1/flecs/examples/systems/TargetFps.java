@@ -10,24 +10,24 @@ import io.github.elebras1.flecs.Flecs;
 public class TargetFps {
 
     static void main(String[] args) {
-        World world = new World();
+        try (World world = new World()) {
 
-        // Create a system that prints delta_time.
-        world.system("DeltaTime")
-                .kind(Flecs.OnUpdate)
-                .run(it -> {
-                    System.out.println("delta_time: " + it.deltaTime());
-                });
+            // Create a system that prints delta_time.
+            world.system("DeltaTime")
+                    .kind(Flecs.OnUpdate)
+                    .run(it -> {
+                        System.out.println("delta_time: " + it.deltaTime());
+                    });
 
-        // Set target FPS to 1 frame per second.
-        world.setTargetFps(1);
+            // Set target FPS to 1 frame per second.
+            world.setTargetFps(1);
 
-        // Run 5 frames.
-        for (int i = 0; i < 5; i++) {
-            world.progress();
+            // Run 5 frames.
+            for (int i = 0; i < 5; i++) {
+                world.progress();
+            }
+
         }
-
-        world.destroy();
     }
 
     // Output:

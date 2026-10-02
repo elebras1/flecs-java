@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
@@ -33,7 +34,7 @@ class QueryTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -48,7 +49,6 @@ class QueryTest {
         query.each(Position.class, (entityId, p) -> count.incrementAndGet());
         assertEquals(3, count.get());
 
-        query.destroy();
     }
 
     @Test
@@ -65,7 +65,6 @@ class QueryTest {
         query.each(Position.class, FlecsParent.class, (position, parentComponent) -> count.incrementAndGet());
         assertEquals(1, count.get());
 
-        query.destroy();
     }
 
     @Test
@@ -81,7 +80,6 @@ class QueryTest {
         query.each(entityId -> count.incrementAndGet());
         assertEquals(3, count.get());
 
-        query.destroy();
     }
 
     @Test
@@ -102,7 +100,6 @@ class QueryTest {
         assertEquals(3, count.get());
         assertEquals(3, entities.stream().distinct().count());
 
-        query.destroy();
     }
 
     @Test
@@ -114,7 +111,6 @@ class QueryTest {
 
         Query query = this.world.query().with(rel, obj).build();
         assertEquals(2, query.count());
-        query.destroy();
     }
 
     @Test
@@ -139,7 +135,6 @@ class QueryTest {
         assertEquals(11.0f, p.x());
         assertEquals(22.0f, p.y());
 
-        query.destroy();
     }
 
     @Test
@@ -155,7 +150,6 @@ class QueryTest {
         assertEquals(1.0f, positions.get(e1.id()));
         assertEquals(3.0f, positions.get(e2.id()));
 
-        query.destroy();
     }
 
     @Test
@@ -171,7 +165,6 @@ class QueryTest {
         long[] entities = query.entities();
         assertEquals(3, entities.length);
 
-        query.destroy();
     }
 
     @Test
@@ -187,7 +180,6 @@ class QueryTest {
         long notFound = query.find(Position.class, p -> p.x() == 30);
         assertEquals(0, notFound);
 
-        query.destroy();
     }
 
     @Test
@@ -208,7 +200,6 @@ class QueryTest {
         });
         assertEquals(e2, found.get());
 
-        query.destroy();
     }
 
     @Test
@@ -226,7 +217,6 @@ class QueryTest {
         long found = query.find(Position.class, p -> p.x() == 20);
         assertEquals(e2, found);
 
-        query.destroy();
     }
 
     @Test
@@ -251,7 +241,6 @@ class QueryTest {
         });
         assertEquals(List.of(1.0f, 2.0f, 4.0f, 5.0f, 6.0f), actual);
 
-        query.destroy();
     }
 
     @Test
@@ -267,7 +256,6 @@ class QueryTest {
 
         assertNotNull(query.toStringExpr());
 
-        query.destroy();
     }
 
     @Test
@@ -297,7 +285,6 @@ class QueryTest {
         assertEquals(1, withVelocity.get());
         assertEquals(1, withoutVelocity.get());
 
-        query.destroy();
     }
 
     @Test
@@ -311,7 +298,6 @@ class QueryTest {
                 .build();
 
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -323,7 +309,6 @@ class QueryTest {
         Query query = this.world.query().with(a).build();
         assertEquals(e1, query.first());
         assertEquals(2, query.count());
-        query.destroy();
     }
 
     @Test
@@ -345,7 +330,6 @@ class QueryTest {
         assertEquals(2, ids.size());
         assertTrue(ids.stream().allMatch(id -> id != 0));
 
-        query.destroy();
     }
 
     @Test
@@ -354,7 +338,6 @@ class QueryTest {
 
         Query query = this.world.query().expr("Position").build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -378,7 +361,6 @@ class QueryTest {
         assertTrue(matchedV.contains(v1));
         assertTrue(matchedV.contains(v2));
 
-        query.destroy();
     }
 
     @Test
@@ -396,7 +378,6 @@ class QueryTest {
         assertEquals(2, matchedV.size());
         assertTrue(matchedV.contains(v1));
 
-        query.destroy();
     }
 
     @Test
@@ -421,7 +402,6 @@ class QueryTest {
 
         assertEquals(2, count.get());
 
-        query.destroy();
     }
 
     @Test
@@ -445,7 +425,6 @@ class QueryTest {
         query.count();
         assertFalse(query.changed());
 
-        query.destroy();
     }
 
     @Test
@@ -460,7 +439,6 @@ class QueryTest {
                 assertFalse(it.isReadonly(0));
             }
         });
-        query.destroy();
     }
 
     @Test
@@ -477,7 +455,6 @@ class QueryTest {
             }
         });
         assertEquals(1, count.get());
-        query.destroy();
     }
 
     @Test
@@ -496,7 +473,6 @@ class QueryTest {
 
         this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
         assertEquals(1, this.world.count(Position.class));
-        query.destroy();
     }
 
     @Test
@@ -508,7 +484,6 @@ class QueryTest {
         assertNotNull(json);
         assertTrue(json.contains("\"results\""));
         assertTrue(json.contains("\"x\":1"));
-        query.destroy();
     }
 
     @Test
@@ -527,7 +502,6 @@ class QueryTest {
                 .serializeQueryPlan(true));
         assertNotNull(planJson);
         assertTrue(planJson.contains("\"query_plan\""));
-        query.destroy();
     }
 
     @Test
@@ -543,7 +517,7 @@ class QueryTest {
             p.x(p.x() + v.x());
             values.add(it.entity(index) + "," + index);
         });
-        query.destroy();
+        query.destruct();
 
         assertEquals(List.of(e + ",0"), values);
         assertEquals(11.0f, this.world.obtainEntity(e).get(Position.class).x());
@@ -600,7 +574,6 @@ class QueryTest {
                 .with(Position.class).idFlags(Flecs.Toggle)
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -611,7 +584,6 @@ class QueryTest {
                 .with(Velocity.class).filter()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -627,7 +599,6 @@ class QueryTest {
                 .scopeClose()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -641,7 +612,6 @@ class QueryTest {
         AtomicReference<Velocity> seen = new AtomicReference<>();
         query.each(Position.class, Velocity.class, (position, velocity) -> seen.set(velocity));
         assertNull(seen.get());
-        query.destroy();
     }
 
     @Test
@@ -654,7 +624,6 @@ class QueryTest {
                 .with(locatedIn).second("$Place")
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -667,7 +636,6 @@ class QueryTest {
                 .with(Position.class).src("Game")
                 .build();
         assertNotNull(query);
-        query.destroy();
     }
 
     @Test
@@ -678,7 +646,6 @@ class QueryTest {
                 .with("Position", target)
                 .build();
         assertNotNull(query);
-        query.destroy();
     }
 
     @Test
@@ -687,7 +654,6 @@ class QueryTest {
                 .with(Flecs.PredEq).second("Position").flags(Flecs.IsName)
                 .build();
         assertNotNull(query);
-        query.destroy();
     }
 
     @Test
@@ -697,7 +663,6 @@ class QueryTest {
         assertTrue(query.toString().contains("Position"));
         assertTrue(query.toString().contains("Velocity"));
 
-        query.destroy();
     }
 
     @Test
@@ -718,7 +683,6 @@ class QueryTest {
         assertNotNull(afterNext.get());
         assertTrue(afterNext.get().contains("Position"));
 
-        query.destroy();
     }
 
     @Test
@@ -744,7 +708,6 @@ class QueryTest {
         });
 
         assertEquals(1, count.get());
-        query.destroy();
     }
 
     @Test
@@ -754,21 +717,18 @@ class QueryTest {
                 .with(Velocity.class).inout(Flecs.In)
                 .build();
         assertNotNull(inout);
-        inout.destroy();
 
         Query in = this.world.query()
                 .with(Position.class)
                 .with(Velocity.class).in()
                 .build();
         assertNotNull(in);
-        in.destroy();
 
         Query out = this.world.query()
                 .with(Position.class)
                 .with(Velocity.class).out()
                 .build();
         assertNotNull(out);
-        out.destroy();
     }
 
     @Test
@@ -781,7 +741,37 @@ class QueryTest {
                 .build();
 
         assertEquals(1, query.count());
-        query.destroy();
+    }
+
+    @Test
+    void destructRemovesQueryCtxEntry() {
+        Query query = this.world.query()
+                .with(Position.class)
+                .ctx(new Object())
+                .build();
+        long ctxId = ecs_query_t.ctx(query.querySeg).address();
+        assertNotNull(ParamRegistry.get(ctxId));
+
+        query.destruct();
+
+        assertNull(ParamRegistry.get(ctxId));
+        assertThrows(IllegalStateException.class, query::count);
+    }
+
+    @Test
+    void worldDestructDestroysTrackedQueries() {
+        Query query = this.world.query()
+                .with(Position.class)
+                .ctx(new Object())
+                .build();
+        long ctxId = ecs_query_t.ctx(query.querySeg).address();
+        assertNotNull(ParamRegistry.get(ctxId));
+
+        this.world.close();
+
+        assertNull(ParamRegistry.get(ctxId));
+        assertThrows(IllegalStateException.class, query::count);
+        assertDoesNotThrow(query::destruct);
     }
 
 }

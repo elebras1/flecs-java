@@ -49,7 +49,7 @@ public class OsApi {
         flecs_h.ecs_os_set_api(this.nativeOsApi);
     }
 
-    public void destroy() {
+    public void destruct() {
         this.arena.close();
     }
 }

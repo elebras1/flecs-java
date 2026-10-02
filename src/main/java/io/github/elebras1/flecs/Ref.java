@@ -69,7 +69,7 @@ public class Ref<T> {
         return this.tryGet() != null;
     }
 
-    public void destroy() {
+    public void destruct() {
         this.arena.close();
     }
 }

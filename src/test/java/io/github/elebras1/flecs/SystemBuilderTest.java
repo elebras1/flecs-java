@@ -29,7 +29,7 @@ class SystemBuilderTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test

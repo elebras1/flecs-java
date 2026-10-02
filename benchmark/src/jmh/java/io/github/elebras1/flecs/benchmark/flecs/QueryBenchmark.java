@@ -61,19 +61,16 @@ public class QueryBenchmark {
     @TearDown(Level.Iteration)
     public void tearDown() {
         if (this.query1 != null) {
-            this.query1.destroy();
             this.query1 = null;
         }
         if (this.query2 != null) {
-            this.query2.destroy();
             this.query2 = null;
         }
         if (this.queryFiltered != null) {
-            this.queryFiltered.destroy();
             this.queryFiltered = null;
         }
         if (this.world != null) {
-            this.world.destroy();
+            this.world.close();
             this.world = null;
         }
     }
@@ -109,7 +106,6 @@ public class QueryBenchmark {
         for (int i = 0; i < this.n; i++) {
             Query query = this.world.query().with(Position.class).with(Velocity.class).build();
             checksum++;
-            query.destroy();
         }
         return (double) checksum / this.n;
     }

@@ -96,7 +96,6 @@ public class InventorySystem {
                 result[0] = itemId;
             }
         });
-        q.destroy();
         return result[0];
     }
 
@@ -128,7 +127,6 @@ public class InventorySystem {
                 Entity item = world.obtainEntity(itemId);
                 transferItem(world, containedById, dstContainer, item, swordId, armorId, coinId);
             });
-            q.destroy();
         });
     }
 
@@ -215,7 +213,6 @@ public class InventorySystem {
             System.out.println(" - " + amountValue + " " + name + (amountValue > 1 ? "s" : "") + " (" + kind + ")");
             count[0]++;
         });
-        q.destroy();
 
         if (count[0] == 0) {
             System.out.println(" - << empty >>");
@@ -224,94 +221,94 @@ public class InventorySystem {
     }
 
     public static void main(String[] args) {
-        World world = new World();
-        long containedById = world.component(ContainedBy.class);
-        long inventoryId = world.component(Inventory.class);
-        long containerId = world.component(Container.class);
-        long itemId = world.component(Item.class);
-        long swordId = world.component(Sword.class);
-        long armorId = world.component(Armor.class);
-        long coinId = world.component(Coin.class);
-        world.component(Amount.class);
-        world.component(Attack.class);
-        world.component(Health.class);
-        world.component(Active.class);
+        try (World world = new World()) {
+            long containedById = world.component(ContainedBy.class);
+            long inventoryId = world.component(Inventory.class);
+            long containerId = world.component(Container.class);
+            long itemId = world.component(Item.class);
+            long swordId = world.component(Sword.class);
+            long armorId = world.component(Armor.class);
+            long coinId = world.component(Coin.class);
+            world.component(Amount.class);
+            world.component(Attack.class);
+            world.component(Health.class);
+            world.component(Active.class);
 
-        // ContainedBy is exclusive: an item can only be in one container.
-        world.obtainEntity(containedById).add(Flecs.Exclusive);
+            // ContainedBy is exclusive: an item can only be in one container.
+            world.obtainEntity(containedById).add(Flecs.Exclusive);
 
-        // Item kinds inherit from Item.
-        world.obtainEntity(swordId).isA(itemId);
-        world.obtainEntity(armorId).isA(itemId);
-        world.obtainEntity(coinId).isA(itemId);
+            // Item kinds inherit from Item.
+            world.obtainEntity(swordId).isA(itemId);
+            world.obtainEntity(armorId).isA(itemId);
+            world.obtainEntity(coinId).isA(itemId);
 
-        // Register prefabs.
-        long woodenSword = world.prefab(WoodenSword.class);
-        world.obtainEntity(woodenSword)
-                .add(Sword.class)
-                .set(new Attack(1))
-                .set(new Health(5))
-                .autoOverride(Health.class);
+            // Register prefabs.
+            long woodenSword = world.prefab(WoodenSword.class);
+            world.obtainEntity(woodenSword)
+                    .add(Sword.class)
+                    .set(new Attack(1))
+                    .set(new Health(5))
+                    .autoOverride(Health.class);
 
-        long ironSword = world.prefab(IronSword.class);
-        world.obtainEntity(ironSword)
-                .add(Sword.class)
-                .set(new Attack(2))
-                .set(new Health(10))
-                .autoOverride(Health.class);
+            long ironSword = world.prefab(IronSword.class);
+            world.obtainEntity(ironSword)
+                    .add(Sword.class)
+                    .set(new Attack(2))
+                    .set(new Health(10))
+                    .autoOverride(Health.class);
 
-        long woodenArmor = world.prefab(WoodenArmor.class);
-        world.obtainEntity(woodenArmor)
-                .add(Armor.class)
-                .set(new Health(10))
-                .autoOverride(Health.class);
+            long woodenArmor = world.prefab(WoodenArmor.class);
+            world.obtainEntity(woodenArmor)
+                    .add(Armor.class)
+                    .set(new Health(10))
+                    .autoOverride(Health.class);
 
-        long ironArmor = world.prefab(IronArmor.class);
-        world.obtainEntity(ironArmor)
-                .add(Armor.class)
-                .set(new Health(20))
-                .autoOverride(Health.class);
+            long ironArmor = world.prefab(IronArmor.class);
+            world.obtainEntity(ironArmor)
+                    .add(Armor.class)
+                    .set(new Health(20))
+                    .autoOverride(Health.class);
 
-        // Create a loot box with items.
-        Entity chest = world.obtainEntity(world.entity("Chest")).add(Container.class);
-        world.obtainEntity(world.entity()).isA(ironSword).add(ContainedBy.class, chest);
-        world.obtainEntity(world.entity()).isA(woodenArmor).add(ContainedBy.class, chest);
-        world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(30))
-                .add(ContainedBy.class, chest);
+            // Create a loot box with items.
+            Entity chest = world.obtainEntity(world.entity("Chest")).add(Container.class);
+            world.obtainEntity(world.entity()).isA(ironSword).add(ContainedBy.class, chest);
+            world.obtainEntity(world.entity()).isA(woodenArmor).add(ContainedBy.class, chest);
+            world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(30))
+                    .add(ContainedBy.class, chest);
 
-        // Create a player with an inventory containing some coins.
-        Entity playerInventory = world.obtainEntity(world.entity()).add(Container.class);
-        world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(20))
-                .add(ContainedBy.class, playerInventory);
+            // Create a player with an inventory containing some coins.
+            Entity playerInventory = world.obtainEntity(world.entity()).add(Container.class);
+            world.obtainEntity(world.entity()).add(Coin.class).set(new Amount(20))
+                    .add(ContainedBy.class, playerInventory);
 
-        Entity player = world.obtainEntity(world.entity("Player"))
-                .set(new Health(10))
-                .add(inventoryId, playerInventory.id());
+            Entity player = world.obtainEntity(world.entity("Player"))
+                    .set(new Health(10))
+                    .add(inventoryId, playerInventory.id());
 
-        // Print initial inventories.
-        printItems(world, inventoryId, swordId, armorId, coinId, chest);
-        printItems(world, inventoryId, swordId, armorId, coinId, player);
+            // Print initial inventories.
+            printItems(world, inventoryId, swordId, armorId, coinId, chest);
+            printItems(world, inventoryId, swordId, armorId, coinId, player);
 
-        // Move items from chest to player.
-        transferItems(world, containedById, inventoryId, player, chest,
-                swordId, armorId, coinId);
+            // Move items from chest to player.
+            transferItems(world, containedById, inventoryId, player, chest,
+                    swordId, armorId, coinId);
 
-        printItems(world, inventoryId, swordId, armorId, coinId, player);
-        printItems(world, inventoryId, swordId, armorId, coinId, chest);
+            printItems(world, inventoryId, swordId, armorId, coinId, player);
+            printItems(world, inventoryId, swordId, armorId, coinId, chest);
 
-        // Equip armor if available.
-        Entity playerContainer = getContainer(world, inventoryId, player);
-        long foundArmor = findItemWithKind(world, playerContainer.id(),
-                armorId, false, swordId, armorId, coinId);
-        if (foundArmor != 0) {
-            world.obtainEntity(foundArmor).add(Active.class);
+            // Equip armor if available.
+            Entity playerContainer = getContainer(world, inventoryId, player);
+            long foundArmor = findItemWithKind(world, playerContainer.id(),
+                    armorId, false, swordId, armorId, coinId);
+            if (foundArmor != 0) {
+                world.obtainEntity(foundArmor).add(Active.class);
+            }
+
+            // Create a weapon and attack the player.
+            Entity mySword = world.obtainEntity(world.entity()).isA(ironSword);
+            attack(world, inventoryId, player, mySword, swordId, armorId);
+
         }
-
-        // Create a weapon and attack the player.
-        Entity mySword = world.obtainEntity(world.entity()).isA(ironSword);
-        attack(world, inventoryId, player, mySword, swordId, armorId);
-
-        world.destroy();
     }
 
     // Output:

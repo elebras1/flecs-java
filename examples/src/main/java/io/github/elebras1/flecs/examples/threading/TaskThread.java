@@ -43,31 +43,31 @@ public class TaskThread {
                 })
                 .set();
 
-        World world = new World();
-        world.setTaskThreads(NUMBER_THREADS);
-        world.component(Health.class);
+        try (World world = new World()) {
+            world.setTaskThreads(NUMBER_THREADS);
+            world.component(Health.class);
 
-        for (int i = 0; i < 100_000; i++) {
-            EntityView entity = world.obtainEntityView(world.entity());
-            entity.set(new Health(100));
-        }
-
-        world.system().with(Health.class).kind(Flecs.OnUpdate).multiThreaded().iter(iter -> {
-            Field<Health> healthField = iter.field(Health.class, 0);
-            for (int i = 0; i < iter.count(); i++) {
-                Health health = healthField.get(i);
-                healthField.set(i, new Health(health.value() - 1));
+            for (int i = 0; i < 100_000; i++) {
+                EntityView entity = world.obtainEntityView(world.entity());
+                entity.set(new Health(100));
             }
-        });
 
-        for (int i = 0; i < 1000; i++) {
-            world.progress();
+            world.system().with(Health.class).kind(Flecs.OnUpdate).multiThreaded().iter(iter -> {
+                Field<Health> healthField = iter.field(Health.class, 0);
+                for (int i = 0; i < iter.count(); i++) {
+                    Health health = healthField.get(i);
+                    healthField.set(i, new Health(health.value() - 1));
+                }
+            });
+
+            for (int i = 0; i < 1000; i++) {
+                world.progress();
+            }
         }
 
         // Tear down the world before the OS API so callbacks are no longer
         // invoked, then shut down the executor.
-        world.destroy();
-        osApi.destroy();
+        osApi.destruct();
         executor.close();
     }
 

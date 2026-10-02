@@ -18,54 +18,54 @@ import io.github.elebras1.flecs.Flecs;
 public class MutateEntity {
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(Timeout.class);
+        try (World world = new World()) {
+            world.component(Timeout.class);
 
-        // System that deletes an entity after its timeout expires.
-        world.system("Expire")
-                .kind(Flecs.OnUpdate)
-                .with(Timeout.class)
-                .eachView(Timeout.class, (Iter it, int index, TimeoutView timeout) -> {
-                    timeout.value(timeout.value() - it.deltaTime());
-                    if (timeout.value() <= 0) {
-                        long entityId = it.entity(index);
-                        EntityView entity = it.world().obtainEntityView(entityId);
-                        System.out.println("Expire: " + entity.name() + " deleted!");
-                        entity.destruct();
-                    }
-                });
+            // System that deletes an entity after its timeout expires.
+            world.system("Expire")
+                    .kind(Flecs.OnUpdate)
+                    .with(Timeout.class)
+                    .eachView(Timeout.class, (Iter it, int index, TimeoutView timeout) -> {
+                        timeout.value(timeout.value() - it.deltaTime());
+                        if (timeout.value() <= 0) {
+                            long entityId = it.entity(index);
+                            EntityView entity = it.world().obtainEntityView(entityId);
+                            System.out.println("Expire: " + entity.name() + " deleted!");
+                            entity.destruct();
+                        }
+                    });
 
-        // System that prints the remaining expiry time.
-        world.system("PrintExpire")
-                .kind(Flecs.OnUpdate)
-                .with(Timeout.class)
-                .eachView(Timeout.class, (long entityId, TimeoutView timeout) -> {
-                    EntityView entity = world.obtainEntityView(entityId);
-                    System.out.printf(Locale.US, "PrintExpire: %s has %.2f seconds left%n", entity.name(), timeout.value());
-                });
+            // System that prints the remaining expiry time.
+            world.system("PrintExpire")
+                    .kind(Flecs.OnUpdate)
+                    .with(Timeout.class)
+                    .eachView(Timeout.class, (long entityId, TimeoutView timeout) -> {
+                        EntityView entity = world.obtainEntityView(entityId);
+                        System.out.printf(Locale.US, "PrintExpire: %s has %.2f seconds left%n", entity.name(), timeout.value());
+                    });
 
-        // Observer that triggers when Timeout is actually removed.
-        world.observer("ExpiredObserver")
-                .event(Flecs.OnRemove)
-                .with(Timeout.class)
-                .each(entityId -> {
-                    EntityView entity = world.obtainEntityView(entityId);
-                    System.out.println("Expired: " + entity.name() + " actually deleted");
-                });
+            // Observer that triggers when Timeout is actually removed.
+            world.observer("ExpiredObserver")
+                    .event(Flecs.OnRemove)
+                    .with(Timeout.class)
+                    .each(entityId -> {
+                        EntityView entity = world.obtainEntityView(entityId);
+                        System.out.println("Expired: " + entity.name() + " actually deleted");
+                    });
 
-        Entity entity = world.obtainEntity(world.entity("MyEntity"))
-                .set(new Timeout(3.0));
+            Entity entity = world.obtainEntity(world.entity("MyEntity"))
+                    .set(new Timeout(3.0));
 
-        world.setTargetFps(1);
+            world.setTargetFps(1);
 
-        while (world.progress()) {
-            if (!entity.isAlive()) {
-                break;
+            while (world.progress()) {
+                if (!entity.isAlive()) {
+                    break;
+                }
+                System.out.println("Tick...");
             }
-            System.out.println("Tick...");
-        }
 
-        world.destroy();
+        }
     }
 
     // Output:

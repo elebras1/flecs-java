@@ -11,20 +11,20 @@ import io.github.elebras1.flecs.examples.components.Position;
 public class BasicsJson {
 
     static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
+        try (World world = new World()) {
+            world.component(Position.class);
 
-        // Create entity with Position as usual.
-        Entity e = world.obtainEntity(world.entity("ent"))
-                .set(new Position(10, 20));
+            // Create entity with Position as usual.
+            Entity e = world.obtainEntity(world.entity("ent"))
+                    .set(new Position(10, 20));
 
-        // Convert the Position component to a JSON string.
-        System.out.println(e.toJson(Position.class));
+            // Convert the Position component to a JSON string.
+            System.out.println(e.toJson(Position.class));
 
-        // Convert the entity to JSON.
-        System.out.println(e.toJson());
+            // Convert the entity to JSON.
+            System.out.println(e.toJson());
 
-        world.destroy();
+        }
     }
 
     // Output (the exact entity JSON may contain additional metadata):

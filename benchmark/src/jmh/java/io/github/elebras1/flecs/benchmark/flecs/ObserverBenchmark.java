@@ -50,7 +50,7 @@ public class ObserverBenchmark {
     @TearDown(Level.Invocation)
     public void tearDown() {
         if (this.world != null) {
-            this.world.destroy();
+            this.world.close();
             this.world = null;
         }
     }

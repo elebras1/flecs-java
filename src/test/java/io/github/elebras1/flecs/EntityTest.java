@@ -29,7 +29,7 @@ class EntityTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -80,20 +80,19 @@ class EntityTest {
 
     @Test
     void entityForComponentRegistersComponent() {
-        World localWorld = new World();
-        long pos = localWorld.entity(Position.class);
-        Entity posEntity = localWorld.obtainEntity(pos);
+        try (World localWorld = new World()) {
+            long pos = localWorld.entity(Position.class);
+            Entity posEntity = localWorld.obtainEntity(pos);
 
-        assertEquals("Position", posEntity.name());
-        FlecsComponent c = posEntity.get(FlecsComponent.class);
-        assertNotNull(c);
-        assertEquals(8, c.size());
+            assertEquals("Position", posEntity.name());
+            FlecsComponent c = posEntity.get(FlecsComponent.class);
+            assertNotNull(c);
+            assertEquals(8, c.size());
 
-        Entity e = localWorld.obtainEntity(localWorld.entity()).add(Position.class);
-        e.set(new Position(10, 20));
-        assertEquals(10.0f, e.get(Position.class).x());
-
-        localWorld.destroy();
+            Entity e = localWorld.obtainEntity(localWorld.entity()).add(Position.class);
+            e.set(new Position(10, 20));
+            assertEquals(10.0f, e.get(Position.class).x());
+        }
     }
 
     @Test
@@ -448,7 +447,7 @@ class EntityTest {
         assertNotNull(p);
         assertEquals(10.0f, p.x());
         assertEquals(20.0f, p.y());
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -657,7 +656,6 @@ class EntityTest {
         query.each(entityId -> count.incrementAndGet());
         assertEquals(1, count.get());
 
-        query.destroy();
     }
 
     @Test

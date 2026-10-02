@@ -13,24 +13,24 @@ import io.github.elebras1.flecs.examples.components.Velocity;
 public class SimpleModule {
 
     static void main(String[] args) {
-        World world = new World();
+        try (World world = new World()) {
 
-        // Import the module.
-        world.importModule(new MovementModule());
+            // Import the module.
+            world.importModule(new MovementModule());
 
-        // Create entity with imported components.
-        Entity e = world.obtainEntity(world.entity("e"))
-                .set(new Position(10, 20))
-                .set(new Velocity(1, 1));
+            // Create entity with imported components.
+            Entity e = world.obtainEntity(world.entity("e"))
+                    .set(new Position(10, 20))
+                    .set(new Velocity(1, 1));
 
-        // Call progress which runs the imported Move system.
-        world.progress(0.0f);
+            // Call progress which runs the imported Move system.
+            world.progress(0.0f);
 
-        // Use component from module in operation.
-        Position p = e.get(Position.class);
-        System.out.println("p = {" + p.x() + ", " + p.y() + "} (get)");
+            // Use component from module in operation.
+            Position p = e.get(Position.class);
+            System.out.println("p = {" + p.x() + ", " + p.y() + "} (get)");
 
-        world.destroy();
+        }
     }
 
     // Output (system prints the value before the update):

@@ -33,7 +33,7 @@ class ComponentLifecycleTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     private static Position[] transformed(Position[] src) {
@@ -124,13 +124,13 @@ class ComponentLifecycleTest {
 
     @Test
     void hooksIndependentPerWorld() {
-        World world2 = new World();
         AtomicInteger onAdd2 = new AtomicInteger();
-        world2.component(Position.class, hooks ->
-                hooks.onAdd(components -> onAdd2.addAndGet(components.length)));
-        world2.obtainEntity(world2.entity()).add(Position.class);
-        assertEquals(1, onAdd2.get());
-        world2.destroy();
+        try (World world2 = new World()) {
+            world2.component(Position.class, hooks ->
+                    hooks.onAdd(components -> onAdd2.addAndGet(components.length)));
+            world2.obtainEntity(world2.entity()).add(Position.class);
+            assertEquals(1, onAdd2.get());
+        }
 
         assertEquals(0, this.onAdd.get());
     }

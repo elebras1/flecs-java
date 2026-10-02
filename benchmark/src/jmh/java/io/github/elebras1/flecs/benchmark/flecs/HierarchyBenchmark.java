@@ -52,11 +52,10 @@ public class HierarchyBenchmark {
     @TearDown(Level.Invocation)
     public void tearDown() {
         if (this.query != null) {
-            this.query.destroy();
             this.query = null;
         }
         if (this.world != null) {
-            this.world.destroy();
+            this.world.close();
             this.world = null;
         }
     }

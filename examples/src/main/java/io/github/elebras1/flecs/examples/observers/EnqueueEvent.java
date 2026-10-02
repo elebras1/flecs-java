@@ -12,28 +12,28 @@ import io.github.elebras1.flecs.examples.components.Position;
 public class EnqueueEvent {
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        long myEvent = world.entity("MyEvent");
+        try (World world = new World()) {
+            world.component(Position.class);
+            long myEvent = world.entity("MyEvent");
 
-        world.observer()
-                .event(myEvent)
-                .with(Position.class)
-                .each(Position.class, (Iter it, int index, Position p) -> {
-                    String eventName = world.obtainEntity(it.event()).name();
-                    System.out.println(" - " + eventName + ": Position: " + world.obtainEntity(it.entity(index)).name() + ": {" + p.x() + ", " + p.y() + "}");
-                });
+            world.observer()
+                    .event(myEvent)
+                    .with(Position.class)
+                    .each(Position.class, (Iter it, int index, Position p) -> {
+                        String eventName = world.obtainEntity(it.event()).name();
+                        System.out.println(" - " + eventName + ": Position: " + world.obtainEntity(it.entity(index)).name() + ": {" + p.x() + ", " + p.y() + "}");
+                    });
 
-        Entity e = world.obtainEntity(world.entity("e"))
-                .set(new Position(10, 20));
+            Entity e = world.obtainEntity(world.entity("e"))
+                    .set(new Position(10, 20));
 
-        // Enqueuing an event while deferred places it in the command queue.
-        world.deferBegin();
-        System.out.println("Event enqueued!");
-        e.enqueue(myEvent, Position.class);
-        world.deferEnd();
+            // Enqueuing an event while deferred places it in the command queue.
+            world.deferBegin();
+            System.out.println("Event enqueued!");
+            e.enqueue(myEvent, Position.class);
+            world.deferEnd();
 
-        world.destroy();
+        }
     }
 
     // Output:

@@ -13,34 +13,34 @@ import io.github.elebras1.flecs.examples.components.Resize;
 public class EnqueueEntityEvent {
 
     public static void main(String[] args) {
-        World world = new World();
-        long clickId = world.component(Click.class);
-        world.component(Resize.class);
+        try (World world = new World()) {
+            long clickId = world.component(Click.class);
+            world.component(Resize.class);
 
-        Entity widget = world.obtainEntity(world.entity("MyWidget"));
+            Entity widget = world.obtainEntity(world.entity("MyWidget"));
 
-        // Observer without source argument.
-        widget.observe(clickId, () -> System.out.println("clicked!"));
+            // Observer without source argument.
+            widget.observe(clickId, () -> System.out.println("clicked!"));
 
-        // Observer with source argument (the entity itself).
-        widget.observe(clickId, () -> System.out.println("clicked on " + widget.name() + "!"));
+            // Observer with source argument (the entity itself).
+            widget.observe(clickId, () -> System.out.println("clicked on " + widget.name() + "!"));
 
-        // Observer for an event with payload.
-        widget.observe(Resize.class, resize ->
-                System.out.println("resized to {" + resize.width() + ", " + resize.height() + "}!"));
+            // Observer for an event with payload.
+            widget.observe(Resize.class, resize ->
+                    System.out.println("resized to {" + resize.width() + ", " + resize.height() + "}!"));
 
-        // Enqueue events while deferred.
-        world.deferBegin();
+            // Enqueue events while deferred.
+            world.deferBegin();
 
-        widget.enqueue(clickId);
+            widget.enqueue(clickId);
 
-        // For a payload event, enqueue the payload with the event.
-        widget.enqueue(Resize.class, new Resize(100, 200));
+            // For a payload event, enqueue the payload with the event.
+            widget.enqueue(Resize.class, new Resize(100, 200));
 
-        System.out.println("Events enqueued!");
-        world.deferEnd();
+            System.out.println("Events enqueued!");
+            world.deferEnd();
 
-        world.destroy();
+        }
     }
 
     // Output:

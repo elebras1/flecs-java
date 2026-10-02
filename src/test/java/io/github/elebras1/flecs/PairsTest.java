@@ -36,7 +36,7 @@ class PairsTest {
 
     @AfterEach
     void tearDown() {
-        world.destroy();
+        world.close();
     }
 
     @Test

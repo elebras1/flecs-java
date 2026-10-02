@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,7 +33,7 @@ class SystemTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -315,6 +317,20 @@ class SystemTest {
         assertTrue(timer.isAlive());
         timer.stop();
         assertTrue(timer.isAlive());
+    }
+
+    @Test
+    void destructRemovesSystemCtxEntry() {
+        FlecsSystem system = this.world.system("CtxSystem", Position.class)
+                .each(Position.class, p -> { });
+
+        system.setCtx(new Object());
+        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), system.id());
+        long ctxId = ecs_system_t.ctx(sysSeg).address();
+        assertNotNull(ParamRegistry.get(ctxId));
+
+        system.destruct();
+        assertNull(ParamRegistry.get(ctxId));
     }
 
     @Test

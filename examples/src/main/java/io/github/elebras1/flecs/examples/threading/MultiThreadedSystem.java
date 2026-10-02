@@ -17,40 +17,40 @@ import java.util.Random;
 public class MultiThreadedSystem {
 
     static void main(String[] args) {
-        World world = new World();
-        world.component(Minister.class);
-        world.setThreads(4);
+        try (World world = new World()) {
+            world.component(Minister.class);
+            world.setThreads(4);
 
-        // Fixed seed so the example output is deterministic.
-        Random rnd = new Random(12345);
-        for (int i = 0; i < 1000; i++) {
-            world.obtainEntity(world.entity("Min_" + i))
-                    .set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
+            // Fixed seed so the example output is deterministic.
+            Random rnd = new Random(12345);
+            for (int i = 0; i < 1000; i++) {
+                world.obtainEntity(world.entity("Min_" + i))
+                        .set(new Minister("M-" + i, "default.png", rnd.nextFloat() * 50, 2020, 0));
+            }
+
+            world.system("LoyaltySystem")
+                    .kind(Flecs.OnUpdate)
+                    .with(Minister.class)
+                    .multiThreaded(true)
+                    .iter(it -> {
+                        Field<Minister> ministerField = it.field(Minister.class, 0);
+                        for (int i = 0; i < it.count(); i++) {
+                            MinisterView minister = ministerField.getMutView(i);
+                            float newLoyalty = Math.min(minister.loyalty() + 10.0f, 100.0f);
+                            String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
+                            minister.loyalty(newLoyalty);
+                            minister.imageFileName(newImg);
+                        }
+                    });
+
+            for (int f = 0; f < 5; f++) {
+                world.progress(0.016f);
+            }
+
+            Minister m = world.obtainEntity(world.lookup("Min_42")).get(Minister.class);
+            System.out.printf(Locale.US, "Check Min_42 -> Loyalty: %.1f | Img: %s%n", m.loyalty(), m.imageFileName());
+
         }
-
-        world.system("LoyaltySystem")
-                .kind(Flecs.OnUpdate)
-                .with(Minister.class)
-                .multiThreaded(true)
-                .iter(it -> {
-                    Field<Minister> ministerField = it.field(Minister.class, 0);
-                    for (int i = 0; i < it.count(); i++) {
-                        MinisterView minister = ministerField.getMutView(i);
-                        float newLoyalty = Math.min(minister.loyalty() + 10.0f, 100.0f);
-                        String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
-                        minister.loyalty(newLoyalty);
-                        minister.imageFileName(newImg);
-                    }
-                });
-
-        for (int f = 0; f < 5; f++) {
-            world.progress(0.016f);
-        }
-
-        Minister m = world.obtainEntity(world.lookup("Min_42")).get(Minister.class);
-        System.out.printf(Locale.US, "Check Min_42 -> Loyalty: %.1f | Img: %s%n", m.loyalty(), m.imageFileName());
-
-        world.destroy();
     }
 
     // Output:

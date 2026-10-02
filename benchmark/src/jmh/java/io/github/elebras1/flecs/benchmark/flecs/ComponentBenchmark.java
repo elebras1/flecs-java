@@ -49,7 +49,7 @@ public class ComponentBenchmark {
         @TearDown(Level.Invocation)
         public void tearDown() {
             if (this.world != null) {
-                this.world.destroy();
+                this.world.close();
                 this.world = null;
             }
         }
@@ -79,7 +79,7 @@ public class ComponentBenchmark {
         @TearDown(Level.Iteration)
         public void tearDown() {
             if (this.world != null) {
-                this.world.destroy();
+                this.world.close();
                 this.world = null;
             }
         }
@@ -108,7 +108,7 @@ public class ComponentBenchmark {
         @TearDown(Level.Iteration)
         public void tearDown() {
             if (this.world != null) {
-                this.world.destroy();
+                this.world.close();
                 this.world = null;
             }
         }

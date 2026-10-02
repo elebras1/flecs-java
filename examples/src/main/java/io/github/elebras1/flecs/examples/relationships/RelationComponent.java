@@ -19,56 +19,55 @@ import io.github.elebras1.flecs.Flecs;
 public class RelationComponent {
 
     public static void main(String[] args) {
-        World world = new World();
+        try (World world = new World()) {
 
-        long gigawattsId = world.component(Gigawatts.class);
-        long requiresId = world.component(Requires.class);
-        long positionId = world.component(Position.class);
-        long mustHaveId = world.component(MustHave.class);
+            long gigawattsId = world.component(Gigawatts.class);
+            long requiresId = world.component(Requires.class);
+            long positionId = world.component(Position.class);
+            long mustHaveId = world.component(MustHave.class);
 
-        // (Requires, Gigawatts) stores a Requires value because Requires is a
-        // component and Gigawatts is a tag.
-        Entity e1 = world.obtainEntity(world.entity())
-                .set(new Requires(1.21), gigawattsId);
-        Requires r1 = e1.get(Requires.class, gigawattsId);
-        System.out.println("requires: " + r1.amount());
+            // (Requires, Gigawatts) stores a Requires value because Requires is a
+            // component and Gigawatts is a tag.
+            Entity e1 = world.obtainEntity(world.entity())
+                    .set(new Requires(1.21), gigawattsId);
+            Requires r1 = e1.get(Requires.class, gigawattsId);
+            System.out.println("requires: " + r1.amount());
 
-        // The component can be either the first or second part of a pair:
-        Entity e2 = world.obtainEntity(world.entity())
-                .setSecond(Requires.class, gigawattsId, (RequiresView view) -> view.amount(1.21));
-        Requires r2 = e2.getSecond(Requires.class, gigawattsId);
-        System.out.println("requires: " + r2.amount());
+            // The component can be either the first or second part of a pair:
+            Entity e2 = world.obtainEntity(world.entity())
+                    .setSecond(Requires.class, gigawattsId, (RequiresView view) -> view.amount(1.21));
+            Requires r2 = e2.getSecond(Requires.class, gigawattsId);
+            System.out.println("requires: " + r2.amount());
 
-        // If both parts of a pair are components, the pair stores a value of the
-        // first element.
-        Entity e3 = world.obtainEntity(world.entity())
-                .set(new Expires(0.5), positionId);
-        Expires e = e3.get(Expires.class, positionId);
-        System.out.println("expires: " + e.timeout());
+            // If both parts of a pair are components, the pair stores a value of the
+            // first element.
+            Entity e3 = world.obtainEntity(world.entity())
+                    .set(new Expires(0.5), positionId);
+            Expires e = e3.get(Expires.class, positionId);
+            System.out.println("expires: " + e.timeout());
 
-        // PairIsTag forces a pair to have no payload even if one of the pair
-        // elements is a component.
-        world.obtainEntity(mustHaveId).add(Flecs.PairIsTag);
-        world.obtainEntity(world.entity()).add(mustHaveId, positionId);
+            // PairIsTag forces a pair to have no payload even if one of the pair
+            // elements is a component.
+            world.obtainEntity(mustHaveId).add(Flecs.PairIsTag);
+            world.obtainEntity(world.entity()).add(mustHaveId, positionId);
 
-        // Print the component type used by each pair.
-        Id requiresPair = world.pair(Requires.class, gigawattsId);
-        System.out.println(world.obtainEntity(requiresPair.typeId()).name());
-        System.out.println(world.obtainEntity(world.pair(Gigawatts.class, requiresId).typeId()).name());
-        System.out.println(world.obtainEntity(world.pair(Expires.class, positionId).typeId()).name());
-        System.out.println(world.pair(MustHave.class, positionId).typeId());
+            // Print the component type used by each pair.
+            Id requiresPair = world.pair(Requires.class, gigawattsId);
+            System.out.println(world.obtainEntity(requiresPair.typeId()).name());
+            System.out.println(world.obtainEntity(world.pair(Gigawatts.class, requiresId).typeId()).name());
+            System.out.println(world.obtainEntity(world.pair(Expires.class, positionId).typeId()).name());
+            System.out.println(world.pair(MustHave.class, positionId).typeId());
 
-        // Query for all (Requires, Gigawatts) pairs and print the payload.
-        Query query = world.query()
-                .with(Requires.class, Gigawatts.class)
-                .build();
+            // Query for all (Requires, Gigawatts) pairs and print the payload.
+            Query query = world.query()
+                    .with(Requires.class, Gigawatts.class)
+                    .build();
 
-        query.eachView(Requires.class, (RequiresView req) -> {
-            System.out.println("requires " + req.amount() + " gigawatts");
-        });
+            query.eachView(Requires.class, (RequiresView req) -> {
+                System.out.println("requires " + req.amount() + " gigawatts");
+            });
 
-        query.destroy();
-        world.destroy();
+        }
     }
 
     // Output:

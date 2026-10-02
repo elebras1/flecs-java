@@ -15,40 +15,40 @@ import io.github.elebras1.flecs.Flecs;
 public class PrefabOverride {
 
     public static void main(String[] args) {
-        World world = new World();
+        try (World world = new World()) {
 
-        // Configure Attack and Defense to be inherited from prefabs.
-        long attackId = world.component(Attack.class);
-        long defenseId = world.component(Defense.class);
-        long damageId = world.component(Damage.class);
+            // Configure Attack and Defense to be inherited from prefabs.
+            long attackId = world.component(Attack.class);
+            long defenseId = world.component(Defense.class);
+            long damageId = world.component(Damage.class);
 
-        world.obtainEntity(attackId).add(Flecs.OnInstantiate, Flecs.Inherit);
-        world.obtainEntity(defenseId).add(Flecs.OnInstantiate, Flecs.Inherit);
+            world.obtainEntity(attackId).add(Flecs.OnInstantiate, Flecs.Inherit);
+            world.obtainEntity(defenseId).add(Flecs.OnInstantiate, Flecs.Inherit);
 
-        // Create a SpaceShip prefab.
-        Entity spaceShip = world.obtainEntity(world.prefab("SpaceShip"))
-                .set(new Attack(75))
-                .set(new Defense(100))
-                .set(new Damage(50));
+            // Create a SpaceShip prefab.
+            Entity spaceShip = world.obtainEntity(world.prefab("SpaceShip"))
+                    .set(new Attack(75))
+                    .set(new Defense(100))
+                    .set(new Damage(50));
 
-        // Create a prefab instance.
-        Entity inst = world.obtainEntity(world.entity("my_spaceship"))
-                .isA(spaceShip);
+            // Create a prefab instance.
+            Entity inst = world.obtainEntity(world.entity("my_spaceship"))
+                    .isA(spaceShip);
 
-        // The instance has a private copy of Damage, but Attack and Defense are
-        // shared from the prefab.
-        System.out.println(inst.table().toString());
+            // The instance has a private copy of Damage, but Attack and Defense are
+            // shared from the prefab.
+            System.out.println(inst.table().toString());
 
-        // Override Attack explicitly on the instance.
-        inst.add(Attack.class);
-        System.out.println(inst.table().toString());
+            // Override Attack explicitly on the instance.
+            inst.add(Attack.class);
+            System.out.println(inst.table().toString());
 
-        // Values can be read whether they are inherited or overridden.
-        System.out.println("attack: " + inst.get(Attack.class).value());
-        System.out.println("defense: " + inst.get(Defense.class).value());
-        System.out.println("damage: " + inst.get(Damage.class).value());
+            // Values can be read whether they are inherited or overridden.
+            System.out.println("attack: " + inst.get(Attack.class).value());
+            System.out.println("defense: " + inst.get(Defense.class).value());
+            System.out.println("damage: " + inst.get(Damage.class).value());
 
-        world.destroy();
+        }
     }
 
     // Output:

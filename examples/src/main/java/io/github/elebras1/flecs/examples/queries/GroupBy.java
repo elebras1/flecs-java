@@ -17,63 +17,62 @@ import io.github.elebras1.flecs.examples.components.PositionView;
 public class GroupBy {
 
     public static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        world.component(Group.class);
-        world.component(DummyTag.class);
+        try (World world = new World()) {
+            world.component(Position.class);
+            world.component(Group.class);
+            world.component(DummyTag.class);
 
-        // Targets for the grouping relationship. Create them in order so that
-        // their ids reflect the intended group ordering.
-        long first = world.entity("First");
-        long second = world.entity("Second");
-        long third = world.entity("Third");
+            // Targets for the grouping relationship. Create them in order so that
+            // their ids reflect the intended group ordering.
+            long first = world.entity("First");
+            long second = world.entity("Second");
+            long third = world.entity("Third");
 
-        // Build a grouped query.
-        Query query = world.query()
-                .with(Position.class)
-                .groupBy(Group.class)
-                .build();
+            // Build a grouped query.
+            Query query = world.query()
+                    .with(Position.class)
+                    .groupBy(Group.class)
+                    .build();
 
-        // Create entities in three different groups and two different tables.
-        Entity e1 = world.obtainEntity(world.entity())
-                .set(new Position(1, 1));
-        e1.add(world.component(Group.class), third);
+            // Create entities in three different groups and two different tables.
+            Entity e1 = world.obtainEntity(world.entity())
+                    .set(new Position(1, 1));
+            e1.add(world.component(Group.class), third);
 
-        Entity e2 = world.obtainEntity(world.entity())
-                .set(new Position(2, 2));
-        e2.add(world.component(Group.class), second);
+            Entity e2 = world.obtainEntity(world.entity())
+                    .set(new Position(2, 2));
+            e2.add(world.component(Group.class), second);
 
-        Entity e3 = world.obtainEntity(world.entity())
-                .set(new Position(3, 3));
-        e3.add(world.component(Group.class), first);
+            Entity e3 = world.obtainEntity(world.entity())
+                    .set(new Position(3, 3));
+            e3.add(world.component(Group.class), first);
 
-        Entity e4 = world.obtainEntity(world.entity())
-                .set(new Position(4, 4))
-                .add(DummyTag.class);
-        e4.add(world.component(Group.class), third);
+            Entity e4 = world.obtainEntity(world.entity())
+                    .set(new Position(4, 4))
+                    .add(DummyTag.class);
+            e4.add(world.component(Group.class), third);
 
-        Entity e5 = world.obtainEntity(world.entity())
-                .set(new Position(5, 5))
-                .add(DummyTag.class);
-        e5.add(world.component(Group.class), second);
+            Entity e5 = world.obtainEntity(world.entity())
+                    .set(new Position(5, 5))
+                    .add(DummyTag.class);
+            e5.add(world.component(Group.class), second);
 
-        Entity e6 = world.obtainEntity(world.entity())
-                .set(new Position(6, 6))
-                .add(DummyTag.class);
-        e6.add(world.component(Group.class), first);
+            Entity e6 = world.obtainEntity(world.entity())
+                    .set(new Position(6, 6))
+                    .add(DummyTag.class);
+            e6.add(world.component(Group.class), first);
 
-        // Iterate the query. Entities are returned grouped by their group id.
-        query.iter(it -> {
-            Field<Position> positions = it.field(Position.class, 0);
-            for (int i = 0; i < it.count(); i++) {
-                PositionView pos = positions.getMutView(i);
-                System.out.println("{" + pos.x() + ", " + pos.y() + "}");
-            }
-            System.out.println();
-        });
+            // Iterate the query. Entities are returned grouped by their group id.
+            query.iter(it -> {
+                Field<Position> positions = it.field(Position.class, 0);
+                for (int i = 0; i < it.count(); i++) {
+                    PositionView pos = positions.getMutView(i);
+                    System.out.println("{" + pos.x() + ", " + pos.y() + "}");
+                }
+                System.out.println();
+            });
 
-        query.destroy();
-        world.destroy();
+        }
     }
 
     // Output:

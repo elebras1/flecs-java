@@ -12,6 +12,25 @@ public class FlecsSystem extends Entity {
         super(world, entityId);
     }
 
+    @Override
+    public void destruct() {
+        this.removeCtxEntry();
+        this.world.unregisterSystemCallbacks(this.id);
+        super.destruct();
+    }
+
+    private void removeCtxEntry() {
+        MemorySegment sysSeg = flecs_h.ecs_system_get(this.world.worldSeg(), this.id);
+        if (sysSeg == null || sysSeg.address() == 0) {
+            return;
+        }
+        MemorySegment ctxSeg = ecs_system_t.ctx(sysSeg);
+        if (ctxSeg != null && ctxSeg.address() != 0) {
+            ParamRegistry.remove(ctxSeg.address());
+            this.world.untrackCtx(ctxSeg.address());
+        }
+    }
+
     public void run() {
         flecs_h.ecs_run(this.world.worldSeg(), this.id, 0.0f, MemorySegment.NULL);
     }

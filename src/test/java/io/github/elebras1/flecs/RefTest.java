@@ -22,7 +22,7 @@ class RefTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -32,7 +32,7 @@ class RefTest {
         assertNotNull(ref);
         assertEquals(entity.id(), ref.entity());
         assertEquals(this.world.id(Position.class), ref.component());
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -46,7 +46,7 @@ class RefTest {
         assertEquals(10.0f, p.x());
         assertEquals(20.0f, p.y());
 
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -61,7 +61,7 @@ class RefTest {
         assertNotNull(ref.tryGet());
         assertEquals(5.0f, ref.get().x());
 
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -79,7 +79,7 @@ class RefTest {
         assertNotNull(v);
         assertEquals(1.0f, v.x());
         assertEquals(2.0f, v.y());
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -91,7 +91,7 @@ class RefTest {
         assertNotNull(ref);
         assertTrue(ref.has());
         assertEquals(1.0f, ref.get().x());
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -106,7 +106,7 @@ class RefTest {
         assertEquals(7.0f, ref.get().x());
         assertEquals(8.0f, ref.get().y());
 
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -127,7 +127,7 @@ class RefTest {
         assertEquals(50.0f, p.x());
         assertEquals(60.0f, p.y());
 
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -137,7 +137,7 @@ class RefTest {
         Ref<Position> ref = entity.getRef(Position.class, target);
 
         assertNull(ref.getMutView());
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -150,6 +150,6 @@ class RefTest {
         assertEquals(30.0f, ref.get().x());
         assertEquals(40.0f, ref.get().y());
 
-        ref.destroy();
+        ref.destruct();
     }
 }

@@ -29,7 +29,7 @@ class QueryBuilderTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -40,7 +40,6 @@ class QueryBuilderTest {
         Query query = this.world.query().with(Position.class).build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -62,7 +61,6 @@ class QueryBuilderTest {
         });
         assertEquals(List.of(10.0f), xs);
         assertEquals(List.of(20.0f), ys);
-        query.destroy();
     }
 
     @Test
@@ -74,7 +72,6 @@ class QueryBuilderTest {
         Query query = this.world.query().with(tag).build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -89,7 +86,6 @@ class QueryBuilderTest {
         Query query = this.world.query().with(likes, apples).build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -104,7 +100,6 @@ class QueryBuilderTest {
         Query query = this.world.query().with(Flecs.Toggle | positionId).build();
         assertEquals(1, query.count());
         assertEquals(disabled.id(), query.first());
-        query.destroy();
     }
 
     @Test
@@ -118,7 +113,6 @@ class QueryBuilderTest {
 
         Query query = this.world.query().with(likes, Flecs.Wildcard).build();
         assertEquals(2, query.count());
-        query.destroy();
     }
 
     @Test
@@ -130,7 +124,6 @@ class QueryBuilderTest {
         Query query = this.world.query().with(Position.class, target).build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -144,7 +137,6 @@ class QueryBuilderTest {
                 .build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -159,7 +151,6 @@ class QueryBuilderTest {
                 .build();
         assertEquals(2, query.count());
         assertTrue(query.entities()[0] == e1 || query.entities()[0] == e2);
-        query.destroy();
     }
 
     @Test
@@ -172,7 +163,6 @@ class QueryBuilderTest {
                 .with(Velocity.class).optional()
                 .build();
         assertEquals(2, query.count());
-        query.destroy();
     }
 
     @Test
@@ -185,7 +175,6 @@ class QueryBuilderTest {
         Query query = this.world.query().expr("Position, [in] Velocity").build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -195,7 +184,6 @@ class QueryBuilderTest {
         Query query = this.world.query().with("Position").build();
         assertEquals(1, query.count());
         assertEquals(e1, query.first());
-        query.destroy();
     }
 
     @Test
@@ -210,7 +198,6 @@ class QueryBuilderTest {
                 .build();
 
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -231,7 +218,6 @@ class QueryBuilderTest {
             invocations.incrementAndGet();
         });
         assertEquals(1, invocations.get());
-        query.destroy();
     }
 
     @Test
@@ -244,7 +230,6 @@ class QueryBuilderTest {
 
         this.world.obtainEntity(this.world.entity()).add(Position.class);
         assertEquals(3, query.count());
-        query.destroy();
     }
 
     @Test
@@ -295,7 +280,6 @@ class QueryBuilderTest {
         assertEquals(1.0f, this.world.obtainEntityView(entities[0]).get(Position.class).x());
         assertEquals(2.0f, this.world.obtainEntityView(entities[1]).get(Position.class).x());
         assertEquals(3.0f, this.world.obtainEntityView(entities[2]).get(Position.class).x());
-        query.destroy();
     }
 
     @Test
@@ -306,7 +290,6 @@ class QueryBuilderTest {
                 .with(Position.class).in()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -320,7 +303,6 @@ class QueryBuilderTest {
                 .termAt(1).out()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -339,7 +321,6 @@ class QueryBuilderTest {
         this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
         assertTrue(query.changed());
 
-        query.destroy();
     }
 
     @Test
@@ -365,7 +346,6 @@ class QueryBuilderTest {
 
         assertEquals(List.of("Earth"), names);
         assertEquals(List.of(10.0f), parentXs);
-        query.destroy();
     }
 
     @Test
@@ -392,7 +372,6 @@ class QueryBuilderTest {
         });
 
         assertEquals(List.of(1.0f), parentXs);
-        query.destroy();
     }
 
     @Test
@@ -418,7 +397,6 @@ class QueryBuilderTest {
 
         assertEquals(List.of("Earth", "Moon"), names);
         assertEquals(List.of(10.0f, 1.0f), parentXs);
-        query.destroy();
     }
 
     @Test
@@ -440,7 +418,6 @@ class QueryBuilderTest {
         });
 
         assertEquals(List.of("Moon", "Earth"), names);
-        query.destroy();
     }
 
     @Test
@@ -462,7 +439,6 @@ class QueryBuilderTest {
         });
         upNames.sort(String::compareTo);
         assertEquals(List.of("childOwn", "childShared"), upNames);
-        upOnly.destroy();
 
         Query selfUp = this.world.query()
                 .with(Position.class).self().up()
@@ -475,7 +451,6 @@ class QueryBuilderTest {
         });
         selfNames.sort(String::compareTo);
         assertEquals(List.of("childOwn", "childShared", "parent"), selfNames);
-        selfUp.destroy();
     }
 
     @Test
@@ -497,7 +472,6 @@ class QueryBuilderTest {
             }
         });
         assertEquals(1, invocations.get());
-        query.destroy();
     }
 
     @Test
@@ -518,7 +492,6 @@ class QueryBuilderTest {
             }
         });
         assertEquals(1, invocations.get());
-        query.destroy();
     }
 
     @Test
@@ -539,7 +512,6 @@ class QueryBuilderTest {
             }
         });
         assertEquals(1, invocations.get());
-        query.destroy();
     }
 
     @Test
@@ -560,7 +532,6 @@ class QueryBuilderTest {
             }
         });
         assertEquals(1, invocations.get());
-        query.destroy();
     }
 
     @Test
@@ -574,7 +545,6 @@ class QueryBuilderTest {
                 .termAt(2).write()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -587,7 +557,6 @@ class QueryBuilderTest {
                 .with(Position.class).termAt(2).filter()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -602,7 +571,6 @@ class QueryBuilderTest {
 
         assertEquals(ctx, query.getCtx());
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -630,7 +598,6 @@ class QueryBuilderTest {
             }
         });
         assertEquals(2, count.get());
-        query.destroy();
     }
 
     @Test
@@ -640,7 +607,6 @@ class QueryBuilderTest {
 
         Query query = this.world.queryBuilder(Position.class, Velocity.class).build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -664,7 +630,6 @@ class QueryBuilderTest {
                 .with(Position.class).termAt(1).inoutNone()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -676,7 +641,6 @@ class QueryBuilderTest {
                 .cacheKind(Flecs.QueryCacheAuto)
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
     }
 
     @Test
@@ -690,19 +654,16 @@ class QueryBuilderTest {
                 .with(rel).second().name("RefBuilderTarget")
                 .build();
         assertEquals(1, viaSecondName.count());
-        viaSecondName.destroy();
 
         Query viaFirstSecond = this.world.query()
                 .with(rel).first(rel).second(target)
                 .build();
         assertEquals(1, viaFirstSecond.count());
-        viaFirstSecond.destroy();
 
         Query viaEntity = this.world.query()
                 .with(rel).second().entity(target)
                 .build();
         assertEquals(1, viaEntity.count());
-        viaEntity.destroy();
     }
 
     @Test
@@ -715,7 +676,6 @@ class QueryBuilderTest {
                 .termAt(Velocity.class).out()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
 
         QueryBuilder builder = this.world.query().with(Position.class);
         try {
@@ -751,7 +711,7 @@ class QueryBuilderTest {
                 .cached()
                 .build();
         assertEquals(1, query.count());
-        query.destroy();
+        query.destruct();
 
         assertTrue(created.get() >= 1);
         assertTrue(deleted.get() >= 1);

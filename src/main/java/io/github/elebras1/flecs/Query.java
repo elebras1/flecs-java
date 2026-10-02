@@ -14,13 +14,14 @@ public class Query extends QueryBase {
 
     private final Arena arena;
     private final Iter iter;
-    private boolean destroyed;
+    private boolean destructed;
 
     Query(World world, MemorySegment querySeg) {
         super(world, querySeg);
         this.arena = Arena.ofShared();
         this.iter = new Iter(MemorySegment.NULL, this.world);
-        this.destroyed = false;
+        this.destructed = false;
+        this.world.trackQuery(this);
     }
 
     private MemorySegment createIterSeg() {
@@ -128,12 +129,13 @@ public class Query extends QueryBase {
 
     @Override
     protected void checkDestroyed() {
-        if (this.destroyed) {
+        if (this.destructed || this.world.isDestroyed()) {
             throw new IllegalStateException("The query has already been destroyed.");
         }
     }
 
     public String toStringExpr() {
+        this.checkDestroyed();
         MemorySegment strSeg = flecs_h.ecs_query_str(this.querySeg);
         if (strSeg.address() == 0) {
             return "Invalid/empty query";
@@ -176,10 +178,11 @@ public class Query extends QueryBase {
         return ParamRegistry.get(ctxSeg.address());
     }
 
-    public void destroy() {
-        if (!this.destroyed) {
-            this.destroyed = true;
-            if (this.querySeg != null && this.querySeg.address() != 0) {
+    void destruct() {
+        if (!this.destructed) {
+            this.destructed = true;
+            this.world.untrackQuery(this);
+            if (!this.world.isDestroyed() && this.querySeg != null && this.querySeg.address() != 0) {
                 MemorySegment ctxSeg = ecs_query_t.ctx(this.querySeg);
                 if (ctxSeg != null && ctxSeg.address() != 0) {
                     ParamRegistry.remove(ctxSeg.address());
@@ -193,6 +196,7 @@ public class Query extends QueryBase {
 
     @Override
     public String toString() {
+        this.checkDestroyed();
         MemorySegment strSeg = flecs_h.ecs_query_str(this.querySeg);
         String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
         FlecsAllocator.free(strSeg);

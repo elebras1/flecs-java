@@ -26,45 +26,45 @@ public class ManualStaging {
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
         List<Future<?>> futures = new ArrayList<>();
 
-        World world = new World();
-        world.setStageCount(THREADS);
-        world.component(Health.class);
+        try (World world = new World()) {
+            world.setStageCount(THREADS);
+            world.component(Health.class);
 
-        for (int i = 0; i < 1000; i++) {
-            Entity entity = world.obtainEntity(world.entity("entity_" + i));
-            entity.set(new Health(i));
-        }
-
-        world.readonlyBegin();
-        for (int i = 0; i < THREADS; i++) {
-            final int stageId = i;
-            futures.add(executor.submit(() -> {
-                World stage = world.getStage(stageId);
-                for (int j = stageId * 250; j < (stageId + 1) * 250; j++) {
-                    long entityId = stage.lookup("entity_" + j);
-                    EntityView entity = stage.obtainEntityView(entityId);
-                    HealthView health = entity.getMutView(Health.class);
-                    health.value(health.value() + 1);
-                }
-            }));
-        }
-
-        try {
-            for (Future<?> f : futures) {
-                f.get();
+            for (int i = 0; i < 1000; i++) {
+                Entity entity = world.obtainEntity(world.entity("entity_" + i));
+                entity.set(new Health(i));
             }
-        } catch (InterruptedException | ExecutionException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+
+            world.readonlyBegin();
+            for (int i = 0; i < THREADS; i++) {
+                final int stageId = i;
+                futures.add(executor.submit(() -> {
+                    World stage = world.getStage(stageId);
+                    for (int j = stageId * 250; j < (stageId + 1) * 250; j++) {
+                        long entityId = stage.lookup("entity_" + j);
+                        EntityView entity = stage.obtainEntityView(entityId);
+                        HealthView health = entity.getMutView(Health.class);
+                        health.value(health.value() + 1);
+                    }
+                }));
+            }
+
+            try {
+                for (Future<?> f : futures) {
+                    f.get();
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
+
+            world.readonlyEnd();
+
+            Health health = world.obtainEntity(world.lookup("entity_42")).get(Health.class);
+            System.out.println("entity_42 health after staging: " + health.value());
+
+            executor.shutdown();
         }
-
-        world.readonlyEnd();
-
-        Health health = world.obtainEntity(world.lookup("entity_42")).get(Health.class);
-        System.out.println("entity_42 health after staging: " + health.value());
-
-        executor.shutdown();
-        world.destroy();
     }
 
     // Output:

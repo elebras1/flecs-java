@@ -10,7 +10,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -19,7 +19,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -28,7 +28,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -37,7 +37,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -46,7 +46,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -55,7 +55,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -73,7 +73,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -82,7 +82,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -91,7 +91,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -109,7 +109,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -118,7 +118,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -127,7 +127,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -136,7 +136,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -145,7 +145,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -154,7 +154,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -163,7 +163,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -172,7 +172,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -181,7 +181,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -190,7 +190,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -199,7 +199,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -208,7 +208,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -217,7 +217,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -226,7 +226,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -235,7 +235,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -244,7 +244,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -253,7 +253,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -262,7 +262,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -271,7 +271,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -280,7 +280,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -289,7 +289,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -298,7 +298,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -307,7 +307,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -316,7 +316,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -325,7 +325,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -334,7 +334,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -343,7 +343,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -352,7 +352,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -361,7 +361,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -370,7 +370,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -379,7 +379,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -388,7 +388,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -397,7 +397,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -406,7 +406,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -415,7 +415,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -424,7 +424,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -433,7 +433,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -442,7 +442,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -451,7 +451,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -460,7 +460,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -469,7 +469,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -478,7 +478,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -487,7 +487,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -496,7 +496,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -505,7 +505,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -514,7 +514,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -523,7 +523,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -532,7 +532,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -541,7 +541,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -550,7 +550,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -559,7 +559,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -568,7 +568,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -577,7 +577,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -586,7 +586,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -595,7 +595,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -604,7 +604,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -613,7 +613,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -622,7 +622,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -631,7 +631,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -640,7 +640,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -649,7 +649,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -658,7 +658,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -667,7 +667,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -676,7 +676,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -685,7 +685,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -694,7 +694,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -703,7 +703,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -712,7 +712,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -721,7 +721,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -730,7 +730,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -739,7 +739,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -748,7 +748,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -757,7 +757,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -766,7 +766,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -775,7 +775,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -784,7 +784,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -793,7 +793,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -802,7 +802,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -811,7 +811,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -820,7 +820,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -829,7 +829,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -838,7 +838,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -847,7 +847,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -856,7 +856,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -865,7 +865,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -874,7 +874,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -883,7 +883,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -892,7 +892,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -901,7 +901,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -910,7 +910,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -919,7 +919,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -928,7 +928,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -937,7 +937,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -946,7 +946,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -955,7 +955,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -964,7 +964,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -973,7 +973,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -982,7 +982,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -991,7 +991,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1000,7 +1000,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1009,7 +1009,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1018,7 +1018,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1027,7 +1027,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1036,7 +1036,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1045,7 +1045,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1054,7 +1054,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1063,7 +1063,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1072,7 +1072,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1081,7 +1081,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1090,7 +1090,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1099,7 +1099,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1108,7 +1108,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1117,7 +1117,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1126,7 +1126,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1135,7 +1135,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1144,7 +1144,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1153,7 +1153,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1162,7 +1162,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1171,7 +1171,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1180,7 +1180,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1189,7 +1189,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1198,7 +1198,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1207,7 +1207,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1216,7 +1216,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1225,7 +1225,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1234,7 +1234,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1243,7 +1243,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1252,7 +1252,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1261,7 +1261,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1270,7 +1270,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1279,7 +1279,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1288,7 +1288,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1297,7 +1297,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1306,7 +1306,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1315,7 +1315,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1324,7 +1324,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1333,7 +1333,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1342,7 +1342,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1351,7 +1351,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1360,7 +1360,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1369,7 +1369,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1378,7 +1378,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1387,7 +1387,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1396,7 +1396,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1405,7 +1405,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1414,7 +1414,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1423,7 +1423,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1432,7 +1432,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1441,7 +1441,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1450,7 +1450,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1459,7 +1459,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1468,7 +1468,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1477,7 +1477,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1486,7 +1486,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1495,7 +1495,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1504,7 +1504,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1513,7 +1513,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1522,7 +1522,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1531,7 +1531,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1540,7 +1540,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1549,7 +1549,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1558,7 +1558,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1567,7 +1567,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1576,7 +1576,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1585,7 +1585,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1594,7 +1594,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1603,7 +1603,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1612,7 +1612,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1621,7 +1621,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1630,7 +1630,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1639,7 +1639,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1648,7 +1648,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1657,7 +1657,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1666,7 +1666,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1675,7 +1675,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1684,7 +1684,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1693,7 +1693,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1702,7 +1702,7 @@ public abstract class WorldBase {
         try {
             query.each(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1711,7 +1711,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1720,7 +1720,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 
@@ -1729,7 +1729,7 @@ public abstract class WorldBase {
         try {
             query.eachView(componentClassA, componentClassB, componentClassC, componentClassD, componentClassE, componentClassF, componentClassG, componentClassH, componentClassI, componentClassJ, componentClassK, componentClassL, componentClassM, componentClassN, componentClassO, componentClassP, componentClassQ, componentClassR, componentClassS, componentClassT, componentClassU, componentClassV, componentClassW, componentClassX, componentClassY, componentClassZ, componentClassAA, componentClassAB, componentClassAC, componentClassAD, componentClassAE, componentClassAF, callback);
         } finally {
-            query.destroy();
+            query.destruct();
         }
     }
 }

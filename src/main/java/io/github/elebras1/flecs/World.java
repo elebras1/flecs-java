@@ -16,13 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-public class World extends WorldBase {
+public class World extends WorldBase implements AutoCloseable {
     public static final MemorySegment WHOLE_MEMORY;
     private final MemorySegment worldSeg;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
+    private final Set<Query> queries;
     private final FlecsBuffers buffers;
     private final FlecsContext context;
     private World[] stages;
@@ -47,6 +48,7 @@ public class World extends WorldBase {
         this.componentRegistry = new ComponentRegistry(this.worldSeg);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
+        this.queries = ConcurrentHashMap.newKeySet();
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.stages = new World[] { this };
@@ -63,6 +65,7 @@ public class World extends WorldBase {
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
+        this.queries = ConcurrentHashMap.newKeySet();
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.destroyed = false;
@@ -847,22 +850,6 @@ public class World extends WorldBase {
         return namePrefixSeg.reinterpret(Long.MAX_VALUE).getString(0);
     }
 
-    void registerSystemCallbacks(long systemId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
-        if (iterCallback != null || runCallback != null || entityCallback != null) {
-            this.systemCallbacks.put(systemId, new SystemCallbacks(iterCallback, runCallback, entityCallback));
-        }
-    }
-
-    void registerObserverCallbacks(long observerId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
-        if (iterCallback != null || runCallback != null || entityCallback != null) {
-            this.observerCallbacks.put(observerId, new ObserverCallbacks(iterCallback, runCallback, entityCallback));
-        }
-    }
-
-    FlecsContext viewCache() {
-        return this.context;
-    }
-
     public void setStageCount(int count) {
         this.checkDestroyed();
         flecs_h.ecs_set_stage_count(this.worldSeg, count);
@@ -1323,25 +1310,80 @@ public class World extends WorldBase {
         }
     }
 
+    FlecsContext viewCache() {
+        return this.context;
+    }
+
+    void registerSystemCallbacks(long systemId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
+        if (iterCallback != null || runCallback != null || entityCallback != null) {
+            this.systemCallbacks.put(systemId, new SystemCallbacks(iterCallback, runCallback, entityCallback));
+        }
+    }
+
+    void registerObserverCallbacks(long observerId, IterCallback iterCallback, RunCallback runCallback, EntityCallback entityCallback) {
+        if (iterCallback != null || runCallback != null || entityCallback != null) {
+            this.observerCallbacks.put(observerId, new ObserverCallbacks(iterCallback, runCallback, entityCallback));
+        }
+    }
+
+    void unregisterSystemCallbacks(long systemId) {
+        this.systemCallbacks.remove(systemId);
+    }
+
+    void unregisterObserverCallbacks(long observerId) {
+        this.observerCallbacks.remove(observerId);
+    }
+
+    void trackQuery(Query query) {
+        this.queries.add(query);
+    }
+
+    void untrackQuery(Query query) {
+        this.queries.remove(query);
+    }
+
+    boolean isDestroyed() {
+        return this.destroyed;
+    }
+
     private long statsGaugeAvg(MemorySegment metric, long t) {
         return (long) ecs_gauge_t.avg(ecs_metric_t.gauge(metric), t);
     }
 
     private float statsGaugeAvgFloat(MemorySegment metric, long t) {
-        return (float) ecs_gauge_t.avg(ecs_metric_t.gauge(metric), t);
+        return ecs_gauge_t.avg(ecs_metric_t.gauge(metric), t);
     }
 
     private double statsCounterValue(MemorySegment metric, long t) {
         return ecs_counter_t.value(ecs_metric_t.counter(metric), t);
     }
 
-    public void destroy() {
+    private void closeQueries() {
+        for (Query query : this.queries) {
+            query.destruct();
+        }
+        this.queries.clear();
+    }
+
+    @Override
+    public void close() {
         if (!this.destroyed) {
+            if (this.worldSeg != null && this.worldSeg.address() != 0) {
+                this.closeQueries();
+                if (this.owned) {
+                    for (World stage : this.stages) {
+                        if (stage != null && stage != this) {
+                            stage.closeQueries();
+                        }
+                    }
+                }
+            }
             if (this.owned && this.worldSeg != null && this.worldSeg.address() != 0) {
                 flecs_h.ecs_fini(this.worldSeg);
                 for(World stage : this.stages) {
                     if (stage != null && stage != this) {
                         stage.arena.close();
+                        stage.destroyed = true;
                     }
                 }
             }

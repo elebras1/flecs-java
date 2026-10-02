@@ -36,7 +36,7 @@ class WorldTest {
 
     @AfterEach
     void tearDown() {
-        this.world.destroy();
+        this.world.close();
     }
 
     @Test
@@ -230,7 +230,7 @@ class WorldTest {
     void atfini() {
         AtomicBoolean ran = new AtomicBoolean(false);
         this.world.atfini(() -> ran.set(true));
-        this.world.destroy();
+        this.world.close();
         assertTrue(ran.get());
 
         this.world = new World();
@@ -325,24 +325,23 @@ class WorldTest {
 
     @Test
     void multiWorld() {
-        World world2 = new World();
-        world2.component(Position.class);
-        world2.component(Velocity.class);
+        try (World world2 = new World()) {
+            world2.component(Position.class);
+            world2.component(Velocity.class);
 
-        long p1 = this.world.id(Position.class);
-        long p2 = world2.id(Position.class);
-        assertTrue(p1 != 0);
-        assertTrue(p2 != 0);
+            long p1 = this.world.id(Position.class);
+            long p2 = world2.id(Position.class);
+            assertTrue(p1 != 0);
+            assertTrue(p2 != 0);
 
-        Entity e1 = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
-        Entity e2 = world2.obtainEntity(world2.entity()).set(new Position(30, 40));
+            Entity e1 = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+            Entity e2 = world2.obtainEntity(world2.entity()).set(new Position(30, 40));
 
-        Position pos1 = e1.get(Position.class);
-        assertEquals(10.0f, pos1.x());
-        Position pos2 = e2.get(Position.class);
-        assertEquals(30.0f, pos2.x());
-
-        world2.destroy();
+            Position pos1 = e1.get(Position.class);
+            assertEquals(10.0f, pos1.x());
+            Position pos2 = e2.get(Position.class);
+            assertEquals(30.0f, pos2.x());
+        }
     }
 
     @Test
@@ -351,7 +350,7 @@ class WorldTest {
         Ref<Position> ref = this.world.getRef(Position.class);
         assertNotNull(ref);
         assertEquals(componentId, ref.component());
-        ref.destroy();
+        ref.destruct();
     }
 
     @Test
@@ -403,17 +402,16 @@ class WorldTest {
         assertNotNull(json);
         assertFalse(json.isEmpty());
 
-        World world2 = new World();
-        world2.component(Position.class);
-        world2.fromJson(json);
-        long entityId = world2.lookup("json_entity");
-        assertTrue(entityId != 0);
-        Entity restored = world2.obtainEntity(entityId);
-        assertTrue(restored.has(Position.class));
-        Position p = restored.get(Position.class);
-        assertNotNull(p);
-
-        world2.destroy();
+        try (World world2 = new World()) {
+            world2.component(Position.class);
+            world2.fromJson(json);
+            long entityId = world2.lookup("json_entity");
+            assertTrue(entityId != 0);
+            Entity restored = world2.obtainEntity(entityId);
+            assertTrue(restored.has(Position.class));
+            Position p = restored.get(Position.class);
+            assertNotNull(p);
+        }
     }
 
     @Test
@@ -602,23 +600,21 @@ class WorldTest {
 
     @Test
     void ctxFreeOnWorldDestroy() {
-        World world2 = new World();
-        long rel = world2.entity();
-        long tgt = world2.entity();
-        world2.obtainEntity(world2.entity()).add(rel, tgt);
-
         AtomicReference<Object> received = new AtomicReference<>();
         Object ctx = new Object();
+        try (World world2 = new World()) {
+            long rel = world2.entity();
+            long tgt = world2.entity();
+            world2.obtainEntity(world2.entity()).add(rel, tgt);
 
-        Query query = world2.query()
-                .with(rel, Flecs.Wildcard)
-                .groupBy(rel)
-                .groupByCtx(ctx, received::set)
-                .cached()
-                .build();
-        assertEquals(1, query.count());
-
-        world2.destroy();
+            Query query = world2.query()
+                    .with(rel, Flecs.Wildcard)
+                    .groupBy(rel)
+                    .groupByCtx(ctx, received::set)
+                    .cached()
+                    .build();
+            assertEquals(1, query.count());
+        }
 
         assertSame(ctx, received.get());
     }
@@ -1212,7 +1208,7 @@ class WorldTest {
         assertEquals(3, query.count());
         assertTrue(created.get() >= 3);
 
-        query.destroy();
+        query.destruct();
         assertEquals(created.get(), deleted.get());
     }
 
@@ -1239,7 +1235,6 @@ class WorldTest {
 
         assertEquals(1, query.count());
         assertTrue(groupByCalls.get() >= 1);
-        query.destroy();
     }
 
     @Test
@@ -1262,7 +1257,15 @@ class WorldTest {
                 .build();
 
         assertEquals(1, query.count());
-        query.destroy();
+        query.destruct();
         assertEquals(1, freed.get());
+    }
+
+    @Test
+    void autoCloseable() {
+        try (World world = new World()) {
+            world.component(Position.class);
+            assertNotEquals(0, world.entity());
+        }
     }
 }

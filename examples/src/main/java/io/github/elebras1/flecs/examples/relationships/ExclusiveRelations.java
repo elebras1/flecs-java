@@ -13,35 +13,35 @@ import io.github.elebras1.flecs.Flecs;
 public class ExclusiveRelations {
 
     public static void main(String[] args) {
-        World world = new World();
+        try (World world = new World()) {
 
-        // Register Platoon as an exclusive relationship. This ensures that an entity
-        // can only belong to a single platoon.
-        world.obtainEntity(world.component(Platoon.class)).add(Flecs.Exclusive);
+            // Register Platoon as an exclusive relationship. This ensures that an entity
+            // can only belong to a single platoon.
+            world.obtainEntity(world.component(Platoon.class)).add(Flecs.Exclusive);
 
-        // Create two platoons.
-        long platoon1 = world.entity();
-        long platoon2 = world.entity();
+            // Create two platoons.
+            long platoon1 = world.entity();
+            long platoon2 = world.entity();
 
-        // Create a unit.
-        Entity unit = world.obtainEntity(world.entity());
+            // Create a unit.
+            Entity unit = world.obtainEntity(world.entity());
 
-        // Add unit to platoon 1.
-        unit.add(Platoon.class, platoon1);
+            // Add unit to platoon 1.
+            unit.add(Platoon.class, platoon1);
 
-        // Log platoon of unit.
-        System.out.println("Unit in platoon 1: " + (unit.has(Platoon.class, platoon1)));
-        System.out.println("Unit in platoon 2: " + (unit.has(Platoon.class, platoon2)));
-        System.out.println();
+            // Log platoon of unit.
+            System.out.println("Unit in platoon 1: " + (unit.has(Platoon.class, platoon1)));
+            System.out.println("Unit in platoon 2: " + (unit.has(Platoon.class, platoon2)));
+            System.out.println();
 
-        // Add unit to platoon 2. Because Platoon is exclusive, this removes the
-        // first pair and adds the second one in a single operation.
-        unit.add(Platoon.class, platoon2);
+            // Add unit to platoon 2. Because Platoon is exclusive, this removes the
+            // first pair and adds the second one in a single operation.
+            unit.add(Platoon.class, platoon2);
 
-        System.out.println("Unit in platoon 1: " + (unit.has(Platoon.class, platoon1)));
-        System.out.println("Unit in platoon 2: " + (unit.has(Platoon.class, platoon2)));
+            System.out.println("Unit in platoon 1: " + (unit.has(Platoon.class, platoon1)));
+            System.out.println("Unit in platoon 2: " + (unit.has(Platoon.class, platoon2)));
 
-        world.destroy();
+        }
     }
 
     // Output:

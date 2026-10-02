@@ -16,6 +16,6 @@ public final class ScopedWorld extends World implements AutoCloseable {
             this.setScope(this.scope);
             this.closed = true;
         }
-        this.destroy();
+        super.close();
     }
 }

@@ -59,7 +59,7 @@ public class PrefabBenchmark {
     @TearDown(Level.Trial)
     public void tearDown() {
         if (this.world != null) {
-            this.world.destroy();
+            this.world.close();
             this.world = null;
         }
     }

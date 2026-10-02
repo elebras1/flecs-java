@@ -19,28 +19,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class IterateComponents {
 
     static void main(String[] args) {
-        World world = new World();
-        world.component(Position.class);
-        world.component(Velocity.class);
-        world.component(Human.class);
-        world.component(Eats.class);
-        world.component(Apples.class);
+        try (World world = new World()) {
+            world.component(Position.class);
+            world.component(Velocity.class);
+            world.component(Human.class);
+            world.component(Eats.class);
+            world.component(Apples.class);
 
-        // Build Bob with Position, Velocity, Human and a (Eats, Apples) pair.
-        Entity bob = world.obtainEntity(world.entity())
-                .set(new Position(10, 20))
-                .set(new Velocity(1, 1))
-                .add(Human.class)
-                .add(Eats.class, Apples.class);
+            // Build Bob with Position, Velocity, Human and a (Eats, Apples) pair.
+            Entity bob = world.obtainEntity(world.entity())
+                    .set(new Position(10, 20))
+                    .set(new Velocity(1, 1))
+                    .add(Human.class)
+                    .add(Eats.class, Apples.class);
 
-        System.out.println("Entity's components:");
-        iterateComponents(world, bob);
+            System.out.println("Entity's components:");
+            iterateComponents(world, bob);
 
-        // We can use the same function to iterate the components of a component.
-        System.out.println("Position's components:");
-        iterateComponents(world, world.obtainEntity(world.entity(Position.class)));
+            // We can use the same function to iterate the components of a component.
+            System.out.println("Position's components:");
+            iterateComponents(world, world.obtainEntity(world.entity(Position.class)));
 
-        world.destroy();
+        }
     }
 
     private static void iterateComponents(World world, Entity entity) {
