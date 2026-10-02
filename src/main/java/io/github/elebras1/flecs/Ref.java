@@ -12,6 +12,7 @@ public class Ref<T> {
     private final Component<T> component;
     private final MemorySegment refSeg;
     private final Arena arena;
+    private boolean destructed;
 
     public Ref(World world, long entityId, Class<T> componentClass) {
         this(world, entityId, world.componentRegistry().getComponentId(componentClass), componentClass);
@@ -36,6 +37,7 @@ public class Ref<T> {
     }
 
     public T get() {
+        this.checkDestructed();
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
         if (address == 0) {
             return null;
@@ -46,6 +48,7 @@ public class Ref<T> {
 
     @SuppressWarnings("unchecked")
     public <A extends ComponentView> A getMutView() {
+        this.checkDestructed();
         ComponentView view = this.world.viewCache().getComponentView(this.componentClass);
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
         if (address == 0) {
@@ -57,6 +60,7 @@ public class Ref<T> {
     }
 
     public T tryGet() {
+        this.checkDestructed();
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
         if (address == 0) {
             return null;
@@ -69,7 +73,17 @@ public class Ref<T> {
         return this.tryGet() != null;
     }
 
+    private void checkDestructed() {
+        if (this.destructed) {
+            throw new IllegalStateException("Ref has been destructed");
+        }
+    }
+
     public void destruct() {
+        if (this.destructed) {
+            return;
+        }
+        this.destructed = true;
         this.arena.close();
     }
 }

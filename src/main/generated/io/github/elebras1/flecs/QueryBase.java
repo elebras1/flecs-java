@@ -79,6 +79,7 @@ public abstract class QueryBase {
             long sizeA = componentA.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 int count = ecs_iter_t.count(iterSeg);
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
@@ -183,6 +184,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 int count = ecs_iter_t.count(iterSeg);
                 boolean isSelfA = flecs_h.ecs_field_is_self(iterSeg, (byte) 0);
@@ -293,6 +295,7 @@ public abstract class QueryBase {
             long sizeB = componentB.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 int count = ecs_iter_t.count(iterSeg);
@@ -420,6 +423,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 int count = ecs_iter_t.count(iterSeg);
@@ -551,6 +555,7 @@ public abstract class QueryBase {
             long sizeC = componentC.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -701,6 +706,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -853,6 +859,7 @@ public abstract class QueryBase {
             long sizeD = componentD.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -1026,6 +1033,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -1199,6 +1207,7 @@ public abstract class QueryBase {
             long sizeE = componentE.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -1395,6 +1404,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -1589,6 +1599,7 @@ public abstract class QueryBase {
             long sizeF = componentF.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -1808,6 +1819,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -2023,6 +2035,7 @@ public abstract class QueryBase {
             long sizeG = componentG.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -2265,6 +2278,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -2501,6 +2515,7 @@ public abstract class QueryBase {
             long sizeH = componentH.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -2766,6 +2781,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -3023,6 +3039,7 @@ public abstract class QueryBase {
             long sizeI = componentI.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -3311,6 +3328,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -3589,6 +3607,7 @@ public abstract class QueryBase {
             long sizeJ = componentJ.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -3900,6 +3919,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -4199,6 +4219,7 @@ public abstract class QueryBase {
             long sizeK = componentK.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -4533,6 +4554,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -4853,6 +4875,7 @@ public abstract class QueryBase {
             long sizeL = componentL.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -5210,6 +5233,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -5551,6 +5575,7 @@ public abstract class QueryBase {
             long sizeM = componentM.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -5931,6 +5956,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -6293,6 +6319,7 @@ public abstract class QueryBase {
             long sizeN = componentN.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -6696,6 +6723,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -7079,6 +7107,7 @@ public abstract class QueryBase {
             long sizeO = componentO.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -7505,6 +7534,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -7909,6 +7939,7 @@ public abstract class QueryBase {
             long sizeP = componentP.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -8358,6 +8389,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -8783,6 +8815,7 @@ public abstract class QueryBase {
             long sizeQ = componentQ.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -9255,6 +9288,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -9701,6 +9735,7 @@ public abstract class QueryBase {
             long sizeR = componentR.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -10196,6 +10231,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -10663,6 +10699,7 @@ public abstract class QueryBase {
             long sizeS = componentS.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -11181,6 +11218,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -11669,6 +11707,7 @@ public abstract class QueryBase {
             long sizeT = componentT.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -12210,6 +12249,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -12719,6 +12759,7 @@ public abstract class QueryBase {
             long sizeU = componentU.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -13283,6 +13324,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -13813,6 +13855,7 @@ public abstract class QueryBase {
             long sizeV = componentV.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -14400,6 +14443,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -14951,6 +14995,7 @@ public abstract class QueryBase {
             long sizeW = componentW.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -15561,6 +15606,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -16133,6 +16179,7 @@ public abstract class QueryBase {
             long sizeX = componentX.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -16766,6 +16813,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -17359,6 +17407,7 @@ public abstract class QueryBase {
             long sizeY = componentY.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -18015,6 +18064,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -18629,6 +18679,7 @@ public abstract class QueryBase {
             long sizeZ = componentZ.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -19308,6 +19359,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -19943,6 +19995,7 @@ public abstract class QueryBase {
             long sizeAA = componentAA.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -20645,6 +20698,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -21301,6 +21355,7 @@ public abstract class QueryBase {
             long sizeAB = componentAB.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -22026,6 +22081,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -22703,6 +22759,7 @@ public abstract class QueryBase {
             long sizeAC = componentAC.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -23451,6 +23508,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -24149,6 +24207,7 @@ public abstract class QueryBase {
             long sizeAD = componentAD.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -24920,6 +24979,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -25639,6 +25699,7 @@ public abstract class QueryBase {
             long sizeAE = componentAE.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -26433,6 +26494,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -27173,6 +27235,7 @@ public abstract class QueryBase {
             long sizeAF = componentAF.size();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 MemorySegment fieldA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0);
                 MemorySegment fieldB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1);
                 MemorySegment fieldC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2);
@@ -27990,6 +28053,7 @@ public abstract class QueryBase {
             this.world.viewCache().resetCursors();
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 long baseA = flecs_h.ecs_field_w_size(iterSeg, sizeA, (byte) 0).address();
                 long baseB = flecs_h.ecs_field_w_size(iterSeg, sizeB, (byte) 1).address();
                 long baseC = flecs_h.ecs_field_w_size(iterSeg, sizeC, (byte) 2).address();
@@ -28318,6 +28382,7 @@ public abstract class QueryBase {
             }
             Iter iter = new Iter(iterSeg, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
                 int count = ecs_iter_t.count(iterSeg);
                 for (int i = 0; i < count; i++) {
                     callback.accept(iter, i);

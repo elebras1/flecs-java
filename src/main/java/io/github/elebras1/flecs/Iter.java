@@ -14,6 +14,7 @@ public class Iter {
     private final Field<?>[] fields;
     private final Table table;
     private int count;
+    private boolean destructed;
 
     Iter(MemorySegment iterSeg, World world) {
         this.iterSeg = iterSeg;
@@ -21,6 +22,7 @@ public class Iter {
         this.fields = new Field[32];
         this.table = new Table(world, MemorySegment.NULL);
         this.count = -1;
+        this.destructed = false;
     }
 
     void setIterSeg(MemorySegment iterSeg) {
@@ -33,17 +35,24 @@ public class Iter {
     }
 
     public boolean next() {
+        assert !this.destructed : "Iterator has been destructed";
+        assert this.iterSeg.address() != 0 : "Iterator is not set";
         boolean hasNext = flecs_h.ecs_iter_next(this.iterSeg);
         this.count = hasNext ? ecs_iter_t.count(this.iterSeg) : 0;
         return hasNext;
     }
 
     public int count() {
+        assert !this.destructed : "Iterator has been destructed";
+        assert this.iterSeg.address() != 0 : "Iterator is not set";
+        assert this.count >= 0 : "Iterator has not been advanced";
         return this.count;
     }
 
     public long entityId(int index) {
-        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        assert !this.destructed : "Iterator has been destructed";
+        assert this.iterSeg.address() != 0 : "Iterator is not set";
+        assert index >= 0 && index < this.count : "The index must be between 0 and count - 1.";
 
         MemorySegment entities = ecs_iter_t.entities(this.iterSeg);
         if (entities.address() == 0) {
@@ -64,9 +73,15 @@ public class Iter {
         return ecs_iter_t.delta_system_time(this.iterSeg);
     }
 
+    private void checkField(int index) {
+        assert !this.destructed : "Iterator has been destructed";
+        assert this.iterSeg.address() != 0 : "Iterator is not set";
+        assert index >= 0 && index < this.fieldCount() : "The field index must be between 0 and field count - 1.";
+    }
+
     @SuppressWarnings("unchecked")
     public <T> Field<T> field(Class<T> componentClass, int index) {
-        assert (index >= 0 && index < 32) : "The field index must be between 0 and 31.";
+        this.checkField(index);
 
         Field<T> field = (Field<T>) this.fields[index];
         boolean shared = !flecs_h.ecs_field_is_self(this.iterSeg, (byte) index);
@@ -86,24 +101,24 @@ public class Iter {
     }
 
     public long src(int index) {
-        assert (index >= 0 && index < 32) : "The field index must be between 0 and 31.";
+        this.checkField(index);
         return flecs_h.ecs_field_src(this.iterSeg, (byte) index);
     }
 
     public boolean isSet(int index) {
-        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        this.checkField(index);
 
         int setFields = ecs_iter_t.set_fields(this.iterSeg);
         return (setFields & (1 << index)) != 0;
     }
 
     public boolean isSelf(int index) {
-        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        this.checkField(index);
         return flecs_h.ecs_field_is_self(this.iterSeg, (byte) index);
     }
 
     public boolean isReadonly(int index) {
-        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        this.checkField(index);
         return flecs_h.ecs_field_is_readonly(this.iterSeg, (byte) index);
     }
 
@@ -153,7 +168,7 @@ public class Iter {
     }
 
     public long id(int index) {
-        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        this.checkField(index);
 
         MemorySegment ids = ecs_iter_t.ids(this.iterSeg);
         if (ids.address() == 0) {
@@ -174,7 +189,7 @@ public class Iter {
     }
 
     public int size(int index) {
-        assert (index >= 0 && index < 32) : "The index must be between 0 and 31.";
+        this.checkField(index);
 
         MemorySegment sizes = ecs_iter_t.sizes(this.iterSeg);
         if (sizes.address() == 0) {
@@ -263,12 +278,17 @@ public class Iter {
     }
 
     public void destruct() {
+        if (this.destructed) {
+            return;
+        }
+        this.destructed = true;
         int flags = ecs_iter_t.flags(this.iterSeg);
         MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
         if((flags & flecs_h.EcsIterIsValid()) != 0 && tableSeg.address() != 0) {
             flecs_h.ecs_table_unlock(this.world.worldSeg(), tableSeg);
         }
         flecs_h.ecs_iter_fini(this.iterSeg);
+        this.iterSeg = MemorySegment.NULL;
     }
 
     @Override

@@ -71,12 +71,14 @@ public class ComponentViewGenerator extends AbstractGenerator {
 
             sb.newline();
             sb.indent4().append("public ").append(elementType).append(" ").append(fieldName).append("(int index) {").newline();
+            sb.indent8().append("assert baseAddress != 0 : \"View is not bound to a component\";").newline();
             sb.indent8().append("return MemoryAccess.").append(methodAtIndex)
                     .append("(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName).append(", index);").newline();
             sb.indent4().append("}").newline();
 
             sb.newline();
             sb.indent4().append("public ").append(viewType).append(" ").append(fieldName).append("(int index, ").append(elementType).append(" value) {").newline();
+            sb.indent8().append("assert baseAddress != 0 : \"View is not bound to a component\";").newline();
             sb.indent8().append("MemoryAccess.").append(setterAtIndex)
                     .append("(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName).append(", index, value);").newline();
         } else {
@@ -85,6 +87,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
 
             sb.newline();
             sb.indent4().append("public ").append(javaType).append(" ").append(fieldName).append("() {").newline();
+            sb.indent8().append("assert baseAddress != 0 : \"View is not bound to a component\";").newline();
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
                 sb.indent8().append("return MemoryAccess.").append(getter)
@@ -98,6 +101,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
 
             sb.newline();
             sb.indent4().append("public ").append(viewType).append(" ").append(fieldName).append("(").append(javaType).append(" value) {").newline();
+            sb.indent8().append("assert baseAddress != 0 : \"View is not bound to a component\";").newline();
             if ("java.lang.String".equals(typeName)) {
                 int size = this.getStringSize(field);
                 sb.indent8().append("MemoryAccess.set(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName)

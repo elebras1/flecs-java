@@ -11,6 +11,7 @@ import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -98,6 +99,7 @@ public class World extends WorldBase implements AutoCloseable {
 
     public long entity(String name) {
         this.checkDestroyed();
+        Objects.requireNonNull(name, "name");
 
         MemorySegment nameSegment = this.buffers.stringRing().set(name);
         MemorySegment separator = this.buffers.stringRing().set("::");
@@ -126,12 +128,16 @@ public class World extends WorldBase implements AutoCloseable {
     }
 
     public Entity obtainEntity(long entityId) {
-        assert entityId >= 0 : "Invalid entity ID: " + entityId;
+        if (entityId <= 0) {
+            throw new IllegalArgumentException("Invalid entity ID: " + entityId);
+        }
         return new Entity(this, entityId);
     }
 
     public EntityView obtainEntityView(long entityId) {
-        assert entityId >= 0 : "Invalid entity ID: " + entityId;
+        if (entityId <= 0) {
+            throw new IllegalArgumentException("Invalid entity ID: " + entityId);
+        }
 
         return this.context.getEntityView(entityId);
     }
@@ -321,11 +327,14 @@ public class World extends WorldBase implements AutoCloseable {
 
     public <T> long component(Class<T> componentClass) {
         this.checkDestroyed();
+        Objects.requireNonNull(componentClass, "componentClass");
         return this.componentRegistry.register(componentClass);
     }
 
     public <T> long component(Class<T> componentClass, Consumer<ComponentHooks<T>> configuration) {
         this.checkDestroyed();
+        Objects.requireNonNull(componentClass, "componentClass");
+        Objects.requireNonNull(configuration, "configuration");
         long id = this.component(componentClass);
         Component<T> component = this.componentRegistry.getComponent(componentClass);
         ComponentHooks<T> hooks = new ComponentHooks<>(this, component);
@@ -513,11 +522,13 @@ public class World extends WorldBase implements AutoCloseable {
 
     public SystemBuilder system(String name) {
         this.checkDestroyed();
+        Objects.requireNonNull(name, "name");
         return new SystemBuilder(this, name);
     }
 
     public SystemBuilder system(String name, Class<?>... componentClasses) {
         this.checkDestroyed();
+        Objects.requireNonNull(name, "name");
         SystemBuilder systemBuilder = new SystemBuilder(this, name);
         for (Class<?> componentClass : componentClasses) {
             systemBuilder.with(componentClass);
@@ -614,11 +625,13 @@ public class World extends WorldBase implements AutoCloseable {
 
     public ObserverBuilder observer(String name) {
         this.checkDestroyed();
+        Objects.requireNonNull(name, "name");
         return new ObserverBuilder(this, name);
     }
 
     public ObserverBuilder observer(String name, Class<?>... componentClasses) {
         this.checkDestroyed();
+        Objects.requireNonNull(name, "name");
         ObserverBuilder observerBuilder = new ObserverBuilder(this, name);
         for (Class<?> componentClass : componentClasses) {
             observerBuilder.with(componentClass);
@@ -643,6 +656,9 @@ public class World extends WorldBase implements AutoCloseable {
 
     public void setThreads(int threads) {
         this.checkDestroyed();
+        if (threads < 0) {
+            throw new IllegalArgumentException("threads must be >= 0: " + threads);
+        }
         flecs_h.ecs_set_threads(this.worldSeg, threads);
 
         this.resetStages();
@@ -650,6 +666,9 @@ public class World extends WorldBase implements AutoCloseable {
 
     public void setTaskThreads(int taskThreads) {
         this.checkDestroyed();
+        if (taskThreads < 0) {
+            throw new IllegalArgumentException("taskThreads must be >= 0: " + taskThreads);
+        }
         flecs_h.ecs_set_task_threads(this.worldSeg, taskThreads);
 
         this.resetStages();
@@ -852,6 +871,9 @@ public class World extends WorldBase implements AutoCloseable {
 
     public void setStageCount(int count) {
         this.checkDestroyed();
+        if (count <= 0) {
+            throw new IllegalArgumentException("count must be > 0: " + count);
+        }
         flecs_h.ecs_set_stage_count(this.worldSeg, count);
 
         this.resetStages();
@@ -1017,11 +1039,15 @@ public class World extends WorldBase implements AutoCloseable {
     }
 
     public long lookup(String name) {
+        Objects.requireNonNull(name, "name");
         return lookup(name, "::", "::", true);
     }
 
     public long lookup(String name, String sep, String rootSep, boolean recursive) {
         this.checkDestroyed();
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(sep, "sep");
+        Objects.requireNonNull(rootSep, "rootSep");
         MemorySegment nameSeg = this.buffers.stringRing().set(name);
         MemorySegment sepSeg = this.buffers.stringRing().set(sep);
         MemorySegment rootSepSeg = this.buffers.stringRing().set(rootSep);

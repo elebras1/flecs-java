@@ -8,6 +8,7 @@ import java.lang.foreign.MemorySegment;
 public class OsApi {
     private final Arena arena;
     private final MemorySegment nativeOsApi;
+    private boolean destructed;
 
     static {
         FlecsLoader.load();
@@ -29,7 +30,14 @@ public class OsApi {
         this.nativeOsApi = flecs_h.ecs_os_get_api(this.arena);
     }
 
+    private void checkDestructed() {
+        if (this.destructed) {
+            throw new IllegalStateException("OsApi has been destructed");
+        }
+    }
+
     public OsApi taskNew(TaskNewCallback callback) {
+        this.checkDestructed();
         MemorySegment nativeCallback = ecs_os_api_thread_new_t.allocate((cb, arg) ->
                 callback.run(() -> ecs_os_thread_callback_t.invoke(cb, arg)), this.arena);
         ecs_os_api_t.task_new_(this.nativeOsApi, nativeCallback);
@@ -37,6 +45,7 @@ public class OsApi {
     }
 
     public OsApi taskJoin(TaskJoinCallback callback) {
+        this.checkDestructed();
         MemorySegment nativeCallback = ecs_os_api_thread_join_t.allocate((threadId) -> {
             callback.run(threadId);
             return MemorySegment.NULL;
@@ -46,10 +55,15 @@ public class OsApi {
     }
 
     public void set() {
+        this.checkDestructed();
         flecs_h.ecs_os_set_api(this.nativeOsApi);
     }
 
     public void destruct() {
+        if (this.destructed) {
+            return;
+        }
+        this.destructed = true;
         this.arena.close();
     }
 }

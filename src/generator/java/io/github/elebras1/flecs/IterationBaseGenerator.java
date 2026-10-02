@@ -123,6 +123,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         }
 
         appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
+        if (em == EntityMode.WITH_ITER) {
+            appendStatement(body, 4, "iter.setIterSeg(iterSeg)");
+        }
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
         }
@@ -308,6 +311,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendLine(body, 3, "}");
         appendStatement(body, 3, "Iter iter = new Iter(iterSeg, this.world)");
         appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
+        appendStatement(body, 4, "iter.setIterSeg(iterSeg)");
         appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
         appendLine(body, 4, "for (int i = 0; i < count; i++) {");
         appendStatement(body, 5, "callback.accept(iter, i)");

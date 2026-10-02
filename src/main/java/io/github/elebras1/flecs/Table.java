@@ -105,37 +105,51 @@ public class Table {
         return this.has(flecs_h.ecs_make_pair(first, second));
     }
 
+    private void checkRow(int row) {
+        if (row < 0 || row >= this.count()) {
+            throw new IndexOutOfBoundsException("row " + row + " out of bound (count=" + this.count() + ")");
+        }
+    }
+
     public <T> T get(Class<T> componentClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(componentClass);
-        assert col != -1 : "Component missing from the table " + componentClass.getSimpleName();
+        if (col == -1) {
+            throw new IllegalArgumentException("Component missing from the table " + componentClass.getSimpleName());
+        }
         return this.readAt(componentClass, col, row);
     }
 
     public <T> T get(Class<T> firstClass, Class<?> secondClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(firstClass, secondClass);
-        assert col != -1 : "Pair missing from the table " + firstClass.getSimpleName() + " " + secondClass.getSimpleName();
+        if (col == -1) {
+            throw new IllegalArgumentException("Pair missing from the table " + firstClass.getSimpleName() + " " + secondClass.getSimpleName());
+        }
         return this.readAt(firstClass, col, row);
     }
 
     public <V extends ComponentView> V getMutView(Class<?> componentClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(componentClass);
-        assert col != -1 : "Component missing from the table " + componentClass.getSimpleName();
+        if (col == -1) {
+            throw new IllegalArgumentException("Component missing from the table " + componentClass.getSimpleName());
+        }
         return this.readViewAt(componentClass, col, row);
     }
 
     public <V extends ComponentView> V getMutView(Class<?> firstClass, Class<?> secondClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(firstClass, secondClass);
-        assert col != -1 : "Pair missing from the table " + firstClass.getSimpleName() + " " + secondClass.getSimpleName();
+        if (col == -1) {
+            throw new IllegalArgumentException("Pair missing from the table " + firstClass.getSimpleName() + " " + secondClass.getSimpleName());
+        }
         return this.readViewAt(firstClass, col, row);
     }
 
 
     public <T> T tryGet(Class<T> componentClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(componentClass);
         if (col == -1) {
             return null;
@@ -144,7 +158,7 @@ public class Table {
     }
 
     public <T> T tryGet(Class<T> firstClass, Class<?> secondClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(firstClass, secondClass);
         if (col == -1) {
             return null;
@@ -153,7 +167,7 @@ public class Table {
     }
 
     public <V extends ComponentView> V tryGetMutView(Class<?> componentClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(componentClass);
         if (col == -1) {
             return null;
@@ -162,7 +176,7 @@ public class Table {
     }
 
     public <V extends ComponentView> V tryGetMutView(Class<?> firstClass, Class<?> secondClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(firstClass, secondClass);
         if (col == -1) {
             return null;
@@ -172,7 +186,7 @@ public class Table {
 
     @SuppressWarnings("unchecked")
     public <V extends ComponentView> V getColumnView(Class<?> componentClass, int row) {
-        assert row >= 0 && row < this.count() : "row " + row + " out of bound (count=" + this.count() + ")";
+        this.checkRow(row);
         int col = this.columnIndex(componentClass);
         if (col == -1) {
             return null;
