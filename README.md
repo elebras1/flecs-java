@@ -22,18 +22,20 @@ record Position(float x, float y) {}
 @Component
 record Velocity(float dx, float dy) {}
 
-try(World world = new World()) {
+void main() {
+    try (World world = new World()) {
 
-    Entity player = world.obtainEntity(world.entity("Player"));
-    player.set(new Position(0, 0)).set(new Velocity(1, 0));
-    
-    world.system("MoveSystem", Position.class, Velocity.class)
-        .eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
-            p.x(p.x() + v.dx() * world.deltaTime());
-            p.y(p.y() + v.dy() * world.deltaTime());
-        });
-    
-    while (world.progress()) {}
+        Entity player = world.obtainEntity(world.entity("Player"));
+        player.set(new Position(0, 0)).set(new Velocity(1, 0));
+
+        world.system("MoveSystem", Position.class, Velocity.class)
+                .eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
+                    p.x(p.x() + v.dx() * world.deltaTime());
+                    p.y(p.y() + v.dy() * world.deltaTime());
+                });
+
+        while (world.progress()) {}
+    }
 }
 ```
 
