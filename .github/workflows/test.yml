@@ -1,0 +1,68 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test ${{ matrix.platform }}-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+          - os: windows-latest
+            platform: windows
+            arch: x64
+          - os: macos-15
+            platform: macos
+            arch: x64
+          - os: macos-latest
+            platform: macos
+            arch: aarch64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Install GCC (Windows)
+        if: runner.os == 'Windows'
+        run: choco install mingw -y
+
+      - name: Grant execute permission for gradlew
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: ./gradlew test --stacktrace
+        shell: bash
+
+      - name: Compile examples
+        run: ./gradlew :examples:compileJava --stacktrace
+        shell: bash
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.platform }}-${{ matrix.arch }}
+          path: build/reports/tests/test
+          retention-days: 7
