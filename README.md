@@ -96,10 +96,10 @@ The build automatically downloads the Flecs C source, compiles the native librar
 
 ```bash
 # requires jextract-25 installed
-./gradlew generateFlecsBindings
+./gradlew generateDowncalls
 ```
 
-Regenerates bindings from `flecs.h` into `src/main/generated/`. Regular users don't need to run this.
+Regenerates bindings from `flecs.h` into `src/main/generated/`, rewrites downcalls into build-time handles and regenerates the GraalVM Native Image configuration. Regular users don't need to run this.
 
 ## Contributing
 

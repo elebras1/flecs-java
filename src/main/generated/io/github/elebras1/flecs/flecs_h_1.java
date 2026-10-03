@@ -66,12 +66,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_type_str(MemorySegment world, MemorySegment type) {
-        var mh$ = ecs_type_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_type_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_type_str", world, type);
             }
-            return (MemorySegment)mh$.invokeExact(world, type);
+            return (MemorySegment)mh$.invokeExact(ecs_type_str.ADDR, world, type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -127,12 +127,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_str(MemorySegment world, MemorySegment table) {
-        var mh$ = ecs_table_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_str", world, table);
             }
-            return (MemorySegment)mh$.invokeExact(world, table);
+            return (MemorySegment)mh$.invokeExact(ecs_table_str.ADDR, world, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -188,12 +188,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_entity_str(MemorySegment world, long entity) {
-        var mh$ = ecs_entity_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_entity_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_entity_str", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_entity_str.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -250,12 +250,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_has_id(MemorySegment world, long entity, long component) {
-        var mh$ = ecs_has_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_has_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_has_id", world, entity, component);
             }
-            return (boolean)mh$.invokeExact(world, entity, component);
+            return (boolean)mh$.invokeExact(ecs_has_id.ADDR, world, entity, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -312,12 +312,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_owns_id(MemorySegment world, long entity, long component) {
-        var mh$ = ecs_owns_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_owns_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_owns_id", world, entity, component);
             }
-            return (boolean)mh$.invokeExact(world, entity, component);
+            return (boolean)mh$.invokeExact(ecs_owns_id.ADDR, world, entity, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -375,12 +375,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_target(MemorySegment world, long entity, long rel, int index) {
-        var mh$ = ecs_get_target.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_target;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_target", world, entity, rel, index);
             }
-            return (long)mh$.invokeExact(world, entity, rel, index);
+            return (long)mh$.invokeExact(ecs_get_target.ADDR, world, entity, rel, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -436,12 +436,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_parent(MemorySegment world, long entity) {
-        var mh$ = ecs_get_parent.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_parent;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_parent", world, entity);
             }
-            return (long)mh$.invokeExact(world, entity);
+            return (long)mh$.invokeExact(ecs_get_parent.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -498,12 +498,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_new_w_parent(MemorySegment world, long parent, MemorySegment name) {
-        var mh$ = ecs_new_w_parent.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_new_w_parent;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_new_w_parent", world, parent, name);
             }
-            return (long)mh$.invokeExact(world, parent, name);
+            return (long)mh$.invokeExact(ecs_new_w_parent.ADDR, world, parent, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -561,12 +561,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_target_for_id(MemorySegment world, long entity, long rel, long component) {
-        var mh$ = ecs_get_target_for_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_target_for_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_target_for_id", world, entity, rel, component);
             }
-            return (long)mh$.invokeExact(world, entity, rel, component);
+            return (long)mh$.invokeExact(ecs_get_target_for_id.ADDR, world, entity, rel, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -623,12 +623,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_get_depth(MemorySegment world, long entity, long rel) {
-        var mh$ = ecs_get_depth.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_depth;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_depth", world, entity, rel);
             }
-            return (int)mh$.invokeExact(world, entity, rel);
+            return (int)mh$.invokeExact(ecs_get_depth.ADDR, world, entity, rel);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -684,12 +684,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_count_id(MemorySegment world, long entity) {
-        var mh$ = ecs_count_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_count_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_count_id", world, entity);
             }
-            return (int)mh$.invokeExact(world, entity);
+            return (int)mh$.invokeExact(ecs_count_id.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -745,12 +745,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_get_name(MemorySegment world, long entity) {
-        var mh$ = ecs_get_name.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_name", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_get_name.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -806,12 +806,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_get_symbol(MemorySegment world, long entity) {
-        var mh$ = ecs_get_symbol.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_symbol;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_symbol", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_get_symbol.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -868,12 +868,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_set_name(MemorySegment world, long entity, MemorySegment name) {
-        var mh$ = ecs_set_name.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_name", world, entity, name);
             }
-            return (long)mh$.invokeExact(world, entity, name);
+            return (long)mh$.invokeExact(ecs_set_name.ADDR, world, entity, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -930,12 +930,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_set_symbol(MemorySegment world, long entity, MemorySegment symbol) {
-        var mh$ = ecs_set_symbol.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_symbol;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_symbol", world, entity, symbol);
             }
-            return (long)mh$.invokeExact(world, entity, symbol);
+            return (long)mh$.invokeExact(ecs_set_symbol.ADDR, world, entity, symbol);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -991,12 +991,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_alias(MemorySegment world, long entity, MemorySegment alias) {
-        var mh$ = ecs_set_alias.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_alias;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_alias", world, entity, alias);
             }
-            mh$.invokeExact(world, entity, alias);
+            mh$.invokeExact(ecs_set_alias.ADDR, world, entity, alias);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1052,12 +1052,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_lookup(MemorySegment world, MemorySegment path) {
-        var mh$ = ecs_lookup.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_lookup;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_lookup", world, path);
             }
-            return (long)mh$.invokeExact(world, path);
+            return (long)mh$.invokeExact(ecs_lookup.ADDR, world, path);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1114,12 +1114,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_lookup_child(MemorySegment world, long parent, MemorySegment name) {
-        var mh$ = ecs_lookup_child.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_lookup_child;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_lookup_child", world, parent, name);
             }
-            return (long)mh$.invokeExact(world, parent, name);
+            return (long)mh$.invokeExact(ecs_lookup_child.ADDR, world, parent, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1179,12 +1179,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_lookup_path_w_sep(MemorySegment world, long parent, MemorySegment path, MemorySegment sep, MemorySegment prefix, boolean recursive) {
-        var mh$ = ecs_lookup_path_w_sep.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_lookup_path_w_sep;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_lookup_path_w_sep", world, parent, path, sep, prefix, recursive);
             }
-            return (long)mh$.invokeExact(world, parent, path, sep, prefix, recursive);
+            return (long)mh$.invokeExact(ecs_lookup_path_w_sep.ADDR, world, parent, path, sep, prefix, recursive);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1242,12 +1242,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_lookup_symbol(MemorySegment world, MemorySegment symbol, boolean lookup_as_path, boolean recursive) {
-        var mh$ = ecs_lookup_symbol.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_lookup_symbol;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_lookup_symbol", world, symbol, lookup_as_path, recursive);
             }
-            return (long)mh$.invokeExact(world, symbol, lookup_as_path, recursive);
+            return (long)mh$.invokeExact(ecs_lookup_symbol.ADDR, world, symbol, lookup_as_path, recursive);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1306,12 +1306,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_get_path_w_sep(MemorySegment world, long parent, long child, MemorySegment sep, MemorySegment prefix) {
-        var mh$ = ecs_get_path_w_sep.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_path_w_sep;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_path_w_sep", world, parent, child, sep, prefix);
             }
-            return (MemorySegment)mh$.invokeExact(world, parent, child, sep, prefix);
+            return (MemorySegment)mh$.invokeExact(ecs_get_path_w_sep.ADDR, world, parent, child, sep, prefix);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1371,12 +1371,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_get_path_w_sep_buf(MemorySegment world, long parent, long child, MemorySegment sep, MemorySegment prefix, MemorySegment buf, boolean escape) {
-        var mh$ = ecs_get_path_w_sep_buf.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_path_w_sep_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_path_w_sep_buf", world, parent, child, sep, prefix, buf, escape);
             }
-            mh$.invokeExact(world, parent, child, sep, prefix, buf, escape);
+            mh$.invokeExact(ecs_get_path_w_sep_buf.ADDR, world, parent, child, sep, prefix, buf, escape);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1435,12 +1435,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_new_from_path_w_sep(MemorySegment world, long parent, MemorySegment path, MemorySegment sep, MemorySegment prefix) {
-        var mh$ = ecs_new_from_path_w_sep.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_new_from_path_w_sep;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_new_from_path_w_sep", world, parent, path, sep, prefix);
             }
-            return (long)mh$.invokeExact(world, parent, path, sep, prefix);
+            return (long)mh$.invokeExact(ecs_new_from_path_w_sep.ADDR, world, parent, path, sep, prefix);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1500,12 +1500,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_add_path_w_sep(MemorySegment world, long entity, long parent, MemorySegment path, MemorySegment sep, MemorySegment prefix) {
-        var mh$ = ecs_add_path_w_sep.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_add_path_w_sep;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_add_path_w_sep", world, entity, parent, path, sep, prefix);
             }
-            return (long)mh$.invokeExact(world, entity, parent, path, sep, prefix);
+            return (long)mh$.invokeExact(ecs_add_path_w_sep.ADDR, world, entity, parent, path, sep, prefix);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1561,12 +1561,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_set_scope(MemorySegment world, long scope) {
-        var mh$ = ecs_set_scope.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_scope;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_scope", world, scope);
             }
-            return (long)mh$.invokeExact(world, scope);
+            return (long)mh$.invokeExact(ecs_set_scope.ADDR, world, scope);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1621,12 +1621,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_scope(MemorySegment world) {
-        var mh$ = ecs_get_scope.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_scope;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_scope", world);
             }
-            return (long)mh$.invokeExact(world);
+            return (long)mh$.invokeExact(ecs_get_scope.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1682,12 +1682,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_set_name_prefix(MemorySegment world, MemorySegment prefix) {
-        var mh$ = ecs_set_name_prefix.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_name_prefix;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_name_prefix", world, prefix);
             }
-            return (MemorySegment)mh$.invokeExact(world, prefix);
+            return (MemorySegment)mh$.invokeExact(ecs_set_name_prefix.ADDR, world, prefix);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1743,12 +1743,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_set_lookup_path(MemorySegment world, MemorySegment lookup_path) {
-        var mh$ = ecs_set_lookup_path.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_lookup_path;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_lookup_path", world, lookup_path);
             }
-            return (MemorySegment)mh$.invokeExact(world, lookup_path);
+            return (MemorySegment)mh$.invokeExact(ecs_set_lookup_path.ADDR, world, lookup_path);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1803,12 +1803,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_get_lookup_path(MemorySegment world) {
-        var mh$ = ecs_get_lookup_path.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_lookup_path;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_lookup_path", world);
             }
-            return (MemorySegment)mh$.invokeExact(world);
+            return (MemorySegment)mh$.invokeExact(ecs_get_lookup_path.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1864,12 +1864,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_component_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_component_init.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_component_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_component_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_component_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1925,12 +1925,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_get_type_info(MemorySegment world, long component) {
-        var mh$ = ecs_get_type_info.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_type_info", world, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, component);
+            return (MemorySegment)mh$.invokeExact(ecs_get_type_info.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -1986,12 +1986,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_hooks_id(MemorySegment world, long component, MemorySegment hooks) {
-        var mh$ = ecs_set_hooks_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_set_hooks_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_hooks_id", world, component, hooks);
             }
-            mh$.invokeExact(world, component, hooks);
+            mh$.invokeExact(ecs_set_hooks_id.ADDR, world, component, hooks);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2047,12 +2047,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_get_hooks_id(MemorySegment world, long component) {
-        var mh$ = ecs_get_hooks_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_hooks_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_hooks_id", world, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, component);
+            return (MemorySegment)mh$.invokeExact(ecs_get_hooks_id.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2108,12 +2108,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_is_tag(MemorySegment world, long component) {
-        var mh$ = ecs_id_is_tag.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_is_tag;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_is_tag", world, component);
             }
-            return (boolean)mh$.invokeExact(world, component);
+            return (boolean)mh$.invokeExact(ecs_id_is_tag.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2169,12 +2169,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_in_use(MemorySegment world, long component) {
-        var mh$ = ecs_id_in_use.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_in_use;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_in_use", world, component);
             }
-            return (boolean)mh$.invokeExact(world, component);
+            return (boolean)mh$.invokeExact(ecs_id_in_use.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2230,12 +2230,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_typeid(MemorySegment world, long component) {
-        var mh$ = ecs_get_typeid.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_get_typeid;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_typeid", world, component);
             }
-            return (long)mh$.invokeExact(world, component);
+            return (long)mh$.invokeExact(ecs_get_typeid.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2291,12 +2291,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_match(long component, long pattern) {
-        var mh$ = ecs_id_match.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_match;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_match", component, pattern);
             }
-            return (boolean)mh$.invokeExact(component, pattern);
+            return (boolean)mh$.invokeExact(ecs_id_match.ADDR, component, pattern);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2351,12 +2351,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_is_pair(long component) {
-        var mh$ = ecs_id_is_pair.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_is_pair;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_is_pair", component);
             }
-            return (boolean)mh$.invokeExact(component);
+            return (boolean)mh$.invokeExact(ecs_id_is_pair.ADDR, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2411,12 +2411,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_is_wildcard(long component) {
-        var mh$ = ecs_id_is_wildcard.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_is_wildcard;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_is_wildcard", component);
             }
-            return (boolean)mh$.invokeExact(component);
+            return (boolean)mh$.invokeExact(ecs_id_is_wildcard.ADDR, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2471,12 +2471,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_is_any(long component) {
-        var mh$ = ecs_id_is_any.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_is_any;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_is_any", component);
             }
-            return (boolean)mh$.invokeExact(component);
+            return (boolean)mh$.invokeExact(ecs_id_is_any.ADDR, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2532,12 +2532,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_id_is_valid(MemorySegment world, long component) {
-        var mh$ = ecs_id_is_valid.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_is_valid;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_is_valid", world, component);
             }
-            return (boolean)mh$.invokeExact(world, component);
+            return (boolean)mh$.invokeExact(ecs_id_is_valid.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2593,12 +2593,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_id_get_flags(MemorySegment world, long component) {
-        var mh$ = ecs_id_get_flags.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_get_flags;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_get_flags", world, component);
             }
-            return (int)mh$.invokeExact(world, component);
+            return (int)mh$.invokeExact(ecs_id_get_flags.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2653,12 +2653,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_id_flag_str(long component_flags) {
-        var mh$ = ecs_id_flag_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_flag_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_flag_str", component_flags);
             }
-            return (MemorySegment)mh$.invokeExact(component_flags);
+            return (MemorySegment)mh$.invokeExact(ecs_id_flag_str.ADDR, component_flags);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2714,12 +2714,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_id_str(MemorySegment world, long component) {
-        var mh$ = ecs_id_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_str", world, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, component);
+            return (MemorySegment)mh$.invokeExact(ecs_id_str.ADDR, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2775,12 +2775,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_id_str_buf(MemorySegment world, long component, MemorySegment buf) {
-        var mh$ = ecs_id_str_buf.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_str_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_str_buf", world, component, buf);
             }
-            mh$.invokeExact(world, component, buf);
+            mh$.invokeExact(ecs_id_str_buf.ADDR, world, component, buf);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2836,12 +2836,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_id_from_str(MemorySegment world, MemorySegment expr) {
-        var mh$ = ecs_id_from_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_id_from_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_id_from_str", world, expr);
             }
-            return (long)mh$.invokeExact(world, expr);
+            return (long)mh$.invokeExact(ecs_id_from_str.ADDR, world, expr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2896,12 +2896,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_term_ref_is_set(MemorySegment ref) {
-        var mh$ = ecs_term_ref_is_set.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_term_ref_is_set;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_term_ref_is_set", ref);
             }
-            return (boolean)mh$.invokeExact(ref);
+            return (boolean)mh$.invokeExact(ecs_term_ref_is_set.ADDR, ref);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -2956,12 +2956,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_term_is_initialized(MemorySegment term) {
-        var mh$ = ecs_term_is_initialized.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_term_is_initialized;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_term_is_initialized", term);
             }
-            return (boolean)mh$.invokeExact(term);
+            return (boolean)mh$.invokeExact(ecs_term_is_initialized.ADDR, term);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3016,12 +3016,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_term_match_this(MemorySegment term) {
-        var mh$ = ecs_term_match_this.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_term_match_this;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_term_match_this", term);
             }
-            return (boolean)mh$.invokeExact(term);
+            return (boolean)mh$.invokeExact(ecs_term_match_this.ADDR, term);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3076,12 +3076,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_term_match_0(MemorySegment term) {
-        var mh$ = ecs_term_match_0.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_term_match_0;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_term_match_0", term);
             }
-            return (boolean)mh$.invokeExact(term);
+            return (boolean)mh$.invokeExact(ecs_term_match_0.ADDR, term);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3137,12 +3137,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_term_str(MemorySegment world, MemorySegment term) {
-        var mh$ = ecs_term_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_term_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_term_str", world, term);
             }
-            return (MemorySegment)mh$.invokeExact(world, term);
+            return (MemorySegment)mh$.invokeExact(ecs_term_str.ADDR, world, term);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3197,12 +3197,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_str(MemorySegment query) {
-        var mh$ = ecs_query_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_str", query);
             }
-            return (MemorySegment)mh$.invokeExact(query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_str.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3258,12 +3258,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_each_id(SegmentAllocator allocator, MemorySegment world, long component) {
-        var mh$ = ecs_each_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_each_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_each_id", allocator, world, component);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, component);
+            return (MemorySegment)mh$.invokeExact(ecs_each_id.ADDR, allocator, world, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3318,12 +3318,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_each_next(MemorySegment it) {
-        var mh$ = ecs_each_next.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_each_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_each_next", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_each_next.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3379,12 +3379,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_children(SegmentAllocator allocator, MemorySegment world, long parent) {
-        var mh$ = ecs_children.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_children;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_children", allocator, world, parent);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, parent);
+            return (MemorySegment)mh$.invokeExact(ecs_children.ADDR, allocator, world, parent);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3441,12 +3441,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_children_w_rel(SegmentAllocator allocator, MemorySegment world, long relationship, long parent) {
-        var mh$ = ecs_children_w_rel.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_children_w_rel;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_children_w_rel", allocator, world, relationship, parent);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, relationship, parent);
+            return (MemorySegment)mh$.invokeExact(ecs_children_w_rel.ADDR, allocator, world, relationship, parent);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3501,12 +3501,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_children_next(MemorySegment it) {
-        var mh$ = ecs_children_next.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_children_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_children_next", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_children_next.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3562,12 +3562,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_query_init.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_init", world, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_query_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3624,12 +3624,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_update(MemorySegment world, long entity, MemorySegment desc) {
-        var mh$ = ecs_query_update.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_update;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_update", world, entity, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_query_update.ADDR, world, entity, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3683,12 +3683,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_fini(MemorySegment query) {
-        var mh$ = ecs_query_fini.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_fini", query);
             }
-            mh$.invokeExact(query);
+            mh$.invokeExact(ecs_query_fini.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3744,12 +3744,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_query_find_var(MemorySegment query, MemorySegment name) {
-        var mh$ = ecs_query_find_var.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_find_var;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_find_var", query, name);
             }
-            return (int)mh$.invokeExact(query, name);
+            return (int)mh$.invokeExact(ecs_query_find_var.ADDR, query, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3805,12 +3805,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_var_name(MemorySegment query, int var_id) {
-        var mh$ = ecs_query_var_name.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_var_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_var_name", query, var_id);
             }
-            return (MemorySegment)mh$.invokeExact(query, var_id);
+            return (MemorySegment)mh$.invokeExact(ecs_query_var_name.ADDR, query, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3866,12 +3866,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_var_is_entity(MemorySegment query, int var_id) {
-        var mh$ = ecs_query_var_is_entity.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_var_is_entity;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_var_is_entity", query, var_id);
             }
-            return (boolean)mh$.invokeExact(query, var_id);
+            return (boolean)mh$.invokeExact(ecs_query_var_is_entity.ADDR, query, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3927,12 +3927,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_iter(SegmentAllocator allocator, MemorySegment world, MemorySegment query) {
-        var mh$ = ecs_query_iter.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_iter;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_iter", allocator, world, query);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_iter.ADDR, allocator, world, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -3987,12 +3987,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_next(MemorySegment it) {
-        var mh$ = ecs_query_next.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_next", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_query_next.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4049,12 +4049,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_has(MemorySegment query, long entity, MemorySegment it) {
-        var mh$ = ecs_query_has.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_has;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_has", query, entity, it);
             }
-            return (boolean)mh$.invokeExact(query, entity, it);
+            return (boolean)mh$.invokeExact(ecs_query_has.ADDR, query, entity, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4111,12 +4111,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_has_table(MemorySegment query, MemorySegment table, MemorySegment it) {
-        var mh$ = ecs_query_has_table.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_has_table;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_has_table", query, table, it);
             }
-            return (boolean)mh$.invokeExact(query, table, it);
+            return (boolean)mh$.invokeExact(ecs_query_has_table.ADDR, query, table, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4173,12 +4173,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_has_range(MemorySegment query, MemorySegment range, MemorySegment it) {
-        var mh$ = ecs_query_has_range.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_has_range;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_has_range", query, range, it);
             }
-            return (boolean)mh$.invokeExact(query, range, it);
+            return (boolean)mh$.invokeExact(ecs_query_has_range.ADDR, query, range, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4233,12 +4233,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_query_match_count(MemorySegment query) {
-        var mh$ = ecs_query_match_count.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_match_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_match_count", query);
             }
-            return (int)mh$.invokeExact(query);
+            return (int)mh$.invokeExact(ecs_query_match_count.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4293,12 +4293,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_plan(MemorySegment query) {
-        var mh$ = ecs_query_plan.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_plan;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_plan", query);
             }
-            return (MemorySegment)mh$.invokeExact(query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_plan.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4354,12 +4354,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_plan_w_profile(MemorySegment query, MemorySegment it) {
-        var mh$ = ecs_query_plan_w_profile.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_plan_w_profile;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_plan_w_profile", query, it);
             }
-            return (MemorySegment)mh$.invokeExact(query, it);
+            return (MemorySegment)mh$.invokeExact(ecs_query_plan_w_profile.ADDR, query, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4414,12 +4414,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_plans(MemorySegment query) {
-        var mh$ = ecs_query_plans.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_plans;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_plans", query);
             }
-            return (MemorySegment)mh$.invokeExact(query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_plans.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4476,12 +4476,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_args_parse(MemorySegment query, MemorySegment it, MemorySegment expr) {
-        var mh$ = ecs_query_args_parse.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_args_parse;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_args_parse", query, it, expr);
             }
-            return (MemorySegment)mh$.invokeExact(query, it, expr);
+            return (MemorySegment)mh$.invokeExact(ecs_query_args_parse.ADDR, query, it, expr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4536,12 +4536,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_changed(MemorySegment query) {
-        var mh$ = ecs_query_changed.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_changed;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_changed", query);
             }
-            return (boolean)mh$.invokeExact(query);
+            return (boolean)mh$.invokeExact(ecs_query_changed.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4597,12 +4597,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_get(MemorySegment world, long query) {
-        var mh$ = ecs_query_get.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_get", world, query);
             }
-            return (MemorySegment)mh$.invokeExact(world, query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_get.ADDR, world, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4656,12 +4656,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_iter_skip(MemorySegment it) {
-        var mh$ = ecs_iter_skip.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_skip;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_skip", it);
             }
-            mh$.invokeExact(it);
+            mh$.invokeExact(ecs_iter_skip.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4716,12 +4716,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_iter_set_group(MemorySegment it, long group_id) {
-        var mh$ = ecs_iter_set_group.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_set_group;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_set_group", it, group_id);
             }
-            mh$.invokeExact(it, group_id);
+            mh$.invokeExact(ecs_iter_set_group.ADDR, it, group_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4776,12 +4776,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_get_groups(MemorySegment query) {
-        var mh$ = ecs_query_get_groups.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_get_groups;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_get_groups", query);
             }
-            return (MemorySegment)mh$.invokeExact(query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_get_groups.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4837,12 +4837,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_get_group_ctx(MemorySegment query, long group_id) {
-        var mh$ = ecs_query_get_group_ctx.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_get_group_ctx;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_get_group_ctx", query, group_id);
             }
-            return (MemorySegment)mh$.invokeExact(query, group_id);
+            return (MemorySegment)mh$.invokeExact(ecs_query_get_group_ctx.ADDR, query, group_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4898,12 +4898,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_get_group_info(MemorySegment query, long group_id) {
-        var mh$ = ecs_query_get_group_info.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_get_group_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_get_group_info", query, group_id);
             }
-            return (MemorySegment)mh$.invokeExact(query, group_id);
+            return (MemorySegment)mh$.invokeExact(ecs_query_get_group_info.ADDR, query, group_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -4958,12 +4958,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_count(SegmentAllocator allocator, MemorySegment query) {
-        var mh$ = ecs_query_count.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_count", allocator, query);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_count.ADDR, allocator, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5018,12 +5018,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_query_is_true(MemorySegment query) {
-        var mh$ = ecs_query_is_true.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_is_true;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_is_true", query);
             }
-            return (boolean)mh$.invokeExact(query);
+            return (boolean)mh$.invokeExact(ecs_query_is_true.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5078,12 +5078,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_query_get_cache_query(MemorySegment query) {
-        var mh$ = ecs_query_get_cache_query.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_query_get_cache_query;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_get_cache_query", query);
             }
-            return (MemorySegment)mh$.invokeExact(query);
+            return (MemorySegment)mh$.invokeExact(ecs_query_get_cache_query.ADDR, query);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5138,12 +5138,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_emit(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_emit.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_emit;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_emit", world, desc);
             }
-            mh$.invokeExact(world, desc);
+            mh$.invokeExact(ecs_emit.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5198,12 +5198,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_enqueue(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_enqueue.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_enqueue;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_enqueue", world, desc);
             }
-            mh$.invokeExact(world, desc);
+            mh$.invokeExact(ecs_enqueue.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5259,12 +5259,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_observer_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_observer_init.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_observer_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_observer_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_observer_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5321,12 +5321,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_observer_update(MemorySegment world, long observer, MemorySegment desc) {
-        var mh$ = ecs_observer_update.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_observer_update;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_observer_update", world, observer, desc);
             }
-            return (long)mh$.invokeExact(world, observer, desc);
+            return (long)mh$.invokeExact(ecs_observer_update.ADDR, world, observer, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5382,12 +5382,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_observer_get(MemorySegment world, long observer) {
-        var mh$ = ecs_observer_get.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_observer_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_observer_get", world, observer);
             }
-            return (MemorySegment)mh$.invokeExact(world, observer);
+            return (MemorySegment)mh$.invokeExact(ecs_observer_get.ADDR, world, observer);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5442,12 +5442,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_iter_next(MemorySegment it) {
-        var mh$ = ecs_iter_next.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_next", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_iter_next.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5501,12 +5501,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_iter_fini(MemorySegment it) {
-        var mh$ = ecs_iter_fini.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_fini", it);
             }
-            mh$.invokeExact(it);
+            mh$.invokeExact(ecs_iter_fini.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5561,12 +5561,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_iter_count(MemorySegment it) {
-        var mh$ = ecs_iter_count.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_count", it);
             }
-            return (int)mh$.invokeExact(it);
+            return (int)mh$.invokeExact(ecs_iter_count.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5621,12 +5621,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_iter_is_true(MemorySegment it) {
-        var mh$ = ecs_iter_is_true.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_is_true;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_is_true", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_iter_is_true.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5681,12 +5681,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_iter_first(MemorySegment it) {
-        var mh$ = ecs_iter_first.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_first;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_first", it);
             }
-            return (long)mh$.invokeExact(it);
+            return (long)mh$.invokeExact(ecs_iter_first.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5742,12 +5742,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_iter_set_var(MemorySegment it, int var_id, long entity) {
-        var mh$ = ecs_iter_set_var.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_set_var;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_set_var", it, var_id, entity);
             }
-            mh$.invokeExact(it, var_id, entity);
+            mh$.invokeExact(ecs_iter_set_var.ADDR, it, var_id, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5803,12 +5803,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_iter_set_var_as_table(MemorySegment it, int var_id, MemorySegment table) {
-        var mh$ = ecs_iter_set_var_as_table.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_set_var_as_table;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_set_var_as_table", it, var_id, table);
             }
-            mh$.invokeExact(it, var_id, table);
+            mh$.invokeExact(ecs_iter_set_var_as_table.ADDR, it, var_id, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5864,12 +5864,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_iter_set_var_as_range(MemorySegment it, int var_id, MemorySegment range) {
-        var mh$ = ecs_iter_set_var_as_range.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_set_var_as_range;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_set_var_as_range", it, var_id, range);
             }
-            mh$.invokeExact(it, var_id, range);
+            mh$.invokeExact(ecs_iter_set_var_as_range.ADDR, it, var_id, range);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5925,12 +5925,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_iter_get_var(MemorySegment it, int var_id) {
-        var mh$ = ecs_iter_get_var.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_var;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_var", it, var_id);
             }
-            return (long)mh$.invokeExact(it, var_id);
+            return (long)mh$.invokeExact(ecs_iter_get_var.ADDR, it, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -5986,12 +5986,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_iter_get_var_name(MemorySegment it, int var_id) {
-        var mh$ = ecs_iter_get_var_name.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_var_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_var_name", it, var_id);
             }
-            return (MemorySegment)mh$.invokeExact(it, var_id);
+            return (MemorySegment)mh$.invokeExact(ecs_iter_get_var_name.ADDR, it, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6046,12 +6046,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_iter_get_var_count(MemorySegment it) {
-        var mh$ = ecs_iter_get_var_count.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_var_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_var_count", it);
             }
-            return (int)mh$.invokeExact(it);
+            return (int)mh$.invokeExact(ecs_iter_get_var_count.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6106,12 +6106,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_iter_get_vars(MemorySegment it) {
-        var mh$ = ecs_iter_get_vars.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_vars;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_vars", it);
             }
-            return (MemorySegment)mh$.invokeExact(it);
+            return (MemorySegment)mh$.invokeExact(ecs_iter_get_vars.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6167,12 +6167,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_iter_get_var_as_table(MemorySegment it, int var_id) {
-        var mh$ = ecs_iter_get_var_as_table.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_var_as_table;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_var_as_table", it, var_id);
             }
-            return (MemorySegment)mh$.invokeExact(it, var_id);
+            return (MemorySegment)mh$.invokeExact(ecs_iter_get_var_as_table.ADDR, it, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6228,12 +6228,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_iter_get_var_as_range(SegmentAllocator allocator, MemorySegment it, int var_id) {
-        var mh$ = ecs_iter_get_var_as_range.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_var_as_range;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_var_as_range", allocator, it, var_id);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, it, var_id);
+            return (MemorySegment)mh$.invokeExact(ecs_iter_get_var_as_range.ADDR, allocator, it, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6289,12 +6289,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_iter_var_is_constrained(MemorySegment it, int var_id) {
-        var mh$ = ecs_iter_var_is_constrained.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_var_is_constrained;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_var_is_constrained", it, var_id);
             }
-            return (boolean)mh$.invokeExact(it, var_id);
+            return (boolean)mh$.invokeExact(ecs_iter_var_is_constrained.ADDR, it, var_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6349,12 +6349,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_iter_get_group(MemorySegment it) {
-        var mh$ = ecs_iter_get_group.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_get_group;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_get_group", it);
             }
-            return (long)mh$.invokeExact(it);
+            return (long)mh$.invokeExact(ecs_iter_get_group.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6409,12 +6409,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_iter_changed(MemorySegment it) {
-        var mh$ = ecs_iter_changed.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_changed;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_changed", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_iter_changed.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6469,12 +6469,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_iter_str(MemorySegment it) {
-        var mh$ = ecs_iter_str.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_iter_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_str", it);
             }
-            return (MemorySegment)mh$.invokeExact(it);
+            return (MemorySegment)mh$.invokeExact(ecs_iter_str.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6531,12 +6531,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_page_iter(SegmentAllocator allocator, MemorySegment it, int offset, int limit) {
-        var mh$ = ecs_page_iter.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_page_iter;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_page_iter", allocator, it, offset, limit);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, it, offset, limit);
+            return (MemorySegment)mh$.invokeExact(ecs_page_iter.ADDR, allocator, it, offset, limit);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6591,12 +6591,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_page_next(MemorySegment it) {
-        var mh$ = ecs_page_next.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_page_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_page_next", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_page_next.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6653,12 +6653,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_worker_iter(SegmentAllocator allocator, MemorySegment it, int index, int count) {
-        var mh$ = ecs_worker_iter.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_worker_iter;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_worker_iter", allocator, it, index, count);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, it, index, count);
+            return (MemorySegment)mh$.invokeExact(ecs_worker_iter.ADDR, allocator, it, index, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6713,12 +6713,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_worker_next(MemorySegment it) {
-        var mh$ = ecs_worker_next.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_worker_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_worker_next", it);
             }
-            return (boolean)mh$.invokeExact(it);
+            return (boolean)mh$.invokeExact(ecs_worker_next.ADDR, it);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6775,12 +6775,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_field_w_size(MemorySegment it, long size, byte index) {
-        var mh$ = ecs_field_w_size.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_w_size;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_w_size", it, size, index);
             }
-            return (MemorySegment)mh$.invokeExact(it, size, index);
+            return (MemorySegment)mh$.invokeExact(ecs_field_w_size.ADDR, it, size, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6838,12 +6838,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_field_at_w_size(MemorySegment it, long size, byte index, int row) {
-        var mh$ = ecs_field_at_w_size.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_at_w_size;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_at_w_size", it, size, index, row);
             }
-            return (MemorySegment)mh$.invokeExact(it, size, index, row);
+            return (MemorySegment)mh$.invokeExact(ecs_field_at_w_size.ADDR, it, size, index, row);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6899,12 +6899,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_field_is_readonly(MemorySegment it, byte index) {
-        var mh$ = ecs_field_is_readonly.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_is_readonly;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_is_readonly", it, index);
             }
-            return (boolean)mh$.invokeExact(it, index);
+            return (boolean)mh$.invokeExact(ecs_field_is_readonly.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -6960,12 +6960,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_field_is_writeonly(MemorySegment it, byte index) {
-        var mh$ = ecs_field_is_writeonly.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_is_writeonly;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_is_writeonly", it, index);
             }
-            return (boolean)mh$.invokeExact(it, index);
+            return (boolean)mh$.invokeExact(ecs_field_is_writeonly.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7021,12 +7021,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_field_is_set(MemorySegment it, byte index) {
-        var mh$ = ecs_field_is_set.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_is_set;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_is_set", it, index);
             }
-            return (boolean)mh$.invokeExact(it, index);
+            return (boolean)mh$.invokeExact(ecs_field_is_set.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7082,12 +7082,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_field_id(MemorySegment it, byte index) {
-        var mh$ = ecs_field_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_id", it, index);
             }
-            return (long)mh$.invokeExact(it, index);
+            return (long)mh$.invokeExact(ecs_field_id.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7143,12 +7143,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_field_column(MemorySegment it, byte index) {
-        var mh$ = ecs_field_column.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_column;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_column", it, index);
             }
-            return (int)mh$.invokeExact(it, index);
+            return (int)mh$.invokeExact(ecs_field_column.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7204,12 +7204,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_field_src(MemorySegment it, byte index) {
-        var mh$ = ecs_field_src.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_src;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_src", it, index);
             }
-            return (long)mh$.invokeExact(it, index);
+            return (long)mh$.invokeExact(ecs_field_src.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7265,12 +7265,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_field_size(MemorySegment it, byte index) {
-        var mh$ = ecs_field_size.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_size;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_size", it, index);
             }
-            return (long)mh$.invokeExact(it, index);
+            return (long)mh$.invokeExact(ecs_field_size.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7326,12 +7326,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_field_is_self(MemorySegment it, byte index) {
-        var mh$ = ecs_field_is_self.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_field_is_self;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_field_is_self", it, index);
             }
-            return (boolean)mh$.invokeExact(it, index);
+            return (boolean)mh$.invokeExact(ecs_field_is_self.ADDR, it, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7386,12 +7386,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_get_type(MemorySegment table) {
-        var mh$ = ecs_table_get_type.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_get_type;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_type", table);
             }
-            return (MemorySegment)mh$.invokeExact(table);
+            return (MemorySegment)mh$.invokeExact(ecs_table_get_type.ADDR, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7448,12 +7448,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_get_type_index(MemorySegment world, MemorySegment table, long component) {
-        var mh$ = ecs_table_get_type_index.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_get_type_index;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_type_index", world, table, component);
             }
-            return (int)mh$.invokeExact(world, table, component);
+            return (int)mh$.invokeExact(ecs_table_get_type_index.ADDR, world, table, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7510,12 +7510,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_get_column_index(MemorySegment world, MemorySegment table, long component) {
-        var mh$ = ecs_table_get_column_index.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_get_column_index;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_column_index", world, table, component);
             }
-            return (int)mh$.invokeExact(world, table, component);
+            return (int)mh$.invokeExact(ecs_table_get_column_index.ADDR, world, table, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7570,12 +7570,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_column_count(MemorySegment table) {
-        var mh$ = ecs_table_column_count.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_column_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_column_count", table);
             }
-            return (int)mh$.invokeExact(table);
+            return (int)mh$.invokeExact(ecs_table_column_count.ADDR, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7631,12 +7631,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_type_to_column_index(MemorySegment table, int index) {
-        var mh$ = ecs_table_type_to_column_index.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_type_to_column_index;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_type_to_column_index", table, index);
             }
-            return (int)mh$.invokeExact(table, index);
+            return (int)mh$.invokeExact(ecs_table_type_to_column_index.ADDR, table, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7692,12 +7692,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_column_to_type_index(MemorySegment table, int index) {
-        var mh$ = ecs_table_column_to_type_index.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_column_to_type_index;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_column_to_type_index", table, index);
             }
-            return (int)mh$.invokeExact(table, index);
+            return (int)mh$.invokeExact(ecs_table_column_to_type_index.ADDR, table, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7754,12 +7754,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_get_column(MemorySegment table, int index, int offset) {
-        var mh$ = ecs_table_get_column.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_get_column;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_column", table, index, offset);
             }
-            return (MemorySegment)mh$.invokeExact(table, index, offset);
+            return (MemorySegment)mh$.invokeExact(ecs_table_get_column.ADDR, table, index, offset);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7817,12 +7817,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_get_id(MemorySegment world, MemorySegment table, long component, int offset) {
-        var mh$ = ecs_table_get_id.HANDLE;
+        var mh$ = FlecsDowncalls1.ecs_table_get_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_id", world, table, component, offset);
             }
-            return (MemorySegment)mh$.invokeExact(world, table, component, offset);
+            return (MemorySegment)mh$.invokeExact(ecs_table_get_id.ADDR, world, table, component, offset);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7878,12 +7878,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_table_get_column_size(MemorySegment table, int index) {
-        var mh$ = ecs_table_get_column_size.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_get_column_size;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_column_size", table, index);
             }
-            return (long)mh$.invokeExact(table, index);
+            return (long)mh$.invokeExact(ecs_table_get_column_size.ADDR, table, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7938,12 +7938,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_count(MemorySegment table) {
-        var mh$ = ecs_table_count.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_count", table);
             }
-            return (int)mh$.invokeExact(table);
+            return (int)mh$.invokeExact(ecs_table_count.ADDR, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -7998,12 +7998,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_size(MemorySegment table) {
-        var mh$ = ecs_table_size.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_size;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_size", table);
             }
-            return (int)mh$.invokeExact(table);
+            return (int)mh$.invokeExact(ecs_table_size.ADDR, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8058,12 +8058,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_entities(MemorySegment table) {
-        var mh$ = ecs_table_entities.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_entities;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_entities", table);
             }
-            return (MemorySegment)mh$.invokeExact(table);
+            return (MemorySegment)mh$.invokeExact(ecs_table_entities.ADDR, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8120,12 +8120,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_table_has_id(MemorySegment world, MemorySegment table, long component) {
-        var mh$ = ecs_table_has_id.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_has_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_has_id", world, table, component);
             }
-            return (boolean)mh$.invokeExact(world, table, component);
+            return (boolean)mh$.invokeExact(ecs_table_has_id.ADDR, world, table, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8183,12 +8183,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_table_get_target(MemorySegment world, MemorySegment table, long relationship, int index) {
-        var mh$ = ecs_table_get_target.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_get_target;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_target", world, table, relationship, index);
             }
-            return (long)mh$.invokeExact(world, table, relationship, index);
+            return (long)mh$.invokeExact(ecs_table_get_target.ADDR, world, table, relationship, index);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8245,12 +8245,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_table_get_depth(MemorySegment world, MemorySegment table, long rel) {
-        var mh$ = ecs_table_get_depth.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_get_depth;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_get_depth", world, table, rel);
             }
-            return (int)mh$.invokeExact(world, table, rel);
+            return (int)mh$.invokeExact(ecs_table_get_depth.ADDR, world, table, rel);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8307,12 +8307,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_add_id(MemorySegment world, MemorySegment table, long component) {
-        var mh$ = ecs_table_add_id.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_add_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_add_id", world, table, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, table, component);
+            return (MemorySegment)mh$.invokeExact(ecs_table_add_id.ADDR, world, table, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8369,12 +8369,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_find(MemorySegment world, MemorySegment ids, int id_count) {
-        var mh$ = ecs_table_find.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_find;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_find", world, ids, id_count);
             }
-            return (MemorySegment)mh$.invokeExact(world, ids, id_count);
+            return (MemorySegment)mh$.invokeExact(ecs_table_find.ADDR, world, ids, id_count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8431,12 +8431,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_remove_id(MemorySegment world, MemorySegment table, long component) {
-        var mh$ = ecs_table_remove_id.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_remove_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_remove_id", world, table, component);
             }
-            return (MemorySegment)mh$.invokeExact(world, table, component);
+            return (MemorySegment)mh$.invokeExact(ecs_table_remove_id.ADDR, world, table, component);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8491,12 +8491,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_table_lock(MemorySegment world, MemorySegment table) {
-        var mh$ = ecs_table_lock.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_lock;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_lock", world, table);
             }
-            mh$.invokeExact(world, table);
+            mh$.invokeExact(ecs_table_lock.ADDR, world, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8551,12 +8551,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_table_unlock(MemorySegment world, MemorySegment table) {
-        var mh$ = ecs_table_unlock.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_unlock;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_unlock", world, table);
             }
-            mh$.invokeExact(world, table);
+            mh$.invokeExact(ecs_table_unlock.ADDR, world, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8612,12 +8612,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_table_has_flags(MemorySegment table, int flags) {
-        var mh$ = ecs_table_has_flags.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_has_flags;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_has_flags", table, flags);
             }
-            return (boolean)mh$.invokeExact(table, flags);
+            return (boolean)mh$.invokeExact(ecs_table_has_flags.ADDR, table, flags);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8672,12 +8672,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_table_has_traversable(MemorySegment table) {
-        var mh$ = ecs_table_has_traversable.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_has_traversable;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_has_traversable", table);
             }
-            return (boolean)mh$.invokeExact(table);
+            return (boolean)mh$.invokeExact(ecs_table_has_traversable.ADDR, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8734,12 +8734,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_table_swap_rows(MemorySegment world, MemorySegment table, int row_1, int row_2) {
-        var mh$ = ecs_table_swap_rows.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_swap_rows;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_swap_rows", world, table, row_1, row_2);
             }
-            mh$.invokeExact(world, table, row_1, row_2);
+            mh$.invokeExact(ecs_table_swap_rows.ADDR, world, table, row_1, row_2);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8799,12 +8799,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_commit(MemorySegment world, long entity, MemorySegment record_, MemorySegment table, MemorySegment added, MemorySegment removed) {
-        var mh$ = ecs_commit.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_commit;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_commit", world, entity, record_, table, added, removed);
             }
-            return (boolean)mh$.invokeExact(world, entity, record_, table, added, removed);
+            return (boolean)mh$.invokeExact(ecs_commit.ADDR, world, entity, record_, table, added, removed);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8862,12 +8862,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_search(MemorySegment world, MemorySegment table, long component, MemorySegment component_out) {
-        var mh$ = ecs_search.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_search;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_search", world, table, component, component_out);
             }
-            return (int)mh$.invokeExact(world, table, component, component_out);
+            return (int)mh$.invokeExact(ecs_search.ADDR, world, table, component, component_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8926,12 +8926,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_search_offset(MemorySegment world, MemorySegment table, int offset, long component, MemorySegment component_out) {
-        var mh$ = ecs_search_offset.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_search_offset;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_search_offset", world, table, offset, component, component_out);
             }
-            return (int)mh$.invokeExact(world, table, offset, component, component_out);
+            return (int)mh$.invokeExact(ecs_search_offset.ADDR, world, table, offset, component, component_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -8994,12 +8994,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_search_relation(MemorySegment world, MemorySegment table, int offset, long component, long rel, long flags, MemorySegment tgt_out, MemorySegment component_out, MemorySegment tr_out) {
-        var mh$ = ecs_search_relation.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_search_relation;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_search_relation", world, table, offset, component, rel, flags, tgt_out, component_out, tr_out);
             }
-            return (int)mh$.invokeExact(world, table, offset, component, rel, flags, tgt_out, component_out, tr_out);
+            return (int)mh$.invokeExact(ecs_search_relation.ADDR, world, table, offset, component, rel, flags, tgt_out, component_out, tr_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9062,12 +9062,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_search_relation_for_entity(MemorySegment world, long entity, long id, long rel, boolean self, MemorySegment cr, MemorySegment tgt_out, MemorySegment id_out, MemorySegment tr_out) {
-        var mh$ = ecs_search_relation_for_entity.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_search_relation_for_entity;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_search_relation_for_entity", world, entity, id, rel, self, cr, tgt_out, id_out, tr_out);
             }
-            return (int)mh$.invokeExact(world, entity, id, rel, self, cr, tgt_out, id_out, tr_out);
+            return (int)mh$.invokeExact(ecs_search_relation_for_entity.ADDR, world, entity, id, rel, self, cr, tgt_out, id_out, tr_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9122,12 +9122,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_table_clear_entities(MemorySegment world, MemorySegment table) {
-        var mh$ = ecs_table_clear_entities.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_table_clear_entities;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_clear_entities", world, table);
             }
-            mh$.invokeExact(world, table);
+            mh$.invokeExact(ecs_table_clear_entities.ADDR, world, table);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9184,12 +9184,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_init(MemorySegment world, long type, MemorySegment ptr) {
-        var mh$ = ecs_value_init.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_init", world, type, ptr);
             }
-            return (int)mh$.invokeExact(world, type, ptr);
+            return (int)mh$.invokeExact(ecs_value_init.ADDR, world, type, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9246,12 +9246,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_init_w_type_info(MemorySegment world, MemorySegment ti, MemorySegment ptr) {
-        var mh$ = ecs_value_init_w_type_info.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_init_w_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_init_w_type_info", world, ti, ptr);
             }
-            return (int)mh$.invokeExact(world, ti, ptr);
+            return (int)mh$.invokeExact(ecs_value_init_w_type_info.ADDR, world, ti, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9307,12 +9307,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_value_new(MemorySegment world, long type) {
-        var mh$ = ecs_value_new.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_new;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_new", world, type);
             }
-            return (MemorySegment)mh$.invokeExact(world, type);
+            return (MemorySegment)mh$.invokeExact(ecs_value_new.ADDR, world, type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9368,12 +9368,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_value_new_w_type_info(MemorySegment world, MemorySegment ti) {
-        var mh$ = ecs_value_new_w_type_info.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_new_w_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_new_w_type_info", world, ti);
             }
-            return (MemorySegment)mh$.invokeExact(world, ti);
+            return (MemorySegment)mh$.invokeExact(ecs_value_new_w_type_info.ADDR, world, ti);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9430,12 +9430,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_fini_w_type_info(MemorySegment world, MemorySegment ti, MemorySegment ptr) {
-        var mh$ = ecs_value_fini_w_type_info.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_fini_w_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_fini_w_type_info", world, ti, ptr);
             }
-            return (int)mh$.invokeExact(world, ti, ptr);
+            return (int)mh$.invokeExact(ecs_value_fini_w_type_info.ADDR, world, ti, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9492,12 +9492,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_fini(MemorySegment world, long type, MemorySegment ptr) {
-        var mh$ = ecs_value_fini.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_fini", world, type, ptr);
             }
-            return (int)mh$.invokeExact(world, type, ptr);
+            return (int)mh$.invokeExact(ecs_value_fini.ADDR, world, type, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9554,12 +9554,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_free(MemorySegment world, long type, MemorySegment ptr) {
-        var mh$ = ecs_value_free.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_free;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_free", world, type, ptr);
             }
-            return (int)mh$.invokeExact(world, type, ptr);
+            return (int)mh$.invokeExact(ecs_value_free.ADDR, world, type, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9617,12 +9617,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_copy_w_type_info(MemorySegment world, MemorySegment ti, MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_value_copy_w_type_info.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_copy_w_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_copy_w_type_info", world, ti, dst, src);
             }
-            return (int)mh$.invokeExact(world, ti, dst, src);
+            return (int)mh$.invokeExact(ecs_value_copy_w_type_info.ADDR, world, ti, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9680,12 +9680,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_copy(MemorySegment world, long type, MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_value_copy.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_copy;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_copy", world, type, dst, src);
             }
-            return (int)mh$.invokeExact(world, type, dst, src);
+            return (int)mh$.invokeExact(ecs_value_copy.ADDR, world, type, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9743,12 +9743,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_move_w_type_info(MemorySegment world, MemorySegment ti, MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_value_move_w_type_info.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_move_w_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_move_w_type_info", world, ti, dst, src);
             }
-            return (int)mh$.invokeExact(world, ti, dst, src);
+            return (int)mh$.invokeExact(ecs_value_move_w_type_info.ADDR, world, ti, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9806,12 +9806,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_move(MemorySegment world, long type, MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_value_move.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_move;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_move", world, type, dst, src);
             }
-            return (int)mh$.invokeExact(world, type, dst, src);
+            return (int)mh$.invokeExact(ecs_value_move.ADDR, world, type, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9869,12 +9869,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_move_ctor_w_type_info(MemorySegment world, MemorySegment ti, MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_value_move_ctor_w_type_info.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_move_ctor_w_type_info;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_move_ctor_w_type_info", world, ti, dst, src);
             }
-            return (int)mh$.invokeExact(world, ti, dst, src);
+            return (int)mh$.invokeExact(ecs_value_move_ctor_w_type_info.ADDR, world, ti, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9932,12 +9932,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_value_move_ctor(MemorySegment world, long type, MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_value_move_ctor.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_value_move_ctor;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_value_move_ctor", world, type, dst, src);
             }
-            return (int)mh$.invokeExact(world, type, dst, src);
+            return (int)mh$.invokeExact(ecs_value_move_ctor.ADDR, world, type, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -9993,12 +9993,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_deprecated_(MemorySegment file, int line, MemorySegment msg) {
-        var mh$ = ecs_deprecated_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_deprecated_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_deprecated_", file, line, msg);
             }
-            mh$.invokeExact(file, line, msg);
+            mh$.invokeExact(ecs_deprecated_.ADDR, file, line, msg);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10052,12 +10052,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_log_push_(int level) {
-        var mh$ = ecs_log_push_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_push_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_push_", level);
             }
-            mh$.invokeExact(level);
+            mh$.invokeExact(ecs_log_push_.ADDR, level);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10111,12 +10111,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_log_pop_(int level) {
-        var mh$ = ecs_log_pop_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_pop_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_pop_", level);
             }
-            mh$.invokeExact(level);
+            mh$.invokeExact(ecs_log_pop_.ADDR, level);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10171,12 +10171,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_should_log(int level) {
-        var mh$ = ecs_should_log.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_should_log;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_should_log", level);
             }
-            return (boolean)mh$.invokeExact(level);
+            return (boolean)mh$.invokeExact(ecs_should_log.ADDR, level);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10231,12 +10231,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_strerror(int error_code) {
-        var mh$ = ecs_strerror.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_strerror;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_strerror", error_code);
             }
-            return (MemorySegment)mh$.invokeExact(error_code);
+            return (MemorySegment)mh$.invokeExact(ecs_strerror.ADDR, error_code);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10368,12 +10368,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_printv_(int level, MemorySegment file, int line, MemorySegment fmt, MemorySegment args) {
-        var mh$ = ecs_printv_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_printv_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_printv_", level, file, line, fmt, args);
             }
-            mh$.invokeExact(level, file, line, fmt, args);
+            mh$.invokeExact(ecs_printv_.ADDR, level, file, line, fmt, args);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10505,12 +10505,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_logv_(int level, MemorySegment file, int line, MemorySegment fmt, MemorySegment args) {
-        var mh$ = ecs_logv_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_logv_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_logv_", level, file, line, fmt, args);
             }
-            mh$.invokeExact(level, file, line, fmt, args);
+            mh$.invokeExact(ecs_logv_.ADDR, level, file, line, fmt, args);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10791,12 +10791,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_parser_errorv_(MemorySegment name, MemorySegment expr, long column, MemorySegment fmt, MemorySegment args) {
-        var mh$ = ecs_parser_errorv_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_parser_errorv_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_parser_errorv_", name, expr, column, fmt, args);
             }
-            mh$.invokeExact(name, expr, column, fmt, args);
+            mh$.invokeExact(ecs_parser_errorv_.ADDR, name, expr, column, fmt, args);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10928,12 +10928,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_parser_warningv_(MemorySegment name, MemorySegment expr, long column, MemorySegment fmt, MemorySegment args) {
-        var mh$ = ecs_parser_warningv_.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_parser_warningv_;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_parser_warningv_", name, expr, column, fmt, args);
             }
-            mh$.invokeExact(name, expr, column, fmt, args);
+            mh$.invokeExact(ecs_parser_warningv_.ADDR, name, expr, column, fmt, args);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -10988,12 +10988,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_log_set_level(int level) {
-        var mh$ = ecs_log_set_level.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_set_level;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_set_level", level);
             }
-            return (int)mh$.invokeExact(level);
+            return (int)mh$.invokeExact(ecs_log_set_level.ADDR, level);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11046,12 +11046,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_log_get_level() {
-        var mh$ = ecs_log_get_level.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_get_level;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_get_level");
             }
-            return (int)mh$.invokeExact();
+            return (int)mh$.invokeExact(ecs_log_get_level.ADDR);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11106,12 +11106,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_log_enable_colors(boolean enabled) {
-        var mh$ = ecs_log_enable_colors.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_enable_colors;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_enable_colors", enabled);
             }
-            return (boolean)mh$.invokeExact(enabled);
+            return (boolean)mh$.invokeExact(ecs_log_enable_colors.ADDR, enabled);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11166,12 +11166,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_log_enable_timestamp(boolean enabled) {
-        var mh$ = ecs_log_enable_timestamp.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_enable_timestamp;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_enable_timestamp", enabled);
             }
-            return (boolean)mh$.invokeExact(enabled);
+            return (boolean)mh$.invokeExact(ecs_log_enable_timestamp.ADDR, enabled);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11226,12 +11226,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_log_enable_timedelta(boolean enabled) {
-        var mh$ = ecs_log_enable_timedelta.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_enable_timedelta;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_enable_timedelta", enabled);
             }
-            return (boolean)mh$.invokeExact(enabled);
+            return (boolean)mh$.invokeExact(ecs_log_enable_timedelta.ADDR, enabled);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11284,12 +11284,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_log_last_error() {
-        var mh$ = ecs_log_last_error.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_last_error;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_last_error");
             }
-            return (int)mh$.invokeExact();
+            return (int)mh$.invokeExact(ecs_log_last_error.ADDR);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11343,12 +11343,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_log_start_capture(boolean capture_try) {
-        var mh$ = ecs_log_start_capture.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_start_capture;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_start_capture", capture_try);
             }
-            mh$.invokeExact(capture_try);
+            mh$.invokeExact(ecs_log_start_capture.ADDR, capture_try);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11401,12 +11401,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_log_stop_capture() {
-        var mh$ = ecs_log_stop_capture.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_log_stop_capture;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_log_stop_capture");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment)mh$.invokeExact(ecs_log_stop_capture.ADDR);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11462,12 +11462,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_app_run(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_app_run.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_app_run;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_app_run", world, desc);
             }
-            return (int)mh$.invokeExact(world, desc);
+            return (int)mh$.invokeExact(ecs_app_run.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11523,12 +11523,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_app_run_frame(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_app_run_frame.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_app_run_frame;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_app_run_frame", world, desc);
             }
-            return (int)mh$.invokeExact(world, desc);
+            return (int)mh$.invokeExact(ecs_app_run_frame.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11583,12 +11583,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_app_set_run_action(MemorySegment callback) {
-        var mh$ = ecs_app_set_run_action.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_app_set_run_action;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_app_set_run_action", callback);
             }
-            return (int)mh$.invokeExact(callback);
+            return (int)mh$.invokeExact(ecs_app_set_run_action.ADDR, callback);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -11643,12 +11643,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_app_set_frame_action(MemorySegment callback) {
-        var mh$ = ecs_app_set_frame_action.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_app_set_frame_action;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_app_set_frame_action", callback);
             }
-            return (int)mh$.invokeExact(callback);
+            return (int)mh$.invokeExact(ecs_app_set_frame_action.ADDR, callback);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12162,12 +12162,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_http_server_init(MemorySegment desc) {
-        var mh$ = ecs_http_server_init.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_init", desc);
             }
-            return (MemorySegment)mh$.invokeExact(desc);
+            return (MemorySegment)mh$.invokeExact(ecs_http_server_init.ADDR, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12221,12 +12221,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_http_server_fini(MemorySegment server) {
-        var mh$ = ecs_http_server_fini.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_fini", server);
             }
-            mh$.invokeExact(server);
+            mh$.invokeExact(ecs_http_server_fini.ADDR, server);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12281,12 +12281,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_http_server_start(MemorySegment server) {
-        var mh$ = ecs_http_server_start.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_start;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_start", server);
             }
-            return (int)mh$.invokeExact(server);
+            return (int)mh$.invokeExact(ecs_http_server_start.ADDR, server);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12341,12 +12341,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_http_server_dequeue(MemorySegment server, float delta_time) {
-        var mh$ = ecs_http_server_dequeue.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_dequeue;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_dequeue", server, delta_time);
             }
-            mh$.invokeExact(server, delta_time);
+            mh$.invokeExact(ecs_http_server_dequeue.ADDR, server, delta_time);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12400,12 +12400,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_http_server_stop(MemorySegment server) {
-        var mh$ = ecs_http_server_stop.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_stop;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_stop", server);
             }
-            mh$.invokeExact(server);
+            mh$.invokeExact(ecs_http_server_stop.ADDR, server);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12463,12 +12463,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_http_server_http_request(MemorySegment srv, MemorySegment req, int len, MemorySegment reply_out) {
-        var mh$ = ecs_http_server_http_request.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_http_request;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_http_request", srv, req, len, reply_out);
             }
-            return (int)mh$.invokeExact(srv, req, len, reply_out);
+            return (int)mh$.invokeExact(ecs_http_server_http_request.ADDR, srv, req, len, reply_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12527,12 +12527,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_http_server_request(MemorySegment srv, MemorySegment method, MemorySegment req, MemorySegment body, MemorySegment reply_out) {
-        var mh$ = ecs_http_server_request.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_request;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_request", srv, method, req, body, reply_out);
             }
-            return (int)mh$.invokeExact(srv, method, req, body, reply_out);
+            return (int)mh$.invokeExact(ecs_http_server_request.ADDR, srv, method, req, body, reply_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12587,12 +12587,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_http_server_ctx(MemorySegment srv) {
-        var mh$ = ecs_http_server_ctx.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_server_ctx;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_server_ctx", srv);
             }
-            return (MemorySegment)mh$.invokeExact(srv);
+            return (MemorySegment)mh$.invokeExact(ecs_http_server_ctx.ADDR, srv);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12648,12 +12648,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_http_get_header(MemorySegment req, MemorySegment name) {
-        var mh$ = ecs_http_get_header.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_get_header;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_get_header", req, name);
             }
-            return (MemorySegment)mh$.invokeExact(req, name);
+            return (MemorySegment)mh$.invokeExact(ecs_http_get_header.ADDR, req, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12709,12 +12709,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_http_get_param(MemorySegment req, MemorySegment name) {
-        var mh$ = ecs_http_get_param.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_http_get_param;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_http_get_param", req, name);
             }
-            return (MemorySegment)mh$.invokeExact(req, name);
+            return (MemorySegment)mh$.invokeExact(ecs_http_get_param.ADDR, req, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12815,12 +12815,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_rest_server_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_rest_server_init.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_rest_server_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_rest_server_init", world, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_rest_server_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12874,12 +12874,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_rest_server_fini(MemorySegment srv) {
-        var mh$ = ecs_rest_server_fini.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_rest_server_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_rest_server_fini", srv);
             }
-            mh$.invokeExact(srv);
+            mh$.invokeExact(ecs_rest_server_fini.ADDR, srv);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12933,12 +12933,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsRestImport(MemorySegment world) {
-        var mh$ = FlecsRestImport.HANDLE;
+        var mh$ = FlecsDowncalls2.FlecsRestImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsRestImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsRestImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -12995,12 +12995,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_set_timeout(MemorySegment world, long tick_source, float timeout) {
-        var mh$ = ecs_set_timeout.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_timeout;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_timeout", world, tick_source, timeout);
             }
-            return (long)mh$.invokeExact(world, tick_source, timeout);
+            return (long)mh$.invokeExact(ecs_set_timeout.ADDR, world, tick_source, timeout);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13056,12 +13056,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static float ecs_get_timeout(MemorySegment world, long tick_source) {
-        var mh$ = ecs_get_timeout.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_get_timeout;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_timeout", world, tick_source);
             }
-            return (float)mh$.invokeExact(world, tick_source);
+            return (float)mh$.invokeExact(ecs_get_timeout.ADDR, world, tick_source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13118,12 +13118,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_set_interval(MemorySegment world, long tick_source, float interval) {
-        var mh$ = ecs_set_interval.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_interval;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_interval", world, tick_source, interval);
             }
-            return (long)mh$.invokeExact(world, tick_source, interval);
+            return (long)mh$.invokeExact(ecs_set_interval.ADDR, world, tick_source, interval);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13179,12 +13179,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static float ecs_get_interval(MemorySegment world, long tick_source) {
-        var mh$ = ecs_get_interval.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_get_interval;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_interval", world, tick_source);
             }
-            return (float)mh$.invokeExact(world, tick_source);
+            return (float)mh$.invokeExact(ecs_get_interval.ADDR, world, tick_source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13239,12 +13239,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_start_timer(MemorySegment world, long tick_source) {
-        var mh$ = ecs_start_timer.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_start_timer;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_start_timer", world, tick_source);
             }
-            mh$.invokeExact(world, tick_source);
+            mh$.invokeExact(ecs_start_timer.ADDR, world, tick_source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13299,12 +13299,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_stop_timer(MemorySegment world, long tick_source) {
-        var mh$ = ecs_stop_timer.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_stop_timer;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_stop_timer", world, tick_source);
             }
-            mh$.invokeExact(world, tick_source);
+            mh$.invokeExact(ecs_stop_timer.ADDR, world, tick_source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13359,12 +13359,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_reset_timer(MemorySegment world, long tick_source) {
-        var mh$ = ecs_reset_timer.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_reset_timer;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_reset_timer", world, tick_source);
             }
-            mh$.invokeExact(world, tick_source);
+            mh$.invokeExact(ecs_reset_timer.ADDR, world, tick_source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13418,12 +13418,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_randomize_timers(MemorySegment world) {
-        var mh$ = ecs_randomize_timers.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_randomize_timers;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_randomize_timers", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(ecs_randomize_timers.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13481,12 +13481,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_set_rate(MemorySegment world, long tick_source, int rate, long source) {
-        var mh$ = ecs_set_rate.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_rate;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_rate", world, tick_source, rate, source);
             }
-            return (long)mh$.invokeExact(world, tick_source, rate, source);
+            return (long)mh$.invokeExact(ecs_set_rate.ADDR, world, tick_source, rate, source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13542,12 +13542,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_tick_source(MemorySegment world, long system, long tick_source) {
-        var mh$ = ecs_set_tick_source.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_tick_source;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_tick_source", world, system, tick_source);
             }
-            mh$.invokeExact(world, system, tick_source);
+            mh$.invokeExact(ecs_set_tick_source.ADDR, world, system, tick_source);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13601,12 +13601,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsTimerImport(MemorySegment world) {
-        var mh$ = FlecsTimerImport.HANDLE;
+        var mh$ = FlecsDowncalls2.FlecsTimerImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsTimerImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsTimerImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13662,12 +13662,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_pipeline_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_pipeline_init.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_pipeline_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13724,12 +13724,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_pipeline_update(MemorySegment world, long pipeline, MemorySegment desc) {
-        var mh$ = ecs_pipeline_update.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_update;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_update", world, pipeline, desc);
             }
-            return (long)mh$.invokeExact(world, pipeline, desc);
+            return (long)mh$.invokeExact(ecs_pipeline_update.ADDR, world, pipeline, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13784,12 +13784,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_pipeline(MemorySegment world, long pipeline) {
-        var mh$ = ecs_set_pipeline.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_pipeline;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_pipeline", world, pipeline);
             }
-            mh$.invokeExact(world, pipeline);
+            mh$.invokeExact(ecs_set_pipeline.ADDR, world, pipeline);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13844,12 +13844,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_pipeline(MemorySegment world) {
-        var mh$ = ecs_get_pipeline.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_get_pipeline;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_pipeline", world);
             }
-            return (long)mh$.invokeExact(world);
+            return (long)mh$.invokeExact(ecs_get_pipeline.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13905,12 +13905,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_progress(MemorySegment world, float delta_time) {
-        var mh$ = ecs_progress.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_progress;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_progress", world, delta_time);
             }
-            return (boolean)mh$.invokeExact(world, delta_time);
+            return (boolean)mh$.invokeExact(ecs_progress.ADDR, world, delta_time);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -13965,12 +13965,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_time_scale(MemorySegment world, float scale) {
-        var mh$ = ecs_set_time_scale.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_time_scale;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_time_scale", world, scale);
             }
-            mh$.invokeExact(world, scale);
+            mh$.invokeExact(ecs_set_time_scale.ADDR, world, scale);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14024,12 +14024,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_reset_clock(MemorySegment world) {
-        var mh$ = ecs_reset_clock.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_reset_clock;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_reset_clock", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(ecs_reset_clock.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14085,12 +14085,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_run_pipeline(MemorySegment world, long pipeline, float delta_time) {
-        var mh$ = ecs_run_pipeline.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_run_pipeline;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_run_pipeline", world, pipeline, delta_time);
             }
-            mh$.invokeExact(world, pipeline, delta_time);
+            mh$.invokeExact(ecs_run_pipeline.ADDR, world, pipeline, delta_time);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14145,12 +14145,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_threads(MemorySegment world, int threads) {
-        var mh$ = ecs_set_threads.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_threads;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_threads", world, threads);
             }
-            mh$.invokeExact(world, threads);
+            mh$.invokeExact(ecs_set_threads.ADDR, world, threads);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14205,12 +14205,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_task_threads(MemorySegment world, int task_threads) {
-        var mh$ = ecs_set_task_threads.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_set_task_threads;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_task_threads", world, task_threads);
             }
-            mh$.invokeExact(world, task_threads);
+            mh$.invokeExact(ecs_set_task_threads.ADDR, world, task_threads);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14265,12 +14265,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_using_task_threads(MemorySegment world) {
-        var mh$ = ecs_using_task_threads.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_using_task_threads;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_using_task_threads", world);
             }
-            return (boolean)mh$.invokeExact(world);
+            return (boolean)mh$.invokeExact(ecs_using_task_threads.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14324,12 +14324,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsPipelineImport(MemorySegment world) {
-        var mh$ = FlecsPipelineImport.HANDLE;
+        var mh$ = FlecsDowncalls2.FlecsPipelineImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsPipelineImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsPipelineImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14385,12 +14385,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_system_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_system_init.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_system_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14447,12 +14447,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_system_update(MemorySegment world, long system, MemorySegment desc) {
-        var mh$ = ecs_system_update.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_update;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_update", world, system, desc);
             }
-            return (long)mh$.invokeExact(world, system, desc);
+            return (long)mh$.invokeExact(ecs_system_update.ADDR, world, system, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14508,12 +14508,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_system_get(MemorySegment world, long system) {
-        var mh$ = ecs_system_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_get", world, system);
             }
-            return (MemorySegment)mh$.invokeExact(world, system);
+            return (MemorySegment)mh$.invokeExact(ecs_system_get.ADDR, world, system);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14569,12 +14569,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_system_set_group(MemorySegment world, long system, long group_id) {
-        var mh$ = ecs_system_set_group.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_set_group;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_set_group", world, system, group_id);
             }
-            mh$.invokeExact(world, system, group_id);
+            mh$.invokeExact(ecs_system_set_group.ADDR, world, system, group_id);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14632,12 +14632,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_run(MemorySegment world, long system, float delta_time, MemorySegment param) {
-        var mh$ = ecs_run.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_run;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_run", world, system, delta_time, param);
             }
-            return (long)mh$.invokeExact(world, system, delta_time, param);
+            return (long)mh$.invokeExact(ecs_run.ADDR, world, system, delta_time, param);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14697,12 +14697,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_run_worker(MemorySegment world, long system, int stage_current, int stage_count, float delta_time, MemorySegment param) {
-        var mh$ = ecs_run_worker.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_run_worker;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_run_worker", world, system, stage_current, stage_count, delta_time, param);
             }
-            return (long)mh$.invokeExact(world, system, stage_current, stage_count, delta_time, param);
+            return (long)mh$.invokeExact(ecs_run_worker.ADDR, world, system, stage_current, stage_count, delta_time, param);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14756,12 +14756,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsSystemImport(MemorySegment world) {
-        var mh$ = FlecsSystemImport.HANDLE;
+        var mh$ = FlecsDowncalls2.FlecsSystemImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsSystemImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsSystemImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14816,12 +14816,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_world_stats_get(MemorySegment world, MemorySegment stats) {
-        var mh$ = ecs_world_stats_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_world_stats_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_stats_get", world, stats);
             }
-            mh$.invokeExact(world, stats);
+            mh$.invokeExact(ecs_world_stats_get.ADDR, world, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14876,12 +14876,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_world_stats_reduce(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_world_stats_reduce.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_world_stats_reduce;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_stats_reduce", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_world_stats_reduce.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14937,12 +14937,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_world_stats_reduce_last(MemorySegment stats, MemorySegment old, int count) {
-        var mh$ = ecs_world_stats_reduce_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_world_stats_reduce_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_stats_reduce_last", stats, old, count);
             }
-            mh$.invokeExact(stats, old, count);
+            mh$.invokeExact(ecs_world_stats_reduce_last.ADDR, stats, old, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -14996,12 +14996,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_world_stats_repeat_last(MemorySegment stats) {
-        var mh$ = ecs_world_stats_repeat_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_world_stats_repeat_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_stats_repeat_last", stats);
             }
-            mh$.invokeExact(stats);
+            mh$.invokeExact(ecs_world_stats_repeat_last.ADDR, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15056,12 +15056,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_world_stats_copy_last(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_world_stats_copy_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_world_stats_copy_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_stats_copy_last", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_world_stats_copy_last.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15116,12 +15116,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_world_stats_log(MemorySegment world, MemorySegment stats) {
-        var mh$ = ecs_world_stats_log.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_world_stats_log;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_stats_log", world, stats);
             }
-            mh$.invokeExact(world, stats);
+            mh$.invokeExact(ecs_world_stats_log.ADDR, world, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15177,12 +15177,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_stats_get(MemorySegment world, MemorySegment query, MemorySegment stats) {
-        var mh$ = ecs_query_stats_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_query_stats_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_stats_get", world, query, stats);
             }
-            mh$.invokeExact(world, query, stats);
+            mh$.invokeExact(ecs_query_stats_get.ADDR, world, query, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15237,12 +15237,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_cache_stats_reduce(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_query_cache_stats_reduce.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_query_cache_stats_reduce;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_cache_stats_reduce", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_query_cache_stats_reduce.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15298,12 +15298,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_cache_stats_reduce_last(MemorySegment stats, MemorySegment old, int count) {
-        var mh$ = ecs_query_cache_stats_reduce_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_query_cache_stats_reduce_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_cache_stats_reduce_last", stats, old, count);
             }
-            mh$.invokeExact(stats, old, count);
+            mh$.invokeExact(ecs_query_cache_stats_reduce_last.ADDR, stats, old, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15357,12 +15357,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_cache_stats_repeat_last(MemorySegment stats) {
-        var mh$ = ecs_query_cache_stats_repeat_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_query_cache_stats_repeat_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_cache_stats_repeat_last", stats);
             }
-            mh$.invokeExact(stats);
+            mh$.invokeExact(ecs_query_cache_stats_repeat_last.ADDR, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15417,12 +15417,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_cache_stats_copy_last(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_query_cache_stats_copy_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_query_cache_stats_copy_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_cache_stats_copy_last", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_query_cache_stats_copy_last.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15479,12 +15479,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_system_stats_get(MemorySegment world, long system, MemorySegment stats) {
-        var mh$ = ecs_system_stats_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_stats_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_stats_get", world, system, stats);
             }
-            return (boolean)mh$.invokeExact(world, system, stats);
+            return (boolean)mh$.invokeExact(ecs_system_stats_get.ADDR, world, system, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15539,12 +15539,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_system_stats_reduce(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_system_stats_reduce.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_stats_reduce;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_stats_reduce", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_system_stats_reduce.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15600,12 +15600,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_system_stats_reduce_last(MemorySegment stats, MemorySegment old, int count) {
-        var mh$ = ecs_system_stats_reduce_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_stats_reduce_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_stats_reduce_last", stats, old, count);
             }
-            mh$.invokeExact(stats, old, count);
+            mh$.invokeExact(ecs_system_stats_reduce_last.ADDR, stats, old, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15659,12 +15659,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_system_stats_repeat_last(MemorySegment stats) {
-        var mh$ = ecs_system_stats_repeat_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_stats_repeat_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_stats_repeat_last", stats);
             }
-            mh$.invokeExact(stats);
+            mh$.invokeExact(ecs_system_stats_repeat_last.ADDR, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15719,12 +15719,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_system_stats_copy_last(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_system_stats_copy_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_system_stats_copy_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_system_stats_copy_last", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_system_stats_copy_last.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15781,12 +15781,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_pipeline_stats_get(MemorySegment world, long pipeline, MemorySegment stats) {
-        var mh$ = ecs_pipeline_stats_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_stats_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_stats_get", world, pipeline, stats);
             }
-            return (boolean)mh$.invokeExact(world, pipeline, stats);
+            return (boolean)mh$.invokeExact(ecs_pipeline_stats_get.ADDR, world, pipeline, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15840,12 +15840,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_pipeline_stats_fini(MemorySegment stats) {
-        var mh$ = ecs_pipeline_stats_fini.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_stats_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_stats_fini", stats);
             }
-            mh$.invokeExact(stats);
+            mh$.invokeExact(ecs_pipeline_stats_fini.ADDR, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15900,12 +15900,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_pipeline_stats_reduce(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_pipeline_stats_reduce.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_stats_reduce;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_stats_reduce", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_pipeline_stats_reduce.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -15961,12 +15961,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_pipeline_stats_reduce_last(MemorySegment stats, MemorySegment old, int count) {
-        var mh$ = ecs_pipeline_stats_reduce_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_stats_reduce_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_stats_reduce_last", stats, old, count);
             }
-            mh$.invokeExact(stats, old, count);
+            mh$.invokeExact(ecs_pipeline_stats_reduce_last.ADDR, stats, old, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -16020,12 +16020,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_pipeline_stats_repeat_last(MemorySegment stats) {
-        var mh$ = ecs_pipeline_stats_repeat_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_stats_repeat_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_stats_repeat_last", stats);
             }
-            mh$.invokeExact(stats);
+            mh$.invokeExact(ecs_pipeline_stats_repeat_last.ADDR, stats);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -16080,12 +16080,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_pipeline_stats_copy_last(MemorySegment dst, MemorySegment src) {
-        var mh$ = ecs_pipeline_stats_copy_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_pipeline_stats_copy_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_pipeline_stats_copy_last", dst, src);
             }
-            mh$.invokeExact(dst, src);
+            mh$.invokeExact(ecs_pipeline_stats_copy_last.ADDR, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -16142,12 +16142,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_metric_reduce(MemorySegment dst, MemorySegment src, int t_dst, int t_src) {
-        var mh$ = ecs_metric_reduce.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_metric_reduce;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_metric_reduce", dst, src, t_dst, t_src);
             }
-            mh$.invokeExact(dst, src, t_dst, t_src);
+            mh$.invokeExact(ecs_metric_reduce.ADDR, dst, src, t_dst, t_src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -16203,12 +16203,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_metric_reduce_last(MemorySegment m, int t, int count) {
-        var mh$ = ecs_metric_reduce_last.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_metric_reduce_last;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_metric_reduce_last", m, t, count);
             }
-            mh$.invokeExact(m, t, count);
+            mh$.invokeExact(ecs_metric_reduce_last.ADDR, m, t, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -16264,12 +16264,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_metric_copy(MemorySegment m, int dst, int src) {
-        var mh$ = ecs_metric_copy.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_metric_copy;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_metric_copy", m, dst, src);
             }
-            mh$.invokeExact(m, dst, src);
+            mh$.invokeExact(ecs_metric_copy.ADDR, m, dst, src);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17179,12 +17179,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_entity_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_entity_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_entity_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_entity_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_entity_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17239,12 +17239,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_component_record_memory_get(MemorySegment cr, MemorySegment result) {
-        var mh$ = ecs_component_record_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_component_record_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_component_record_memory_get", cr, result);
             }
-            mh$.invokeExact(cr, result);
+            mh$.invokeExact(ecs_component_record_memory_get.ADDR, cr, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17299,12 +17299,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_component_index_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_component_index_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_component_index_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_component_index_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_component_index_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17359,12 +17359,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_query_memory_get(MemorySegment query, MemorySegment result) {
-        var mh$ = ecs_query_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_query_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_query_memory_get", query, result);
             }
-            mh$.invokeExact(query, result);
+            mh$.invokeExact(ecs_query_memory_get.ADDR, query, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17419,12 +17419,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_queries_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_queries_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls2.ecs_queries_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_queries_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_queries_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17479,12 +17479,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_table_component_memory_get(MemorySegment table, MemorySegment result) {
-        var mh$ = ecs_table_component_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_table_component_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_component_memory_get", table, result);
             }
-            mh$.invokeExact(table, result);
+            mh$.invokeExact(ecs_table_component_memory_get.ADDR, table, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17539,12 +17539,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_component_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_component_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_component_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_component_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_component_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17599,12 +17599,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_table_memory_get(MemorySegment table, MemorySegment result) {
-        var mh$ = ecs_table_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_table_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_memory_get", table, result);
             }
-            mh$.invokeExact(table, result);
+            mh$.invokeExact(ecs_table_memory_get.ADDR, table, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17659,12 +17659,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_tables_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_tables_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_tables_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_tables_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_tables_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17719,12 +17719,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_table_histogram_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_table_histogram_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_table_histogram_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_table_histogram_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_table_histogram_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17779,12 +17779,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_misc_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_misc_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_misc_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_misc_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_misc_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17839,12 +17839,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_allocator_memory_get(SegmentAllocator allocator, MemorySegment world) {
-        var mh$ = ecs_allocator_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_allocator_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_allocator_memory_get", allocator, world);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world);
+            return (MemorySegment)mh$.invokeExact(ecs_allocator_memory_get.ADDR, allocator, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17899,12 +17899,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_memory_get(MemorySegment world) {
-        var mh$ = ecs_memory_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_memory_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_memory_get", world);
             }
-            return (int)mh$.invokeExact(world);
+            return (int)mh$.invokeExact(ecs_memory_get.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -17958,12 +17958,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsStatsImport(MemorySegment world) {
-        var mh$ = FlecsStatsImport.HANDLE;
+        var mh$ = FlecsDowncalls3.FlecsStatsImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsStatsImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsStatsImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -18694,12 +18694,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_metric_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_metric_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_metric_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_metric_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_metric_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -18753,12 +18753,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsMetricsImport(MemorySegment world) {
-        var mh$ = FlecsMetricsImport.HANDLE;
+        var mh$ = FlecsDowncalls3.FlecsMetricsImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsMetricsImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsMetricsImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19399,12 +19399,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_alert_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_alert_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_alert_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_alert_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_alert_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19461,12 +19461,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_get_alert_count(MemorySegment world, long entity, long alert) {
-        var mh$ = ecs_get_alert_count.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_get_alert_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_alert_count", world, entity, alert);
             }
-            return (int)mh$.invokeExact(world, entity, alert);
+            return (int)mh$.invokeExact(ecs_get_alert_count.ADDR, world, entity, alert);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19523,12 +19523,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_get_alert(MemorySegment world, long entity, long alert) {
-        var mh$ = ecs_get_alert.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_get_alert;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_get_alert", world, entity, alert);
             }
-            return (long)mh$.invokeExact(world, entity, alert);
+            return (long)mh$.invokeExact(ecs_get_alert.ADDR, world, entity, alert);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19582,12 +19582,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsAlertsImport(MemorySegment world) {
-        var mh$ = FlecsAlertsImport.HANDLE;
+        var mh$ = FlecsDowncalls3.FlecsAlertsImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsAlertsImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsAlertsImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19646,12 +19646,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_ptr_from_json(MemorySegment world, long type, MemorySegment ptr, MemorySegment json, MemorySegment desc) {
-        var mh$ = ecs_ptr_from_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_from_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_from_json", world, type, ptr, json, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, ptr, json, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_ptr_from_json.ADDR, world, type, ptr, json, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19709,12 +19709,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_entity_from_json(MemorySegment world, long entity, MemorySegment json, MemorySegment desc) {
-        var mh$ = ecs_entity_from_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_entity_from_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_entity_from_json", world, entity, json, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity, json, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_entity_from_json.ADDR, world, entity, json, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19771,12 +19771,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_world_from_json(MemorySegment world, MemorySegment json, MemorySegment desc) {
-        var mh$ = ecs_world_from_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_world_from_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_from_json", world, json, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, json, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_world_from_json.ADDR, world, json, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19833,12 +19833,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_world_from_json_file(MemorySegment world, MemorySegment filename, MemorySegment desc) {
-        var mh$ = ecs_world_from_json_file.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_world_from_json_file;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_from_json_file", world, filename, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, filename, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_world_from_json_file.ADDR, world, filename, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19896,12 +19896,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_array_to_json(MemorySegment world, long type, MemorySegment data, int count) {
-        var mh$ = ecs_array_to_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_array_to_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_array_to_json", world, type, data, count);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, data, count);
+            return (MemorySegment)mh$.invokeExact(ecs_array_to_json.ADDR, world, type, data, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -19960,12 +19960,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_array_to_json_buf(MemorySegment world, long type, MemorySegment data, int count, MemorySegment buf_out) {
-        var mh$ = ecs_array_to_json_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_array_to_json_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_array_to_json_buf", world, type, data, count, buf_out);
             }
-            return (int)mh$.invokeExact(world, type, data, count, buf_out);
+            return (int)mh$.invokeExact(ecs_array_to_json_buf.ADDR, world, type, data, count, buf_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20022,12 +20022,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_ptr_to_json(MemorySegment world, long type, MemorySegment data) {
-        var mh$ = ecs_ptr_to_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_to_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_to_json", world, type, data);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, data);
+            return (MemorySegment)mh$.invokeExact(ecs_ptr_to_json.ADDR, world, type, data);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20085,12 +20085,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_ptr_to_json_buf(MemorySegment world, long type, MemorySegment data, MemorySegment buf_out) {
-        var mh$ = ecs_ptr_to_json_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_to_json_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_to_json_buf", world, type, data, buf_out);
             }
-            return (int)mh$.invokeExact(world, type, data, buf_out);
+            return (int)mh$.invokeExact(ecs_ptr_to_json_buf.ADDR, world, type, data, buf_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20146,12 +20146,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_type_info_to_json(MemorySegment world, long type) {
-        var mh$ = ecs_type_info_to_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_type_info_to_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_type_info_to_json", world, type);
             }
-            return (MemorySegment)mh$.invokeExact(world, type);
+            return (MemorySegment)mh$.invokeExact(ecs_type_info_to_json.ADDR, world, type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20208,12 +20208,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_type_info_to_json_buf(MemorySegment world, long type, MemorySegment buf_out) {
-        var mh$ = ecs_type_info_to_json_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_type_info_to_json_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_type_info_to_json_buf", world, type, buf_out);
             }
-            return (int)mh$.invokeExact(world, type, buf_out);
+            return (int)mh$.invokeExact(ecs_type_info_to_json_buf.ADDR, world, type, buf_out);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20270,12 +20270,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_entity_to_json(MemorySegment world, long entity, MemorySegment desc) {
-        var mh$ = ecs_entity_to_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_entity_to_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_entity_to_json", world, entity, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_entity_to_json.ADDR, world, entity, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20333,12 +20333,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_entity_to_json_buf(MemorySegment world, long entity, MemorySegment buf_out, MemorySegment desc) {
-        var mh$ = ecs_entity_to_json_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_entity_to_json_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_entity_to_json_buf", world, entity, buf_out, desc);
             }
-            return (int)mh$.invokeExact(world, entity, buf_out, desc);
+            return (int)mh$.invokeExact(ecs_entity_to_json_buf.ADDR, world, entity, buf_out, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20394,12 +20394,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_iter_to_json(MemorySegment iter, MemorySegment desc) {
-        var mh$ = ecs_iter_to_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_iter_to_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_to_json", iter, desc);
             }
-            return (MemorySegment)mh$.invokeExact(iter, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_iter_to_json.ADDR, iter, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20456,12 +20456,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_iter_to_json_buf(MemorySegment iter, MemorySegment buf_out, MemorySegment desc) {
-        var mh$ = ecs_iter_to_json_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_iter_to_json_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_iter_to_json_buf", iter, buf_out, desc);
             }
-            return (int)mh$.invokeExact(iter, buf_out, desc);
+            return (int)mh$.invokeExact(ecs_iter_to_json_buf.ADDR, iter, buf_out, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20517,12 +20517,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_world_to_json(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_world_to_json.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_world_to_json;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_to_json", world, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_world_to_json.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -20579,12 +20579,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_world_to_json_buf(MemorySegment world, MemorySegment buf_out, MemorySegment desc) {
-        var mh$ = ecs_world_to_json_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_world_to_json_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_world_to_json_buf", world, buf_out, desc);
             }
-            return (int)mh$.invokeExact(world, buf_out, desc);
+            return (int)mh$.invokeExact(ecs_world_to_json_buf.ADDR, world, buf_out, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -25768,12 +25768,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsUnitsImport(MemorySegment world) {
-        var mh$ = FlecsUnitsImport.HANDLE;
+        var mh$ = FlecsDowncalls3.FlecsUnitsImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsUnitsImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsUnitsImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26192,12 +26192,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_parse(MemorySegment world, MemorySegment name, MemorySegment code, MemorySegment desc, MemorySegment result) {
-        var mh$ = ecs_script_parse.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_parse;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_parse", world, name, code, desc, result);
             }
-            return (MemorySegment)mh$.invokeExact(world, name, code, desc, result);
+            return (MemorySegment)mh$.invokeExact(ecs_script_parse.ADDR, world, name, code, desc, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26254,12 +26254,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_script_eval(MemorySegment script, MemorySegment desc, MemorySegment result) {
-        var mh$ = ecs_script_eval.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_eval;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_eval", script, desc, result);
             }
-            return (int)mh$.invokeExact(script, desc, result);
+            return (int)mh$.invokeExact(ecs_script_eval.ADDR, script, desc, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26313,12 +26313,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_free(MemorySegment script) {
-        var mh$ = ecs_script_free.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_free;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_free", script);
             }
-            mh$.invokeExact(script);
+            mh$.invokeExact(ecs_script_free.ADDR, script);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26376,12 +26376,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_script_run(MemorySegment world, MemorySegment name, MemorySegment code, MemorySegment result) {
-        var mh$ = ecs_script_run.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_run;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_run", world, name, code, result);
             }
-            return (int)mh$.invokeExact(world, name, code, result);
+            return (int)mh$.invokeExact(ecs_script_run.ADDR, world, name, code, result);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26437,12 +26437,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_script_run_file(MemorySegment world, MemorySegment filename) {
-        var mh$ = ecs_script_run_file.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_run_file;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_run_file", world, filename);
             }
-            return (int)mh$.invokeExact(world, filename);
+            return (int)mh$.invokeExact(ecs_script_run_file.ADDR, world, filename);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26495,12 +26495,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_runtime_new() {
-        var mh$ = ecs_script_runtime_new.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_runtime_new;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_runtime_new");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment)mh$.invokeExact(ecs_script_runtime_new.ADDR);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26554,12 +26554,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_runtime_free(MemorySegment runtime) {
-        var mh$ = ecs_script_runtime_free.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_runtime_free;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_runtime_free", runtime);
             }
-            mh$.invokeExact(runtime);
+            mh$.invokeExact(ecs_script_runtime_free.ADDR, runtime);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26616,12 +26616,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_script_ast_to_buf(MemorySegment script, MemorySegment buf, boolean colors) {
-        var mh$ = ecs_script_ast_to_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_ast_to_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_ast_to_buf", script, buf, colors);
             }
-            return (int)mh$.invokeExact(script, buf, colors);
+            return (int)mh$.invokeExact(ecs_script_ast_to_buf.ADDR, script, buf, colors);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26677,12 +26677,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_ast_to_str(MemorySegment script, boolean colors) {
-        var mh$ = ecs_script_ast_to_str.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_ast_to_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_ast_to_str", script, colors);
             }
-            return (MemorySegment)mh$.invokeExact(script, colors);
+            return (MemorySegment)mh$.invokeExact(ecs_script_ast_to_str.ADDR, script, colors);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26738,12 +26738,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_script_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_script_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_script_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26801,12 +26801,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_script_update(MemorySegment world, long script, long instance, MemorySegment code) {
-        var mh$ = ecs_script_update.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_update;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_update", world, script, instance, code);
             }
-            return (int)mh$.invokeExact(world, script, instance, code);
+            return (int)mh$.invokeExact(ecs_script_update.ADDR, world, script, instance, code);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26862,12 +26862,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_clear(MemorySegment world, long script, long instance) {
-        var mh$ = ecs_script_clear.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_clear;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_clear", world, script, instance);
             }
-            mh$.invokeExact(world, script, instance);
+            mh$.invokeExact(ecs_script_clear.ADDR, world, script, instance);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26922,12 +26922,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_init(MemorySegment world) {
-        var mh$ = ecs_script_vars_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_init", world);
             }
-            return (MemorySegment)mh$.invokeExact(world);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_init.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -26981,12 +26981,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_vars_fini(MemorySegment vars) {
-        var mh$ = ecs_script_vars_fini.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_fini;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_fini", vars);
             }
-            mh$.invokeExact(vars);
+            mh$.invokeExact(ecs_script_vars_fini.ADDR, vars);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27041,12 +27041,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_push(MemorySegment parent) {
-        var mh$ = ecs_script_vars_push.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_push;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_push", parent);
             }
-            return (MemorySegment)mh$.invokeExact(parent);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_push.ADDR, parent);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27101,12 +27101,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_pop(MemorySegment vars) {
-        var mh$ = ecs_script_vars_pop.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_pop;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_pop", vars);
             }
-            return (MemorySegment)mh$.invokeExact(vars);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_pop.ADDR, vars);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27162,12 +27162,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_declare(MemorySegment vars, MemorySegment name) {
-        var mh$ = ecs_script_vars_declare.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_declare;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_declare", vars, name);
             }
-            return (MemorySegment)mh$.invokeExact(vars, name);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_declare.ADDR, vars, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27224,12 +27224,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_define_id(MemorySegment vars, MemorySegment name, long type) {
-        var mh$ = ecs_script_vars_define_id.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_define_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_define_id", vars, name, type);
             }
-            return (MemorySegment)mh$.invokeExact(vars, name, type);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_define_id.ADDR, vars, name, type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27285,12 +27285,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_lookup(MemorySegment vars, MemorySegment name) {
-        var mh$ = ecs_script_vars_lookup.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_lookup;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_lookup", vars, name);
             }
-            return (MemorySegment)mh$.invokeExact(vars, name);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_lookup.ADDR, vars, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27346,12 +27346,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_vars_from_sp(MemorySegment vars, int sp) {
-        var mh$ = ecs_script_vars_from_sp.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_from_sp;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_from_sp", vars, sp);
             }
-            return (MemorySegment)mh$.invokeExact(vars, sp);
+            return (MemorySegment)mh$.invokeExact(ecs_script_vars_from_sp.ADDR, vars, sp);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27405,12 +27405,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_vars_print(MemorySegment vars) {
-        var mh$ = ecs_script_vars_print.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_print;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_print", vars);
             }
-            mh$.invokeExact(vars);
+            mh$.invokeExact(ecs_script_vars_print.ADDR, vars);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27465,12 +27465,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_vars_set_size(MemorySegment vars, int count) {
-        var mh$ = ecs_script_vars_set_size.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_set_size;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_set_size", vars, count);
             }
-            mh$.invokeExact(vars, count);
+            mh$.invokeExact(ecs_script_vars_set_size.ADDR, vars, count);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27526,12 +27526,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_script_vars_from_iter(MemorySegment it, MemorySegment vars, int offset) {
-        var mh$ = ecs_script_vars_from_iter.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_vars_from_iter;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_vars_from_iter", it, vars, offset);
             }
-            mh$.invokeExact(it, vars, offset);
+            mh$.invokeExact(ecs_script_vars_from_iter.ADDR, it, vars, offset);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27589,12 +27589,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_expr_run(MemorySegment world, MemorySegment ptr, MemorySegment value, MemorySegment desc) {
-        var mh$ = ecs_expr_run.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_expr_run;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_expr_run", world, ptr, value, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, ptr, value, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_expr_run.ADDR, world, ptr, value, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27651,12 +27651,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_expr_parse(MemorySegment world, MemorySegment expr, MemorySegment desc) {
-        var mh$ = ecs_expr_parse.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_expr_parse;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_expr_parse", world, expr, desc);
             }
-            return (MemorySegment)mh$.invokeExact(world, expr, desc);
+            return (MemorySegment)mh$.invokeExact(ecs_expr_parse.ADDR, world, expr, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27713,12 +27713,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_expr_eval(MemorySegment script, MemorySegment value, MemorySegment desc) {
-        var mh$ = ecs_expr_eval.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_expr_eval;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_expr_eval", script, value, desc);
             }
-            return (int)mh$.invokeExact(script, value, desc);
+            return (int)mh$.invokeExact(ecs_expr_eval.ADDR, script, value, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27775,12 +27775,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_script_string_interpolate(MemorySegment world, MemorySegment str, MemorySegment vars) {
-        var mh$ = ecs_script_string_interpolate.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_script_string_interpolate;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_script_string_interpolate", world, str, vars);
             }
-            return (MemorySegment)mh$.invokeExact(world, str, vars);
+            return (MemorySegment)mh$.invokeExact(ecs_script_string_interpolate.ADDR, world, str, vars);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27836,12 +27836,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_const_var_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_const_var_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_const_var_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_const_var_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_const_var_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27897,12 +27897,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_const_var_get(SegmentAllocator allocator, MemorySegment world, long var_) {
-        var mh$ = ecs_const_var_get.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_const_var_get;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_const_var_get", allocator, world, var_);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, var_);
+            return (MemorySegment)mh$.invokeExact(ecs_const_var_get.ADDR, allocator, world, var_);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -27958,12 +27958,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_function_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_function_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_function_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_function_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_function_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28019,12 +28019,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_method_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_method_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_method_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_method_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_method_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28081,12 +28081,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_ptr_to_expr(MemorySegment world, long type, MemorySegment data) {
-        var mh$ = ecs_ptr_to_expr.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_to_expr;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_to_expr", world, type, data);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, data);
+            return (MemorySegment)mh$.invokeExact(ecs_ptr_to_expr.ADDR, world, type, data);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28144,12 +28144,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_ptr_to_expr_buf(MemorySegment world, long type, MemorySegment data, MemorySegment buf) {
-        var mh$ = ecs_ptr_to_expr_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_to_expr_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_to_expr_buf", world, type, data, buf);
             }
-            return (int)mh$.invokeExact(world, type, data, buf);
+            return (int)mh$.invokeExact(ecs_ptr_to_expr_buf.ADDR, world, type, data, buf);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28206,12 +28206,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_ptr_to_str(MemorySegment world, long type, MemorySegment data) {
-        var mh$ = ecs_ptr_to_str.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_to_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_to_str", world, type, data);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, data);
+            return (MemorySegment)mh$.invokeExact(ecs_ptr_to_str.ADDR, world, type, data);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28269,12 +28269,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_ptr_to_str_buf(MemorySegment world, long type, MemorySegment data, MemorySegment buf) {
-        var mh$ = ecs_ptr_to_str_buf.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_ptr_to_str_buf;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_ptr_to_str_buf", world, type, data, buf);
             }
-            return (int)mh$.invokeExact(world, type, data, buf);
+            return (int)mh$.invokeExact(ecs_ptr_to_str_buf.ADDR, world, type, data, buf);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28328,12 +28328,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsScriptImport(MemorySegment world) {
-        var mh$ = FlecsScriptImport.HANDLE;
+        var mh$ = FlecsDowncalls3.FlecsScriptImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsScriptImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsScriptImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28659,12 +28659,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_doc_set_uuid(MemorySegment world, long entity, MemorySegment uuid) {
-        var mh$ = ecs_doc_set_uuid.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_set_uuid;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_set_uuid", world, entity, uuid);
             }
-            mh$.invokeExact(world, entity, uuid);
+            mh$.invokeExact(ecs_doc_set_uuid.ADDR, world, entity, uuid);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28720,12 +28720,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_doc_set_name(MemorySegment world, long entity, MemorySegment name) {
-        var mh$ = ecs_doc_set_name.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_set_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_set_name", world, entity, name);
             }
-            mh$.invokeExact(world, entity, name);
+            mh$.invokeExact(ecs_doc_set_name.ADDR, world, entity, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28781,12 +28781,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_doc_set_brief(MemorySegment world, long entity, MemorySegment description) {
-        var mh$ = ecs_doc_set_brief.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_set_brief;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_set_brief", world, entity, description);
             }
-            mh$.invokeExact(world, entity, description);
+            mh$.invokeExact(ecs_doc_set_brief.ADDR, world, entity, description);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28842,12 +28842,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_doc_set_detail(MemorySegment world, long entity, MemorySegment description) {
-        var mh$ = ecs_doc_set_detail.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_set_detail;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_set_detail", world, entity, description);
             }
-            mh$.invokeExact(world, entity, description);
+            mh$.invokeExact(ecs_doc_set_detail.ADDR, world, entity, description);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28903,12 +28903,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_doc_set_link(MemorySegment world, long entity, MemorySegment link) {
-        var mh$ = ecs_doc_set_link.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_set_link;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_set_link", world, entity, link);
             }
-            mh$.invokeExact(world, entity, link);
+            mh$.invokeExact(ecs_doc_set_link.ADDR, world, entity, link);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -28964,12 +28964,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_doc_set_color(MemorySegment world, long entity, MemorySegment color) {
-        var mh$ = ecs_doc_set_color.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_set_color;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_set_color", world, entity, color);
             }
-            mh$.invokeExact(world, entity, color);
+            mh$.invokeExact(ecs_doc_set_color.ADDR, world, entity, color);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29025,12 +29025,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_doc_get_uuid(MemorySegment world, long entity) {
-        var mh$ = ecs_doc_get_uuid.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_get_uuid;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_get_uuid", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_doc_get_uuid.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29086,12 +29086,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_doc_get_name(MemorySegment world, long entity) {
-        var mh$ = ecs_doc_get_name.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_get_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_get_name", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_doc_get_name.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29147,12 +29147,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_doc_get_brief(MemorySegment world, long entity) {
-        var mh$ = ecs_doc_get_brief.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_get_brief;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_get_brief", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_doc_get_brief.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29208,12 +29208,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_doc_get_detail(MemorySegment world, long entity) {
-        var mh$ = ecs_doc_get_detail.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_get_detail;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_get_detail", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_doc_get_detail.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29269,12 +29269,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_doc_get_link(MemorySegment world, long entity) {
-        var mh$ = ecs_doc_get_link.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_get_link;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_get_link", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_doc_get_link.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29330,12 +29330,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_doc_get_color(MemorySegment world, long entity) {
-        var mh$ = ecs_doc_get_color.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_doc_get_color;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_doc_get_color", world, entity);
             }
-            return (MemorySegment)mh$.invokeExact(world, entity);
+            return (MemorySegment)mh$.invokeExact(ecs_doc_get_color.ADDR, world, entity);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -29389,12 +29389,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsDocImport(MemorySegment world) {
-        var mh$ = FlecsDocImport.HANDLE;
+        var mh$ = FlecsDowncalls3.FlecsDocImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsDocImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsDocImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31562,12 +31562,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_meta_serializer_to_str(MemorySegment world, long type) {
-        var mh$ = ecs_meta_serializer_to_str.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_serializer_to_str;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_serializer_to_str", world, type);
             }
-            return (MemorySegment)mh$.invokeExact(world, type);
+            return (MemorySegment)mh$.invokeExact(ecs_meta_serializer_to_str.ADDR, world, type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31624,12 +31624,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_meta_cursor(SegmentAllocator allocator, MemorySegment world, long type, MemorySegment ptr) {
-        var mh$ = ecs_meta_cursor.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_cursor;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_cursor", allocator, world, type, ptr);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, type, ptr);
+            return (MemorySegment)mh$.invokeExact(ecs_meta_cursor.ADDR, allocator, world, type, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31684,12 +31684,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_meta_get_ptr(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_ptr.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_ptr;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_ptr", cursor);
             }
-            return (MemorySegment)mh$.invokeExact(cursor);
+            return (MemorySegment)mh$.invokeExact(ecs_meta_get_ptr.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31744,12 +31744,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_next(MemorySegment cursor) {
-        var mh$ = ecs_meta_next.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_next;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_next", cursor);
             }
-            return (int)mh$.invokeExact(cursor);
+            return (int)mh$.invokeExact(ecs_meta_next.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31805,12 +31805,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_elem(MemorySegment cursor, int elem) {
-        var mh$ = ecs_meta_elem.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_elem;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_elem", cursor, elem);
             }
-            return (int)mh$.invokeExact(cursor, elem);
+            return (int)mh$.invokeExact(ecs_meta_elem.ADDR, cursor, elem);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31866,12 +31866,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_member(MemorySegment cursor, MemorySegment name) {
-        var mh$ = ecs_meta_member.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_member", cursor, name);
             }
-            return (int)mh$.invokeExact(cursor, name);
+            return (int)mh$.invokeExact(ecs_meta_member.ADDR, cursor, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31927,12 +31927,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_try_member(MemorySegment cursor, MemorySegment name) {
-        var mh$ = ecs_meta_try_member.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_try_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_try_member", cursor, name);
             }
-            return (int)mh$.invokeExact(cursor, name);
+            return (int)mh$.invokeExact(ecs_meta_try_member.ADDR, cursor, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -31988,12 +31988,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_dotmember(MemorySegment cursor, MemorySegment name) {
-        var mh$ = ecs_meta_dotmember.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_dotmember;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_dotmember", cursor, name);
             }
-            return (int)mh$.invokeExact(cursor, name);
+            return (int)mh$.invokeExact(ecs_meta_dotmember.ADDR, cursor, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32049,12 +32049,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_try_dotmember(MemorySegment cursor, MemorySegment name) {
-        var mh$ = ecs_meta_try_dotmember.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_try_dotmember;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_try_dotmember", cursor, name);
             }
-            return (int)mh$.invokeExact(cursor, name);
+            return (int)mh$.invokeExact(ecs_meta_try_dotmember.ADDR, cursor, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32109,12 +32109,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_push(MemorySegment cursor) {
-        var mh$ = ecs_meta_push.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_push;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_push", cursor);
             }
-            return (int)mh$.invokeExact(cursor);
+            return (int)mh$.invokeExact(ecs_meta_push.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32169,12 +32169,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_pop(MemorySegment cursor) {
-        var mh$ = ecs_meta_pop.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_pop;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_pop", cursor);
             }
-            return (int)mh$.invokeExact(cursor);
+            return (int)mh$.invokeExact(ecs_meta_pop.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32229,12 +32229,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_meta_is_collection(MemorySegment cursor) {
-        var mh$ = ecs_meta_is_collection.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_is_collection;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_is_collection", cursor);
             }
-            return (boolean)mh$.invokeExact(cursor);
+            return (boolean)mh$.invokeExact(ecs_meta_is_collection.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32289,12 +32289,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_type(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_type.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_type;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_type", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_type.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32349,12 +32349,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_unit(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_unit.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_unit;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_unit", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_unit.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32409,12 +32409,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_meta_get_member(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_member.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_member", cursor);
             }
-            return (MemorySegment)mh$.invokeExact(cursor);
+            return (MemorySegment)mh$.invokeExact(ecs_meta_get_member.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32469,12 +32469,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_member_id(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_member_id.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_member_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_member_id", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_member_id.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32530,12 +32530,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_bool(MemorySegment cursor, boolean value) {
-        var mh$ = ecs_meta_set_bool.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_bool;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_bool", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_bool.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32591,12 +32591,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_char(MemorySegment cursor, byte value) {
-        var mh$ = ecs_meta_set_char.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_char;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_char", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_char.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32652,12 +32652,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_int(MemorySegment cursor, long value) {
-        var mh$ = ecs_meta_set_int.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_int;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_int", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_int.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32713,12 +32713,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_uint(MemorySegment cursor, long value) {
-        var mh$ = ecs_meta_set_uint.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_uint;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_uint", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_uint.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32774,12 +32774,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_float(MemorySegment cursor, double value) {
-        var mh$ = ecs_meta_set_float.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_float;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_float", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_float.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32835,12 +32835,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_string(MemorySegment cursor, MemorySegment value) {
-        var mh$ = ecs_meta_set_string.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_string;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_string", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_string.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32896,12 +32896,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_string_literal(MemorySegment cursor, MemorySegment value) {
-        var mh$ = ecs_meta_set_string_literal.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_string_literal;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_string_literal", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_string_literal.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -32957,12 +32957,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_entity(MemorySegment cursor, long value) {
-        var mh$ = ecs_meta_set_entity.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_entity;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_entity", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_entity.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33018,12 +33018,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_id(MemorySegment cursor, long value) {
-        var mh$ = ecs_meta_set_id.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_id", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_id.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33078,12 +33078,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_null(MemorySegment cursor) {
-        var mh$ = ecs_meta_set_null.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_null;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_null", cursor);
             }
-            return (int)mh$.invokeExact(cursor);
+            return (int)mh$.invokeExact(ecs_meta_set_null.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33139,12 +33139,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_set_value(MemorySegment cursor, MemorySegment value) {
-        var mh$ = ecs_meta_set_value.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_set_value;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_set_value", cursor, value);
             }
-            return (int)mh$.invokeExact(cursor, value);
+            return (int)mh$.invokeExact(ecs_meta_set_value.ADDR, cursor, value);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33199,12 +33199,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static boolean ecs_meta_get_bool(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_bool.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_bool;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_bool", cursor);
             }
-            return (boolean)mh$.invokeExact(cursor);
+            return (boolean)mh$.invokeExact(ecs_meta_get_bool.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33259,12 +33259,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static byte ecs_meta_get_char(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_char.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_char;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_char", cursor);
             }
-            return (byte)mh$.invokeExact(cursor);
+            return (byte)mh$.invokeExact(ecs_meta_get_char.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33319,12 +33319,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_int(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_int.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_int;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_int", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_int.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33379,12 +33379,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_uint(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_uint.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_uint;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_uint", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_uint.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33439,12 +33439,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static double ecs_meta_get_float(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_float.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_float;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_float", cursor);
             }
-            return (double)mh$.invokeExact(cursor);
+            return (double)mh$.invokeExact(ecs_meta_get_float.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33499,12 +33499,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_meta_get_string(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_string.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_string;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_string", cursor);
             }
-            return (MemorySegment)mh$.invokeExact(cursor);
+            return (MemorySegment)mh$.invokeExact(ecs_meta_get_string.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33559,12 +33559,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_entity(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_entity.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_entity;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_entity", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_entity.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33619,12 +33619,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_meta_get_id(MemorySegment cursor) {
-        var mh$ = ecs_meta_get_id.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_get_id;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_get_id", cursor);
             }
-            return (long)mh$.invokeExact(cursor);
+            return (long)mh$.invokeExact(ecs_meta_get_id.ADDR, cursor);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33680,12 +33680,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static double ecs_meta_ptr_to_float(int type_kind, MemorySegment ptr) {
-        var mh$ = ecs_meta_ptr_to_float.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_ptr_to_float;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_ptr_to_float", type_kind, ptr);
             }
-            return (double)mh$.invokeExact(type_kind, ptr);
+            return (double)mh$.invokeExact(ecs_meta_ptr_to_float.ADDR, type_kind, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33741,12 +33741,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_op_get_elem_count(MemorySegment op, MemorySegment ptr) {
-        var mh$ = ecs_meta_op_get_elem_count.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_meta_op_get_elem_count;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_op_get_elem_count", op, ptr);
             }
-            return (int)mh$.invokeExact(op, ptr);
+            return (int)mh$.invokeExact(ecs_meta_op_get_elem_count.ADDR, op, ptr);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33802,12 +33802,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_primitive_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_primitive_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_primitive_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_primitive_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_primitive_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33863,12 +33863,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_enum_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_enum_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_enum_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_enum_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_enum_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33924,12 +33924,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_bitmask_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_bitmask_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_bitmask_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_bitmask_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_bitmask_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -33985,12 +33985,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_array_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_array_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_array_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_array_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_array_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34046,12 +34046,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_vector_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_vector_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_vector_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_vector_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_vector_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34107,12 +34107,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_struct_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_struct_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_struct_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_struct_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_struct_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34169,12 +34169,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_struct_add_member(MemorySegment world, long type, MemorySegment member) {
-        var mh$ = ecs_struct_add_member.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_struct_add_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_struct_add_member", world, type, member);
             }
-            return (int)mh$.invokeExact(world, type, member);
+            return (int)mh$.invokeExact(ecs_struct_add_member.ADDR, world, type, member);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34231,12 +34231,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_struct_get_member(MemorySegment world, long type, MemorySegment name) {
-        var mh$ = ecs_struct_get_member.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_struct_get_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_struct_get_member", world, type, name);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, name);
+            return (MemorySegment)mh$.invokeExact(ecs_struct_get_member.ADDR, world, type, name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34293,12 +34293,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_struct_get_nth_member(MemorySegment world, long type, int i) {
-        var mh$ = ecs_struct_get_nth_member.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_struct_get_nth_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_struct_get_nth_member", world, type, i);
             }
-            return (MemorySegment)mh$.invokeExact(world, type, i);
+            return (MemorySegment)mh$.invokeExact(ecs_struct_get_nth_member.ADDR, world, type, i);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34354,12 +34354,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_opaque_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_opaque_init.HANDLE;
+        var mh$ = FlecsDowncalls3.ecs_opaque_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_opaque_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_opaque_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34415,12 +34415,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_unit_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_unit_init.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_unit_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_unit_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_unit_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34476,12 +34476,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_unit_prefix_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_unit_prefix_init.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_unit_prefix_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_unit_prefix_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_unit_prefix_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34537,12 +34537,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_quantity_init(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_quantity_init.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_quantity_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_quantity_init", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_quantity_init.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34596,12 +34596,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void FlecsMetaImport(MemorySegment world) {
-        var mh$ = FlecsMetaImport.HANDLE;
+        var mh$ = FlecsDowncalls4.FlecsMetaImport;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("FlecsMetaImport", world);
             }
-            mh$.invokeExact(world);
+            mh$.invokeExact(FlecsMetaImport.ADDR, world);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34659,12 +34659,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static int ecs_meta_from_desc(MemorySegment world, long component, int kind, MemorySegment desc) {
-        var mh$ = ecs_meta_from_desc.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_meta_from_desc;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_meta_from_desc", world, component, kind, desc);
             }
-            return (int)mh$.invokeExact(world, component, kind, desc);
+            return (int)mh$.invokeExact(ecs_meta_from_desc.ADDR, world, component, kind, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34716,12 +34716,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_set_os_api_impl() {
-        var mh$ = ecs_set_os_api_impl.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_set_os_api_impl;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_set_os_api_impl");
             }
-            mh$.invokeExact();
+            mh$.invokeExact(ecs_set_os_api_impl.ADDR);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34778,12 +34778,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_import(MemorySegment world, MemorySegment module, MemorySegment module_name) {
-        var mh$ = ecs_import.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_import;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_import", world, module, module_name);
             }
-            return (long)mh$.invokeExact(world, module, module_name);
+            return (long)mh$.invokeExact(ecs_import.ADDR, world, module, module_name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34840,12 +34840,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_import_c(MemorySegment world, MemorySegment module, MemorySegment module_name_c) {
-        var mh$ = ecs_import_c.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_import_c;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_import_c", world, module, module_name_c);
             }
-            return (long)mh$.invokeExact(world, module, module_name_c);
+            return (long)mh$.invokeExact(ecs_import_c.ADDR, world, module, module_name_c);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34902,12 +34902,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_import_from_library(MemorySegment world, MemorySegment library_name, MemorySegment module_name) {
-        var mh$ = ecs_import_from_library.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_import_from_library;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_import_from_library", world, library_name, module_name);
             }
-            return (long)mh$.invokeExact(world, library_name, module_name);
+            return (long)mh$.invokeExact(ecs_import_from_library.ADDR, world, library_name, module_name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -34964,12 +34964,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_module_init(MemorySegment world, MemorySegment c_name, MemorySegment desc) {
-        var mh$ = ecs_module_init.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_module_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_module_init", world, c_name, desc);
             }
-            return (long)mh$.invokeExact(world, c_name, desc);
+            return (long)mh$.invokeExact(ecs_module_init.ADDR, world, c_name, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35027,12 +35027,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_get_type_name(MemorySegment type_name, MemorySegment func_name, long len, long front_len) {
-        var mh$ = ecs_cpp_get_type_name.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_get_type_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_get_type_name", type_name, func_name, len, front_len);
             }
-            return (MemorySegment)mh$.invokeExact(type_name, func_name, len, front_len);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_get_type_name.ADDR, type_name, func_name, len, front_len);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35089,12 +35089,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_get_symbol_name(MemorySegment symbol_name, MemorySegment type_name, long len) {
-        var mh$ = ecs_cpp_get_symbol_name.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_get_symbol_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_get_symbol_name", symbol_name, type_name, len);
             }
-            return (MemorySegment)mh$.invokeExact(symbol_name, type_name, len);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_get_symbol_name.ADDR, symbol_name, type_name, len);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35152,12 +35152,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_get_constant_name(MemorySegment constant_name, MemorySegment func_name, long len, long back_len) {
-        var mh$ = ecs_cpp_get_constant_name.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_get_constant_name;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_get_constant_name", constant_name, func_name, len, back_len);
             }
-            return (MemorySegment)mh$.invokeExact(constant_name, func_name, len, back_len);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_get_constant_name.ADDR, constant_name, func_name, len, back_len);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35213,12 +35213,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_trim_module(MemorySegment world, MemorySegment type_name) {
-        var mh$ = ecs_cpp_trim_module.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_trim_module;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_trim_module", world, type_name);
             }
-            return (MemorySegment)mh$.invokeExact(world, type_name);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_trim_module.ADDR, world, type_name);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35274,12 +35274,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_cpp_component_register(MemorySegment world, MemorySegment desc) {
-        var mh$ = ecs_cpp_component_register.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_component_register;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_component_register", world, desc);
             }
-            return (long)mh$.invokeExact(world, desc);
+            return (long)mh$.invokeExact(ecs_cpp_component_register.ADDR, world, desc);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35335,12 +35335,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static void ecs_cpp_enum_init(MemorySegment world, long id, long underlying_type) {
-        var mh$ = ecs_cpp_enum_init.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_enum_init;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_enum_init", world, id, underlying_type);
             }
-            mh$.invokeExact(world, id, underlying_type);
+            mh$.invokeExact(ecs_cpp_enum_init.ADDR, world, id, underlying_type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35401,12 +35401,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_cpp_enum_constant_register(MemorySegment world, long parent, long id, MemorySegment name, MemorySegment value, long value_type, long value_size) {
-        var mh$ = ecs_cpp_enum_constant_register.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_enum_constant_register;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_enum_constant_register", world, parent, id, name, value, value_type, value_size);
             }
-            return (long)mh$.invokeExact(world, parent, id, name, value, value_type, value_size);
+            return (long)mh$.invokeExact(ecs_cpp_enum_constant_register.ADDR, world, parent, id, name, value, value_type, value_size);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35465,12 +35465,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_set(SegmentAllocator allocator, MemorySegment world, long entity, long component, MemorySegment new_ptr, long size) {
-        var mh$ = ecs_cpp_set.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_set;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_set", allocator, world, entity, component, new_ptr, size);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, entity, component, new_ptr, size);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_set.ADDR, allocator, world, entity, component, new_ptr, size);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35529,12 +35529,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_assign(SegmentAllocator allocator, MemorySegment world, long entity, long component, MemorySegment new_ptr, long size) {
-        var mh$ = ecs_cpp_assign.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_assign;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_assign", allocator, world, entity, component, new_ptr, size);
             }
-            return (MemorySegment)mh$.invokeExact(allocator, world, entity, component, new_ptr, size);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_assign.ADDR, allocator, world, entity, component, new_ptr, size);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35593,12 +35593,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static long ecs_cpp_new(MemorySegment world, long parent, MemorySegment name, MemorySegment sep, MemorySegment root_sep) {
-        var mh$ = ecs_cpp_new.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_new;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_new", world, parent, name, sep, root_sep);
             }
-            return (long)mh$.invokeExact(world, parent, name, sep, root_sep);
+            return (long)mh$.invokeExact(ecs_cpp_new.ADDR, world, parent, name, sep, root_sep);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {
@@ -35654,12 +35654,12 @@ class flecs_h_1 extends flecs_h_2 {
      * }
      */
     public static MemorySegment ecs_cpp_last_member(MemorySegment world, long type) {
-        var mh$ = ecs_cpp_last_member.HANDLE;
+        var mh$ = FlecsDowncalls4.ecs_cpp_last_member;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ecs_cpp_last_member", world, type);
             }
-            return (MemorySegment)mh$.invokeExact(world, type);
+            return (MemorySegment)mh$.invokeExact(ecs_cpp_last_member.ADDR, world, type);
         } catch (Error | RuntimeException ex) {
            throw ex;
         } catch (Throwable ex$) {

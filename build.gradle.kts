@@ -234,6 +234,15 @@ val generateBase by tasks.registering(JavaExec::class) {
     }
 }
 
+val generateDowncalls by tasks.registering(JavaExec::class) {
+    description = "Rewrite jextract downcalls into unbound build-time handles and generate the GraalVM Native Image configuration (run after generateFlecsBindings)"
+    group = "flecs"
+    dependsOn(generateFlecsBindings)
+    classpath = sourceSets["generator"].runtimeClasspath
+    mainClass.set("io.github.elebras1.flecs.GenerateDowncalls")
+    args(generatedSourcesDir.absolutePath, file("src/main/resources").absolutePath)
+}
+
 sourceSets {
     create("generator") {
         java.srcDir(generatorSourcesDir)
