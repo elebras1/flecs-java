@@ -444,6 +444,8 @@ public class World extends WorldBase implements AutoCloseable {
     public void runPostFrame(Runnable action) {
         this.checkDestroyed();
         MemorySegment ctxSeg = this.registerCallbackCtx(action);
+        long ctxId = ctxSeg.get(ValueLayout.JAVA_LONG, 0);
+        this.trackCtx(ctxId);
         MemorySegment actionSeg = ecs_fini_action_t.allocate((world, ctx) -> {
             long id = ctx.get(ValueLayout.JAVA_LONG, 0);
             Object cb = ParamRegistry.get(id);
@@ -451,6 +453,7 @@ public class World extends WorldBase implements AutoCloseable {
                 runnable.run();
             }
             ParamRegistry.remove(id);
+            World.this.untrackCtx(id);
         }, this.arena);
         flecs_h.ecs_run_post_frame(this.worldSeg, actionSeg, ctxSeg);
     }

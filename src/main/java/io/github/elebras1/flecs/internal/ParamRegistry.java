@@ -27,4 +27,8 @@ public final class ParamRegistry {
     public static void remove(long id) {
         TABLE.remove(id);
     }
+
+    public static int size() {
+        return TABLE.size();
+    }
 }

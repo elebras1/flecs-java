@@ -1,6 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.*;
+import io.github.elebras1.flecs.internal.ParamRegistry;
 import io.github.elebras1.flecs.internal.RestComponent;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import org.junit.jupiter.api.AfterEach;
@@ -224,6 +225,19 @@ class WorldTest {
         this.world.progress();
 
         assertTrue(ran.get());
+    }
+
+    @Test
+    void runPostFrameClearsCtxWhenNeverRun() {
+        AtomicBoolean ran = new AtomicBoolean(false);
+        int before = ParamRegistry.size();
+        this.world.runPostFrame(() -> ran.set(true));
+        assertEquals(before + 1, ParamRegistry.size());
+
+        this.world.close();
+
+        assertFalse(ran.get());
+        assertEquals(before, ParamRegistry.size());
     }
 
     @Test
