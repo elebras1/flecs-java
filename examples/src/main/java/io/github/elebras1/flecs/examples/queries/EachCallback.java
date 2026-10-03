@@ -3,9 +3,9 @@ package io.github.elebras1.flecs.examples.queries;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 /**
  * Iterates a query with an eachView callback and mutates components in place.
@@ -37,7 +37,7 @@ public class EachCallback {
                     .with(Velocity.class)
                     .build();
 
-            query.eachView(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+            query.eachView(Position.class, Velocity.class, (PositionMutView pos, VelocityView vel) -> {
                 pos.x(pos.x() + vel.dx());
                 pos.y(pos.y() + vel.dy());
                 System.out.println("{" + pos.x() + ", " + pos.y() + "}");

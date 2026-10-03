@@ -9,11 +9,11 @@ import io.github.elebras1.flecs.examples.components.Button;
 import io.github.elebras1.flecs.examples.components.Character;
 import io.github.elebras1.flecs.examples.components.GameScene;
 import io.github.elebras1.flecs.examples.components.Health;
-import io.github.elebras1.flecs.examples.components.HealthView;
 import io.github.elebras1.flecs.examples.components.MenuScene;
 import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.SceneRoot;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.HealthMutView;
 
 /**
  * Shows one possible way to implement scene management using pipelines.
@@ -105,7 +105,7 @@ public class SceneManagement {
         // Runs only when the game scene is active.
         world.system("Characters Lose Health", Health.class)
                 .kind(gameSceneId)
-                .eachView(Health.class, (HealthView h) -> {
+                .eachView(Health.class, (HealthMutView h) -> {
                     System.out.println(h.value() + " health remaining");
                     h.value(h.value() - 1);
                 });

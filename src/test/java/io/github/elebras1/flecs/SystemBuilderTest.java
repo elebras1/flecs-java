@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Mass;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.component.VelocityView;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PositionMutView;
 
 class SystemBuilderTest {
 
@@ -168,7 +168,7 @@ class SystemBuilderTest {
         FlecsSystem sys = this.world.system()
                 .with(Position.class)
                 .each(Position.class, (entityId, p) -> {
-                    this.world.obtainEntity(entityId).insert(Position.class, (PositionView view) -> {
+                    this.world.obtainEntity(entityId).insert(Position.class, (PositionMutView view) -> {
                         view.x(p.x() + 1);
                         view.y(p.y() + 1);
                     });
@@ -275,7 +275,7 @@ class SystemBuilderTest {
 
         this.world.system("Move", Position.class, Velocity.class)
                 .kind(Flecs.OnUpdate)
-                .eachView(Position.class, Velocity.class, (Iter it, int index, PositionView p, VelocityView v) -> {
+                .eachView(Position.class, Velocity.class, (Iter it, int index, PositionMutView p, VelocityView v) -> {
                     p.x(p.x() + v.x() * it.deltaTime());
                     p.y(p.y() + v.y() * it.deltaTime());
                 });

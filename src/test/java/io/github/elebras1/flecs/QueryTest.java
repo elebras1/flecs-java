@@ -4,7 +4,6 @@ import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.internal.ParamRegistry;
 import io.github.elebras1.flecs.component.Position;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.component.VelocityView;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PositionMutView;
+import io.github.elebras1.flecs.component.PositionView;
 
 class QueryTest {
 
@@ -505,6 +506,23 @@ class QueryTest {
     }
 
     @Test
+    void fieldGetView() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        Query query = this.world.query(Position.class);
+        query.iter(it -> {
+            Field<Position> positions = it.field(Position.class, 0);
+            for (int i = 0; i < it.count(); i++) {
+                PositionView view = positions.getView(i);
+                assertEquals(10.0f, view.x());
+                assertEquals(20.0f, view.y());
+                assertFalse(view instanceof ComponentMutView);
+            }
+        });
+        query.destruct();
+    }
+
+    @Test
     void eachViewWithIter() {
         long e = this.world.obtainEntity(this.world.entity())
                 .set(new Position(10, 20))
@@ -513,7 +531,7 @@ class QueryTest {
 
         Query query = this.world.query(Position.class, Velocity.class);
         List<String> values = new ArrayList<>();
-        query.eachView(Position.class, Velocity.class, (Iter it, int index, PositionView p, VelocityView v) -> {
+        query.eachView(Position.class, Velocity.class, (Iter it, int index, PositionMutView p, VelocityView v) -> {
             p.x(p.x() + v.x());
             values.add(it.entity(index) + "," + index);
         });
@@ -552,7 +570,7 @@ class QueryTest {
                 .set(new Velocity(1, 2))
                 .id();
 
-        this.world.eachView(Position.class, Velocity.class, (PositionView p, VelocityView v) -> {
+        this.world.eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
             p.x(p.x() + v.x());
             p.y(p.y() + v.y());
         });

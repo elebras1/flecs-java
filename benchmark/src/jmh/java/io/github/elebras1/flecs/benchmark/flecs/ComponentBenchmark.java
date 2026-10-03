@@ -153,7 +153,7 @@ public class ComponentBenchmark {
     public double get(AccessState state) {
         double checksum = 0.0;
         for (int i = 0; i < state.n; i++) {
-            PositionView position = state.world.obtainEntityView(state.nextId()).getMutView(Position.class);
+            PositionView position = state.world.obtainEntityView(state.nextId()).getView(Position.class);
             checksum += position.x() + position.y();
         }
         return checksum / state.n;
@@ -163,7 +163,7 @@ public class ComponentBenchmark {
     public double getSet(AccessState state) {
         double checksum = 0.0;
         for (int i = 0; i < state.n; i++) {
-            PositionView position = state.world.obtainEntityView(state.nextId()).getMutView(Position.class);
+            PositionMutView position = state.world.obtainEntityView(state.nextId()).getMutView(Position.class);
             float x = position.x();
             position.x(x + 1.0f);
             position.y(position.y() + 1.0f);

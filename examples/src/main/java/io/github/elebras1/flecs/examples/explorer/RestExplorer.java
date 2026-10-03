@@ -4,11 +4,11 @@ import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.Flecs;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.examples.components.VelocityView;
 
 import java.util.Random;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
+import io.github.elebras1.flecs.examples.components.VelocityMutView;
 
 public class RestExplorer {
 
@@ -48,8 +48,8 @@ public class RestExplorer {
                         Field<Position> positions = it.field(Position.class, 0);
                         Field<Velocity> velocities = it.field(Velocity.class, 1);
                         for (int i = 0; i < it.count(); i++) {
-                            PositionView p = positions.getMutView(i);
-                            VelocityView v = velocities.getMutView(i);
+                            PositionMutView p = positions.getMutView(i);
+                            VelocityMutView v = velocities.getMutView(i);
                             float newX = p.x() + v.dx() * it.deltaTime();
                             float newY = p.y() + v.dy() * it.deltaTime();
                             p.x(newX).y(newY);

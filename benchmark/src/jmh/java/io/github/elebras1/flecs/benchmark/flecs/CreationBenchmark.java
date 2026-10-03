@@ -38,11 +38,11 @@ public class CreationBenchmark {
         this.world.component(Velocity.class);
         this.prefabId = this.world.prefab();
         this.world.obtainEntityView(this.prefabId)
-                .insert(Position.class, (PositionView position) -> {
+                .insert(Position.class, (PositionMutView position) -> {
                     position.x(1.0f);
                     position.y(2.0f);
                 })
-                .insert(Velocity.class, (VelocityView velocity) -> {
+                .insert(Velocity.class, (VelocityMutView velocity) -> {
                     velocity.dx(0.5f);
                     velocity.dy(0.25f);
                 });
@@ -70,7 +70,7 @@ public class CreationBenchmark {
         long checksum = 0L;
         for (int i = 0; i < this.n; i++) {
             long entityId = this.world.entity();
-            this.world.obtainEntityView(entityId).insert(Position.class, (PositionView position) -> {
+            this.world.obtainEntityView(entityId).insert(Position.class, (PositionMutView position) -> {
                 position.x(1.0f);
                 position.y(2.0f);
             });
@@ -85,11 +85,11 @@ public class CreationBenchmark {
         for (int i = 0; i < this.n; i++) {
             long entityId = this.world.entity();
             this.world.obtainEntityView(entityId)
-                    .insert(Position.class, (PositionView position) -> {
+                    .insert(Position.class, (PositionMutView position) -> {
                         position.x(1.0f);
                         position.y(2.0f);
                     })
-                    .insert(Velocity.class, (VelocityView velocity) -> {
+                    .insert(Velocity.class, (VelocityMutView velocity) -> {
                         velocity.dx(0.5f);
                         velocity.dy(0.25f);
                     });

@@ -5,9 +5,9 @@ import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 /**
  * Iterates a query with the lower-level iter callback.
@@ -38,7 +38,7 @@ public class EachWithIterCallback {
                     .with(Velocity.class)
                     .build();
 
-            query.eachView(Position.class, Velocity.class, (Iter it, int index, PositionView pos, VelocityView vel) -> {
+            query.eachView(Position.class, Velocity.class, (Iter it, int index, PositionMutView pos, VelocityView vel) -> {
                 pos.x(pos.x() + vel.dx());
                 pos.y(pos.y() + vel.dy());
 

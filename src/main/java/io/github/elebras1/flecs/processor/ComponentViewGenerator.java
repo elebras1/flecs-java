@@ -23,9 +23,9 @@ public class ComponentViewGenerator extends AbstractGenerator {
         String componentReference = packageName + "." + recordName + "Component";
 
         CodeBuilder body = new CodeBuilder();
-        body.append("public final class ").append(componentViewClassName).append(" implements ComponentView {").newline();
+        body.append("public class ").append(componentViewClassName).append(" implements ComponentView {").newline();
 
-        body.indent4().append("private long baseAddress;").newline();
+        body.indent4().append("protected long baseAddress;").newline();
 
         body.newline();
         body.indent4().append("/**").newline();
@@ -37,7 +37,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
         body.indent4().append("}").newline();
 
         for (VariableElement field : fields) {
-            body.append(buildFieldMethods(field, componentReference, componentViewClassName));
+            body.append(buildFieldMethods(field, componentReference));
         }
 
         body.append("}").newline();
@@ -51,7 +51,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                 .build();
     }
 
-    private String buildFieldMethods(VariableElement field, String componentReference, String viewType) {
+    private String buildFieldMethods(VariableElement field, String componentReference) {
         String fieldName = field.getSimpleName().toString();
         String offsetName = "OFFSET_" + fieldName.toUpperCase();
         String typeName = field.asType().toString();
@@ -62,7 +62,6 @@ public class ComponentViewGenerator extends AbstractGenerator {
             String elementType = this.getElementTypeName(field);
             String suffix = Character.toUpperCase(elementType.charAt(0)) + elementType.substring(1);
             String methodAtIndex = "get" + suffix + "AtIndex";
-            String setterAtIndex = "set" + suffix + "AtIndex";
 
             sb.newline();
             sb.indent4().append("public int ").append(fieldName).append("Length() {").newline();
@@ -75,12 +74,6 @@ public class ComponentViewGenerator extends AbstractGenerator {
             sb.indent8().append("return MemoryAccess.").append(methodAtIndex)
                     .append("(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName).append(", index);").newline();
             sb.indent4().append("}").newline();
-
-            sb.newline();
-            sb.indent4().append("public ").append(viewType).append(" ").append(fieldName).append("(int index, ").append(elementType).append(" value) {").newline();
-            sb.indent8().append("assert baseAddress != 0 : \"View is not bound to a component\";").newline();
-            sb.indent8().append("MemoryAccess.").append(setterAtIndex)
-                    .append("(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName).append(", index, value);").newline();
         } else {
             String getter = this.getGetterMethod(typeName);
             String javaType = "java.lang.String".equals(typeName) ? "String" : typeName;
@@ -98,20 +91,7 @@ public class ComponentViewGenerator extends AbstractGenerator {
                         .append("(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName).append(");").newline();
             }
             sb.indent4().append("}").newline();
-
-            sb.newline();
-            sb.indent4().append("public ").append(viewType).append(" ").append(fieldName).append("(").append(javaType).append(" value) {").newline();
-            sb.indent8().append("assert baseAddress != 0 : \"View is not bound to a component\";").newline();
-            if ("java.lang.String".equals(typeName)) {
-                int size = this.getStringSize(field);
-                sb.indent8().append("MemoryAccess.set(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName)
-                        .append(", value, ").append(size).append(");").newline();
-            } else {
-                sb.indent8().append("MemoryAccess.set(World.WHOLE_MEMORY, baseAddress + ").append(componentReference).append(".").append(offsetName).append(", value);").newline();
-            }
         }
-        sb.indent4().append("return this;").newline();
-        sb.indent4().append("}").newline();
 
         return sb.toString();
     }

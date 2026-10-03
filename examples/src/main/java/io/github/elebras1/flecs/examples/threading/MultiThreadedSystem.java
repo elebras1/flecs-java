@@ -3,11 +3,11 @@ package io.github.elebras1.flecs.examples.threading;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Minister;
-import io.github.elebras1.flecs.examples.components.MinisterView;
 import io.github.elebras1.flecs.Flecs;
 
 import java.util.Locale;
 import java.util.Random;
+import io.github.elebras1.flecs.examples.components.MinisterMutView;
 
 /**
  * Demonstrates running a system across multiple worker threads. The world is
@@ -35,7 +35,7 @@ public class MultiThreadedSystem {
                     .iter(it -> {
                         Field<Minister> ministerField = it.field(Minister.class, 0);
                         for (int i = 0; i < it.count(); i++) {
-                            MinisterView minister = ministerField.getMutView(i);
+                            MinisterMutView minister = ministerField.getMutView(i);
                             float newLoyalty = Math.min(minister.loyalty() + 10.0f, 100.0f);
                             String newImg = newLoyalty > 50 ? "happy.png" : "angry.png";
                             minister.loyalty(newLoyalty);

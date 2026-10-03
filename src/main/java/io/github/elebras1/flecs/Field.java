@@ -8,6 +8,7 @@ public class Field<T> {
     private final long componentSize;
     private final Component<T> component;
     private final ComponentView componentView;
+    private final ComponentMutView componentMutView;
     private boolean shared;
 
     Field(MemorySegment memorySegment, int count, World world, Class<T> componentClass, boolean shared) {
@@ -16,6 +17,7 @@ public class Field<T> {
         this.component = world.componentRegistry().getComponent(componentClass);
         this.componentSize = this.component.size();
         this.componentView = world.viewCache().getComponentView(componentClass);
+        this.componentMutView = world.viewCache().getComponentMutView(componentClass);
         this.shared = shared;
     }
 
@@ -43,7 +45,7 @@ public class Field<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public <V extends ComponentView> V getMutView(int i) {
+    public <V extends ComponentView> V getView(int i) {
         assert this.memorySegment.address() != 0 : "Field is not set";
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
         assert !this.shared || i == 0 : "Non-zero index invalid for shared field";
@@ -52,6 +54,18 @@ public class Field<T> {
         this.componentView.setBaseAddress(this.memorySegment.address() + elementOffset);
 
         return (V) this.componentView;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <V extends ComponentMutView> V getMutView(int i) {
+        assert this.memorySegment.address() != 0 : "Field is not set";
+        assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
+        assert !this.shared || i == 0 : "Non-zero index invalid for shared field";
+
+        long elementOffset = i * this.componentSize;
+        this.componentMutView.setBaseAddress(this.memorySegment.address() + elementOffset);
+
+        return (V) this.componentMutView;
     }
 
     public void set(int i, T componentData) {

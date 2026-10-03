@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Position;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PositionMutView;
 
 class ComponentLifecycleTest {
 
@@ -138,7 +138,7 @@ class ComponentLifecycleTest {
     @Test
     void insertWithModified() {
         Entity entity = this.world.obtainEntity(this.world.entity());
-        entity.insert(Position.class, (PositionView view) -> {
+        entity.insert(Position.class, (PositionMutView view) -> {
             view.x(10);
             view.y(20);
         });

@@ -41,18 +41,18 @@ public class SystemBenchmark {
         this.world.component(Velocity.class);
         for (int i = 0; i < this.n; i++) {
             this.world.obtainEntityView(this.world.entity())
-                    .insert(Position.class, (PositionView position) -> {
+                    .insert(Position.class, (PositionMutView position) -> {
                         position.x(1.0f);
                         position.y(2.0f);
                     })
-                    .insert(Velocity.class, (VelocityView velocity) -> {
+                    .insert(Velocity.class, (VelocityMutView velocity) -> {
                         velocity.dx(0.5f);
                         velocity.dy(0.25f);
                     });
         }
         this.system = this.world.system("Move", Position.class, Velocity.class)
                 .kind(Flecs.OnUpdate)
-                .eachView(Position.class, Velocity.class, (PositionView position, VelocityView velocity) -> {
+                .eachView(Position.class, Velocity.class, (PositionMutView position, VelocityView velocity) -> {
                     position.x(position.x() + velocity.dx());
                     position.y(position.y() + velocity.dy());
                     this.checksum += position.x();

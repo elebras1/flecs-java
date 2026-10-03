@@ -5,9 +5,9 @@ import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 public class Movement {
 
@@ -38,7 +38,7 @@ public class Movement {
                         Field<Position> positions = it.field(Position.class, 0);
                         Field<Velocity> velocities = it.field(Velocity.class, 1);
                         for (int i = 0; i < it.count(); i++) {
-                            PositionView pos = positions.getMutView(i);
+                            PositionMutView pos = positions.getMutView(i);
                             Velocity vel = velocities.get(i);
                             pos.x(pos.x() + vel.dx());
                             pos.y(pos.y() + vel.dy());

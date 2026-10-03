@@ -88,7 +88,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
             appendStatement(body, 2, "long sizeA = this.world.componentRegistry().getComponent(componentClassA).size()");
             appendStatement(body, 2, "long addressA = " + simpleName(FLECS_H_FQN)
                     + ".ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address()");
-            appendStatement(body, 2, "VA componentViewA = (VA) this.world.viewCache().getComponentView(componentClassA)");
+            appendStatement(body, 2, "VA componentViewA = (VA) this.world.viewCache().getComponentMutView(componentClassA)");
             appendStatement(body, 2, "componentViewA.setBaseAddress(addressA)");
             appendStatement(body, 2, "callback.accept(componentViewA)");
             appendStatement(body, 2, simpleName(FLECS_H_FQN) + ".ecs_modified_id(this.world.worldSeg(), this.id, componentIdA)");
@@ -159,7 +159,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
             String comp = letter(i);
             String view = "V" + comp;
             appendStatement(body, 7, view + " componentView" + comp + " = (" + view
-                    + ") this.world.viewCache().getComponentView(componentClass" + comp + ")");
+                    + ") this.world.viewCache().getComponentMutView(componentClass" + comp + ")");
             appendStatement(body, 7, "componentView" + comp + ".setBaseAddress(address" + comp + ")");
             paramNames[i] = "componentView" + comp + "";
         }
@@ -212,7 +212,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
             String comp = letter(i);
             String view = "V" + comp;
             appendStatement(body, 2, view + " componentView" + comp + " = (" + view
-                    + ") this.world.viewCache().getComponentView(componentClass" + comp + ")");
+                    + ") this.world.viewCache().getComponentMutView(componentClass" + comp + ")");
             appendStatement(body, 2, "componentView" + comp + ".setBaseAddress(address" + comp + ")");
             fallbackParamNames[i] = "componentView" + comp + "";
         }

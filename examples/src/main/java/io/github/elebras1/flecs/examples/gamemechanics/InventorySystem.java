@@ -5,14 +5,12 @@ import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Active;
 import io.github.elebras1.flecs.examples.components.Amount;
-import io.github.elebras1.flecs.examples.components.AmountView;
 import io.github.elebras1.flecs.examples.components.Armor;
 import io.github.elebras1.flecs.examples.components.Attack;
 import io.github.elebras1.flecs.examples.components.Coin;
 import io.github.elebras1.flecs.examples.components.Container;
 import io.github.elebras1.flecs.examples.components.ContainedBy;
 import io.github.elebras1.flecs.examples.components.Health;
-import io.github.elebras1.flecs.examples.components.HealthView;
 import io.github.elebras1.flecs.examples.components.Inventory;
 import io.github.elebras1.flecs.examples.components.Item;
 import io.github.elebras1.flecs.examples.components.Sword;
@@ -21,6 +19,8 @@ import io.github.elebras1.flecs.examples.components.IronSword;
 import io.github.elebras1.flecs.examples.components.WoodenArmor;
 import io.github.elebras1.flecs.examples.components.IronArmor;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.HealthMutView;
+import io.github.elebras1.flecs.examples.components.AmountMutView;
 
 /**
  * Demonstrates one possible way to implement an inventory system using ECS
@@ -106,7 +106,7 @@ public class InventorySystem {
             long existingId = findItemWithKind(world, container.id(), kindId, false, swordId, armorId, coinId);
             if (existingId != 0) {
                 Entity existing = world.obtainEntity(existingId);
-                existing.insert(Amount.class, (AmountView existingAmount) ->
+                existing.insert(Amount.class, (AmountMutView existingAmount) ->
                         existingAmount.value(existingAmount.value() + amount.value()));
                 item.destruct();
                 return;
@@ -145,7 +145,7 @@ public class InventorySystem {
         long armorIdFound = findItemWithKind(world, playerContainer.id(), armorId, true, swordId, armorId, 0);
         if (armorIdFound != 0) {
             Entity armor = world.obtainEntity(armorIdFound);
-            HealthView armorHealth = armor.tryGetMutView(Health.class);
+            HealthMutView armorHealth = armor.tryGetMutView(Health.class);
             if (armorHealth == null) {
                 System.out.println(" - the " + itemName(world, armor.id()) + " armor is a dud");
             } else {
@@ -166,7 +166,7 @@ public class InventorySystem {
             System.out.println(" - " + player.name() + " fights without armor!");
         }
 
-        HealthView weaponHealth = weapon.tryGetMutView(Health.class);
+        HealthMutView weaponHealth = weapon.tryGetMutView(Health.class);
         if (weaponHealth != null) {
             int remaining = weaponHealth.value() - 1;
             if (remaining <= 0) {
@@ -179,7 +179,7 @@ public class InventorySystem {
         }
 
         if (attackValue > 0) {
-            HealthView playerHealth = player.tryGetMutView(Health.class);
+            HealthMutView playerHealth = player.tryGetMutView(Health.class);
             if (playerHealth != null) {
                 int remaining = playerHealth.value() - attackValue;
                 if (remaining <= 0) {

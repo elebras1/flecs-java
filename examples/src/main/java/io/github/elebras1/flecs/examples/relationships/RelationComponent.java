@@ -11,6 +11,7 @@ import io.github.elebras1.flecs.examples.components.Position;
 import io.github.elebras1.flecs.examples.components.Requires;
 import io.github.elebras1.flecs.examples.components.RequiresView;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.RequiresMutView;
 
 /**
  * Shows how relationships can carry data. When one element of a pair is a
@@ -35,7 +36,7 @@ public class RelationComponent {
 
             // The component can be either the first or second part of a pair:
             Entity e2 = world.obtainEntity(world.entity())
-                    .setSecond(Requires.class, gigawattsId, (RequiresView view) -> view.amount(1.21));
+                    .setSecond(Requires.class, gigawattsId, (RequiresMutView view) -> view.amount(1.21));
             Requires r2 = e2.getSecond(Requires.class, gigawattsId);
             System.out.println("requires: " + r2.amount());
 

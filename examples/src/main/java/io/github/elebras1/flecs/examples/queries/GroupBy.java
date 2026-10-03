@@ -66,7 +66,7 @@ public class GroupBy {
             query.iter(it -> {
                 Field<Position> positions = it.field(Position.class, 0);
                 for (int i = 0; i < it.count(); i++) {
-                    PositionView pos = positions.getMutView(i);
+                    PositionView pos = positions.getView(i);
                     System.out.println("{" + pos.x() + ", " + pos.y() + "}");
                 }
                 System.out.println();

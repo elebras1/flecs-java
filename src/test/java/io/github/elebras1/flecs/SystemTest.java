@@ -3,7 +3,6 @@ package io.github.elebras1.flecs;
 import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.internal.ParamRegistry;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.component.VelocityView;
@@ -18,6 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.VelocityMutView;
+import io.github.elebras1.flecs.component.PositionMutView;
 
 class SystemTest {
 
@@ -129,7 +130,7 @@ class SystemTest {
                 .each(Position.class, (entityId, p) -> {
                     EntityView e = this.world.obtainEntityView(entityId);
                     Velocity v = e.get(Velocity.class);
-                    e.insert(Position.class, (PositionView view) -> {
+                    e.insert(Position.class, (PositionMutView view) -> {
                         view.x(p.x() + v.x());
                         view.y(p.y() + v.y());
                     });
@@ -359,7 +360,7 @@ class SystemTest {
 
         long[] ids = this.world.entityBulk(n, Position.class, Velocity.class);
         for (long id : ids) {
-            VelocityView velocity = this.world.obtainEntityView(id).getMutView(Velocity.class);
+            VelocityMutView velocity = this.world.obtainEntityView(id).getMutView(Velocity.class);
             velocity.x(1.0f);
             velocity.y(1.0f);
         }
@@ -367,7 +368,7 @@ class SystemTest {
         this.world.system("MoveAll", Position.class, Velocity.class)
                 .kind(Flecs.OnUpdate)
                 .multiThreaded(true)
-                .eachView(Position.class, Velocity.class, (PositionView position, VelocityView velocity) -> {
+                .eachView(Position.class, Velocity.class, (PositionMutView position, VelocityView velocity) -> {
                     position.x(position.x() + velocity.x());
                     position.y(position.y() + velocity.y());
                 });

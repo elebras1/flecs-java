@@ -4,6 +4,7 @@ public class FlecsContext {
     private static final int BUFFER_SIZE = 48;
     private static final int MASK = BUFFER_SIZE - 1;
     private final ComponentViewPool[] componentViewPools;
+    private final ComponentMutViewPool[] componentMutViewPools;
     private final EntityView[] entityViewPool;
     private final ComponentRowViewPool[] componentRowViewPools;
     private int entityViewCursor;
@@ -15,6 +16,18 @@ public class FlecsContext {
         int epoch;
 
         ComponentViewPool(ComponentView[] pool) {
+            this.pool = pool;
+            this.cursor = 0;
+            this.epoch = -1;
+        }
+    }
+
+    private static class ComponentMutViewPool {
+        final ComponentMutView[] pool;
+        int cursor;
+        int epoch;
+
+        ComponentMutViewPool(ComponentMutView[] pool) {
             this.pool = pool;
             this.cursor = 0;
             this.epoch = -1;
@@ -35,6 +48,7 @@ public class FlecsContext {
 
     public FlecsContext(World world) {
         this.componentViewPools = new ComponentViewPool[ComponentMap.size()];
+        this.componentMutViewPools = new ComponentMutViewPool[ComponentMap.size()];
         this.entityViewPool = new EntityView[BUFFER_SIZE];
         this.componentRowViewPools = new ComponentRowViewPool[ComponentMap.size()];
         for (int i = 0; i < BUFFER_SIZE; i++) {
@@ -71,6 +85,33 @@ public class FlecsContext {
 
         int cursor = viewPool.cursor;
         ComponentView view = viewPool.pool[cursor];
+        viewPool.cursor = (cursor + 1) & MASK;
+        return view;
+    }
+
+    public ComponentMutView getComponentMutView(Class<?> componentClass) {
+        int index = ComponentMap.getIndex(componentClass);
+        if (index < 0) {
+            return null;
+        }
+        ComponentMutViewPool viewPool = this.componentMutViewPools[index];
+
+        if (viewPool == null) {
+            ComponentMutView[] pool = new ComponentMutView[BUFFER_SIZE];
+            for (int i = 0; i < BUFFER_SIZE; i++) {
+                pool[i] = ComponentMap.getMutView(componentClass);
+            }
+            viewPool = new ComponentMutViewPool(pool);
+            this.componentMutViewPools[index] = viewPool;
+        }
+
+        if (viewPool.epoch != this.epoch) {
+            viewPool.cursor = 0;
+            viewPool.epoch = this.epoch;
+        }
+
+        int cursor = viewPool.cursor;
+        ComponentMutView view = viewPool.pool[cursor];
         viewPool.cursor = (cursor + 1) & MASK;
         return view;
     }

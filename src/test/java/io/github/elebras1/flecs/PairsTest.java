@@ -1,9 +1,7 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Pair;
-import io.github.elebras1.flecs.component.PairView;
 import io.github.elebras1.flecs.component.Position;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Tag;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PairMutView;
+import io.github.elebras1.flecs.component.PositionMutView;
 
 class PairsTest {
 
@@ -124,7 +124,7 @@ class PairsTest {
     void setTagPair() {
         long pairTagId = world.entity("PairRelation");
         Entity entity = world.obtainEntity(world.entity())
-                .setSecond(Position.class, pairTagId, (PositionView view) -> {
+                .setSecond(Position.class, pairTagId, (PositionMutView view) -> {
                     view.x(10);
                     view.y(20);
                 });
@@ -226,7 +226,7 @@ class PairsTest {
         world.obtainEntity(pairTagId).add(Flecs.OnInstantiate, Flecs.Inherit);
 
         Entity base = world.obtainEntity(world.entity())
-                .setSecond(Position.class, pairTagId, (PositionView view) -> {
+                .setSecond(Position.class, pairTagId, (PositionMutView view) -> {
                     view.x(10);
                     view.y(20);
                 });
@@ -261,7 +261,7 @@ class PairsTest {
     void ensurePair() {
         Entity e = world.obtainEntity(world.entity());
 
-        e.set(Pair.class, positionId, (PairView view) -> view.value(10));
+        e.set(Pair.class, positionId, (PairMutView view) -> view.value(10));
         Pair t = e.get(Pair.class, Position.class);
         assertNotNull(t);
         assertEquals(10.0f, t.value());
@@ -271,7 +271,7 @@ class PairsTest {
     void ensurePairExisting() {
         Entity e = world.obtainEntity(world.entity())
                 .set(new Pair(20), positionId);
-        e.set(Pair.class, positionId, (PairView view) -> {
+        e.set(Pair.class, positionId, (PairMutView view) -> {
             assertEquals(20.0f, view.value());
             view.value(10);
         });
@@ -283,7 +283,7 @@ class PairsTest {
     void ensurePairTag() {
         long pairTagId = world.entity("PairRelation");
         Entity e = world.obtainEntity(world.entity());
-        e.setSecond(Position.class, pairTagId, (PositionView view) -> {
+        e.setSecond(Position.class, pairTagId, (PositionMutView view) -> {
             view.x(10);
             view.y(20);
         });
@@ -296,11 +296,11 @@ class PairsTest {
     void ensurePairTagExisting() {
         long pairTagId = world.entity("PairRelation");
         Entity e = world.obtainEntity(world.entity())
-                .setSecond(Position.class, pairTagId, (PositionView view) -> {
+                .setSecond(Position.class, pairTagId, (PositionMutView view) -> {
                     view.x(10);
                     view.y(20);
                 });
-        e.setSecond(Position.class, pairTagId, (PositionView view) -> {
+        e.setSecond(Position.class, pairTagId, (PositionMutView view) -> {
             assertEquals(10.0f, view.x());
             assertEquals(20.0f, view.y());
             view.x(30);
@@ -314,11 +314,11 @@ class PairsTest {
     @Test
     void ensureRTagO() {
         Entity e = world.obtainEntity(world.entity())
-                .setSecond(Position.class, tagId, (PositionView view) -> {
+                .setSecond(Position.class, tagId, (PositionMutView view) -> {
                     view.x(10);
                     view.y(20);
                 });
-        e.setSecond(Position.class, tagId, (PositionView view) -> {
+        e.setSecond(Position.class, tagId, (PositionMutView view) -> {
             assertEquals(10.0f, view.x());
             assertEquals(20.0f, view.y());
             view.x(30);
@@ -429,7 +429,7 @@ class PairsTest {
     @Test
     void getRTagO() {
         Entity e = world.obtainEntity(world.entity())
-                .setSecond(Position.class, tagId, (PositionView view) -> {
+                .setSecond(Position.class, tagId, (PositionMutView view) -> {
                     view.x(10);
                     view.y(20);
                 });
@@ -443,7 +443,7 @@ class PairsTest {
     void getSecond() {
         long rel = world.entity();
         Entity e = world.obtainEntity(world.entity())
-                .setSecond(Position.class, rel, (PositionView view) -> {
+                .setSecond(Position.class, rel, (PositionMutView view) -> {
                     view.x(10);
                     view.y(20);
                 });
@@ -707,7 +707,7 @@ class PairsTest {
                 });
 
         Entity e = world.obtainEntity(world.entity());
-        e.set(Position.class, tagId, (PositionView view) -> {
+        e.set(Position.class, tagId, (PositionMutView view) -> {
             view.x(10);
             view.y(20);
         });
@@ -750,7 +750,7 @@ class PairsTest {
                 });
 
         Entity e = world.obtainEntity(world.entity());
-        e.setSecond(Position.class, tagId, (PositionView view) -> {
+        e.setSecond(Position.class, tagId, (PositionMutView view) -> {
             view.x(10);
             view.y(20);
         });

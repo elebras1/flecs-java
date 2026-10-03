@@ -1,10 +1,8 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Mass;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
-import io.github.elebras1.flecs.component.VelocityView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +12,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PositionMutView;
+import io.github.elebras1.flecs.component.PositionView;
+import io.github.elebras1.flecs.component.VelocityMutView;
 
 class EntityTest {
 
@@ -527,7 +528,7 @@ class EntityTest {
     @Test
     void insert() {
         Entity entity = this.world.obtainEntity(this.world.entity());
-        entity.insert(Position.class, (PositionView view) -> {
+        entity.insert(Position.class, (PositionMutView view) -> {
             view.x(10);
             view.y(20);
         });
@@ -538,9 +539,34 @@ class EntityTest {
     }
 
     @Test
+    void getViewReadsComponent() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+
+        PositionView view = entity.getView(Position.class);
+        assertNotNull(view);
+        assertEquals(10.0f, view.x());
+        assertEquals(20.0f, view.y());
+        assertFalse(view instanceof ComponentMutView);
+        assertNull(entity.tryGetView(Velocity.class));
+    }
+
+    @Test
+    void getViewWithTarget() {
+        long target = this.world.entity();
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20), target);
+
+        PositionView view = entity.getView(Position.class, target);
+        assertNotNull(view);
+        assertEquals(10.0f, view.x());
+        assertEquals(20.0f, view.y());
+        assertFalse(view instanceof ComponentMutView);
+        assertNull(entity.tryGetView(Position.class, this.world.entity()));
+    }
+
+    @Test
     void insertMultiple() {
         Entity entity = this.world.obtainEntity(this.world.entity());
-        entity.insert(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+        entity.insert(Position.class, Velocity.class, (PositionMutView pos, VelocityMutView vel) -> {
             pos.x(10);
             pos.y(20);
             vel.x(1);
@@ -566,7 +592,7 @@ class EntityTest {
         Entity entity = this.world.obtainEntity(this.world.entity())
                 .set(new Position(1, 2));
 
-        entity.insert(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+        entity.insert(Position.class, Velocity.class, (PositionMutView pos, VelocityMutView vel) -> {
             pos.x(10);
             pos.y(20);
             vel.x(3);
@@ -587,7 +613,7 @@ class EntityTest {
         Entity entity = this.world.obtainEntity(this.world.entity());
 
         this.world.deferBegin();
-        entity.insert(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+        entity.insert(Position.class, Velocity.class, (PositionMutView pos, VelocityMutView vel) -> {
             pos.x(10);
             pos.y(20);
             vel.x(1);

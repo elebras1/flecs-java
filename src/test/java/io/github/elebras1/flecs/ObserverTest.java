@@ -1,7 +1,6 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Position;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.callback.ComparatorId;
 import io.github.elebras1.flecs.internal.ParamRegistry;
@@ -18,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PositionMutView;
 
 class ObserverTest {
 
@@ -853,7 +853,7 @@ class ObserverTest {
         this.world.observer()
                 .event(Flecs.OnAdd)
                 .with(Position.class)
-                .eachView(Position.class, (PositionView position) -> {
+                .eachView(Position.class, (PositionMutView position) -> {
                     position.x(position.x() + 1.0f);
                     calls.incrementAndGet();
                 });

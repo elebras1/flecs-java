@@ -4,9 +4,9 @@ import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 /**
  * Same as EachCallback, but the callback also receives the matched entity id.
@@ -37,7 +37,7 @@ public class EachWithEntityCallback {
                     .with(Velocity.class)
                     .build();
 
-            query.eachView(Position.class, Velocity.class, (long entityId, PositionView pos, VelocityView vel) -> {
+            query.eachView(Position.class, Velocity.class, (long entityId, PositionMutView pos, VelocityView vel) -> {
                 pos.x(pos.x() + vel.dx());
                 pos.y(pos.y() + vel.dy());
                 EntityView entity = world.obtainEntityView(entityId);

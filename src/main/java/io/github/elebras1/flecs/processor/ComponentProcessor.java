@@ -18,6 +18,7 @@ public class ComponentProcessor extends AbstractProcessor {
     private Filer filer;
     private ComponentGenerator componentGenerator;
     private ComponentViewGenerator componentViewGenerator;
+    private ComponentMutViewGenerator componentMutViewGenerator;
     private ComponentRowViewGenerator componentRowViewGenerator;
     private ComponentMapGenerator mapGenerator;
     private List<TypeElement> processedComponents;
@@ -30,6 +31,7 @@ public class ComponentProcessor extends AbstractProcessor {
         this.filer = processingEnv.getFiler();
         this.componentGenerator = new ComponentGenerator();
         this.componentViewGenerator = new ComponentViewGenerator();
+        this.componentMutViewGenerator = new ComponentMutViewGenerator();
         this.componentRowViewGenerator = new ComponentRowViewGenerator();
         this.mapGenerator = new ComponentMapGenerator();
         this.processedComponents = new ArrayList<>();
@@ -95,6 +97,9 @@ public class ComponentProcessor extends AbstractProcessor {
 
         SourceFile javaComponentViewFile = this.componentViewGenerator.generate(recordElement, fields);
         javaComponentViewFile.writeTo(this.filer);
+
+        SourceFile javaComponentMutViewFile = this.componentMutViewGenerator.generate(recordElement, fields);
+        javaComponentMutViewFile.writeTo(this.filer);
 
         SourceFile javaComponentRowFile = this.componentRowViewGenerator.generate(recordElement, fields);
         javaComponentRowFile.writeTo(this.filer);

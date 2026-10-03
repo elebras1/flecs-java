@@ -4,9 +4,9 @@ import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.FlecsSystem;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 public class SystemBasics {
 
@@ -20,7 +20,7 @@ public class SystemBasics {
             FlecsSystem moveSystem = world.system("MoveSystem")
                     .with(Position.class)
                     .with(Velocity.class)
-                    .eachView(Position.class, Velocity.class, (long entityId, PositionView pos, VelocityView vel) -> {
+                    .eachView(Position.class, Velocity.class, (long entityId, PositionMutView pos, VelocityView vel) -> {
                         pos.x(pos.x() + vel.dx());
                         pos.y(pos.y() + vel.dy());
 

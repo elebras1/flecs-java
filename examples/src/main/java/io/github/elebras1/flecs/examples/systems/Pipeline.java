@@ -7,6 +7,7 @@ import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 /**
  * Demonstrates the built-in pipeline. Systems are assigned to phases such as
@@ -26,7 +27,7 @@ public class Pipeline {
                     .with(Position.class)
                     .with(Velocity.class)
                     .kind(Flecs.OnUpdate)
-                    .eachView(Position.class, Velocity.class, (PositionView p, VelocityView v) -> {
+                    .eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
                         p.x(p.x() + v.dx());
                         p.y(p.y() + v.dy());
                     });

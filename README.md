@@ -28,7 +28,7 @@ Entity player = world.obtainEntity(world.entity("Player"));
 player.set(new Position(0, 0)).set(new Velocity(1, 0));
 
 world.system("MoveSystem", Position.class, Velocity.class)
-    .eachView(Position.class, Velocity.class, (PositionView p, VelocityView v) -> {
+    .eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
         p.x(p.x() + v.dx() * world.deltaTime());
         p.y(p.y() + v.dy() * world.deltaTime());
     });

@@ -2,6 +2,7 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
+import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,6 +100,20 @@ class TableTest {
         Table table = this.world.obtainEntity(e).table();
         assertNull(table.tryGet(Velocity.class, 0));
         assertNotNull(table.tryGet(Position.class, 0));
+    }
+
+    @Test
+    void getView() {
+        long e = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20)).id();
+        Table table = this.world.obtainEntity(e).table();
+
+        PositionView view = table.getView(Position.class, 0);
+        assertNotNull(view);
+        assertEquals(10.0f, view.x());
+        assertEquals(20.0f, view.y());
+        assertFalse(view instanceof ComponentMutView);
+        assertNull(table.tryGetView(Velocity.class, 0));
+        assertThrows(IllegalArgumentException.class, () -> table.getView(Velocity.class, 0));
     }
 
     @Test

@@ -4,7 +4,6 @@ import io.github.elebras1.flecs.Entity;
 import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Health;
-import io.github.elebras1.flecs.examples.components.HealthView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import io.github.elebras1.flecs.examples.components.HealthMutView;
 
 /**
  * Demonstrates manual staging: multiple threads perform writes on their own
@@ -43,7 +43,7 @@ public class ManualStaging {
                     for (int j = stageId * 250; j < (stageId + 1) * 250; j++) {
                         long entityId = stage.lookup("entity_" + j);
                         EntityView entity = stage.obtainEntityView(entityId);
-                        HealthView health = entity.getMutView(Health.class);
+                        HealthMutView health = entity.getMutView(Health.class);
                         health.value(health.value() + 1);
                     }
                 }));

@@ -37,7 +37,7 @@ public class SingletonBenchmark {
         this.world = new World();
         this.world.component(Position.class);
         this.singleton = this.world.singleton(Position.class);
-        this.singleton.insert(Position.class, (PositionView position) -> {
+        this.singleton.insert(Position.class, (PositionMutView position) -> {
             position.x(1.0f);
             position.y(2.0f);
         });
@@ -55,7 +55,7 @@ public class SingletonBenchmark {
     public double singletonGetSet() {
         double checksum = 0.0;
         for (int i = 0; i < this.n; i++) {
-            PositionView position = this.singleton.getMutView(Position.class);
+            PositionMutView position = this.singleton.getMutView(Position.class);
             position.x(i);
             position.y(i + 1.0f);
             checksum += position.x();

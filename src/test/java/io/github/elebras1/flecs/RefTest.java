@@ -1,13 +1,14 @@
 package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Position;
-import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import io.github.elebras1.flecs.component.PositionMutView;
+import io.github.elebras1.flecs.component.PositionView;
 
 class RefTest {
 
@@ -110,12 +111,26 @@ class RefTest {
     }
 
     @Test
+    void getViewReadsComponent() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
+        Ref<Position> ref = entity.getRef(Position.class);
+
+        PositionView view = ref.getView();
+        assertNotNull(view);
+        assertEquals(10.0f, view.x());
+        assertEquals(20.0f, view.y());
+        assertFalse(view instanceof ComponentMutView);
+
+        ref.destruct();
+    }
+
+    @Test
     void getMutViewOnPair() {
         long target = this.world.entity();
         Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20), target);
         Ref<Position> ref = entity.getRef(Position.class, target);
 
-        PositionView view = ref.getMutView();
+        PositionMutView view = ref.getMutView();
         assertNotNull(view);
         assertEquals(10.0f, view.x());
         assertEquals(20.0f, view.y());

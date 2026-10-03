@@ -41,11 +41,11 @@ public class ThreadingBenchmark {
         this.world.setThreads(THREADS);
         for (int i = 0; i < this.n; i++) {
             this.world.obtainEntityView(this.world.entity())
-                    .insert(Position.class, (PositionView position) -> {
+                    .insert(Position.class, (PositionMutView position) -> {
                         position.x(1.0f);
                         position.y(2.0f);
                     })
-                    .insert(Velocity.class, (VelocityView velocity) -> {
+                    .insert(Velocity.class, (VelocityMutView velocity) -> {
                         velocity.dx(0.5f);
                         velocity.dy(0.25f);
                     });
@@ -53,7 +53,7 @@ public class ThreadingBenchmark {
         this.world.system("MultiThreadedMove", Position.class, Velocity.class)
                 .kind(Flecs.OnUpdate)
                 .multiThreaded(true)
-                .eachView(Position.class, Velocity.class, (PositionView position, VelocityView velocity) -> {
+                .eachView(Position.class, Velocity.class, (PositionMutView position, VelocityView velocity) -> {
                     position.x(position.x() + velocity.dx());
                     position.y(position.y() + velocity.dy());
                 });

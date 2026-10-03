@@ -129,7 +129,7 @@ public class Table {
         return this.readAt(firstClass, col, row);
     }
 
-    public <V extends ComponentView> V getMutView(Class<?> componentClass, int row) {
+    public <V extends ComponentView> V getView(Class<?> componentClass, int row) {
         this.checkRow(row);
         int col = this.columnIndex(componentClass);
         if (col == -1) {
@@ -138,13 +138,31 @@ public class Table {
         return this.readViewAt(componentClass, col, row);
     }
 
-    public <V extends ComponentView> V getMutView(Class<?> firstClass, Class<?> secondClass, int row) {
+    public <V extends ComponentView> V getView(Class<?> firstClass, Class<?> secondClass, int row) {
         this.checkRow(row);
         int col = this.columnIndex(firstClass, secondClass);
         if (col == -1) {
             throw new IllegalArgumentException("Pair missing from the table " + firstClass.getSimpleName() + " " + secondClass.getSimpleName());
         }
         return this.readViewAt(firstClass, col, row);
+    }
+
+    public <V extends ComponentMutView> V getMutView(Class<?> componentClass, int row) {
+        this.checkRow(row);
+        int col = this.columnIndex(componentClass);
+        if (col == -1) {
+            throw new IllegalArgumentException("Component missing from the table " + componentClass.getSimpleName());
+        }
+        return this.readMutViewAt(componentClass, col, row);
+    }
+
+    public <V extends ComponentMutView> V getMutView(Class<?> firstClass, Class<?> secondClass, int row) {
+        this.checkRow(row);
+        int col = this.columnIndex(firstClass, secondClass);
+        if (col == -1) {
+            throw new IllegalArgumentException("Pair missing from the table " + firstClass.getSimpleName() + " " + secondClass.getSimpleName());
+        }
+        return this.readMutViewAt(firstClass, col, row);
     }
 
 
@@ -166,7 +184,7 @@ public class Table {
         return this.readAt(firstClass, col, row);
     }
 
-    public <V extends ComponentView> V tryGetMutView(Class<?> componentClass, int row) {
+    public <V extends ComponentView> V tryGetView(Class<?> componentClass, int row) {
         this.checkRow(row);
         int col = this.columnIndex(componentClass);
         if (col == -1) {
@@ -175,13 +193,31 @@ public class Table {
         return this.readViewAt(componentClass, col, row);
     }
 
-    public <V extends ComponentView> V tryGetMutView(Class<?> firstClass, Class<?> secondClass, int row) {
+    public <V extends ComponentView> V tryGetView(Class<?> firstClass, Class<?> secondClass, int row) {
         this.checkRow(row);
         int col = this.columnIndex(firstClass, secondClass);
         if (col == -1) {
             return null;
         }
         return this.readViewAt(firstClass, col, row);
+    }
+
+    public <V extends ComponentMutView> V tryGetMutView(Class<?> componentClass, int row) {
+        this.checkRow(row);
+        int col = this.columnIndex(componentClass);
+        if (col == -1) {
+            return null;
+        }
+        return this.readMutViewAt(componentClass, col, row);
+    }
+
+    public <V extends ComponentMutView> V tryGetMutView(Class<?> firstClass, Class<?> secondClass, int row) {
+        this.checkRow(row);
+        int col = this.columnIndex(firstClass, secondClass);
+        if (col == -1) {
+            return null;
+        }
+        return this.readMutViewAt(firstClass, col, row);
     }
 
     @SuppressWarnings("unchecked")
@@ -297,6 +333,21 @@ public class Table {
         long elementOffset = (long) row * size;
         MemorySegment slice = columnSeg.reinterpret(size * this.count()).asSlice(elementOffset, size);
         return component.read(slice, 0);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <V extends ComponentMutView> V readMutViewAt(Class<?> componentClass, int columnIndex, int row) {
+        Component<?> component = this.world.componentRegistry().getComponent(componentClass);
+        MemorySegment columnSeg = this.getRawColumn(columnIndex);
+        if (columnSeg.address() == 0) {
+            return null;
+        }
+        long size = component.size();
+        long elementOffset = (long) row * size;
+        MemorySegment slice = columnSeg.reinterpret(size * this.count()).asSlice(elementOffset, size);
+        V view = (V) this.world.viewCache().getComponentMutView(componentClass);
+        view.setBaseAddress(slice.address());
+        return view;
     }
 
     @SuppressWarnings("unchecked")

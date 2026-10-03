@@ -3,10 +3,10 @@ package io.github.elebras1.flecs.examples.systems;
 import io.github.elebras1.flecs.Field;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.examples.components.VelocityView;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
+import io.github.elebras1.flecs.examples.components.VelocityMutView;
 
 /**
  * Demonstrates sync points. While systems are progressing, operations such as
@@ -33,7 +33,7 @@ public class SyncPoint {
                     .iter(it -> {
                         for (int i = 0; i < it.count(); i++) {
                             long entityId = it.entity(i);
-                            world.obtainEntity(entityId).insert(Velocity.class, (VelocityView v) -> {
+                            world.obtainEntity(entityId).insert(Velocity.class, (VelocityMutView v) -> {
                                 v.dx(1);
                                 v.dy(2);
                             });
@@ -49,7 +49,7 @@ public class SyncPoint {
                         Field<Position> positions = it.field(Position.class, 0);
                         Field<Velocity> velocities = it.field(Velocity.class, 1);
                         for (int i = 0; i < it.count(); i++) {
-                            PositionView p = positions.getMutView(i);
+                            PositionMutView p = positions.getMutView(i);
                             Velocity v = velocities.get(i);
                             p.x(p.x() + v.dx());
                             p.y(p.y() + v.dy());

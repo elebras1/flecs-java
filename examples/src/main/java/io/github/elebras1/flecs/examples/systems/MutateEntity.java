@@ -9,6 +9,7 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Timeout;
 import io.github.elebras1.flecs.examples.components.TimeoutView;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.TimeoutMutView;
 
 /**
  * Demonstrates how to mutate (here, delete) the currently iterated entity from
@@ -25,7 +26,7 @@ public class MutateEntity {
             world.system("Expire")
                     .kind(Flecs.OnUpdate)
                     .with(Timeout.class)
-                    .eachView(Timeout.class, (Iter it, int index, TimeoutView timeout) -> {
+                    .eachView(Timeout.class, (Iter it, int index, TimeoutMutView timeout) -> {
                         timeout.value(timeout.value() - it.deltaTime());
                         if (timeout.value() <= 0) {
                             long entityId = it.entity(index);

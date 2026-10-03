@@ -6,10 +6,10 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Apples;
 import io.github.elebras1.flecs.examples.components.Eats;
 import io.github.elebras1.flecs.examples.components.Position;
-import io.github.elebras1.flecs.examples.components.PositionView;
 import io.github.elebras1.flecs.examples.components.Velocity;
 import io.github.elebras1.flecs.examples.components.VelocityView;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.PositionMutView;
 
 public class HelloWorld {
 
@@ -25,7 +25,7 @@ public class HelloWorld {
             // Register a system that updates Position from Velocity.
             world.system("MoveSystem", Position.class, Velocity.class)
                     .kind(Flecs.OnUpdate)
-                    .eachView(Position.class, Velocity.class, (PositionView pos, VelocityView vel) -> {
+                    .eachView(Position.class, Velocity.class, (PositionMutView pos, VelocityView vel) -> {
                         pos.x(pos.x() + vel.dx());
                         pos.y(pos.y() + vel.dy());
                     });

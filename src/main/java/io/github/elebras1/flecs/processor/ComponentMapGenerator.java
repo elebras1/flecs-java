@@ -31,6 +31,9 @@ public class ComponentMapGenerator {
         body.indent4().append("private static final Supplier<ComponentView>[] VIEWS;").newline();
 
         body.newline();
+        body.indent4().append("private static final Supplier<ComponentMutView>[] MUT_VIEWS;").newline();
+
+        body.newline();
         body.indent4().append("private static final ClassValue<Integer> COMPONENT_INDEX = new ClassValue<Integer>() {").newline();
         body.indent8().append("@Override").newline();
         body.indent8().append("protected Integer computeValue(Class<?> clazz) {").newline();
@@ -63,6 +66,15 @@ public class ComponentMapGenerator {
             String packageName = this.getPackageName(component);
             String recordName = component.getSimpleName().toString();
             String fqn = packageName.isEmpty() ? recordName + "View" : packageName + "." + recordName + "View";
+            body.indent12().append(fqn).append("::new,").newline();
+        }
+        body.indent8().append("};").newline();
+
+        body.indent8().append("MUT_VIEWS = new Supplier[] {").newline();
+        for (TypeElement component : components) {
+            String packageName = this.getPackageName(component);
+            String recordName = component.getSimpleName().toString();
+            String fqn = packageName.isEmpty() ? recordName + "MutView" : packageName + "." + recordName + "MutView";
             body.indent12().append(fqn).append("::new,").newline();
         }
         body.indent8().append("};").newline();
@@ -106,6 +118,13 @@ public class ComponentMapGenerator {
         body.indent4().append("}").newline();
 
         body.newline();
+        body.indent4().append("public static <T> ComponentMutView getMutView(Class<T> componentClass) {").newline();
+        body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
+        body.indent8().append("Supplier<ComponentMutView> supplier = index >= 0 ? MUT_VIEWS[index] : null;").newline();
+        body.indent8().append("return supplier != null ? supplier.get() : null;").newline();
+        body.indent4().append("}").newline();
+
+        body.newline();
         body.indent4().append("public static <T> ComponentRowView getRowView(Class<T> componentClass) {").newline();
         body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
         body.indent8().append("Supplier<ComponentRowView> supplier = index >= 0 ? ROW_VIEWS[index] : null;").newline();
@@ -119,6 +138,7 @@ public class ComponentMapGenerator {
                 .addImport("io.github.elebras1.flecs.Component")
                 .addImport("io.github.elebras1.flecs.ComponentRowView")
                 .addImport("io.github.elebras1.flecs.ComponentView")
+                .addImport("io.github.elebras1.flecs.ComponentMutView")
                 .addImport("java.util.function.Supplier")
                 .classBody(body.toString())
                 .build();

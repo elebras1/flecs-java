@@ -41,11 +41,11 @@ public class PrefabBenchmark {
         this.world.obtainEntity(positionId).add(Flecs.OnInstantiate, Flecs.Inherit);
         long prefabId = this.world.prefab();
         this.world.obtainEntityView(prefabId)
-                .insert(Position.class, (PositionView position) -> {
+                .insert(Position.class, (PositionMutView position) -> {
                     position.x(1.0f);
                     position.y(2.0f);
                 })
-                .insert(Velocity.class, (VelocityView velocity) -> {
+                .insert(Velocity.class, (VelocityMutView velocity) -> {
                     velocity.dx(0.5f);
                     velocity.dy(0.25f);
                 });

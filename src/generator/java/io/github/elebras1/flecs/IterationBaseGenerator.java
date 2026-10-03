@@ -265,7 +265,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                     String comp = letter(i);
                     String view = "V" + comp;
                     appendStatement(body, bodyIndent, view + " componentView" + comp + " = (" + view
-                            + ") stageWorld.viewCache().getComponentView(componentClass" + comp + ")");
+                            + ") stageWorld.viewCache().getComponentMutView(componentClass" + comp + ")");
                 }
             }
         }
@@ -438,7 +438,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                 String comp = letter(i);
                 String view = "V" + comp;
                 appendStatement(body, level, view + " componentView" + comp + " = (" + view
-                        + ") this.world.viewCache().getComponentView(componentClass" + comp + ")");
+                        + ") this.world.viewCache().getComponentMutView(componentClass" + comp + ")");
             }
         }
         for (int i = 0; i < n; i++) {

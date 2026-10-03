@@ -6,8 +6,8 @@ import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Gravity;
 import io.github.elebras1.flecs.examples.components.Velocity;
-import io.github.elebras1.flecs.examples.components.VelocityView;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.examples.components.VelocityMutView;
 
 /**
  * Demonstrates singleton components. A singleton component lives on its
@@ -45,7 +45,7 @@ public class Singleton {
                 float gravityValue = gravities.get(0).value();
 
                 for (int i = 0; i < it.count(); i++) {
-                    VelocityView vel = velocities.getMutView(i);
+                    VelocityMutView vel = velocities.getMutView(i);
                     vel.dy(vel.dy() + gravityValue);
                     System.out.println("velocity is {" + vel.dx() + ", " + vel.dy() + "}");
                 }

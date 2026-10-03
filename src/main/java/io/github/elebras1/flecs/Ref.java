@@ -47,9 +47,22 @@ public class Ref<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public <A extends ComponentView> A getMutView() {
+    public <A extends ComponentView> A getView() {
         this.checkDestructed();
         ComponentView view = this.world.viewCache().getComponentView(this.componentClass);
+        long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
+        if (address == 0) {
+            return null;
+        }
+
+        view.setBaseAddress(address);
+        return (A) view;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A extends ComponentMutView> A getMutView() {
+        this.checkDestructed();
+        ComponentMutView view = this.world.viewCache().getComponentMutView(this.componentClass);
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
         if (address == 0) {
             return null;
