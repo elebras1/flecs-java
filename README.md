@@ -22,18 +22,19 @@ record Position(float x, float y) {}
 @Component
 record Velocity(float dx, float dy) {}
 
-World world = new World();
+try(World world = new World()) {
 
-Entity player = world.obtainEntity(world.entity("Player"));
-player.set(new Position(0, 0)).set(new Velocity(1, 0));
-
-world.system("MoveSystem", Position.class, Velocity.class)
-    .eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
-        p.x(p.x() + v.dx() * world.deltaTime());
-        p.y(p.y() + v.dy() * world.deltaTime());
-    });
-
-while (world.progress()) {}
+    Entity player = world.obtainEntity(world.entity("Player"));
+    player.set(new Position(0, 0)).set(new Velocity(1, 0));
+    
+    world.system("MoveSystem", Position.class, Velocity.class)
+        .eachView(Position.class, Velocity.class, (PositionMutView p, VelocityView v) -> {
+            p.x(p.x() + v.dx() * world.deltaTime());
+            p.y(p.y() + v.dy() * world.deltaTime());
+        });
+    
+    while (world.progress()) {}
+}
 ```
 
 Find many examples in [`examples/`](https://github.com/elebras1/flecs-java/blob/main/examples/src/main/java/io/github/elebras1/flecs/examples).
@@ -46,8 +47,8 @@ If this project is useful to you, consider giving it a ⭐, it helps others find
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:0.15.0'
-    annotationProcessor 'io.github.elebras1:flecs-java:0.15.0'
+    implementation 'io.github.elebras1:flecs-java:1.0.0'
+    annotationProcessor 'io.github.elebras1:flecs-java:1.0.0'
 }
 ```
 
