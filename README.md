@@ -99,10 +99,13 @@ The build automatically downloads the Flecs C source, compiles the native librar
 
 ```bash
 # requires jextract-25 installed
-./gradlew generateFlecsBindings
+./gradlew generateBindings
 ```
 
-Regenerates bindings from `flecs.h` into `src/main/generated/`. Regular users don't need to run this.
+Regenerates bindings from `flecs.h` into `src/main/generated/` and applies the
+reviewed `Linker.Option.critical(false)` list defined in
+`ApplyCriticalDowncalls`. The post-processing step is idempotent and fails if a
+listed function no longer exists. Regular users don't need to run this.
 
 ## Contributing
 

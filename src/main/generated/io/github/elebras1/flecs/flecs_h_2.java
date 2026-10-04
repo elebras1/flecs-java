@@ -38642,7 +38642,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_new_w_id");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**
@@ -38764,7 +38764,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_entity_init");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**
@@ -39926,7 +39926,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_get_mut_id");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -40484,7 +40484,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_is_alive");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -40786,7 +40786,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_exists");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**

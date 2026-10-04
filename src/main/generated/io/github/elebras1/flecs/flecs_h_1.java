@@ -211,7 +211,7 @@ class flecs_h_1 extends flecs_h_2 {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_has_id");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -273,7 +273,7 @@ class flecs_h_1 extends flecs_h_2 {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_owns_id");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -2191,7 +2191,7 @@ class flecs_h_1 extends flecs_h_2 {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_get_typeid");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -7287,7 +7287,7 @@ class flecs_h_1 extends flecs_h_2 {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_field_is_self");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**

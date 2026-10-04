@@ -182,7 +182,7 @@ val compileFlecsNative by tasks.registering(Exec::class) {
 }
 
 val generateFlecsBindings by tasks.registering(Exec::class) {
-    description = "Generate Java FFM bindings using jextract (maintainer-only task, run when updating Flecs version)"
+    description = "Run jextract only (raw bindings, no critical options). Use generateBindings instead."
     group = "flecs"
 
     dependsOn(compileFlecsNative)
@@ -209,6 +209,28 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
     doLast {
         println("Java FFM bindings generated in: ${generatedSourcesDir.absolutePath}")
     }
+}
+
+val applyCriticalDowncalls by tasks.registering(JavaExec::class) {
+    description = "Apply/remove Linker.Option.critical(false) in generated bindings from the reviewed list in ApplyCriticalDowncalls"
+    group = "flecs"
+
+    classpath = sourceSets["generator"].runtimeClasspath
+    mainClass.set("io.github.elebras1.flecs.ApplyCriticalDowncalls")
+    args(generatedSourcesDir.absolutePath)
+
+    outputs.upToDateWhen { false }
+}
+
+val generateBindings by tasks.registering {
+    description = "Regenerate Java FFM bindings with jextract and apply the reviewed critical downcall options"
+    group = "flecs"
+
+    dependsOn(generateFlecsBindings, applyCriticalDowncalls)
+}
+
+tasks.named("applyCriticalDowncalls") {
+    mustRunAfter(generateFlecsBindings)
 }
 
 val validateGeneratedBindings by tasks.registering {
@@ -336,12 +358,14 @@ tasks.clean {
 
 tasks.test {
     useJUnitPlatform()
+    // CriticalDowncallTest shares the reviewed critical list with ApplyCriticalDowncalls.
+    classpath += sourceSets["generator"].output
 }
 
 tasks.compileTestJava {
-    dependsOn(compileProcessor)
+    dependsOn(compileProcessor, sourceSets["generator"].classesTaskName)
     val processorOutput = compileProcessor.get().destinationDirectory.get().asFile
-    classpath = files(processorOutput) + classpath
+    classpath = files(processorOutput) + classpath + sourceSets["generator"].output
 
     options.annotationProcessorPath = files(processorOutput) + configurations.runtimeClasspath.get()
 
