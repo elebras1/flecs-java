@@ -13,7 +13,7 @@ plugins {
 group = "io.github.elebras1"
 version = System.getenv("GITHUB_REF_NAME")?.takeIf { it.isNotBlank() }?.removePrefix("v")
     ?: (project.findProperty("version") as? String)?.takeIf { it != "unspecified" }
-    ?: "0.1-SNAPSHOT"
+    ?: "1.0.0"
 
 repositories {
     mavenCentral()
