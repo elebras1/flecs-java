@@ -67,6 +67,9 @@ public class FlecsContext {
 
     public ComponentView getComponentView(Class<?> componentClass) {
         int index = ComponentMap.getIndex(componentClass);
+        if (index < 0) {
+            return null;
+        }
         ComponentViewPool viewPool = this.componentViewPools[index];
 
         if (viewPool == null) {
