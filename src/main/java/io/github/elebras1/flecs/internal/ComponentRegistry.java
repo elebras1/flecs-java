@@ -21,12 +21,14 @@ public class ComponentRegistry {
     private final ClassLongMap componentIds;
     private final LongClassMap componentClasses;
     private final LongObjectMap<Component<?>> components;
+    private final long[] componentIdsByIndex;
 
     public ComponentRegistry(MemorySegment worldSeg) {
         this.worldSeg = worldSeg;
         this.componentIds = new ClassLongMap(ComponentMap.size());
         this.componentClasses = new LongClassMap(ComponentMap.size());
         this.components = new LongObjectMap<>(ComponentMap.size());
+        this.componentIdsByIndex = new long[ComponentMap.size()];
         this.registerBuiltins();
     }
 
@@ -37,13 +39,21 @@ public class ComponentRegistry {
     }
 
     private void registerBuiltin(Class<?> componentClass, long componentId, Component<?> component) {
-        this.componentIds.put(componentClass, componentId);
+        this.cacheComponentId(componentClass, componentId);
         this.componentClasses.put(componentId, componentClass);
         this.components.put(componentId, component);
     }
 
+    private void cacheComponentId(Class<?> componentClass, long componentId) {
+        this.componentIds.put(componentClass, componentId);
+        int index = ComponentMap.getIndex(componentClass);
+        if (index >= 0) {
+            this.componentIdsByIndex[index] = componentId;
+        }
+    }
+
     public long ensureEntity(Class<?> componentClass) {
-        long existingId = this.componentIds.get(componentClass);
+        long existingId = this.tryGetComponentId(componentClass);
         if (existingId != -1) {
             return existingId;
         }
@@ -79,7 +89,7 @@ public class ComponentRegistry {
                 }
             }
 
-            this.componentIds.put(componentClass, entityId);
+            this.cacheComponentId(componentClass, entityId);
             this.componentClasses.put(entityId, componentClass);
             return entityId;
         }
@@ -144,7 +154,7 @@ public class ComponentRegistry {
                 this.registerReflectionData(tempArena, componentId, component.layout());
             }
 
-            this.componentIds.put(componentClass, componentId);
+            this.cacheComponentId(componentClass, componentId);
             this.componentClasses.put(componentId, componentClass);
             return componentId;
         }
@@ -202,7 +212,7 @@ public class ComponentRegistry {
     }
 
     public <E extends Enum<E>> long registerEnum(Class<E> enumClass) {
-        long existingId = this.componentIds.get(enumClass);
+        long existingId = this.tryGetComponentId(enumClass);
         if (existingId != -1) {
             return existingId;
         }
@@ -236,7 +246,7 @@ public class ComponentRegistry {
                 throw new IllegalStateException("Failed to register enum: " + symbol);
             }
 
-            this.componentIds.put(enumClass, resultId);
+            this.cacheComponentId(enumClass, resultId);
             this.componentClasses.put(resultId, enumClass);
             return resultId;
         }
@@ -254,13 +264,24 @@ public class ComponentRegistry {
     }
 
     public <T> long getComponentId(Class<T> componentClass) {
-        long id = this.componentIds.get(componentClass);
+        long id = this.tryGetComponentId(componentClass);
 
         if (id <= 0) {
             id = this.register(componentClass);
         }
 
         return id;
+    }
+
+    private long tryGetComponentId(Class<?> componentClass) {
+        int index = ComponentMap.getIndex(componentClass);
+        if (index >= 0) {
+            long id = this.componentIdsByIndex[index];
+            if (id > 0) {
+                return id;
+            }
+        }
+        return this.componentIds.get(componentClass);
     }
 
     @SuppressWarnings("unchecked")

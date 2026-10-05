@@ -38,6 +38,10 @@ public class Entity extends EntityBase<Entity> {
         return this.add(pair);
     }
 
+    public Entity add(Entity first, Entity second) {
+        return this.add(first.id(), second.id());
+    }
+
     public <T> Entity add(Class<T> first, long second) {
         long firstId = this.world.componentRegistry().getComponentId(first);
         return this.add(firstId, second);

@@ -9,7 +9,9 @@ import io.github.elebras1.flecs.internal.buffer.FlecsBuffers;
 import io.github.elebras1.flecs.internal.FlecsAllocator;
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -49,7 +51,7 @@ public class World extends WorldBase implements AutoCloseable {
         this.componentRegistry = new ComponentRegistry(this.worldSeg);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.queries = ConcurrentHashMap.newKeySet();
+        this.queries = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.stages = new World[] { this };
@@ -66,7 +68,7 @@ public class World extends WorldBase implements AutoCloseable {
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.queries = ConcurrentHashMap.newKeySet();
+        this.queries = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.destroyed = false;
@@ -1388,10 +1390,13 @@ public class World extends WorldBase implements AutoCloseable {
     }
 
     private void closeQueries() {
-        for (Query query : this.queries) {
+        Query[] snapshot;
+        synchronized (this.queries) {
+            snapshot = this.queries.toArray(new Query[0]);
+        }
+        for (Query query : snapshot) {
             query.destruct();
         }
-        this.queries.clear();
     }
 
     @Override

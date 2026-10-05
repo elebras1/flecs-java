@@ -12,64 +12,78 @@ import java.lang.foreign.ValueLayout;
 
 public class Query extends QueryBase {
 
-    private final Arena arena;
-    private final Iter iter;
+    private Iter iter;
     private boolean destructed;
 
     Query(World world, MemorySegment querySeg) {
         super(world, querySeg);
-        this.arena = Arena.ofShared();
-        this.iter = new Iter(MemorySegment.NULL, this.world);
         this.destructed = false;
         this.world.trackQuery(this);
     }
 
-    private MemorySegment createIterSeg() {
-        return flecs_h.ecs_query_iter(this.arena, this.world.worldSeg(), this.querySeg);
+    private Iter iter() {
+        Iter local = this.iter;
+        if (local == null) {
+            local = new Iter(MemorySegment.NULL, this.world);
+            this.iter = local;
+        }
+        return local;
+    }
+
+    private MemorySegment createIterSeg(Arena arena) {
+        return flecs_h.ecs_query_iter(arena, this.world.worldSeg(), this.querySeg);
     }
 
     public void each(EntityCallback callback) {
         this.checkDestroyed();
-        MemorySegment iterSeg = this.createIterSeg();
-        if (iterSeg.address() == 0) {
-            throw new IllegalStateException("ecs_query_iter returned a null iterator");
-        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(arena);
+            if (iterSeg.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
 
-        while (flecs_h.ecs_iter_next(iterSeg)) {
-            int count = ecs_iter_t.count(iterSeg);
-            MemorySegment entities = ecs_iter_t.entities(iterSeg);
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                MemorySegment entities = ecs_iter_t.entities(iterSeg);
 
-            for (int i = 0; i < count; i++) {
-                long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                callback.accept(entityId);
+                for (int i = 0; i < count; i++) {
+                    long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                    callback.accept(entityId);
+                }
             }
         }
     }
 
     public void iter(IterCallback callback) {
         this.checkDestroyed();
-        MemorySegment iterSeg = this.createIterSeg();
-        if (iterSeg.address() == 0) {
-            throw new IllegalStateException("ecs_query_iter returned a null iterator");
-        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(arena);
+            if (iterSeg.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
 
-        this.world.viewCache().resetCursors();
-        while (flecs_h.ecs_iter_next(iterSeg)) {
-            this.iter.setIterSeg(iterSeg);
-            callback.accept(this.iter);
+            Iter iter = this.iter();
+            this.world.viewCache().resetCursors();
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                iter.setIterSeg(iterSeg);
+                callback.accept(iter);
+            }
         }
     }
 
     public void run(RunCallback callback) {
         this.checkDestroyed();
-        MemorySegment iterSeg = this.createIterSeg();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(arena);
 
-        if (iterSeg.address() == 0) {
-            throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            if (iterSeg.address() == 0) {
+                throw new IllegalStateException("ecs_query_iter returned a null iterator");
+            }
+            Iter iter = this.iter();
+            iter.setIterSeg(iterSeg);
+            this.world.viewCache().resetCursors();
+            callback.accept(iter);
         }
-        this.iter.setIterSeg(iterSeg);
-        this.world.viewCache().resetCursors();
-        callback.accept(this.iter);
     }
 
     public boolean changed() {
@@ -86,45 +100,51 @@ public class Query extends QueryBase {
 
     public int count() {
         this.checkDestroyed();
-        MemorySegment iterSeg = this.createIterSeg();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(arena);
 
-        int total = 0;
-        while (flecs_h.ecs_iter_next(iterSeg)) {
-            total += ecs_iter_t.count(iterSeg);
+            int total = 0;
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                total += ecs_iter_t.count(iterSeg);
+            }
+
+            return total;
         }
-
-        return total;
     }
 
     public long[] entities() {
         this.checkDestroyed();
         int[] index = {0};
         long[] result = new long[this.count()];
-        MemorySegment iterSeg = this.createIterSeg();
-        while (flecs_h.ecs_iter_next(iterSeg)) {
-            int count = ecs_iter_t.count(iterSeg);
-            MemorySegment entities = ecs_iter_t.entities(iterSeg);
-            for (int i = 0; i < count; i++) {
-                result[index[0]++] = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(arena);
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                MemorySegment entities = ecs_iter_t.entities(iterSeg);
+                for (int i = 0; i < count; i++) {
+                    result[index[0]++] = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
+                }
             }
+            return result;
         }
-        return result;
     }
 
     public long first() {
         this.checkDestroyed();
         long[] result = { 0L };
-        MemorySegment iterSeg = this.createIterSeg();
-        while (flecs_h.ecs_iter_next(iterSeg)) {
-            int count = ecs_iter_t.count(iterSeg);
-            MemorySegment entities = ecs_iter_t.entities(iterSeg);
-            if (count > 0) {
-                result[0] = entities.getAtIndex(ValueLayout.JAVA_LONG, 0);
-                flecs_h.ecs_iter_fini(iterSeg);
-                return result[0];
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(arena);
+            while (flecs_h.ecs_iter_next(iterSeg)) {
+                int count = ecs_iter_t.count(iterSeg);
+                MemorySegment entities = ecs_iter_t.entities(iterSeg);
+                if (count > 0) {
+                    result[0] = entities.getAtIndex(ValueLayout.JAVA_LONG, 0);
+                    flecs_h.ecs_iter_fini(iterSeg);
+                    return result[0];
+                }
             }
+            return result[0];
         }
-        return result[0];
     }
 
     @Override
@@ -151,8 +171,8 @@ public class Query extends QueryBase {
 
     public String toJson(IterToJsonDesc desc) {
         this.checkDestroyed();
-        MemorySegment iterSeg = this.createIterSeg();
         try (Arena tempArena = Arena.ofConfined()) {
+            MemorySegment iterSeg = this.createIterSeg(tempArena);
             MemorySegment descSeg = MemorySegment.NULL;
             if (desc != null) {
                 desc.query(this.querySeg);
@@ -178,7 +198,7 @@ public class Query extends QueryBase {
         return ParamRegistry.get(ctxSeg.address());
     }
 
-    void destruct() {
+    public void destruct() {
         if (!this.destructed) {
             this.destructed = true;
             this.world.untrackQuery(this);
@@ -190,7 +210,6 @@ public class Query extends QueryBase {
                 }
                 flecs_h.ecs_query_fini(this.querySeg);
             }
-            this.arena.close();
         }
     }
 
