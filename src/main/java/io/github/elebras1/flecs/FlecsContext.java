@@ -66,7 +66,10 @@ public class FlecsContext {
     }
 
     public ComponentView getComponentView(Class<?> componentClass) {
-        int index = ComponentMap.getIndex(componentClass);
+        return this.getComponentView(ComponentMap.getIndex(componentClass), componentClass);
+    }
+
+    public ComponentView getComponentView(int index, Class<?> componentClass) {
         if (index < 0) {
             return null;
         }
@@ -93,7 +96,10 @@ public class FlecsContext {
     }
 
     public ComponentMutView getComponentMutView(Class<?> componentClass) {
-        int index = ComponentMap.getIndex(componentClass);
+        return this.getComponentMutView(ComponentMap.getIndex(componentClass), componentClass);
+    }
+
+    public ComponentMutView getComponentMutView(int index, Class<?> componentClass) {
         if (index < 0) {
             return null;
         }
@@ -120,7 +126,10 @@ public class FlecsContext {
     }
 
     public ComponentRowView getComponentRowView(Class<?> componentClass) {
-        int index = ComponentMap.getIndex(componentClass);
+        return this.getComponentRowView(ComponentMap.getIndex(componentClass), componentClass);
+    }
+
+    public ComponentRowView getComponentRowView(int index, Class<?> componentClass) {
         if (index <0) {
             return null;
         }

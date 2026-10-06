@@ -273,6 +273,16 @@ public class ComponentRegistry {
         return id;
     }
 
+    public long getComponentId(int index, Class<?> componentClass) {
+        if (index >= 0) {
+            long id = this.componentIdsByIndex[index];
+            if (id > 0) {
+                return id;
+            }
+        }
+        return this.getComponentId(componentClass);
+    }
+
     private long tryGetComponentId(Class<?> componentClass) {
         int index = ComponentMap.getIndex(componentClass);
         if (index >= 0) {

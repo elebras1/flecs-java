@@ -596,8 +596,9 @@ public class Entity extends EntityBase<Entity> {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T tryGetView(Class<?> componentClass) {
-        ComponentView view = this.world.viewCache().getComponentView(componentClass);
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        ComponentView view = this.world.viewCache().getComponentView(index, componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
 
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
 
@@ -620,9 +621,10 @@ public class Entity extends EntityBase<Entity> {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T tryGetView(Class<?> componentClass, long target) {
-        ComponentView view = this.world.viewCache().getComponentView(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        ComponentView view = this.world.viewCache().getComponentView(index, componentClass);
 
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
@@ -646,8 +648,9 @@ public class Entity extends EntityBase<Entity> {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentMutView> T tryGetMutView(Class<?> componentClass) {
-        ComponentMutView view = this.world.viewCache().getComponentMutView(componentClass);
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
 
         long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentId);
 
@@ -670,9 +673,10 @@ public class Entity extends EntityBase<Entity> {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentMutView> T tryGetMutView(Class<?> componentClass, long target) {
-        ComponentMutView view = this.world.viewCache().getComponentMutView(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
 
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         long address = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, pairId);

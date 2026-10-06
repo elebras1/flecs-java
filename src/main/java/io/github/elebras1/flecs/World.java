@@ -1080,9 +1080,11 @@ public class World extends WorldBase implements AutoCloseable {
 
     MemorySegment worldSeg() {
         this.checkDestroyed();
-        Throwable failure = this.hookFailure.getAndSet(null);
-        if (failure != null) {
-            throw (failure instanceof RuntimeException runtimeException) ? runtimeException : new IllegalStateException(failure);
+        if (this.hookFailure.get() != null) {
+            Throwable failure = this.hookFailure.getAndSet(null);
+            if (failure != null) {
+                throw (failure instanceof RuntimeException runtimeException) ? runtimeException : new IllegalStateException(failure);
+            }
         }
         return this.worldSeg;
     }
