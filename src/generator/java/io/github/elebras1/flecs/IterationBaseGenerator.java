@@ -266,20 +266,18 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         if (runEach) {
             if (stageScopedViews) {
                 appendStatement(body, 3, simpleName(WORLD_FQN) + " stageWorld = this.iterFor(iterSegment).world()");
-            }
-            appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSegment)) {");
-        }
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            String cacheOwner = stageScopedViews ? "stageWorld" : "this.world";
-            appendStatement(body, bodyIndent, cacheOwner + ".viewCache().resetCursors()");
-            if (stageScopedViews) {
+                appendStatement(body, 3, "stageWorld.viewCache().resetCursors()");
                 for (int i = 0; i < n; i++) {
                     String comp = letter(i);
                     String view = "V" + comp;
-                    appendStatement(body, bodyIndent, view + " componentView" + comp + " = (" + view
+                    appendStatement(body, 3, view + " componentView" + comp + " = (" + view
                             + ") stageWorld.viewCache().getComponentMutView(componentClass" + comp + ")");
                 }
             }
+            appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSegment)) {");
+        }
+        if (vm == ViewMode.COMPONENT_VIEW && !stageScopedViews) {
+            appendStatement(body, bodyIndent, "this.world.viewCache().resetCursors()");
         }
         if (em == EntityMode.WITH_ITER) {
             appendStatement(body, bodyIndent, "Iter iter = this.iterFor(iterSegment)");
