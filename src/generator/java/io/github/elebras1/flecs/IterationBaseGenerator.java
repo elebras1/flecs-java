@@ -133,12 +133,18 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
         emitEmptyTableGuard(body, 4, em, "iterSeg");
         emitSelfFlags(body, 4, n, "iterSeg");
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorSetup(body, 4, n);
+        }
         appendLine(body, 4, "for (int i = 0; i < count; i++) {");
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, 5, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
         }
         emitInstanceOrView(body, 5, n, vm);
         emitCallbackAccept(body, 5, n, vm, em);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorAdvance(body, 5, n);
+        }
         appendLine(body, 4, "}");
         appendLine(body, 3, "}");
         appendLine(body, 2, "}");
@@ -166,6 +172,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         emitFieldOrBase(body, 4, n, vm, "iterSeg");
         appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
         emitSelfFlags(body, 4, n, "iterSeg");
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorSetup(body, 4, n);
+        }
         appendLine(body, 4, "for (int i = 0; i < count; i++) {");
         emitInstanceOrView(body, 5, n, vm);
 
@@ -174,6 +183,9 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, 6, simpleName(FLECS_H_FQN) + ".ecs_iter_fini(iterSeg)");
         appendStatement(body, 6, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
         appendLine(body, 5, "}");
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorAdvance(body, 5, n);
+        }
 
         appendLine(body, 4, "}");
         appendLine(body, 3, "}");
@@ -279,12 +291,18 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, bodyIndent, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
         emitEmptyTableGuard(body, bodyIndent, em, "iterSegment");
         emitSelfFlags(body, bodyIndent, n, "iterSegment");
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorSetup(body, bodyIndent, n);
+        }
         appendLine(body, bodyIndent, "for (int i = 0; i < count; i++) {");
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, loopIndent, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
         }
         emitInstanceOrView(body, loopIndent, n, vm);
         emitCallbackAccept(body, loopIndent, n, vm, em);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorAdvance(body, loopIndent, n);
+        }
         appendLine(body, bodyIndent, "}");
         if (runEach) {
             appendLine(body, 3, "}");
@@ -477,11 +495,31 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         }
     }
 
+    private void emitCursorSetup(CodeBuilder body, int level, int n) {
+        for (int i = 0; i < n; i++) {
+            String comp = letter(i);
+            appendStatement(body, level, "long step" + comp + " = isSelf" + comp + " ? size" + comp + " : 0L");
+            appendStatement(body, level, "long cursor" + comp + " = base" + comp);
+            appendLine(body, level, "if (!isSelf" + comp + ") {");
+            appendStatement(body, level + 1, "componentView" + comp + ".setBaseAddress(base" + comp + ")");
+            appendLine(body, level, "}");
+        }
+    }
+
+    private void emitCursorAdvance(CodeBuilder body, int level, int n) {
+        for (int i = 0; i < n; i++) {
+            String comp = letter(i);
+            appendStatement(body, level, "cursor" + comp + " += step" + comp);
+        }
+    }
+
     private void emitInstanceOrView(CodeBuilder body, int level, int n, ViewMode vm) {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             if (vm == ViewMode.COMPONENT_VIEW) {
-                appendStatement(body, level, "componentView" + comp + ".setBaseAddress(base" + comp + " + (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
+                appendLine(body, level, "if (isSelf" + comp + ") {");
+                appendStatement(body, level + 1, "componentView" + comp + ".setBaseAddress(cursor" + comp + ")");
+                appendLine(body, level, "}");
             } else {
                 appendStatement(body, level, comp + " componentInstance" + comp + " = field" + comp + ".address() == 0 ? null : component" + comp + ".read(field" + comp + ", (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
             }

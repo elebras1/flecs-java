@@ -94,9 +94,17 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
                 count = 1;
             }
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
                 callback.accept(componentViewA);
+                cursorA += stepA;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -114,10 +122,18 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             long baseA = flecs_h.ecs_field_w_size(iterSegment, sizeA, (byte) 0).address();
             int count = ecs_iter_t.count(iterSegment);
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
                 callback.accept(entityId, componentViewA);
+                cursorA += stepA;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -135,9 +151,17 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             long baseA = flecs_h.ecs_field_w_size(iterSegment, sizeA, (byte) 0).address();
             int count = ecs_iter_t.count(iterSegment);
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
                 callback.accept(iter, i, componentViewA);
+                cursorA += stepA;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -231,10 +255,26 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             }
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
                 callback.accept(componentViewA, componentViewB);
+                cursorA += stepA;
+                cursorB += stepB;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -257,11 +297,27 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             int count = ecs_iter_t.count(iterSegment);
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
                 callback.accept(entityId, componentViewA, componentViewB);
+                cursorA += stepA;
+                cursorB += stepB;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -284,10 +340,26 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             int count = ecs_iter_t.count(iterSegment);
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB);
+                cursorA += stepA;
+                cursorB += stepB;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -401,11 +473,35 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -433,12 +529,36 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -466,11 +586,35 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfA = flecs_h.ecs_field_is_self(iterSegment, (byte) 0);
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -604,12 +748,44 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -642,13 +818,45 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -681,12 +889,44 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfB = flecs_h.ecs_field_is_self(iterSegment, (byte) 1);
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -840,13 +1080,53 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -884,14 +1164,54 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -929,13 +1249,53 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfC = flecs_h.ecs_field_is_self(iterSegment, (byte) 2);
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1109,14 +1469,62 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1159,15 +1567,63 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1210,14 +1666,62 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfD = flecs_h.ecs_field_is_self(iterSegment, (byte) 3);
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1411,15 +1915,71 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1467,16 +2027,72 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1524,15 +2140,71 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfE = flecs_h.ecs_field_is_self(iterSegment, (byte) 4);
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1746,16 +2418,80 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1808,17 +2544,81 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -1871,16 +2671,80 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfF = flecs_h.ecs_field_is_self(iterSegment, (byte) 5);
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2114,17 +2978,89 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2182,18 +3118,90 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2251,17 +3259,89 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfG = flecs_h.ecs_field_is_self(iterSegment, (byte) 6);
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2515,18 +3595,98 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2589,19 +3749,99 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2664,18 +3904,98 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfH = flecs_h.ecs_field_is_self(iterSegment, (byte) 7);
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -2949,19 +4269,107 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -3029,20 +4437,108 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -3110,19 +4606,107 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfI = flecs_h.ecs_field_is_self(iterSegment, (byte) 8);
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -3416,20 +5000,116 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -3502,21 +5182,117 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -3589,20 +5365,116 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfJ = flecs_h.ecs_field_is_self(iterSegment, (byte) 9);
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -3916,21 +5788,125 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -4008,22 +5984,126 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -4101,21 +6181,125 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfK = flecs_h.ecs_field_is_self(iterSegment, (byte) 10);
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -4449,22 +6633,134 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -4547,23 +6843,135 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -4646,22 +7054,134 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfL = flecs_h.ecs_field_is_self(iterSegment, (byte) 11);
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -5015,23 +7535,143 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -5119,24 +7759,144 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -5224,23 +7984,143 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfM = flecs_h.ecs_field_is_self(iterSegment, (byte) 12);
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -5614,24 +8494,152 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -5724,25 +8732,153 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -5835,24 +8971,152 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfN = flecs_h.ecs_field_is_self(iterSegment, (byte) 13);
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -6246,25 +9510,161 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -6362,26 +9762,162 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -6479,25 +10015,161 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfO = flecs_h.ecs_field_is_self(iterSegment, (byte) 14);
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -6911,26 +10583,170 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -7033,27 +10849,171 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -7156,26 +11116,170 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfP = flecs_h.ecs_field_is_self(iterSegment, (byte) 15);
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -7609,27 +11713,179 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -7737,28 +11993,180 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -7866,27 +12274,179 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfQ = flecs_h.ecs_field_is_self(iterSegment, (byte) 16);
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -8340,28 +12900,188 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -8474,29 +13194,189 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -8609,28 +13489,188 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfR = flecs_h.ecs_field_is_self(iterSegment, (byte) 17);
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -9104,29 +14144,197 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -9244,30 +14452,198 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -9385,29 +14761,197 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfS = flecs_h.ecs_field_is_self(iterSegment, (byte) 18);
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -9901,30 +15445,206 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -10047,31 +15767,207 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -10194,30 +16090,206 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfT = flecs_h.ecs_field_is_self(iterSegment, (byte) 19);
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -10731,31 +16803,215 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -10883,32 +17139,216 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -11036,31 +17476,215 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfU = flecs_h.ecs_field_is_self(iterSegment, (byte) 20);
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -11594,32 +18218,224 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -11752,33 +18568,225 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -11911,32 +18919,224 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfV = flecs_h.ecs_field_is_self(iterSegment, (byte) 21);
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -12490,33 +19690,233 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -12654,34 +20054,234 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -12819,33 +20419,233 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfW = flecs_h.ecs_field_is_self(iterSegment, (byte) 22);
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -13419,34 +21219,242 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -13589,35 +21597,243 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -13760,34 +21976,242 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfX = flecs_h.ecs_field_is_self(iterSegment, (byte) 23);
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -14381,35 +22805,251 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -14557,36 +23197,252 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -14734,35 +23590,251 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfY = flecs_h.ecs_field_is_self(iterSegment, (byte) 24);
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -15376,36 +24448,260 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -15558,37 +24854,261 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -15741,36 +25261,260 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfZ = flecs_h.ecs_field_is_self(iterSegment, (byte) 25);
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -16404,37 +26148,269 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -16592,38 +26568,270 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -16781,37 +26989,269 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAA = flecs_h.ecs_field_is_self(iterSegment, (byte) 26);
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -17465,38 +27905,278 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -17659,39 +28339,279 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -17854,38 +28774,278 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAB = flecs_h.ecs_field_is_self(iterSegment, (byte) 27);
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -18559,39 +29719,287 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
             boolean isSelfAE = flecs_h.ecs_field_is_self(iterSegment, (byte) 30);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
+            long stepAE = isSelfAE ? sizeAE : 0L;
+            long cursorAE = baseAE;
+            if (!isSelfAE) {
+                componentViewAE.setBaseAddress(baseAE);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
-                componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
+                if (isSelfAE) {
+                    componentViewAE.setBaseAddress(cursorAE);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
+                cursorAE += stepAE;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -18759,40 +30167,288 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
             boolean isSelfAE = flecs_h.ecs_field_is_self(iterSegment, (byte) 30);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
+            long stepAE = isSelfAE ? sizeAE : 0L;
+            long cursorAE = baseAE;
+            if (!isSelfAE) {
+                componentViewAE.setBaseAddress(baseAE);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
-                componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
+                if (isSelfAE) {
+                    componentViewAE.setBaseAddress(cursorAE);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
+                cursorAE += stepAE;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -18960,39 +30616,287 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAC = flecs_h.ecs_field_is_self(iterSegment, (byte) 28);
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
             boolean isSelfAE = flecs_h.ecs_field_is_self(iterSegment, (byte) 30);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
+            long stepAE = isSelfAE ? sizeAE : 0L;
+            long cursorAE = baseAE;
+            if (!isSelfAE) {
+                componentViewAE.setBaseAddress(baseAE);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
-                componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
+                if (isSelfAE) {
+                    componentViewAE.setBaseAddress(cursorAE);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
+                cursorAE += stepAE;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -19686,40 +31590,296 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
             boolean isSelfAE = flecs_h.ecs_field_is_self(iterSegment, (byte) 30);
             boolean isSelfAF = flecs_h.ecs_field_is_self(iterSegment, (byte) 31);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
+            long stepAE = isSelfAE ? sizeAE : 0L;
+            long cursorAE = baseAE;
+            if (!isSelfAE) {
+                componentViewAE.setBaseAddress(baseAE);
+            }
+            long stepAF = isSelfAF ? sizeAF : 0L;
+            long cursorAF = baseAF;
+            if (!isSelfAF) {
+                componentViewAF.setBaseAddress(baseAF);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
-                componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
-                componentViewAF.setBaseAddress(baseAF + (long) (isSelfAF ? i : 0) * sizeAF);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
+                if (isSelfAE) {
+                    componentViewAE.setBaseAddress(cursorAE);
+                }
+                if (isSelfAF) {
+                    componentViewAF.setBaseAddress(cursorAF);
+                }
                 callback.accept(componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE, componentViewAF);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
+                cursorAE += stepAE;
+                cursorAF += stepAF;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -19892,41 +32052,297 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
             boolean isSelfAE = flecs_h.ecs_field_is_self(iterSegment, (byte) 30);
             boolean isSelfAF = flecs_h.ecs_field_is_self(iterSegment, (byte) 31);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
+            long stepAE = isSelfAE ? sizeAE : 0L;
+            long cursorAE = baseAE;
+            if (!isSelfAE) {
+                componentViewAE.setBaseAddress(baseAE);
+            }
+            long stepAF = isSelfAF ? sizeAF : 0L;
+            long cursorAF = baseAF;
+            if (!isSelfAF) {
+                componentViewAF.setBaseAddress(baseAF);
+            }
             for (int i = 0; i < count; i++) {
                 long entityId = entities.getAtIndex(ValueLayout.JAVA_LONG, i);
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
-                componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
-                componentViewAF.setBaseAddress(baseAF + (long) (isSelfAF ? i : 0) * sizeAF);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
+                if (isSelfAE) {
+                    componentViewAE.setBaseAddress(cursorAE);
+                }
+                if (isSelfAF) {
+                    componentViewAF.setBaseAddress(cursorAF);
+                }
                 callback.accept(entityId, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE, componentViewAF);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
+                cursorAE += stepAE;
+                cursorAF += stepAF;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
@@ -20099,40 +32515,296 @@ public abstract class ObserverBuilderBase extends QueryTermBuilder<ObserverBuild
             boolean isSelfAD = flecs_h.ecs_field_is_self(iterSegment, (byte) 29);
             boolean isSelfAE = flecs_h.ecs_field_is_self(iterSegment, (byte) 30);
             boolean isSelfAF = flecs_h.ecs_field_is_self(iterSegment, (byte) 31);
+            long stepA = isSelfA ? sizeA : 0L;
+            long cursorA = baseA;
+            if (!isSelfA) {
+                componentViewA.setBaseAddress(baseA);
+            }
+            long stepB = isSelfB ? sizeB : 0L;
+            long cursorB = baseB;
+            if (!isSelfB) {
+                componentViewB.setBaseAddress(baseB);
+            }
+            long stepC = isSelfC ? sizeC : 0L;
+            long cursorC = baseC;
+            if (!isSelfC) {
+                componentViewC.setBaseAddress(baseC);
+            }
+            long stepD = isSelfD ? sizeD : 0L;
+            long cursorD = baseD;
+            if (!isSelfD) {
+                componentViewD.setBaseAddress(baseD);
+            }
+            long stepE = isSelfE ? sizeE : 0L;
+            long cursorE = baseE;
+            if (!isSelfE) {
+                componentViewE.setBaseAddress(baseE);
+            }
+            long stepF = isSelfF ? sizeF : 0L;
+            long cursorF = baseF;
+            if (!isSelfF) {
+                componentViewF.setBaseAddress(baseF);
+            }
+            long stepG = isSelfG ? sizeG : 0L;
+            long cursorG = baseG;
+            if (!isSelfG) {
+                componentViewG.setBaseAddress(baseG);
+            }
+            long stepH = isSelfH ? sizeH : 0L;
+            long cursorH = baseH;
+            if (!isSelfH) {
+                componentViewH.setBaseAddress(baseH);
+            }
+            long stepI = isSelfI ? sizeI : 0L;
+            long cursorI = baseI;
+            if (!isSelfI) {
+                componentViewI.setBaseAddress(baseI);
+            }
+            long stepJ = isSelfJ ? sizeJ : 0L;
+            long cursorJ = baseJ;
+            if (!isSelfJ) {
+                componentViewJ.setBaseAddress(baseJ);
+            }
+            long stepK = isSelfK ? sizeK : 0L;
+            long cursorK = baseK;
+            if (!isSelfK) {
+                componentViewK.setBaseAddress(baseK);
+            }
+            long stepL = isSelfL ? sizeL : 0L;
+            long cursorL = baseL;
+            if (!isSelfL) {
+                componentViewL.setBaseAddress(baseL);
+            }
+            long stepM = isSelfM ? sizeM : 0L;
+            long cursorM = baseM;
+            if (!isSelfM) {
+                componentViewM.setBaseAddress(baseM);
+            }
+            long stepN = isSelfN ? sizeN : 0L;
+            long cursorN = baseN;
+            if (!isSelfN) {
+                componentViewN.setBaseAddress(baseN);
+            }
+            long stepO = isSelfO ? sizeO : 0L;
+            long cursorO = baseO;
+            if (!isSelfO) {
+                componentViewO.setBaseAddress(baseO);
+            }
+            long stepP = isSelfP ? sizeP : 0L;
+            long cursorP = baseP;
+            if (!isSelfP) {
+                componentViewP.setBaseAddress(baseP);
+            }
+            long stepQ = isSelfQ ? sizeQ : 0L;
+            long cursorQ = baseQ;
+            if (!isSelfQ) {
+                componentViewQ.setBaseAddress(baseQ);
+            }
+            long stepR = isSelfR ? sizeR : 0L;
+            long cursorR = baseR;
+            if (!isSelfR) {
+                componentViewR.setBaseAddress(baseR);
+            }
+            long stepS = isSelfS ? sizeS : 0L;
+            long cursorS = baseS;
+            if (!isSelfS) {
+                componentViewS.setBaseAddress(baseS);
+            }
+            long stepT = isSelfT ? sizeT : 0L;
+            long cursorT = baseT;
+            if (!isSelfT) {
+                componentViewT.setBaseAddress(baseT);
+            }
+            long stepU = isSelfU ? sizeU : 0L;
+            long cursorU = baseU;
+            if (!isSelfU) {
+                componentViewU.setBaseAddress(baseU);
+            }
+            long stepV = isSelfV ? sizeV : 0L;
+            long cursorV = baseV;
+            if (!isSelfV) {
+                componentViewV.setBaseAddress(baseV);
+            }
+            long stepW = isSelfW ? sizeW : 0L;
+            long cursorW = baseW;
+            if (!isSelfW) {
+                componentViewW.setBaseAddress(baseW);
+            }
+            long stepX = isSelfX ? sizeX : 0L;
+            long cursorX = baseX;
+            if (!isSelfX) {
+                componentViewX.setBaseAddress(baseX);
+            }
+            long stepY = isSelfY ? sizeY : 0L;
+            long cursorY = baseY;
+            if (!isSelfY) {
+                componentViewY.setBaseAddress(baseY);
+            }
+            long stepZ = isSelfZ ? sizeZ : 0L;
+            long cursorZ = baseZ;
+            if (!isSelfZ) {
+                componentViewZ.setBaseAddress(baseZ);
+            }
+            long stepAA = isSelfAA ? sizeAA : 0L;
+            long cursorAA = baseAA;
+            if (!isSelfAA) {
+                componentViewAA.setBaseAddress(baseAA);
+            }
+            long stepAB = isSelfAB ? sizeAB : 0L;
+            long cursorAB = baseAB;
+            if (!isSelfAB) {
+                componentViewAB.setBaseAddress(baseAB);
+            }
+            long stepAC = isSelfAC ? sizeAC : 0L;
+            long cursorAC = baseAC;
+            if (!isSelfAC) {
+                componentViewAC.setBaseAddress(baseAC);
+            }
+            long stepAD = isSelfAD ? sizeAD : 0L;
+            long cursorAD = baseAD;
+            if (!isSelfAD) {
+                componentViewAD.setBaseAddress(baseAD);
+            }
+            long stepAE = isSelfAE ? sizeAE : 0L;
+            long cursorAE = baseAE;
+            if (!isSelfAE) {
+                componentViewAE.setBaseAddress(baseAE);
+            }
+            long stepAF = isSelfAF ? sizeAF : 0L;
+            long cursorAF = baseAF;
+            if (!isSelfAF) {
+                componentViewAF.setBaseAddress(baseAF);
+            }
             for (int i = 0; i < count; i++) {
-                componentViewA.setBaseAddress(baseA + (long) (isSelfA ? i : 0) * sizeA);
-                componentViewB.setBaseAddress(baseB + (long) (isSelfB ? i : 0) * sizeB);
-                componentViewC.setBaseAddress(baseC + (long) (isSelfC ? i : 0) * sizeC);
-                componentViewD.setBaseAddress(baseD + (long) (isSelfD ? i : 0) * sizeD);
-                componentViewE.setBaseAddress(baseE + (long) (isSelfE ? i : 0) * sizeE);
-                componentViewF.setBaseAddress(baseF + (long) (isSelfF ? i : 0) * sizeF);
-                componentViewG.setBaseAddress(baseG + (long) (isSelfG ? i : 0) * sizeG);
-                componentViewH.setBaseAddress(baseH + (long) (isSelfH ? i : 0) * sizeH);
-                componentViewI.setBaseAddress(baseI + (long) (isSelfI ? i : 0) * sizeI);
-                componentViewJ.setBaseAddress(baseJ + (long) (isSelfJ ? i : 0) * sizeJ);
-                componentViewK.setBaseAddress(baseK + (long) (isSelfK ? i : 0) * sizeK);
-                componentViewL.setBaseAddress(baseL + (long) (isSelfL ? i : 0) * sizeL);
-                componentViewM.setBaseAddress(baseM + (long) (isSelfM ? i : 0) * sizeM);
-                componentViewN.setBaseAddress(baseN + (long) (isSelfN ? i : 0) * sizeN);
-                componentViewO.setBaseAddress(baseO + (long) (isSelfO ? i : 0) * sizeO);
-                componentViewP.setBaseAddress(baseP + (long) (isSelfP ? i : 0) * sizeP);
-                componentViewQ.setBaseAddress(baseQ + (long) (isSelfQ ? i : 0) * sizeQ);
-                componentViewR.setBaseAddress(baseR + (long) (isSelfR ? i : 0) * sizeR);
-                componentViewS.setBaseAddress(baseS + (long) (isSelfS ? i : 0) * sizeS);
-                componentViewT.setBaseAddress(baseT + (long) (isSelfT ? i : 0) * sizeT);
-                componentViewU.setBaseAddress(baseU + (long) (isSelfU ? i : 0) * sizeU);
-                componentViewV.setBaseAddress(baseV + (long) (isSelfV ? i : 0) * sizeV);
-                componentViewW.setBaseAddress(baseW + (long) (isSelfW ? i : 0) * sizeW);
-                componentViewX.setBaseAddress(baseX + (long) (isSelfX ? i : 0) * sizeX);
-                componentViewY.setBaseAddress(baseY + (long) (isSelfY ? i : 0) * sizeY);
-                componentViewZ.setBaseAddress(baseZ + (long) (isSelfZ ? i : 0) * sizeZ);
-                componentViewAA.setBaseAddress(baseAA + (long) (isSelfAA ? i : 0) * sizeAA);
-                componentViewAB.setBaseAddress(baseAB + (long) (isSelfAB ? i : 0) * sizeAB);
-                componentViewAC.setBaseAddress(baseAC + (long) (isSelfAC ? i : 0) * sizeAC);
-                componentViewAD.setBaseAddress(baseAD + (long) (isSelfAD ? i : 0) * sizeAD);
-                componentViewAE.setBaseAddress(baseAE + (long) (isSelfAE ? i : 0) * sizeAE);
-                componentViewAF.setBaseAddress(baseAF + (long) (isSelfAF ? i : 0) * sizeAF);
+                if (isSelfA) {
+                    componentViewA.setBaseAddress(cursorA);
+                }
+                if (isSelfB) {
+                    componentViewB.setBaseAddress(cursorB);
+                }
+                if (isSelfC) {
+                    componentViewC.setBaseAddress(cursorC);
+                }
+                if (isSelfD) {
+                    componentViewD.setBaseAddress(cursorD);
+                }
+                if (isSelfE) {
+                    componentViewE.setBaseAddress(cursorE);
+                }
+                if (isSelfF) {
+                    componentViewF.setBaseAddress(cursorF);
+                }
+                if (isSelfG) {
+                    componentViewG.setBaseAddress(cursorG);
+                }
+                if (isSelfH) {
+                    componentViewH.setBaseAddress(cursorH);
+                }
+                if (isSelfI) {
+                    componentViewI.setBaseAddress(cursorI);
+                }
+                if (isSelfJ) {
+                    componentViewJ.setBaseAddress(cursorJ);
+                }
+                if (isSelfK) {
+                    componentViewK.setBaseAddress(cursorK);
+                }
+                if (isSelfL) {
+                    componentViewL.setBaseAddress(cursorL);
+                }
+                if (isSelfM) {
+                    componentViewM.setBaseAddress(cursorM);
+                }
+                if (isSelfN) {
+                    componentViewN.setBaseAddress(cursorN);
+                }
+                if (isSelfO) {
+                    componentViewO.setBaseAddress(cursorO);
+                }
+                if (isSelfP) {
+                    componentViewP.setBaseAddress(cursorP);
+                }
+                if (isSelfQ) {
+                    componentViewQ.setBaseAddress(cursorQ);
+                }
+                if (isSelfR) {
+                    componentViewR.setBaseAddress(cursorR);
+                }
+                if (isSelfS) {
+                    componentViewS.setBaseAddress(cursorS);
+                }
+                if (isSelfT) {
+                    componentViewT.setBaseAddress(cursorT);
+                }
+                if (isSelfU) {
+                    componentViewU.setBaseAddress(cursorU);
+                }
+                if (isSelfV) {
+                    componentViewV.setBaseAddress(cursorV);
+                }
+                if (isSelfW) {
+                    componentViewW.setBaseAddress(cursorW);
+                }
+                if (isSelfX) {
+                    componentViewX.setBaseAddress(cursorX);
+                }
+                if (isSelfY) {
+                    componentViewY.setBaseAddress(cursorY);
+                }
+                if (isSelfZ) {
+                    componentViewZ.setBaseAddress(cursorZ);
+                }
+                if (isSelfAA) {
+                    componentViewAA.setBaseAddress(cursorAA);
+                }
+                if (isSelfAB) {
+                    componentViewAB.setBaseAddress(cursorAB);
+                }
+                if (isSelfAC) {
+                    componentViewAC.setBaseAddress(cursorAC);
+                }
+                if (isSelfAD) {
+                    componentViewAD.setBaseAddress(cursorAD);
+                }
+                if (isSelfAE) {
+                    componentViewAE.setBaseAddress(cursorAE);
+                }
+                if (isSelfAF) {
+                    componentViewAF.setBaseAddress(cursorAF);
+                }
                 callback.accept(iter, i, componentViewA, componentViewB, componentViewC, componentViewD, componentViewE, componentViewF, componentViewG, componentViewH, componentViewI, componentViewJ, componentViewK, componentViewL, componentViewM, componentViewN, componentViewO, componentViewP, componentViewQ, componentViewR, componentViewS, componentViewT, componentViewU, componentViewV, componentViewW, componentViewX, componentViewY, componentViewZ, componentViewAA, componentViewAB, componentViewAC, componentViewAD, componentViewAE, componentViewAF);
+                cursorA += stepA;
+                cursorB += stepB;
+                cursorC += stepC;
+                cursorD += stepD;
+                cursorE += stepE;
+                cursorF += stepF;
+                cursorG += stepG;
+                cursorH += stepH;
+                cursorI += stepI;
+                cursorJ += stepJ;
+                cursorK += stepK;
+                cursorL += stepL;
+                cursorM += stepM;
+                cursorN += stepN;
+                cursorO += stepO;
+                cursorP += stepP;
+                cursorQ += stepQ;
+                cursorR += stepR;
+                cursorS += stepS;
+                cursorT += stepT;
+                cursorU += stepU;
+                cursorV += stepV;
+                cursorW += stepW;
+                cursorX += stepX;
+                cursorY += stepY;
+                cursorZ += stepZ;
+                cursorAA += stepAA;
+                cursorAB += stepAB;
+                cursorAC += stepAC;
+                cursorAD += stepAD;
+                cursorAE += stepAE;
+                cursorAF += stepAF;
             }
         }, this.world.arena());
         ecs_observer_desc_t.callback(this.desc, callbackStub);
