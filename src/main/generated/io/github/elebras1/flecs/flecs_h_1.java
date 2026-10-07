@@ -7471,7 +7471,7 @@ class flecs_h_1 extends flecs_h_2 {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_table_get_column_index");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**

@@ -30,7 +30,12 @@ public final class ApplyCriticalDowncalls {
             "ecs_new",
             "ecs_new_w_parent",
             "ecs_owns_id",
-            "ecs_stage_get_id");
+            "ecs_record_find",
+            "ecs_record_get_by_column",
+            "ecs_ref_get_id",
+            "ecs_stage_get_id",
+            "ecs_table_get_column_index",
+            "flecs_table_traverse_add");
 
     private static final String DOWN_CALL = "HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC";
     private static final String CRITICAL_OPTION = ", Linker.Option.critical(false)";
