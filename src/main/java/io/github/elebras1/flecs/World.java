@@ -1159,8 +1159,9 @@ public class World extends WorldBase implements AutoCloseable {
     public <T> World set(T value) {
         this.checkDestroyed();
         Class<T> componentClass = (Class<T>) value.getClass();
-        long componentId = this.componentRegistry().getComponentId(componentClass);
-        Component<T> component = this.componentRegistry().getComponent(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.componentRegistry().getComponentId(index, componentClass);
+        Component<T> component = this.componentRegistry().getComponent(index, componentClass);
 
         MemorySegment dataSeg = this.getComponentBuffer(component.size());
         component.write(dataSeg, 0, value);

@@ -409,8 +409,9 @@ public class Entity extends EntityBase<Entity> {
     @SuppressWarnings("unchecked")
     public <T> Entity set(T data) {
         Class<T> componentClass = (Class<T>) data.getClass();
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
+        Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
 
         MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
         component.write(dataSeg, 0, data);
@@ -422,11 +423,12 @@ public class Entity extends EntityBase<Entity> {
     @SuppressWarnings("unchecked")
     public <T> Entity set(T data, long target) {
         Class<T> componentClass = (Class<T>) data.getClass();
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
 
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
-        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+        Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
         MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
         component.write(dataSeg, 0, data);
 
@@ -437,13 +439,14 @@ public class Entity extends EntityBase<Entity> {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> Entity set(Class<?> componentClass, long target, Consumer<T> consumer) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        long size = this.world.componentRegistry().getComponent(componentClass).size();
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
+        long size = this.world.componentRegistry().getComponent(index, componentClass).size();
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size);
 
-        T view = (T) this.world.viewCache().getComponentMutView(componentClass);
+        T view = (T) this.world.viewCache().getComponentMutView(index, componentClass);
         view.setBaseAddress(dataSeg.address());
         consumer.accept(view);
 
@@ -452,13 +455,14 @@ public class Entity extends EntityBase<Entity> {
 
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> Entity setSecond(Class<?> componentClass, long relationId, Consumer<T> consumer) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        long size = this.world.componentRegistry().getComponent(componentClass).size();
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
+        long size = this.world.componentRegistry().getComponent(index, componentClass).size();
         long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
         MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size);
 
-        T view = (T) this.world.viewCache().getComponentMutView(componentClass);
+        T view = (T) this.world.viewCache().getComponentMutView(index, componentClass);
         view.setBaseAddress(dataSeg.address());
         consumer.accept(view);
 
@@ -495,8 +499,18 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T tryGet(Class<T> componentClass) {
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
-        return this.tryGet(componentId);
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
+        Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
+
+        if (address == 0) {
+            return null;
+        }
+
+        MemorySegment dataSeg = MemorySegment.ofAddress(address).reinterpret(component.size());
+
+        return component.read(dataSeg, 0);
     }
 
     public <T> T get(Class<T> componentClass, long target) {
@@ -508,8 +522,9 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T tryGet(Class<T> componentClass, long target) {
-        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);
@@ -538,8 +553,9 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> T tryGetSecond(Class<T> componentClass, long relationId) {
-        Component<T> component = this.world.componentRegistry().getComponent(componentClass);
-        long componentId = this.world.componentRegistry().getComponentId(componentClass);
+        int index = ComponentMap.getIndex(componentClass);
+        Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, pairId);

@@ -111,6 +111,11 @@ public class ComponentMapGenerator {
         body.indent4().append("}").newline();
 
         body.newline();
+        body.indent4().append("public static <T> Component<T> getInstanceByIndex(int index) {").newline();
+        body.indent8().append("return index >= 0 && index < COMPONENT_COUNT ? (Component<T>) COMPONENTS[index] : null;").newline();
+        body.indent4().append("}").newline();
+
+        body.newline();
         body.indent4().append("public static <T> ComponentView getView(Class<T> componentClass) {").newline();
         body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
         body.indent8().append("Supplier<ComponentView> supplier = index >= 0 ? VIEWS[index] : null;").newline();

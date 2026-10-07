@@ -310,6 +310,17 @@ public class ComponentRegistry {
     }
 
     @SuppressWarnings("unchecked")
+    public <T> Component<T> getComponent(int index, Class<T> componentClass) {
+        if (index >= 0) {
+            Component<T> component = ComponentMap.getInstanceByIndex(index);
+            if (component != null) {
+                return component;
+            }
+        }
+        return this.getComponent(componentClass);
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> Component<T> getComponentById(long componentId) {
         Component<T> component = (Component<T>) this.components.get(componentId);
         if(component == null) {

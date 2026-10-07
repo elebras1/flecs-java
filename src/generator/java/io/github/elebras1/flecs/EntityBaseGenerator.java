@@ -79,16 +79,18 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
 
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
+            appendStatement(body, 2, "int index" + comp
+                    + " = ComponentMap.getIndex(componentClass" + comp + ")");
             appendStatement(body, 2, "long componentId" + comp
-                    + " = this.world.componentRegistry().getComponentId(componentClass" + comp + ")");
+                    + " = this.world.componentRegistry().getComponentId(index" + comp + ", componentClass" + comp + ")");
         }
         body.newline();
 
         if (n == 1) {
-            appendStatement(body, 2, "long sizeA = this.world.componentRegistry().getComponent(componentClassA).size()");
+            appendStatement(body, 2, "long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size()");
             appendStatement(body, 2, "long addressA = " + simpleName(FLECS_H_FQN)
                     + ".ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address()");
-            appendStatement(body, 2, "VA componentViewA = (VA) this.world.viewCache().getComponentMutView(componentClassA)");
+            appendStatement(body, 2, "VA componentViewA = (VA) this.world.viewCache().getComponentMutView(indexA, componentClassA)");
             appendStatement(body, 2, "componentViewA.setBaseAddress(addressA)");
             appendStatement(body, 2, "callback.accept(componentViewA)");
             appendStatement(body, 2, simpleName(FLECS_H_FQN) + ".ecs_modified_id(this.world.worldSeg(), this.id, componentIdA)");
@@ -159,7 +161,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
             String comp = letter(i);
             String view = "V" + comp;
             appendStatement(body, 7, view + " componentView" + comp + " = (" + view
-                    + ") this.world.viewCache().getComponentMutView(componentClass" + comp + ")");
+                    + ") this.world.viewCache().getComponentMutView(index" + comp + ", componentClass" + comp + ")");
             appendStatement(body, 7, "componentView" + comp + ".setBaseAddress(address" + comp + ")");
             paramNames[i] = "componentView" + comp + "";
         }
@@ -186,7 +188,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             appendStatement(body, 3, "long size" + comp
-                    + " = this.world.componentRegistry().getComponent(componentClass" + comp + ").size()");
+                    + " = this.world.componentRegistry().getComponent(index" + comp + ", componentClass" + comp + ").size()");
             appendStatement(body, 3, "address" + comp + " = " + simpleName(FLECS_H_FQN)
                     + ".ecs_ensure_id(this.world.worldSeg(), this.id, componentId" + comp
                     + ", size" + comp + ").address()");
@@ -195,7 +197,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             appendStatement(body, 3, "long size" + comp
-                    + " = this.world.componentRegistry().getComponent(componentClass" + comp + ").size()");
+                    + " = this.world.componentRegistry().getComponent(index" + comp + ", componentClass" + comp + ").size()");
             appendStatement(body, 3, simpleName(FLECS_H_FQN) + ".ecs_ensure_id(this.world.worldSeg(), this.id, componentId"
                     + comp + ", size" + comp + ")");
         }
@@ -212,7 +214,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
             String comp = letter(i);
             String view = "V" + comp;
             appendStatement(body, 2, view + " componentView" + comp + " = (" + view
-                    + ") this.world.viewCache().getComponentMutView(componentClass" + comp + ")");
+                    + ") this.world.viewCache().getComponentMutView(index" + comp + ", componentClass" + comp + ")");
             appendStatement(body, 2, "componentView" + comp + ".setBaseAddress(address" + comp + ")");
             fallbackParamNames[i] = "componentView" + comp + "";
         }
