@@ -111,7 +111,6 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSeg -> {
             Iter iter = this.iterFor(iterSeg);
-            this.world.viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());
 
@@ -125,7 +124,6 @@ public class ObserverBuilder extends ObserverBuilderBase {
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
             this.iter.setIterSeg(iterSeg);
-            this.world.viewCache().resetCursors();
             callback.accept(this.iter);
         }, this.world.arena());
 

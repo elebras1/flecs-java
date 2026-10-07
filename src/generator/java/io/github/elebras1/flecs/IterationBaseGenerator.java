@@ -113,40 +113,50 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         appendLine(body, 3, "}");
 
-        emitComponentLookups(body, 3, n, vm, false);
+        emitComponentLookups(body, 3, n, vm);
 
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            appendStatement(body, 3, "this.world.viewCache().resetCursors()");
+        boolean scoped = vm == ViewMode.COMPONENT_VIEW;
+        int level = 3;
+        if (scoped) {
+            appendStatement(body, 3, "this.world.viewCache().enterIteration()");
+            appendLine(body, 3, "try {");
+            level = 4;
+            emitAcquireViews(body, 4, n, "this.world");
         }
         if (em == EntityMode.WITH_ITER) {
-            appendStatement(body, 3, "Iter iter = new Iter(iterSeg, this.world)");
+            appendStatement(body, level, "Iter iter = new Iter(iterSeg, this.world)");
         }
 
-        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
+        appendLine(body, level, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
         if (em == EntityMode.WITH_ITER) {
-            appendStatement(body, 4, "iter.setIterSeg(iterSeg)");
+            appendStatement(body, level + 1, "iter.setIterSeg(iterSeg)");
         }
         if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
+            appendStatement(body, level + 1, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
         }
-        emitFieldOrBase(body, 4, n, vm, "iterSeg");
-        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
-        emitEmptyTableGuard(body, 4, em, "iterSeg");
-        emitSelfFlags(body, 4, n, "iterSeg");
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorSetup(body, 4, n);
+        emitFieldOrBase(body, level + 1, n, vm, "iterSeg");
+        appendStatement(body, level + 1, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
+        emitEmptyTableGuard(body, level + 1, em, "iterSeg");
+        emitSelfFlags(body, level + 1, n, "iterSeg");
+        if (scoped) {
+            emitCursorSetup(body, level + 1, n);
         }
-        appendLine(body, 4, "for (int i = 0; i < count; i++) {");
+        appendLine(body, level + 1, "for (int i = 0; i < count; i++) {");
         if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, 5, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+            appendStatement(body, level + 2, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
         }
-        emitInstanceOrView(body, 5, n, vm);
-        emitCallbackAccept(body, 5, n, vm, em);
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorAdvance(body, 5, n);
+        emitInstanceOrView(body, level + 2, n, vm);
+        emitCallbackAccept(body, level + 2, n, vm, em);
+        if (scoped) {
+            emitCursorAdvance(body, level + 2, n);
         }
-        appendLine(body, 4, "}");
-        appendLine(body, 3, "}");
+        appendLine(body, level + 1, "}");
+        appendLine(body, level, "}");
+        if (scoped) {
+            appendLine(body, 3, "} finally {");
+            appendStatement(body, 4, "this.world.viewCache().exitIteration()");
+            appendLine(body, 3, "}");
+        }
         appendLine(body, 2, "}");
         appendLine(body, 1, "}");
     }
@@ -161,34 +171,44 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendStatement(body, 4, "throw new IllegalStateException(\"ecs_query_iter returned a null iterator\")");
         appendLine(body, 3, "}");
 
-        emitComponentLookups(body, 3, n, vm, false);
+        emitComponentLookups(body, 3, n, vm);
 
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            appendStatement(body, 3, "this.world.viewCache().resetCursors()");
+        boolean scoped = vm == ViewMode.COMPONENT_VIEW;
+        int level = 3;
+        if (scoped) {
+            appendStatement(body, 3, "this.world.viewCache().enterIteration()");
+            appendLine(body, 3, "try {");
+            level = 4;
+            emitAcquireViews(body, 4, n, "this.world");
         }
 
-        appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
-        appendStatement(body, 4, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
-        emitFieldOrBase(body, 4, n, vm, "iterSeg");
-        appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
-        emitSelfFlags(body, 4, n, "iterSeg");
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorSetup(body, 4, n);
+        appendLine(body, level, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
+        appendStatement(body, level + 1, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
+        emitFieldOrBase(body, level + 1, n, vm, "iterSeg");
+        appendStatement(body, level + 1, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
+        emitSelfFlags(body, level + 1, n, "iterSeg");
+        if (scoped) {
+            emitCursorSetup(body, level + 1, n);
         }
-        appendLine(body, 4, "for (int i = 0; i < count; i++) {");
-        emitInstanceOrView(body, 5, n, vm);
+        appendLine(body, level + 1, "for (int i = 0; i < count; i++) {");
+        emitInstanceOrView(body, level + 2, n, vm);
 
-        String args = buildArgs(vm == ViewMode.COMPONENT_VIEW ? "componentView" : "componentInstance", n);
-        appendLine(body, 5, "if (predicate.test(" + args + ")) {");
-        appendStatement(body, 6, simpleName(FLECS_H_FQN) + ".ecs_iter_fini(iterSeg)");
-        appendStatement(body, 6, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
-        appendLine(body, 5, "}");
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorAdvance(body, 5, n);
+        String args = buildArgs(scoped ? "componentView" : "componentInstance", n);
+        appendLine(body, level + 2, "if (predicate.test(" + args + ")) {");
+        appendStatement(body, level + 3, simpleName(FLECS_H_FQN) + ".ecs_iter_fini(iterSeg)");
+        appendStatement(body, level + 3, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+        appendLine(body, level + 2, "}");
+        if (scoped) {
+            emitCursorAdvance(body, level + 2, n);
         }
 
-        appendLine(body, 4, "}");
-        appendLine(body, 3, "}");
+        appendLine(body, level + 1, "}");
+        appendLine(body, level, "}");
+        if (scoped) {
+            appendLine(body, 3, "} finally {");
+            appendStatement(body, 4, "this.world.viewCache().exitIteration()");
+            appendLine(body, 3, "}");
+        }
         appendLine(body, 2, "}");
         appendStatement(body, 2, "return 0L");
         appendLine(body, 1, "}");
@@ -253,57 +273,49 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
 
     private void appendBuilderEachMethod(CodeBuilder body, int n, ViewMode vm, EntityMode em, BuilderKind kind) {
         boolean runEach = kind == BuilderKind.SYSTEM;
-        boolean stageScopedViews = runEach && vm == ViewMode.COMPONENT_VIEW;
+        boolean scoped = vm == ViewMode.COMPONENT_VIEW;
         String actionType = runEach ? ECS_RUN_ACTION_T_FQN : ECS_ITER_ACTION_T_FQN;
-        int bodyIndent = runEach ? 4 : 3;
-        int loopIndent = bodyIndent + 1;
 
         appendEachMethodSignature(body, n, vm, em, kind.returnType, "each");
-        emitComponentLookups(body, 2, n, vm, stageScopedViews);
+        emitComponentLookups(body, 2, n, vm);
 
         appendLine(body, 2, simpleName(MEMORY_SEGMENT_FQN) + " callbackStub = " + simpleName(actionType)
                 + ".allocate(iterSegment -> {");
-        if (runEach) {
-            if (stageScopedViews) {
+
+        if (scoped) {
+            String cacheOwner;
+            if (runEach) {
                 appendStatement(body, 3, simpleName(WORLD_FQN) + " stageWorld = this.iterFor(iterSegment).world()");
-                appendStatement(body, 3, "stageWorld.viewCache().resetCursors()");
-                for (int i = 0; i < n; i++) {
-                    String comp = letter(i);
-                    String view = "V" + comp;
-                    appendStatement(body, 3, view + " componentView" + comp + " = (" + view
-                            + ") stageWorld.viewCache().getComponentMutView(componentClass" + comp + ")");
-                }
+                cacheOwner = "stageWorld";
+            } else {
+                cacheOwner = "this.world";
             }
-            appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSegment)) {");
-        }
-        if (vm == ViewMode.COMPONENT_VIEW && !stageScopedViews) {
-            appendStatement(body, bodyIndent, "this.world.viewCache().resetCursors()");
-        }
-        if (em == EntityMode.WITH_ITER) {
-            appendStatement(body, bodyIndent, "Iter iter = this.iterFor(iterSegment)");
-        }
-        if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, bodyIndent, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSegment)");
-        }
-        emitFieldOrBase(body, bodyIndent, n, vm, "iterSegment");
-        appendStatement(body, bodyIndent, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
-        emitEmptyTableGuard(body, bodyIndent, em, "iterSegment");
-        emitSelfFlags(body, bodyIndent, n, "iterSegment");
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorSetup(body, bodyIndent, n);
-        }
-        appendLine(body, bodyIndent, "for (int i = 0; i < count; i++) {");
-        if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, loopIndent, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
-        }
-        emitInstanceOrView(body, loopIndent, n, vm);
-        emitCallbackAccept(body, loopIndent, n, vm, em);
-        if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorAdvance(body, loopIndent, n);
-        }
-        appendLine(body, bodyIndent, "}");
-        if (runEach) {
+            appendStatement(body, 3, cacheOwner + ".viewCache().enterIteration()");
+            appendLine(body, 3, "try {");
+            emitAcquireViews(body, 4, n, cacheOwner);
+
+            int tableIndent = 4;
+            if (runEach) {
+                appendLine(body, 4, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSegment)) {");
+                tableIndent = 5;
+            }
+            emitTableBody(body, tableIndent, n, vm, em);
+            if (runEach) {
+                appendLine(body, 4, "}");
+            }
+            appendLine(body, 3, "} finally {");
+            appendStatement(body, 4, cacheOwner + ".viewCache().exitIteration()");
             appendLine(body, 3, "}");
+        } else {
+            int tableIndent = 3;
+            if (runEach) {
+                appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSegment)) {");
+                tableIndent = 4;
+            }
+            emitTableBody(body, tableIndent, n, vm, em);
+            if (runEach) {
+                appendLine(body, 3, "}");
+            }
         }
         appendLine(body, 2, "}, this.world.arena());");
 
@@ -438,7 +450,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendLine(body, 1, signature.toString());
     }
 
-    private void emitComponentLookups(CodeBuilder body, int level, int n, ViewMode vm, boolean stageScopedViews) {
+    private void emitComponentLookups(CodeBuilder body, int level, int n, ViewMode vm) {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             if (vm == ViewMode.COMPONENT_VIEW) {
@@ -449,17 +461,18 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                         + " = this.world.componentRegistry().getComponent(componentClass" + comp + ")");
             }
         }
-        if (vm == ViewMode.COMPONENT_VIEW && !stageScopedViews) {
-            for (int i = 0; i < n; i++) {
-                String comp = letter(i);
-                String view = "V" + comp;
-                appendStatement(body, level, view + " componentView" + comp + " = (" + view
-                        + ") this.world.viewCache().getComponentMutView(componentClass" + comp + ")");
-            }
-        }
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             appendStatement(body, level, "long size" + comp + " = component" + comp + ".size()");
+        }
+    }
+
+    private void emitAcquireViews(CodeBuilder body, int level, int n, String cacheOwner) {
+        for (int i = 0; i < n; i++) {
+            String comp = letter(i);
+            String view = "V" + comp;
+            appendStatement(body, level, view + " componentView" + comp + " = (" + view
+                    + ") " + cacheOwner + ".viewCache().acquireComponentMutView(componentClass" + comp + ")");
         }
     }
 
@@ -491,6 +504,32 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
             String comp = letter(i);
             appendStatement(body, level, "boolean isSelf" + comp + " = " + simpleName(FLECS_H_FQN) + ".ecs_field_is_self(" + iterVar + ", (byte) " + i + ")");
         }
+    }
+
+    private void emitTableBody(CodeBuilder body, int level, int n, ViewMode vm, EntityMode em) {
+        if (em == EntityMode.WITH_ITER) {
+            appendStatement(body, level, "Iter iter = this.iterFor(iterSegment)");
+        }
+        if (em == EntityMode.WITH_ENTITY) {
+            appendStatement(body, level, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSegment)");
+        }
+        emitFieldOrBase(body, level, n, vm, "iterSegment");
+        appendStatement(body, level, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
+        emitEmptyTableGuard(body, level, em, "iterSegment");
+        emitSelfFlags(body, level, n, "iterSegment");
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorSetup(body, level, n);
+        }
+        appendLine(body, level, "for (int i = 0; i < count; i++) {");
+        if (em == EntityMode.WITH_ENTITY) {
+            appendStatement(body, level + 1, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+        }
+        emitInstanceOrView(body, level + 1, n, vm);
+        emitCallbackAccept(body, level + 1, n, vm, em);
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorAdvance(body, level + 1, n);
+        }
+        appendLine(body, level, "}");
     }
 
     private void emitCursorSetup(CodeBuilder body, int level, int n) {

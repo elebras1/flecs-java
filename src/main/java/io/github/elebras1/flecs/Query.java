@@ -63,7 +63,6 @@ public class Query extends QueryBase {
             }
 
             Iter iter = this.iter();
-            this.world.viewCache().resetCursors();
             while (flecs_h.ecs_iter_next(iterSeg)) {
                 iter.setIterSeg(iterSeg);
                 callback.accept(iter);
@@ -81,7 +80,6 @@ public class Query extends QueryBase {
             }
             Iter iter = this.iter();
             iter.setIterSeg(iterSeg);
-            this.world.viewCache().resetCursors();
             callback.accept(iter);
         }
     }

@@ -1,48 +1,48 @@
 package io.github.elebras1.flecs;
 
 public class FlecsContext {
-    private static final int BUFFER_SIZE = 48;
+    private static final int BUFFER_SIZE = 64;
     private static final int MASK = BUFFER_SIZE - 1;
     private final ComponentViewPool[] componentViewPools;
     private final ComponentMutViewPool[] componentMutViewPools;
     private final EntityView[] entityViewPool;
     private final ComponentRowViewPool[] componentRowViewPools;
     private int entityViewCursor;
-    private int epoch;
+    private int[] scopeFrameBase;
+    private int[] scopePairIndex;
+    private int[] scopePairStart;
+    private final int[] scopeTouched;
+    private int scopePairCount;
+    private int scopeDepth;
+    private int scopeFrameId;
 
     private static class ComponentViewPool {
         final ComponentView[] pool;
         int cursor;
-        int epoch;
 
         ComponentViewPool(ComponentView[] pool) {
             this.pool = pool;
             this.cursor = 0;
-            this.epoch = -1;
         }
     }
 
     private static class ComponentMutViewPool {
         final ComponentMutView[] pool;
         int cursor;
-        int epoch;
 
         ComponentMutViewPool(ComponentMutView[] pool) {
             this.pool = pool;
             this.cursor = 0;
-            this.epoch = -1;
         }
     }
 
     private static class ComponentRowViewPool {
         final ComponentRowView[] pool;
         int cursor;
-        int epoch;
 
         ComponentRowViewPool(ComponentRowView[] pool) {
             this.pool = pool;
             this.cursor = 0;
-            this.epoch = -1;
         }
     }
 
@@ -55,7 +55,13 @@ public class FlecsContext {
             this.entityViewPool[i] = new EntityView(world, 0);
         }
         this.entityViewCursor = 0;
-        this.epoch = 0;
+        this.scopeFrameBase = new int[8];
+        this.scopePairIndex = new int[16];
+        this.scopePairStart = new int[16];
+        this.scopeTouched = new int[ComponentMap.size()];
+        this.scopePairCount = 0;
+        this.scopeDepth = 0;
+        this.scopeFrameId = 0;
     }
 
     public EntityView getEntityView(long entityId) {
@@ -84,11 +90,6 @@ public class FlecsContext {
             this.componentViewPools[index] = viewPool;
         }
 
-        if (viewPool.epoch != this.epoch) {
-            viewPool.cursor = 0;
-            viewPool.epoch = this.epoch;
-        }
-
         int cursor = viewPool.cursor;
         ComponentView view = viewPool.pool[cursor];
         viewPool.cursor = (cursor + 1) & MASK;
@@ -114,15 +115,69 @@ public class FlecsContext {
             this.componentMutViewPools[index] = viewPool;
         }
 
-        if (viewPool.epoch != this.epoch) {
-            viewPool.cursor = 0;
-            viewPool.epoch = this.epoch;
+        int cursor = viewPool.cursor;
+        ComponentMutView view = viewPool.pool[cursor];
+        viewPool.cursor = (cursor + 1) & MASK;
+        return view;
+    }
+
+    public ComponentMutView acquireComponentMutView(Class<?> componentClass) {
+        return this.acquireComponentMutView(ComponentMap.getIndex(componentClass), componentClass);
+    }
+
+    public ComponentMutView acquireComponentMutView(int index, Class<?> componentClass) {
+        if (index < 0) {
+            return null;
+        }
+
+        ComponentMutViewPool viewPool = this.componentMutViewPools[index];
+        if (viewPool == null) {
+            ComponentMutView[] pool = new ComponentMutView[BUFFER_SIZE];
+            for (int i = 0; i < BUFFER_SIZE; i++) {
+                pool[i] = ComponentMap.getMutView(componentClass);
+            }
+            viewPool = new ComponentMutViewPool(pool);
+            this.componentMutViewPools[index] = viewPool;
+        }
+
+        if (this.scopeDepth > 0 && this.scopeTouched[index] != this.scopeFrameId) {
+            this.scopeTouched[index] = this.scopeFrameId;
+            if (this.scopePairCount == this.scopePairIndex.length) {
+                int size = this.scopePairIndex.length * 2;
+                this.scopePairIndex = java.util.Arrays.copyOf(this.scopePairIndex, size);
+                this.scopePairStart = java.util.Arrays.copyOf(this.scopePairStart, size);
+            }
+            this.scopePairIndex[this.scopePairCount] = index;
+            this.scopePairStart[this.scopePairCount] = viewPool.cursor;
+            this.scopePairCount++;
         }
 
         int cursor = viewPool.cursor;
         ComponentMutView view = viewPool.pool[cursor];
         viewPool.cursor = (cursor + 1) & MASK;
         return view;
+    }
+
+    public void enterIteration() {
+        if (this.scopeDepth == this.scopeFrameBase.length) {
+            this.scopeFrameBase = java.util.Arrays.copyOf(this.scopeFrameBase, this.scopeDepth * 2);
+        }
+        this.scopeFrameId++;
+        this.scopeFrameBase[this.scopeDepth++] = this.scopePairCount;
+    }
+
+    public void exitIteration() {
+        if (this.scopeDepth == 0) {
+            return;
+        }
+        int base = this.scopeFrameBase[--this.scopeDepth];
+        for (int i = this.scopePairCount - 1; i >= base; i--) {
+            ComponentMutViewPool viewPool = this.componentMutViewPools[this.scopePairIndex[i]];
+            if (viewPool != null) {
+                viewPool.cursor = this.scopePairStart[i];
+            }
+        }
+        this.scopePairCount = base;
     }
 
     public ComponentRowView getComponentRowView(Class<?> componentClass) {
@@ -144,19 +199,9 @@ public class FlecsContext {
             this.componentRowViewPools[index] = viewPool;
         }
 
-        if (viewPool.epoch != this.epoch) {
-            viewPool.cursor =0;
-            viewPool.epoch = this.epoch;
-        }
-
         int cursor = viewPool.cursor;
         ComponentRowView view = viewPool.pool[cursor];
-        viewPool.cursor = (cursor +1) % BUFFER_SIZE;
+        viewPool.cursor = (cursor +1) & MASK;
         return view;
-    }
-
-    public void resetCursors() {
-        this.epoch++;
-        this.entityViewCursor = 0;
     }
 }

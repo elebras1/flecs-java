@@ -158,7 +158,6 @@ public class SystemBuilder extends SystemBuilderBase {
 
         MemorySegment callbackStub = ecs_iter_action_t.allocate(iterSegment -> {
             Iter iter = this.iterFor(iterSegment);
-            iter.world().viewCache().resetCursors();
             callback.accept(iter);
         }, this.world.arena());
 
@@ -175,7 +174,6 @@ public class SystemBuilder extends SystemBuilderBase {
             int stageId = flecs_h.ecs_stage_get_id(stageSeg);
             Iter iter = this.iters[stageId];
             iter.setIterSeg(iterSeg);
-            iter.world().viewCache().resetCursors();
             callback.accept(this.iters[stageId]);
         }, this.world.arena());
 
