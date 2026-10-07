@@ -1,74 +1,155 @@
 package io.github.elebras1.flecs;
 
+import java.util.Arrays;
+
 public class FlecsContext {
     private static final int BUFFER_SIZE = 64;
     private static final int MASK = BUFFER_SIZE - 1;
+    private static final int CURSOR_BITS = Integer.numberOfTrailingZeros(BUFFER_SIZE);
+    private static final int LEVELS = 16;
+
     private final ComponentViewPool[] componentViewPools;
     private final ComponentMutViewPool[] componentMutViewPools;
-    private final EntityView[] entityViewPool;
     private final ComponentRowViewPool[] componentRowViewPools;
-    private int entityViewCursor;
-    private int[] scopeFrameBase;
-    private int[] scopePairIndex;
-    private int[] scopePairStart;
-    private final int[] scopeTouched;
-    private int scopePairCount;
+    private final EntityViewPool entityViewPool;
+
     private int scopeDepth;
-    private int scopeFrameId;
+    private int scopeLevel;
 
-    private static class ComponentViewPool {
-        final ComponentView[] pool;
-        int cursor;
+    private abstract static class Pool {
+        final int[] cursors = new int[LEVELS];
+        int levels;
 
-        ComponentViewPool(ComponentView[] pool) {
-            this.pool = pool;
-            this.cursor = 0;
+        abstract void addLevel(int level);
+    }
+
+    private static final class EntityViewPool extends Pool {
+        final World world;
+        EntityView[] items = new EntityView[0];
+
+        EntityViewPool(World world) {
+            this.world = world;
+        }
+
+        @Override
+        void addLevel(int level) {
+            int from = this.levels << CURSOR_BITS;
+            int to = (level + 1) << CURSOR_BITS;
+            EntityView[] grown = Arrays.copyOf(this.items, to);
+            for (int i = from; i < to; i++) {
+                grown[i] = new EntityView(this.world, 0);
+            }
+            this.items = grown;
+            this.levels = level + 1;
         }
     }
 
-    private static class ComponentMutViewPool {
-        final ComponentMutView[] pool;
-        int cursor;
+    private static final class ComponentViewPool extends Pool {
+        final Class<?> componentClass;
+        ComponentView[] items = new ComponentView[0];
 
-        ComponentMutViewPool(ComponentMutView[] pool) {
-            this.pool = pool;
-            this.cursor = 0;
+        ComponentViewPool(Class<?> componentClass) {
+            this.componentClass = componentClass;
+        }
+
+        @Override
+        void addLevel(int level) {
+            int from = this.levels << CURSOR_BITS;
+            int to = (level + 1) << CURSOR_BITS;
+            ComponentView[] grown = Arrays.copyOf(this.items, to);
+            for (int i = from; i < to; i++) {
+                grown[i] = ComponentMap.getView(this.componentClass);
+            }
+            this.items = grown;
+            this.levels = level + 1;
         }
     }
 
-    private static class ComponentRowViewPool {
-        final ComponentRowView[] pool;
-        int cursor;
+    private static final class ComponentMutViewPool extends Pool {
+        final Class<?> componentClass;
+        ComponentMutView[] items = new ComponentMutView[0];
 
-        ComponentRowViewPool(ComponentRowView[] pool) {
-            this.pool = pool;
-            this.cursor = 0;
+        ComponentMutViewPool(Class<?> componentClass) {
+            this.componentClass = componentClass;
+        }
+
+        @Override
+        void addLevel(int level) {
+            int from = this.levels << CURSOR_BITS;
+            int to = (level + 1) << CURSOR_BITS;
+            ComponentMutView[] grown = Arrays.copyOf(this.items, to);
+            for (int i = from; i < to; i++) {
+                grown[i] = ComponentMap.getMutView(this.componentClass);
+            }
+            this.items = grown;
+            this.levels = level + 1;
+        }
+    }
+
+    private static final class ComponentRowViewPool extends Pool {
+        final Class<?> componentClass;
+        ComponentRowView[] items = new ComponentRowView[0];
+
+        ComponentRowViewPool(Class<?> componentClass) {
+            this.componentClass = componentClass;
+        }
+
+        @Override
+        void addLevel(int level) {
+            int from = this.levels << CURSOR_BITS;
+            int to = (level + 1) << CURSOR_BITS;
+            ComponentRowView[] grown = Arrays.copyOf(this.items, to);
+            for (int i = from; i < to; i++) {
+                grown[i] = ComponentMap.getRowView(this.componentClass);
+            }
+            this.items = grown;
+            this.levels = level + 1;
         }
     }
 
     public FlecsContext(World world) {
-        this.componentViewPools = new ComponentViewPool[ComponentMap.size()];
-        this.componentMutViewPools = new ComponentMutViewPool[ComponentMap.size()];
-        this.entityViewPool = new EntityView[BUFFER_SIZE];
-        this.componentRowViewPools = new ComponentRowViewPool[ComponentMap.size()];
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            this.entityViewPool[i] = new EntityView(world, 0);
-        }
-        this.entityViewCursor = 0;
-        this.scopeFrameBase = new int[8];
-        this.scopePairIndex = new int[16];
-        this.scopePairStart = new int[16];
-        this.scopeTouched = new int[ComponentMap.size()];
-        this.scopePairCount = 0;
+        int size = ComponentMap.size();
+        this.componentViewPools = new ComponentViewPool[size];
+        this.componentMutViewPools = new ComponentMutViewPool[size];
+        this.componentRowViewPools = new ComponentRowViewPool[size];
+        this.entityViewPool = new EntityViewPool(world);
         this.scopeDepth = 0;
-        this.scopeFrameId = 0;
+        this.scopeLevel = 0;
+    }
+
+    public void enterIteration() {
+        int depth = this.scopeDepth + 1;
+        this.scopeDepth = depth;
+        this.scopeLevel = depth < LEVELS ? depth : LEVELS - 1;
+    }
+
+    public void exitIteration() {
+        int depth = this.scopeDepth;
+        if (depth == 0) {
+            return;
+        }
+        depth--;
+        this.scopeDepth = depth;
+        this.scopeLevel = depth < LEVELS ? depth : LEVELS - 1;
+    }
+
+    private int slot(Pool pool) {
+        int level = this.scopeLevel;
+        if (level >= pool.levels) {
+            pool.addLevel(level);
+        }
+        int[] cursors = pool.cursors;
+        int c = cursors[level];
+        cursors[level] = (c + 1) & MASK;
+        return (level << CURSOR_BITS) | c;
     }
 
     public EntityView getEntityView(long entityId) {
-        EntityView entityView = this.entityViewPool[this.entityViewCursor];
-        entityView.id = entityId;
-        this.entityViewCursor = (this.entityViewCursor + 1) & MASK;
-        return entityView;
+        EntityViewPool pool = this.entityViewPool;
+        int s = this.slot(pool);
+        EntityView view = pool.items[s];
+        view.id = entityId;
+        return view;
     }
 
     public ComponentView getComponentView(Class<?> componentClass) {
@@ -79,21 +160,13 @@ public class FlecsContext {
         if (index < 0) {
             return null;
         }
-        ComponentViewPool viewPool = this.componentViewPools[index];
-
-        if (viewPool == null) {
-            ComponentView[] pool = new ComponentView[BUFFER_SIZE];
-            for (int i = 0; i < BUFFER_SIZE; i++) {
-                pool[i] = ComponentMap.getView(componentClass);
-            }
-            viewPool = new ComponentViewPool(pool);
-            this.componentViewPools[index] = viewPool;
+        ComponentViewPool pool = this.componentViewPools[index];
+        if (pool == null) {
+            pool = new ComponentViewPool(componentClass);
+            this.componentViewPools[index] = pool;
         }
-
-        int cursor = viewPool.cursor;
-        ComponentView view = viewPool.pool[cursor];
-        viewPool.cursor = (cursor + 1) & MASK;
-        return view;
+        int s = this.slot(pool);
+        return pool.items[s];
     }
 
     public ComponentMutView getComponentMutView(Class<?> componentClass) {
@@ -104,80 +177,21 @@ public class FlecsContext {
         if (index < 0) {
             return null;
         }
-        ComponentMutViewPool viewPool = this.componentMutViewPools[index];
-
-        if (viewPool == null) {
-            ComponentMutView[] pool = new ComponentMutView[BUFFER_SIZE];
-            for (int i = 0; i < BUFFER_SIZE; i++) {
-                pool[i] = ComponentMap.getMutView(componentClass);
-            }
-            viewPool = new ComponentMutViewPool(pool);
-            this.componentMutViewPools[index] = viewPool;
+        ComponentMutViewPool pool = this.componentMutViewPools[index];
+        if (pool == null) {
+            pool = new ComponentMutViewPool(componentClass);
+            this.componentMutViewPools[index] = pool;
         }
-
-        int cursor = viewPool.cursor;
-        ComponentMutView view = viewPool.pool[cursor];
-        viewPool.cursor = (cursor + 1) & MASK;
-        return view;
+        int s = this.slot(pool);
+        return pool.items[s];
     }
 
     public ComponentMutView acquireComponentMutView(Class<?> componentClass) {
-        return this.acquireComponentMutView(ComponentMap.getIndex(componentClass), componentClass);
+        return this.getComponentMutView(componentClass);
     }
 
     public ComponentMutView acquireComponentMutView(int index, Class<?> componentClass) {
-        if (index < 0) {
-            return null;
-        }
-
-        ComponentMutViewPool viewPool = this.componentMutViewPools[index];
-        if (viewPool == null) {
-            ComponentMutView[] pool = new ComponentMutView[BUFFER_SIZE];
-            for (int i = 0; i < BUFFER_SIZE; i++) {
-                pool[i] = ComponentMap.getMutView(componentClass);
-            }
-            viewPool = new ComponentMutViewPool(pool);
-            this.componentMutViewPools[index] = viewPool;
-        }
-
-        if (this.scopeDepth > 0 && this.scopeTouched[index] != this.scopeFrameId) {
-            this.scopeTouched[index] = this.scopeFrameId;
-            if (this.scopePairCount == this.scopePairIndex.length) {
-                int size = this.scopePairIndex.length * 2;
-                this.scopePairIndex = java.util.Arrays.copyOf(this.scopePairIndex, size);
-                this.scopePairStart = java.util.Arrays.copyOf(this.scopePairStart, size);
-            }
-            this.scopePairIndex[this.scopePairCount] = index;
-            this.scopePairStart[this.scopePairCount] = viewPool.cursor;
-            this.scopePairCount++;
-        }
-
-        int cursor = viewPool.cursor;
-        ComponentMutView view = viewPool.pool[cursor];
-        viewPool.cursor = (cursor + 1) & MASK;
-        return view;
-    }
-
-    public void enterIteration() {
-        if (this.scopeDepth == this.scopeFrameBase.length) {
-            this.scopeFrameBase = java.util.Arrays.copyOf(this.scopeFrameBase, this.scopeDepth * 2);
-        }
-        this.scopeFrameId++;
-        this.scopeFrameBase[this.scopeDepth++] = this.scopePairCount;
-    }
-
-    public void exitIteration() {
-        if (this.scopeDepth == 0) {
-            return;
-        }
-        int base = this.scopeFrameBase[--this.scopeDepth];
-        for (int i = this.scopePairCount - 1; i >= base; i--) {
-            ComponentMutViewPool viewPool = this.componentMutViewPools[this.scopePairIndex[i]];
-            if (viewPool != null) {
-                viewPool.cursor = this.scopePairStart[i];
-            }
-        }
-        this.scopePairCount = base;
+        return this.getComponentMutView(index, componentClass);
     }
 
     public ComponentRowView getComponentRowView(Class<?> componentClass) {
@@ -185,23 +199,15 @@ public class FlecsContext {
     }
 
     public ComponentRowView getComponentRowView(int index, Class<?> componentClass) {
-        if (index <0) {
+        if (index < 0) {
             return null;
         }
-
-        ComponentRowViewPool viewPool = this.componentRowViewPools[index];
-        if (viewPool == null) {
-            ComponentRowView[] pool = new ComponentRowView[BUFFER_SIZE];
-            for (int i =0; i < BUFFER_SIZE; i++) {
-                pool[i] = ComponentMap.getRowView(componentClass);
-            }
-            viewPool = new ComponentRowViewPool(pool);
-            this.componentRowViewPools[index] = viewPool;
+        ComponentRowViewPool pool = this.componentRowViewPools[index];
+        if (pool == null) {
+            pool = new ComponentRowViewPool(componentClass);
+            this.componentRowViewPools[index] = pool;
         }
-
-        int cursor = viewPool.cursor;
-        ComponentRowView view = viewPool.pool[cursor];
-        viewPool.cursor = (cursor +1) & MASK;
-        return view;
+        int s = this.slot(pool);
+        return pool.items[s];
     }
 }
