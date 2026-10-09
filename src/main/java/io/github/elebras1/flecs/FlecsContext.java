@@ -25,10 +25,15 @@ public class FlecsContext {
 
     private static final class EntityViewPool extends Pool {
         final World world;
-        EntityView[] items = new EntityView[0];
+        EntityView[] items;
 
         EntityViewPool(World world) {
             this.world = world;
+            this.items = new EntityView[BUFFER_SIZE];
+            for (int i = 0; i < BUFFER_SIZE; i++) {
+                this.items[i] = new EntityView(world, 0);
+            }
+            this.levels = 1;
         }
 
         @Override
@@ -46,10 +51,15 @@ public class FlecsContext {
 
     private static final class ComponentViewPool extends Pool {
         final Class<?> componentClass;
-        ComponentView[] items = new ComponentView[0];
+        ComponentView[] items;
 
         ComponentViewPool(Class<?> componentClass) {
             this.componentClass = componentClass;
+            this.items = new ComponentView[BUFFER_SIZE];
+            for (int i = 0; i < BUFFER_SIZE; i++) {
+                this.items[i] = ComponentMap.getView(componentClass);
+            }
+            this.levels = 1;
         }
 
         @Override
@@ -67,10 +77,15 @@ public class FlecsContext {
 
     private static final class ComponentMutViewPool extends Pool {
         final Class<?> componentClass;
-        ComponentMutView[] items = new ComponentMutView[0];
+        ComponentMutView[] items;
 
         ComponentMutViewPool(Class<?> componentClass) {
             this.componentClass = componentClass;
+            this.items = new ComponentMutView[BUFFER_SIZE];
+            for (int i = 0; i < BUFFER_SIZE; i++) {
+                this.items[i] = ComponentMap.getMutView(componentClass);
+            }
+            this.levels = 1;
         }
 
         @Override
@@ -88,10 +103,15 @@ public class FlecsContext {
 
     private static final class ComponentRowViewPool extends Pool {
         final Class<?> componentClass;
-        ComponentRowView[] items = new ComponentRowView[0];
+        ComponentRowView[] items;
 
         ComponentRowViewPool(Class<?> componentClass) {
             this.componentClass = componentClass;
+            this.items = new ComponentRowView[BUFFER_SIZE];
+            for (int i = 0; i < BUFFER_SIZE; i++) {
+                this.items[i] = ComponentMap.getRowView(componentClass);
+            }
+            this.levels = 1;
         }
 
         @Override

@@ -4,17 +4,13 @@ import io.github.elebras1.flecs.callback.*;
 import io.github.elebras1.flecs.internal.ComponentRegistry;
 import io.github.elebras1.flecs.internal.FlecsLoader;
 import io.github.elebras1.flecs.internal.ParamRegistry;
+import io.github.elebras1.flecs.internal.QueryTracker;
 import io.github.elebras1.flecs.internal.buffer.FlecsBuffers;
 
 import io.github.elebras1.flecs.internal.FlecsAllocator;
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -26,7 +22,8 @@ public class World extends WorldBase implements AutoCloseable {
     private final ComponentRegistry componentRegistry;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
-    private final Set<Query> queries;
+    private final Object queryLock = new Object();
+    private final QueryTracker queries = new QueryTracker();
     private final FlecsBuffers buffers;
     private final FlecsContext context;
     private World[] stages;
@@ -51,7 +48,6 @@ public class World extends WorldBase implements AutoCloseable {
         this.componentRegistry = new ComponentRegistry(this.worldSeg);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.queries = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.stages = new World[] { this };
@@ -68,7 +64,6 @@ public class World extends WorldBase implements AutoCloseable {
         this.componentRegistry = componentRegistry;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
-        this.queries = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
         this.destroyed = false;
@@ -104,8 +99,8 @@ public class World extends WorldBase implements AutoCloseable {
         Objects.requireNonNull(name, "name");
 
         MemorySegment nameSegment = this.buffers.stringRing().set(name);
-        MemorySegment separator = this.buffers.stringRing().set("::");
-        MemorySegment rootSeparator = this.buffers.stringRing().set("::");
+        MemorySegment separator = this.buffers.stringRing().separator();
+        MemorySegment rootSeparator = separator;
         MemorySegment descSeg = this.buffers.entityDescBuffer().get();
         ecs_entity_desc_t.name(descSeg, nameSegment);
         ecs_entity_desc_t.sep(descSeg, separator);
@@ -1053,9 +1048,10 @@ public class World extends WorldBase implements AutoCloseable {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(sep, "sep");
         Objects.requireNonNull(rootSep, "rootSep");
-        MemorySegment nameSeg = this.buffers.stringRing().set(name);
-        MemorySegment sepSeg = this.buffers.stringRing().set(sep);
-        MemorySegment rootSepSeg = this.buffers.stringRing().set(rootSep);
+        var ring = this.buffers.stringRing();
+        MemorySegment nameSeg = ring.set(name);
+        MemorySegment sepSeg = "::".equals(sep) ? ring.separator() : ring.set(sep);
+        MemorySegment rootSepSeg = "::".equals(rootSep) ? ring.separator() : ring.set(rootSep);
         return flecs_h.ecs_lookup_path_w_sep(this.worldSeg, 0, nameSeg, sepSeg, rootSepSeg, recursive);
     }
 
@@ -1369,11 +1365,21 @@ public class World extends WorldBase implements AutoCloseable {
     }
 
     void trackQuery(Query query) {
-        this.queries.add(query);
+        long address = query.querySeg.address();
+        if (address != 0) {
+            synchronized (this.queryLock) {
+                this.queries.put(address, query);
+            }
+        }
     }
 
     void untrackQuery(Query query) {
-        this.queries.remove(query);
+        long address = query.querySeg.address();
+        if (address != 0) {
+            synchronized (this.queryLock) {
+                this.queries.remove(address);
+            }
+        }
     }
 
     boolean isDestroyed() {
@@ -1393,9 +1399,9 @@ public class World extends WorldBase implements AutoCloseable {
     }
 
     private void closeQueries() {
-        Query[] snapshot;
-        synchronized (this.queries) {
-            snapshot = this.queries.toArray(new Query[0]);
+        List<Query> snapshot = new ArrayList<>(this.queries.size());
+        synchronized (this.queryLock) {
+            this.queries.forEachValue(snapshot::add);
         }
         for (Query query : snapshot) {
             query.destruct();

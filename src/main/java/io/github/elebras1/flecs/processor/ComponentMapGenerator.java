@@ -106,7 +106,7 @@ public class ComponentMapGenerator {
 
         body.newline();
         body.indent4().append("public static <T> Component<T> getInstance(Class<T> componentClass) {").newline();
-        body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
+        body.indent8().append("int index = getIndex(componentClass);").newline();
         body.indent8().append("return index >= 0 ? (Component<T>) COMPONENTS[index] : null;").newline();
         body.indent4().append("}").newline();
 
@@ -117,21 +117,21 @@ public class ComponentMapGenerator {
 
         body.newline();
         body.indent4().append("public static <T> ComponentView getView(Class<T> componentClass) {").newline();
-        body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
+        body.indent8().append("int index = getIndex(componentClass);").newline();
         body.indent8().append("Supplier<ComponentView> supplier = index >= 0 ? VIEWS[index] : null;").newline();
         body.indent8().append("return supplier != null ? supplier.get() : null;").newline();
         body.indent4().append("}").newline();
 
         body.newline();
         body.indent4().append("public static <T> ComponentMutView getMutView(Class<T> componentClass) {").newline();
-        body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
+        body.indent8().append("int index = getIndex(componentClass);").newline();
         body.indent8().append("Supplier<ComponentMutView> supplier = index >= 0 ? MUT_VIEWS[index] : null;").newline();
         body.indent8().append("return supplier != null ? supplier.get() : null;").newline();
         body.indent4().append("}").newline();
 
         body.newline();
         body.indent4().append("public static <T> ComponentRowView getRowView(Class<T> componentClass) {").newline();
-        body.indent8().append("int index = COMPONENT_INDEX.get(componentClass);").newline();
+        body.indent8().append("int index = getIndex(componentClass);").newline();
         body.indent8().append("Supplier<ComponentRowView> supplier = index >= 0 ? ROW_VIEWS[index] : null;").newline();
         body.indent8().append("return supplier != null ? supplier.get() : null;").newline();
         body.indent4().append("}").newline();
