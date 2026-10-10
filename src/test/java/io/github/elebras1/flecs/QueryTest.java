@@ -6,6 +6,7 @@ import io.github.elebras1.flecs.internal.ParamRegistry;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.component.VelocityView;
+import io.github.elebras1.flecs.component.VelocityMutView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -792,4 +793,92 @@ class QueryTest {
         assertDoesNotThrow(query::destruct);
     }
 
+    private long parentWithChildren(float parentX, float parentY, int childCount, List<Long> children) {
+        long parent = this.world.entity();
+        this.world.obtainEntity(parent).set(new Position(parentX, parentY));
+        for (int i = 0; i < childCount; i++) {
+            long child = this.world.entity(parent);
+            this.world.obtainEntity(child).set(new Velocity(i, i * 10));
+            children.add(child);
+        }
+        return parent;
+    }
+
+    @Test
+    void eachViewMixesOwnedAndSharedFields() {
+        List<Long> children = new ArrayList<>();
+        this.parentWithChildren(1, 2, 3, children);
+        this.parentWithChildren(5, 6, 2, children);
+
+        Query query = this.world.query()
+                .with(Velocity.class)
+                .with(Position.class).up(Flecs.ChildOf)
+                .build();
+
+        Map<Long, float[]> seen = new HashMap<>();
+        query.eachView(Velocity.class, Position.class, (long entityId, VelocityMutView velocity, PositionView position) -> {
+            seen.put(entityId, new float[] { velocity.x(), velocity.y(), position.x(), position.y() });
+            velocity.x(velocity.x() + position.x());
+        });
+
+        assertEquals(5, seen.size());
+        for (int i = 0; i < 3; i++) {
+            float[] values = seen.get(children.get(i));
+            assertArrayEquals(new float[] { i, i * 10, 1, 2 }, values);
+        }
+        for (int i = 0; i < 2; i++) {
+            float[] values = seen.get(children.get(3 + i));
+            assertArrayEquals(new float[] { i, i * 10, 5, 6 }, values);
+        }
+        assertEquals(2.0f, this.world.obtainEntity(children.get(1)).get(Velocity.class).x());
+        assertEquals(6.0f, this.world.obtainEntity(children.get(4)).get(Velocity.class).x());
+    }
+
+    @Test
+    void eachRecordsMixesOwnedAndSharedFields() {
+        List<Long> children = new ArrayList<>();
+        this.parentWithChildren(3, 4, 4, children);
+
+        Query query = this.world.query()
+                .with(Velocity.class)
+                .with(Position.class).up(Flecs.ChildOf)
+                .build();
+
+        Map<Long, Velocity> velocities = new HashMap<>();
+        List<Position> positions = new ArrayList<>();
+        query.each(Velocity.class, Position.class, (entityId, velocity, position) -> {
+            velocities.put(entityId, velocity);
+            positions.add(position);
+        });
+
+        assertEquals(4, velocities.size());
+        for (int i = 0; i < 4; i++) {
+            assertEquals(new Velocity(i, i * 10), velocities.get(children.get(i)));
+        }
+        positions.forEach(position -> assertEquals(new Position(3, 4), position));
+    }
+
+    @Test
+    void eachRecordsGivesNullForUnsetOptionalField() {
+        long withMass = this.world.entity();
+        this.world.obtainEntity(withMass).set(new Position(1, 1)).set(new Mass(7));
+        long withoutMass = this.world.entity();
+        this.world.obtainEntity(withoutMass).set(new Position(2, 2));
+
+        Query query = this.world.query()
+                .with(Position.class)
+                .with(Mass.class).optional()
+                .build();
+
+        Map<Long, Mass> masses = new HashMap<>();
+        AtomicInteger calls = new AtomicInteger();
+        query.each(Position.class, Mass.class, (entityId, position, mass) -> {
+            calls.incrementAndGet();
+            masses.put(entityId, mass);
+        });
+
+        assertEquals(2, calls.get());
+        assertEquals(new Mass(7), masses.get(withMass));
+        assertNull(masses.get(withoutMass));
+    }
 }

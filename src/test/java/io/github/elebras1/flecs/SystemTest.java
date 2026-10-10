@@ -383,4 +383,28 @@ class SystemTest {
             assertEquals(steps, position.y(), 0.0f, "entity " + id + " y");
         }
     }
+
+    @Test
+    void runEachVisitsEveryTableWithReusedIter() {
+        for (int i = 0; i < 3; i++) {
+            this.world.obtainEntity(this.world.entity()).set(new Position(i, i));
+        }
+        for (int i = 0; i < 2; i++) {
+            this.world.obtainEntity(this.world.entity()).set(new Position(i, i)).set(new Mass(i));
+        }
+
+        FlecsSystem system = this.world.system("Visit", Position.class).each(Position.class, p -> { });
+        List<Integer> counts = new ArrayList<>();
+        List<Iter> iters = new ArrayList<>();
+        system.runEach(it -> {
+            counts.add(it.count());
+            iters.add(it);
+        });
+
+        this.world.progress();
+
+        counts.sort(Integer::compare);
+        assertEquals(List.of(2, 3), counts);
+        assertSame(iters.get(0), iters.get(1));
+    }
 }

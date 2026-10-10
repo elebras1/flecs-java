@@ -212,7 +212,7 @@ val generateFlecsBindings by tasks.registering(Exec::class) {
 }
 
 val applyCriticalDowncalls by tasks.registering(JavaExec::class) {
-    description = "Apply/remove Linker.Option.critical(false) in generated bindings from the reviewed list in ApplyCriticalDowncalls"
+    description = "Apply the reviewed binding rules of ApplyCriticalDowncalls (critical downcalls, pointer results as long)"
     group = "flecs"
 
     classpath = sourceSets["generator"].runtimeClasspath

@@ -19,7 +19,8 @@ public final class ComponentBuffer implements AutoCloseable {
             FlecsAllocator.free(segment);
             this.segment = FlecsAllocator.malloc(this.capacity);
         }
-        return this.segment.fill((byte) 0);
+        this.segment.asSlice(0, needed).fill((byte) 0);
+        return this.segment;
     }
 
     @Override

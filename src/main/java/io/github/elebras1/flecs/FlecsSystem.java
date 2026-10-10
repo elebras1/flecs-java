@@ -154,9 +154,14 @@ public class FlecsSystem extends Entity {
     }
 
     public FlecsSystem runEach(IterCallback callback) {
+        Iter[] iters = new Iter[this.world.getStageCount()];
+        for (int i = 0; i < iters.length; i++) {
+            iters[i] = new Iter(MemorySegment.NULL, this.world.getStage(i));
+        }
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
+            int stageId = flecs_h.ecs_stage_get_id(ecs_iter_t.world(iterSeg));
+            Iter iter = stageId < iters.length ? iters[stageId] : new Iter(MemorySegment.NULL, this.world);
             while (flecs_h.ecs_iter_next(iterSeg)) {
-                Iter iter = new Iter(iterSeg, this.world);
                 iter.setIterSeg(iterSeg);
                 callback.accept(iter);
             }

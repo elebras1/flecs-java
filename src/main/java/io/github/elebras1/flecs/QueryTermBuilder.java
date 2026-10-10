@@ -68,9 +68,8 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
         if ((componentId & flecs_h.ECS_ID_FLAGS_MASK()) != 0) {
             ecs_term_t.id(termSeg, componentId);
         } else {
-            MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+            MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
             ecs_term_ref_t.id(firstRefSeg, componentId);
-            ecs_term_t.first(termSeg, firstRefSeg);
         }
 
         return builder();
@@ -78,9 +77,8 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
     public S with(String componentName) {
         MemorySegment termSeg = newTerm();
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         applyNameOrVar(firstRefSeg, componentName);
-        ecs_term_t.first(termSeg, firstRefSeg);
 
         return builder();
     }
@@ -96,14 +94,11 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     public S with(long first, long second) {
         MemorySegment termSeg = newTerm();
 
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         ecs_term_ref_t.id(firstRefSeg, first);
 
-        MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
         ecs_term_ref_t.id(secondRefSeg, second);
-
-        ecs_term_t.first(termSeg, firstRefSeg);
-        ecs_term_t.second(termSeg, secondRefSeg);
 
         return builder();
     }
@@ -111,14 +106,11 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     public S with(String first, String second) {
         MemorySegment termSeg = newTerm();
 
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         applyNameOrVar(firstRefSeg, first);
 
-        MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
         applyNameOrVar(secondRefSeg, second);
-
-        ecs_term_t.first(termSeg, firstRefSeg);
-        ecs_term_t.second(termSeg, secondRefSeg);
 
         return builder();
     }
@@ -130,14 +122,11 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     public S with(String first, long second) {
         MemorySegment termSeg = newTerm();
 
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         applyNameOrVar(firstRefSeg, first);
 
-        MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
         ecs_term_ref_t.id(secondRefSeg, second);
-
-        ecs_term_t.first(termSeg, firstRefSeg);
-        ecs_term_t.second(termSeg, secondRefSeg);
 
         return builder();
     }
@@ -145,14 +134,11 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     public S with(long first, String second) {
         MemorySegment termSeg = newTerm();
 
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         ecs_term_ref_t.id(firstRefSeg, first);
 
-        MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
         applyNameOrVar(secondRefSeg, second);
-
-        ecs_term_t.first(termSeg, firstRefSeg);
-        ecs_term_t.second(termSeg, secondRefSeg);
 
         return builder();
     }
@@ -164,14 +150,11 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
     public <T> S with(Class<T> first, String second) {
         MemorySegment termSeg = newTerm();
 
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         ecs_term_ref_t.id(firstRefSeg, this.world.componentRegistry().getComponentId(first));
 
-        MemorySegment secondRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment secondRefSeg = ecs_term_t.second(termSeg);
         applyNameOrVar(secondRefSeg, second);
-
-        ecs_term_t.first(termSeg, firstRefSeg);
-        ecs_term_t.second(termSeg, secondRefSeg);
 
         return builder();
     }
@@ -541,18 +524,16 @@ public abstract class QueryTermBuilder<S extends QueryTermBuilder<S>> {
 
     public S scopeOpen() {
         MemorySegment termSeg = newTerm();
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         ecs_term_ref_t.id(firstRefSeg, Flecs.ScopeOpen);
-        ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
         return builder();
     }
 
     public S scopeClose() {
         MemorySegment termSeg = newTerm();
-        MemorySegment firstRefSeg = ecs_term_ref_t.allocate(this.arena);
+        MemorySegment firstRefSeg = ecs_term_t.first(termSeg);
         ecs_term_ref_t.id(firstRefSeg, Flecs.ScopeClose);
-        ecs_term_t.first(termSeg, firstRefSeg);
         ecs_term_ref_t.id(ecs_term_t.src(termSeg), Flecs.IsEntity);
         return builder();
     }
