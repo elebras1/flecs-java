@@ -27,58 +27,83 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 public class PairBenchmark {
 
-    @Param({"1000", "10000", "100000"})
-    public int n;
+    @State(Scope.Benchmark)
+    public static class AddState {
 
-    private World world;
-    private long[] plainIds;
-    private long[] pairIds;
-    private Query query;
-    private int[] order;
-    private double checksum;
+        @Param({"1000", "10000", "100000"})
+        public int n;
 
-    @Setup(Level.Invocation)
-    public void setup() {
-        this.world = new World();
-        this.world.component(Likes.class);
-        this.world.component(Apples.class);
-        this.plainIds = this.world.entityBulk(this.n);
-        this.pairIds = this.world.entityBulk(this.n);
-        for (long entityId : this.pairIds) {
-            this.world.obtainEntity(entityId).add(Likes.class, Apples.class);
+        private World world;
+        private long[] plainIds;
+        private int[] order;
+
+        @Setup(Level.Invocation)
+        public void setup() {
+            this.world = new World();
+            this.world.component(Likes.class);
+            this.world.component(Apples.class);
+            this.plainIds = this.world.entityBulk(this.n);
+            this.order = BenchUtils.shuffledIndices(this.n);
         }
-        this.query = this.world.query().with(Likes.class, Flecs.Wildcard).build();
-        this.order = BenchUtils.shuffledIndices(this.n);
+
+        @TearDown(Level.Invocation)
+        public void tearDown() {
+            if (this.world != null) {
+                this.world.close();
+                this.world = null;
+            }
+        }
     }
 
-    @TearDown(Level.Invocation)
-    public void tearDown() {
-        if (this.query != null) {
-            this.query = null;
+    @State(Scope.Benchmark)
+    public static class IterateState {
+
+        @Param({"1000", "10000", "100000"})
+        public int n;
+
+        private World world;
+        private Query query;
+        private double checksum;
+
+        @Setup(Level.Iteration)
+        public void setup() {
+            this.world = new World();
+            this.world.component(Likes.class);
+            this.world.component(Apples.class);
+            long[] pairIds = this.world.entityBulk(this.n);
+            for (long entityId : pairIds) {
+                this.world.obtainEntity(entityId).add(Likes.class, Apples.class);
+            }
+            this.query = this.world.query().with(Likes.class, Flecs.Wildcard).build();
         }
-        if (this.world != null) {
-            this.world.close();
-            this.world = null;
+
+        @TearDown(Level.Iteration)
+        public void tearDown() {
+            this.query = null;
+            if (this.world != null) {
+                this.world.close();
+                this.world = null;
+            }
         }
     }
 
     @Benchmark
-    public double pairAdd() {
+    public double pairAdd(AddState state) {
         long checksum = 0L;
-        int[] order = this.order;
-        long[] ids = this.plainIds;
-        for (int i = 0; i < this.n; i++) {
+        int[] order = state.order;
+        long[] ids = state.plainIds;
+        for (int i = 0; i < state.n; i++) {
             long entityId = ids[order[i]];
-            this.world.obtainEntity(entityId).add(Likes.class, Apples.class);
+            state.world.obtainEntity(entityId).add(Likes.class, Apples.class);
             checksum += entityId;
         }
-        return (double) checksum / this.n;
+        return (double) checksum / state.n;
     }
 
     @Benchmark
-    public double pairIterate() {
-        this.checksum = 0.0;
-        this.query.each(entityId -> this.checksum += entityId);
-        return this.checksum / this.n;
+    public double pairIterate(IterateState state) {
+        state.checksum = 0.0;
+        state.query.each(entityId -> state.checksum += entityId);
+        return state.checksum / state.n;
     }
 }
