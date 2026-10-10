@@ -228,13 +228,13 @@ val tier1Benchmarks = listOf(
     "createEmpty", "create1", "create2", "createFromPrefab",
     "destroyEmpty", "destroy2", "addComponent", "removeComponent",
     "get", "getSet", "has", "query1Read", "query2ReadWrite", "queryFiltered",
-    "systemRun", "queryCreate", "lookup", "mixedSimulation"
+    "systemRun", "systemRun5", "queryCreate", "lookup"
 )
 
 val tier2Benchmarks = listOf(
     "pairAdd", "pairIterate", "hierarchyBuild", "hierarchyTraverse",
     "prefabInheritGet", "observerAdd", "singletonGetSet", "deferAdd",
-    "multiThreadedProgress"
+    "multiThreadedProgress", "setValue", "bulkCreate"
 )
 
 val benchmarkTier = (tier1Benchmarks.map { it to 1 } + tier2Benchmarks.map { it to 2 }).toMap()
@@ -246,10 +246,11 @@ val benchmarkUnits = mapOf(
     "get" to "ns/op", "getSet" to "ns/op", "has" to "ns/op",
     "query1Read" to "ns/entity", "query2ReadWrite" to "ns/entity", "queryFiltered" to "ns/entity",
     "systemRun" to "ns/entity", "queryCreate" to "ns/op", "lookup" to "ns/op",
-    "mixedSimulation" to "ns/entity", "pairAdd" to "ns/entity", "pairIterate" to "ns/entity",
+    "pairAdd" to "ns/entity", "pairIterate" to "ns/entity",
     "hierarchyBuild" to "ns/entity", "hierarchyTraverse" to "ns/entity",
     "prefabInheritGet" to "ns/op", "observerAdd" to "ns/entity", "singletonGetSet" to "ns/op",
-    "deferAdd" to "ns/entity", "multiThreadedProgress" to "ns/entity"
+    "deferAdd" to "ns/entity", "multiThreadedProgress" to "ns/entity",
+    "setValue" to "ns/op", "bulkCreate" to "ns/entity", "systemRun5" to "ns/entity"
 )
 
 val implOrder = listOf("flecs-c", "flecs-java", "artemis-odb", "dominion-ecs")

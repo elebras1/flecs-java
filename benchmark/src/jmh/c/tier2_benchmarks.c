@@ -406,6 +406,77 @@ static void run_multiThreadedProgress(int n) {
     Benchmark benchmark = { "multiThreadedProgress", n, multiThreadedProgress_setup, NULL, multiThreadedProgress_run, NULL, multiThreadedProgress_fini, &ctx };
     bench_run_benchmark(&benchmark);
 }
+typedef struct {
+    ecs_world_t *world;
+    ecs_entity_t *entities;
+    int *order;
+    int n;
+} SetValueCtx;
+
+static void setValue_before(void *ptr) {
+    SetValueCtx *ctx = ptr;
+    ctx->world = bench_world_new();
+    for (int i = 0; i < ctx->n; i++) {
+        ctx->entities[i] = ecs_new(ctx->world);
+    }
+    bench_shuffle(ctx->order, ctx->n, BENCH_SEED);
+}
+
+static void setValue_after(void *ptr) {
+    SetValueCtx *ctx = ptr;
+    bench_world_free(ctx->world);
+    ctx->world = NULL;
+}
+
+static void setValue_run(void *ptr) {
+    SetValueCtx *ctx = ptr;
+    unsigned long long acc = 0;
+    for (int i = 0; i < ctx->n; i++) {
+        ecs_entity_t entity = ctx->entities[ctx->order[i]];
+        ecs_set(ctx->world, entity, Position, { 1.0f, 2.0f });
+        acc ^= (unsigned long long)entity;
+    }
+    bench_sink_u64(acc);
+}
+
+static void run_setValue(int n) {
+    SetValueCtx ctx = { NULL, bench_entities_alloc(n), bench_order_alloc(n), n };
+    Benchmark benchmark = { "setValue", n, NULL, setValue_before, setValue_run, setValue_after, NULL, &ctx };
+    bench_run_benchmark(&benchmark);
+    free(ctx.entities);
+    free(ctx.order);
+}
+typedef struct {
+    ecs_world_t *world;
+    int n;
+} BulkCreateCtx;
+
+static void bulkCreate_before(void *ptr) {
+    BulkCreateCtx *ctx = ptr;
+    ctx->world = bench_world_new();
+}
+
+static void bulkCreate_after(void *ptr) {
+    BulkCreateCtx *ctx = ptr;
+    bench_world_free(ctx->world);
+    ctx->world = NULL;
+}
+
+static void bulkCreate_run(void *ptr) {
+    BulkCreateCtx *ctx = ptr;
+    ecs_bulk_desc_t desc = { 0 };
+    desc.count = ctx->n;
+    desc.ids[0] = ecs_id(Position);
+    desc.ids[1] = ecs_id(Velocity);
+    const ecs_entity_t *entities = ecs_bulk_init(ctx->world, &desc);
+    bench_sink_u64((unsigned long long)entities[ctx->n - 1]);
+}
+
+static void run_bulkCreate(int n) {
+    BulkCreateCtx ctx = { NULL, n };
+    Benchmark benchmark = { "bulkCreate", n, NULL, bulkCreate_before, bulkCreate_run, bulkCreate_after, NULL, &ctx };
+    bench_run_benchmark(&benchmark);
+}
 const BenchEntry tier2_benchmarks[] = {
     { "pairAdd", run_pairAdd },
     { "pairIterate", run_pairIterate },
@@ -416,6 +487,8 @@ const BenchEntry tier2_benchmarks[] = {
     { "singletonGetSet", run_singletonGetSet },
     { "deferAdd", run_deferAdd },
     { "multiThreadedProgress", run_multiThreadedProgress },
+    { "setValue", run_setValue },
+    { "bulkCreate", run_bulkCreate },
 };
 
 const int tier2_benchmark_count =

@@ -576,81 +576,71 @@ static void run_lookup(int n) {
     bench_run_benchmark(&benchmark);
     free(ctx.order);
 }
-typedef struct {
-    ecs_world_t *world;
-    ecs_query_t *query;
-    ecs_entity_t *entities;
-    ecs_entity_t *created;
-    int n;
-    int k;
-    int head;
-} MixedCtx;
-
-static void mixedSimulation_setup(void *ptr) {
-    MixedCtx *ctx = ptr;
-    ctx->world = bench_world_new();
-    ctx->entities = bench_entities_alloc(ctx->n);
-    ctx->k = ctx->n / 10;
-    ctx->created = bench_entities_alloc(ctx->k);
-    ctx->head = 0;
-    ctx->query = ecs_query(ctx->world, {
-        .terms = {
-            { .id = ecs_id(Position) },
-            { .id = ecs_id(Velocity) }
-        }
-    });
-    for (int i = 0; i < ctx->n; i++) {
-        ecs_entity_t entity = ecs_new(ctx->world);
-        ecs_set(ctx->world, entity, Position, { (float)i, 0.0f });
-        ecs_set(ctx->world, entity, Velocity, { 1.0f, 0.5f });
-        ctx->entities[i] = entity;
-    }
-}
-
-static void mixedSimulation_fini(void *ptr) {
-    MixedCtx *ctx = ptr;
-    ecs_query_fini(ctx->query);
-    bench_world_free(ctx->world);
-    ctx->world = NULL;
-    free(ctx->entities);
-    free(ctx->created);
-}
-
-static void mixedSimulation_run(void *ptr) {
-    MixedCtx *ctx = ptr;
-    int k = ctx->k;
-
-    for (int i = 0; i < k; i++) {
-        ecs_entity_t entity = ecs_new(ctx->world);
-        ecs_set(ctx->world, entity, Position, { 0.0f, 0.0f });
-        ecs_set(ctx->world, entity, Velocity, { 1.0f, 0.5f });
-        ctx->created[i] = entity;
-    }
-
+static void systemRun5_callback(ecs_iter_t *it) {
+    Position *positions = ecs_field(it, Position, 0);
+    const Velocity *velocities = ecs_field(it, Velocity, 1);
+    Health *healths = ecs_field(it, Health, 2);
+    Mass *masses = ecs_field(it, Mass, 3);
+    Age *ages = ecs_field(it, Age, 4);
     double sum = 0.0;
-    ecs_iter_t it = ecs_query_iter(ctx->world, ctx->query);
-    while (ecs_query_next(&it)) {
-        Position *positions = ecs_field(&it, Position, 0);
-        const Velocity *velocities = ecs_field(&it, Velocity, 1);
-        for (int i = 0; i < it.count; i++) {
-            positions[i].x += velocities[i].dx;
-            positions[i].y += velocities[i].dy;
-            sum += positions[i].x;
-        }
+    for (int i = 0; i < it->count; i++) {
+        positions[i].x += velocities[i].dx;
+        positions[i].y += velocities[i].dy;
+        healths[i].value += 1;
+        masses[i].value += 0.5f;
+        ages[i].value += 1;
+        sum += positions[i].x;
     }
-
-    for (int i = 0; i < k; i++) {
-        ecs_delete(ctx->world, ctx->entities[ctx->head]);
-        ctx->entities[ctx->head] = ctx->created[i];
-        ctx->head = (ctx->head + 1) % ctx->n;
-    }
-
     bench_sink_f32((float)sum);
 }
 
-static void run_mixedSimulation(int n) {
-    MixedCtx ctx = { NULL, NULL, NULL, NULL, n, 0, 0 };
-    Benchmark benchmark = { "mixedSimulation", n, mixedSimulation_setup, NULL, mixedSimulation_run, NULL, mixedSimulation_fini, &ctx };
+typedef struct {
+    ecs_world_t *world;
+    ecs_entity_t system;
+    int n;
+} System5Ctx;
+
+static void systemRun5_setup(void *ptr) {
+    System5Ctx *ctx = ptr;
+    ctx->world = bench_world_new();
+    for (int i = 0; i < ctx->n; i++) {
+        ecs_entity_t entity = ecs_new(ctx->world);
+        ecs_set(ctx->world, entity, Position, { 1.0f, 2.0f });
+        ecs_set(ctx->world, entity, Velocity, { 0.5f, 0.25f });
+        ecs_set(ctx->world, entity, Health, { 100 });
+        ecs_set(ctx->world, entity, Mass, { 1.0f });
+        ecs_set(ctx->world, entity, Age, { 10 });
+    }
+    ctx->system = ecs_system(ctx->world, {
+        .entity = ecs_entity(ctx->world, {
+            .name = "Move5",
+            .add = ecs_ids(ecs_dependson(EcsOnUpdate))
+        }),
+        .query.terms = {
+            { .id = ecs_id(Position) },
+            { .id = ecs_id(Velocity) },
+            { .id = ecs_id(Health) },
+            { .id = ecs_id(Mass) },
+            { .id = ecs_id(Age) }
+        },
+        .callback = systemRun5_callback
+    });
+}
+
+static void systemRun5_fini(void *ptr) {
+    System5Ctx *ctx = ptr;
+    bench_world_free(ctx->world);
+    ctx->world = NULL;
+}
+
+static void systemRun5_run(void *ptr) {
+    System5Ctx *ctx = ptr;
+    ecs_run(ctx->world, ctx->system, 0.0f, NULL);
+}
+
+static void run_systemRun5(int n) {
+    System5Ctx ctx = { NULL, 0, n };
+    Benchmark benchmark = { "systemRun5", n, systemRun5_setup, NULL, systemRun5_run, NULL, systemRun5_fini, &ctx };
     bench_run_benchmark(&benchmark);
 }
 const BenchEntry tier1_benchmarks[] = {
@@ -671,7 +661,7 @@ const BenchEntry tier1_benchmarks[] = {
     { "systemRun", run_systemRun },
     { "queryCreate", run_queryCreate },
     { "lookup", run_lookup },
-    { "mixedSimulation", run_mixedSimulation },
+    { "systemRun5", run_systemRun5 },
 };
 
 const int tier1_benchmark_count =

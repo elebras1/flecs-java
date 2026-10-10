@@ -36,10 +36,20 @@ typedef struct {
     int value;
 } Health;
 
+typedef struct {
+    float value;
+} Mass;
+
+typedef struct {
+    int value;
+} Age;
+
 extern ECS_COMPONENT_DECLARE(Position);
 extern ECS_COMPONENT_DECLARE(Velocity);
 extern ECS_TAG_DECLARE(Tag);
 extern ECS_COMPONENT_DECLARE(Health);
+extern ECS_COMPONENT_DECLARE(Mass);
+extern ECS_COMPONENT_DECLARE(Age);
 
 extern _Atomic unsigned long long bench_checksum;
 

@@ -9,6 +9,8 @@ ECS_COMPONENT_DECLARE(Position);
 ECS_COMPONENT_DECLARE(Velocity);
 ECS_TAG_DECLARE(Tag);
 ECS_COMPONENT_DECLARE(Health);
+ECS_COMPONENT_DECLARE(Mass);
+ECS_COMPONENT_DECLARE(Age);
 
 _Atomic unsigned long long bench_checksum = 0;
 
@@ -30,6 +32,8 @@ ecs_world_t *bench_world_new(void) {
     ECS_COMPONENT_DEFINE(world, Velocity);
     ECS_TAG_DEFINE(world, Tag);
     ECS_COMPONENT_DEFINE(world, Health);
+    ECS_COMPONENT_DEFINE(world, Mass);
+    ECS_COMPONENT_DEFINE(world, Age);
     return world;
 }
 
