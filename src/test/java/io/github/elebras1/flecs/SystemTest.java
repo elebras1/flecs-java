@@ -77,6 +77,16 @@ class SystemTest {
     }
 
     @Test
+    void systemQueryNotFreedOnWorldClose() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        FlecsSystem system = this.world.system("SystemQueryOwnership", Position.class)
+                .each(Position.class, p -> {});
+
+        assertEquals(1, system.query().count());
+        system.destruct();
+    }
+
+    @Test
     void runWorker() {
         AtomicInteger runs = new AtomicInteger();
         FlecsSystem system = this.world.system("Worker", Position.class)

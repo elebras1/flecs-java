@@ -18,7 +18,9 @@ public class Query extends QueryBase {
     Query(World world, MemorySegment querySeg) {
         super(world, querySeg);
         this.destructed = false;
-        this.world.trackQuery(this);
+        if (ecs_query_t.entity(querySeg) == 0) {
+            this.world.trackQuery(this);
+        }
     }
 
     private Iter iter() {
