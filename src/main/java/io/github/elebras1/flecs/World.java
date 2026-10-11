@@ -397,8 +397,9 @@ public class World extends WorldBase implements AutoCloseable {
         flecs_h.ecs_remove_all(this.worldSeg, componentId);
     }
 
-    public void removeAll(Entity component) {
-        this.removeAll(component.id());
+    public void removeAll(Id component) {
+        this.checkDestroyed();
+        flecs_h.ecs_remove_all(this.worldSeg, component.id());
     }
 
     public <T> void removeAll(Class<T> componentClass) {
