@@ -87,6 +87,8 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         body.newline();
         appendQueryEachIterMethod(body);
 
+        appendTableMethods(body, true);
+
         body.append("}").newline();
 
         return SourceFile.builder(GENERATED_PACKAGE, "QueryBase")
@@ -134,23 +136,14 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, level + 1, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
         }
-        emitFieldOrBase(body, level + 1, n, vm, "iterSeg");
+        emitFieldBases(body, level + 1, n, "iterSeg");
         appendStatement(body, level + 1, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
         emitEmptyTableGuard(body, level + 1, em, "iterSeg");
         emitSelfFlags(body, level + 1, n, "iterSeg");
         if (scoped) {
             emitCursorSetup(body, level + 1, n);
         }
-        appendLine(body, level + 1, "for (int i = 0; i < count; i++) {");
-        if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, level + 2, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
-        }
-        emitInstanceOrView(body, level + 2, n, vm);
-        emitCallbackAccept(body, level + 2, n, vm, em);
-        if (scoped) {
-            emitCursorAdvance(body, level + 2, n);
-        }
-        appendLine(body, level + 1, "}");
+        emitEachTableCall(body, level + 1, n, vm, em);
         appendLine(body, level, "}");
         if (scoped) {
             appendLine(body, 3, "} finally {");
@@ -184,24 +177,19 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
 
         appendLine(body, level, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
         appendStatement(body, level + 1, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSeg)");
-        emitFieldOrBase(body, level + 1, n, vm, "iterSeg");
+        emitFieldBases(body, level + 1, n, "iterSeg");
         appendStatement(body, level + 1, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
         emitSelfFlags(body, level + 1, n, "iterSeg");
         if (scoped) {
             emitCursorSetup(body, level + 1, n);
         }
-        appendLine(body, level + 1, "for (int i = 0; i < count; i++) {");
-        emitInstanceOrView(body, level + 2, n, vm);
-
-        String args = buildArgs(scoped ? "componentView" : "componentInstance", n);
-        appendLine(body, level + 2, "if (predicate.test(" + args + ")) {");
-        appendStatement(body, level + 3, simpleName(FLECS_H_FQN) + ".ecs_iter_fini(iterSeg)");
-        appendStatement(body, level + 3, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
-        appendLine(body, level + 2, "}");
-        if (scoped) {
-            emitCursorAdvance(body, level + 2, n);
-        }
-
+        List<String> findArgs = new ArrayList<>(tableArgs(n, vm));
+        findArgs.add("count");
+        findArgs.add("predicate");
+        appendStatement(body, level + 1, "int index = " + tableMethodName("find", n, vm, EntityMode.WITHOUT_ENTITY) + "(" + join(findArgs) + ")");
+        appendLine(body, level + 1, "if (index >= 0) {");
+        appendStatement(body, level + 2, simpleName(FLECS_H_FQN) + ".ecs_iter_fini(iterSeg)");
+        appendStatement(body, level + 2, "return entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, index)");
         appendLine(body, level + 1, "}");
         appendLine(body, level, "}");
         if (scoped) {
@@ -240,6 +228,8 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
 
         body.newline();
         appendBuilderEachIterMethod(body, kind);
+
+        appendTableMethods(body, false);
 
         body.append("}").newline();
 
@@ -341,9 +331,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         appendLine(body, 3, "while (" + simpleName(FLECS_H_FQN) + ".ecs_iter_next(iterSeg)) {");
         appendStatement(body, 4, "iter.setIterSeg(iterSeg)");
         appendStatement(body, 4, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSeg)");
-        appendLine(body, 4, "for (int i = 0; i < count; i++) {");
-        appendStatement(body, 5, "callback.accept(iter, i)");
-        appendLine(body, 4, "}");
+        appendStatement(body, 4, "eachIterTable(iter, count, callback)");
         appendLine(body, 3, "}");
         appendLine(body, 2, "}");
         appendLine(body, 1, "}");
@@ -362,9 +350,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         }
         appendStatement(body, bodyIndent, "Iter iter = this.iterFor(iterSegment)");
         appendStatement(body, bodyIndent, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
-        appendLine(body, bodyIndent, "for (int i = 0; i < count; i++) {");
-        appendStatement(body, bodyIndent + 1, "callback.accept(iter, i)");
-        appendLine(body, bodyIndent, "}");
+        appendStatement(body, bodyIndent, "eachIterTable(iter, count, callback)");
         if (runEach) {
             appendLine(body, 3, "}");
         }
@@ -476,16 +462,11 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         }
     }
 
-    private void emitFieldOrBase(CodeBuilder body, int level, int n, ViewMode vm, String iterVar) {
+    private void emitFieldBases(CodeBuilder body, int level, int n, String iterVar) {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
-            if (vm == ViewMode.COMPONENT_VIEW) {
-                appendStatement(body, level, "long base" + comp + " = " + simpleName(FLECS_H_FQN)
-                        + ".ecs_field_w_size(" + iterVar + ", size" + comp + ", (byte) " + i + ").address()");
-            } else {
-                appendStatement(body, level, simpleName(MEMORY_SEGMENT_FQN) + " field" + comp + " = "
-                        + simpleName(FLECS_H_FQN) + ".ecs_field_w_size(" + iterVar + ", size" + comp + ", (byte) " + i + ")");
-            }
+            appendStatement(body, level, "long base" + comp + " = " + simpleName(FLECS_H_FQN)
+                    + ".ecs_field_w_size(" + iterVar + ", size" + comp + ", (byte) " + i + ").address()");
         }
     }
 
@@ -513,30 +494,172 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
         if (em == EntityMode.WITH_ENTITY) {
             appendStatement(body, level, simpleName(MEMORY_SEGMENT_FQN) + " entities = " + simpleName(ECS_ITER_T_FQN) + ".entities(iterSegment)");
         }
-        emitFieldOrBase(body, level, n, vm, "iterSegment");
+        emitFieldBases(body, level, n, "iterSegment");
         appendStatement(body, level, "int count = " + simpleName(ECS_ITER_T_FQN) + ".count(iterSegment)");
         emitEmptyTableGuard(body, level, em, "iterSegment");
         emitSelfFlags(body, level, n, "iterSegment");
         if (vm == ViewMode.COMPONENT_VIEW) {
             emitCursorSetup(body, level, n);
         }
-        appendLine(body, level, "for (int i = 0; i < count; i++) {");
+        emitEachTableCall(body, level, n, vm, em);
+    }
+
+    private void appendTableMethods(CodeBuilder body, boolean withFind) {
+        body.newline();
+        appendEachIterTableMethod(body);
+        for (int n = 1; n <= MAX_COMPONENTS; n++) {
+            for (ViewMode vm : ViewMode.values()) {
+                for (EntityMode em : EntityMode.values()) {
+                    body.newline();
+                    appendEachTableMethod(body, n, vm, em);
+                }
+                if (withFind) {
+                    body.newline();
+                    appendFindTableMethod(body, n, vm);
+                }
+            }
+        }
+    }
+
+    private void appendEachIterTableMethod(CodeBuilder body) {
+        appendLine(body, 1, "private static void eachIterTable(Iter iter, int count, IterWithIndexCallback callback) {");
+        appendLine(body, 2, "for (int i = 0; i < count; i++) {");
+        appendStatement(body, 3, "callback.accept(iter, i)");
+        appendLine(body, 2, "}");
+        appendLine(body, 1, "}");
+    }
+
+    private void appendEachTableMethod(CodeBuilder body, int n, ViewMode vm, EntityMode em) {
+        List<String> params = new ArrayList<>();
         if (em == EntityMode.WITH_ENTITY) {
-            appendStatement(body, level + 1, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+            params.add(simpleName(MEMORY_SEGMENT_FQN) + " entities");
+        } else if (em == EntityMode.WITH_ITER) {
+            params.add("Iter iter");
         }
-        emitInstanceOrView(body, level + 1, n, vm);
-        emitCallbackAccept(body, level + 1, n, vm, em);
+        params.addAll(tableParams(n, vm));
+        params.add("int count");
+        params.add(callbackInterfaceName(n, vm, em) + "<" + join(tableTypeVars(n, vm)) + "> callback");
+
+        appendLine(body, 1, "private static <" + join(tableTypeDecls(n, vm)) + "> void " + tableMethodName("each", n, vm, em) + "(" + join(params) + ") {");
+        emitTableLoopStart(body, n, vm);
+        if (em == EntityMode.WITH_ENTITY) {
+            appendStatement(body, 3, "long entityId = entities.getAtIndex(" + simpleName(VALUE_LAYOUT_FQN) + ".JAVA_LONG, i)");
+        }
+        emitInstanceOrView(body, 3, n, vm);
+        emitCallbackAccept(body, 3, n, vm, em);
         if (vm == ViewMode.COMPONENT_VIEW) {
-            emitCursorAdvance(body, level + 1, n);
+            emitCursorAdvance(body, 3, n);
         }
-        appendLine(body, level, "}");
+        appendLine(body, 2, "}");
+        appendLine(body, 1, "}");
+    }
+
+    private void appendFindTableMethod(CodeBuilder body, int n, ViewMode vm) {
+        List<String> params = new ArrayList<>(tableParams(n, vm));
+        params.add("int count");
+        params.add(predicateInterfaceName(n, vm) + "<" + join(tableTypeVars(n, vm)) + "> predicate");
+
+        appendLine(body, 1, "private static <" + join(tableTypeDecls(n, vm)) + "> int " + tableMethodName("find", n, vm, EntityMode.WITHOUT_ENTITY) + "(" + join(params) + ") {");
+        emitTableLoopStart(body, n, vm);
+        emitInstanceOrView(body, 3, n, vm);
+        String args = buildArgs(vm == ViewMode.COMPONENT_VIEW ? "componentView" : "componentInstance", n);
+        appendLine(body, 3, "if (predicate.test(" + args + ")) {");
+        appendStatement(body, 4, "return i");
+        appendLine(body, 3, "}");
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            emitCursorAdvance(body, 3, n);
+        }
+        appendLine(body, 2, "}");
+        appendStatement(body, 2, "return -1");
+        appendLine(body, 1, "}");
+    }
+
+    private void emitTableLoopStart(CodeBuilder body, int n, ViewMode vm) {
+        if (vm == ViewMode.COMPONENT_VIEW) {
+            for (int i = 0; i < n; i++) {
+                String comp = letter(i);
+                appendStatement(body, 2, "long cursor" + comp + " = base" + comp);
+            }
+        }
+        appendLine(body, 2, "for (int i = 0; i < count; i++) {");
+    }
+
+    private void emitEachTableCall(CodeBuilder body, int level, int n, ViewMode vm, EntityMode em) {
+        List<String> args = new ArrayList<>();
+        if (em == EntityMode.WITH_ENTITY) {
+            args.add("entities");
+        } else if (em == EntityMode.WITH_ITER) {
+            args.add("iter");
+        }
+        args.addAll(tableArgs(n, vm));
+        args.add("count");
+        args.add("callback");
+        appendStatement(body, level, tableMethodName("each", n, vm, em) + "(" + join(args) + ")");
+    }
+
+    private List<String> tableTypeVars(int n, ViewMode vm) {
+        return vm == ViewMode.COMPONENT_VIEW ? viewTypeVars(n) : compTypeVars(n);
+    }
+
+    private List<String> tableTypeDecls(int n, ViewMode vm) {
+        List<String> typeDecls = new ArrayList<>();
+        for (String typeVar : tableTypeVars(n, vm)) {
+            typeDecls.add(vm == ViewMode.COMPONENT_VIEW ? typeVar + " extends " + simpleName(COMPONENT_VIEW_FQN) : typeVar);
+        }
+        return typeDecls;
+    }
+
+    private List<String> tableParams(int n, ViewMode vm) {
+        List<String> params = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            String comp = letter(i);
+            if (vm == ViewMode.COMPONENT_VIEW) {
+                params.add("V" + comp + " componentView" + comp);
+                params.add("boolean isSelf" + comp);
+                params.add("long base" + comp);
+                params.add("long step" + comp);
+            } else {
+                params.add(simpleName(COMPONENT_FQN) + "<" + comp + "> component" + comp);
+                params.add("long base" + comp);
+                params.add("boolean isSelf" + comp);
+                params.add("long size" + comp);
+            }
+        }
+        return params;
+    }
+
+    private List<String> tableArgs(int n, ViewMode vm) {
+        List<String> args = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            String comp = letter(i);
+            if (vm == ViewMode.COMPONENT_VIEW) {
+                args.add("componentView" + comp);
+                args.add("isSelf" + comp);
+                args.add("base" + comp);
+                args.add("step" + comp);
+            } else {
+                args.add("component" + comp);
+                args.add("base" + comp);
+                args.add("isSelf" + comp);
+                args.add("size" + comp);
+            }
+        }
+        return args;
+    }
+
+    private static String tableMethodName(String prefix, int n, ViewMode vm, EntityMode em) {
+        String suffix = switch (em) {
+            case WITHOUT_ENTITY -> "";
+            case WITH_ENTITY -> "WithEntity";
+            case WITH_ITER -> "WithIter";
+        };
+        return prefix + (vm == ViewMode.COMPONENT_VIEW ? "View" : "") + "Table" + n + suffix;
     }
 
     private void emitCursorSetup(CodeBuilder body, int level, int n) {
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             appendStatement(body, level, "long step" + comp + " = isSelf" + comp + " ? size" + comp + " : 0L");
-            appendStatement(body, level, "long cursor" + comp + " = base" + comp);
             appendLine(body, level, "if (!isSelf" + comp + ") {");
             appendStatement(body, level + 1, "componentView" + comp + ".setBaseAddress(base" + comp + ")");
             appendLine(body, level, "}");
@@ -558,7 +681,7 @@ public class IterationBaseGenerator extends AbstractBaseGenerator {
                 appendStatement(body, level + 1, "componentView" + comp + ".setBaseAddress(cursor" + comp + ")");
                 appendLine(body, level, "}");
             } else {
-                appendStatement(body, level, comp + " componentInstance" + comp + " = field" + comp + ".address() == 0 ? null : component" + comp + ".read(field" + comp + ", (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
+                appendStatement(body, level, comp + " componentInstance" + comp + " = base" + comp + " == 0 ? null : component" + comp + ".read(" + simpleName(WORLD_FQN) + ".WHOLE_MEMORY, base" + comp + " + (long) (isSelf" + comp + " ? i : 0) * size" + comp + ")");
             }
         }
     }
