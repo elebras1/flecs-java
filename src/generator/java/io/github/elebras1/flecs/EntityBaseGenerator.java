@@ -99,44 +99,22 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
             return;
         }
 
-        appendLine(body, 2, "if (!" + simpleName(FLECS_H_FQN) + ".ecs_is_deferred(this.world.worldSeg())) {");
-        appendLine(body, 3, "MemorySegment recordSeg = " + simpleName(FLECS_H_FQN) + ".ecs_record_find(this.world.worldSeg(), this.id);");
+        appendLine(body, 2, "if (!" + simpleName(FLECS_H_FQN) + ".ecs_is_stage(this.world.worldSeg())) {");
+        appendLine(body, 3, "MemorySegment recordSeg = " + simpleName(FLECS_H_FQN) + ".flecs_entities_get(this.world.worldSeg(), this.id);");
         appendLine(body, 3, "if (recordSeg.address() != 0) {");
         appendLine(body, 4, "recordSeg = recordSeg.reinterpret(" + simpleName(ECS_RECORD_T_FQN) + ".layout().byteSize());");
         appendLine(body, 4, "MemorySegment tableSeg = " + simpleName(ECS_RECORD_T_FQN) + ".table(recordSeg);");
         appendLine(body, 4, "if (tableSeg.address() != 0) {");
         appendLine(body, 5, "try (Arena arena = Arena.ofConfined()) {");
-        appendLine(body, 6, "MemorySegment diffSeg = " + simpleName(ECS_TABLE_DIFF_T_FQN) + ".allocate(arena);");
-        appendLine(body, 6, "MemorySegment idSlot = arena.allocate(" + simpleName(FLECS_H_FQN) + ".C_LONG);");
-        appendLine(body, 6, "MemorySegment addedBuf = arena.allocate(" + simpleName(FLECS_H_FQN) + ".C_LONG, " + n + ");");
-        appendLine(body, 6, "MemorySegment nextSeg;");
-        appendStatement(body, 6, "int addedCount = 0");
-        body.newline();
-
+        appendLine(body, 6, "MemorySegment idsBuf = arena.allocate(" + simpleName(FLECS_H_FQN) + ".C_LONG, " + n + ");");
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
-            appendStatement(body, 6, "idSlot.set(" + simpleName(FLECS_H_FQN) + ".C_LONG, 0, componentId" + comp + ")");
-            appendStatement(body, 6, "nextSeg = " + simpleName(FLECS_H_FQN)
-                    + ".flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg)");
-            appendStatement(body, 6, "long id" + comp + " = idSlot.get(" + simpleName(FLECS_H_FQN) + ".C_LONG, 0)");
-            appendLine(body, 6, "if (nextSeg.address() != tableSeg.address()) {");
-            appendStatement(body, 7, "addedBuf.setAtIndex(" + simpleName(FLECS_H_FQN) + ".C_LONG, addedCount++, id" + comp + ")");
-            appendLine(body, 6, "} else if ((" + simpleName(ECS_TABLE_DIFF_T_FQN) + ".added_flags(diffSeg) & "
-                    + simpleName(FLECS_H_FQN) + ".EcsTableHasDontFragment()) != 0) {");
-            appendStatement(body, 7, simpleName(FLECS_H_FQN) + ".ecs_add_id(this.world.worldSeg(), this.id, id" + comp + ")");
-            appendStatement(body, 7, "addedBuf.setAtIndex(" + simpleName(FLECS_H_FQN) + ".C_LONG, addedCount++, id" + comp + ")");
-            appendLine(body, 6, "}");
-            appendStatement(body, 6, "tableSeg = nextSeg");
+            appendStatement(body, 6, "idsBuf.setAtIndex(" + simpleName(FLECS_H_FQN) + ".C_LONG, " + i + ", componentId" + comp + ")");
         }
-        body.newline();
-
-        appendLine(body, 6, "if (addedCount > 0) {");
-        appendLine(body, 7, "MemorySegment typeSeg = " + simpleName(ECS_TYPE_T_FQN) + ".allocate(arena);");
-        appendStatement(body, 7, simpleName(ECS_TYPE_T_FQN) + ".array(typeSeg, addedBuf)");
-        appendStatement(body, 7, simpleName(ECS_TYPE_T_FQN) + ".count(typeSeg, addedCount)");
-        appendStatement(body, 7, simpleName(FLECS_H_FQN)
-                + ".ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL)");
-        appendLine(body, 6, "}");
+        appendStatement(body, 6, simpleName(FLECS_H_FQN) + ".flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, " + n + ")");
+        appendStatement(body, 6, "recordSeg = " + simpleName(FLECS_H_FQN) + ".flecs_entities_get(this.world.worldSeg(), this.id)");
+        appendStatement(body, 6, "recordSeg = recordSeg.reinterpret(" + simpleName(ECS_RECORD_T_FQN) + ".layout().byteSize())");
+        appendStatement(body, 6, "tableSeg = " + simpleName(ECS_RECORD_T_FQN) + ".table(recordSeg)");
         body.newline();
 
         for (int i = 0; i < n; i++) {
@@ -149,7 +127,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
                     + ".ecs_get_mut_id(this.world.worldSeg(), this.id, componentId" + comp + ")");
             appendLine(body, 6, "} else {");
             appendStatement(body, 7, "address" + comp + " = " + simpleName(FLECS_H_FQN)
-                    + ".ecs_record_get_by_column(recordSeg, column" + comp + ", 0L).address()");
+                    + ".flecs_entity_get_column(recordSeg, column" + comp + ", 0L).address()");
             appendLine(body, 6, "}");
         }
         body.newline();
@@ -184,7 +162,7 @@ public class EntityBaseGenerator extends AbstractBaseGenerator {
         for (int i = 0; i < n; i++) {
             appendStatement(body, 2, "long address" + letter(i));
         }
-        appendLine(body, 2, "if (" + simpleName(FLECS_H_FQN) + ".ecs_is_deferred(this.world.worldSeg())) {");
+        appendLine(body, 2, "if (" + simpleName(FLECS_H_FQN) + ".ecs_is_stage(this.world.worldSeg())) {");
         for (int i = 0; i < n; i++) {
             String comp = letter(i);
             appendStatement(body, 3, "long size" + comp

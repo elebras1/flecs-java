@@ -23,9 +23,6 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     const char *root_sep;
  *     const char *symbol;
  *     _Bool use_low_id;
- *     const ecs_id_t *add;
- *     const ecs_value_t *set;
- *     const char *add_expr;
  * }
  * }
  */
@@ -45,10 +42,7 @@ public class ecs_entity_desc_t {
         flecs_h.C_POINTER.withName("root_sep"),
         flecs_h.C_POINTER.withName("symbol"),
         flecs_h.C_BOOL.withName("use_low_id"),
-        MemoryLayout.paddingLayout(7),
-        flecs_h.C_POINTER.withName("add"),
-        flecs_h.C_POINTER.withName("set"),
-        flecs_h.C_POINTER.withName("add_expr")
+        MemoryLayout.paddingLayout(7)
     ).withName("ecs_entity_desc_t");
 
     /**
@@ -408,138 +402,6 @@ public class ecs_entity_desc_t {
      */
     public static void use_low_id(MemorySegment struct, boolean fieldValue) {
         struct.set(use_low_id$LAYOUT, use_low_id$OFFSET, fieldValue);
-    }
-
-    private static final AddressLayout add$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("add"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * const ecs_id_t *add
-     * }
-     */
-    public static final AddressLayout add$layout() {
-        return add$LAYOUT;
-    }
-
-    private static final long add$OFFSET = $LAYOUT.byteOffset(groupElement("add"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * const ecs_id_t *add
-     * }
-     */
-    public static final long add$offset() {
-        return add$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * const ecs_id_t *add
-     * }
-     */
-    public static MemorySegment add(MemorySegment struct) {
-        return struct.get(add$LAYOUT, add$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * const ecs_id_t *add
-     * }
-     */
-    public static void add(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(add$LAYOUT, add$OFFSET, fieldValue);
-    }
-
-    private static final AddressLayout set$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("set"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * const ecs_value_t *set
-     * }
-     */
-    public static final AddressLayout set$layout() {
-        return set$LAYOUT;
-    }
-
-    private static final long set$OFFSET = $LAYOUT.byteOffset(groupElement("set"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * const ecs_value_t *set
-     * }
-     */
-    public static final long set$offset() {
-        return set$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * const ecs_value_t *set
-     * }
-     */
-    public static MemorySegment set(MemorySegment struct) {
-        return struct.get(set$LAYOUT, set$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * const ecs_value_t *set
-     * }
-     */
-    public static void set(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(set$LAYOUT, set$OFFSET, fieldValue);
-    }
-
-    private static final AddressLayout add_expr$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("add_expr"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * const char *add_expr
-     * }
-     */
-    public static final AddressLayout add_expr$layout() {
-        return add_expr$LAYOUT;
-    }
-
-    private static final long add_expr$OFFSET = $LAYOUT.byteOffset(groupElement("add_expr"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * const char *add_expr
-     * }
-     */
-    public static final long add_expr$offset() {
-        return add_expr$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * const char *add_expr
-     * }
-     */
-    public static MemorySegment add_expr(MemorySegment struct) {
-        return struct.get(add_expr$LAYOUT, add_expr$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * const char *add_expr
-     * }
-     */
-    public static void add_expr(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(add_expr$LAYOUT, add_expr$OFFSET, fieldValue);
     }
 
     /**

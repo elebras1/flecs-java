@@ -31,60 +31,34 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexB = ComponentMap.getIndex(componentClassB);
         long componentIdB = this.world.componentRegistry().getComponentId(indexB, componentClassB);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 2);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 2);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 2);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -107,7 +81,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
 
         long addressA;
         long addressB;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -140,77 +114,42 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexC = ComponentMap.getIndex(componentClassC);
         long componentIdC = this.world.componentRegistry().getComponentId(indexC, componentClassC);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 3);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 3);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 3);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -237,7 +176,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressA;
         long addressB;
         long addressC;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -280,94 +219,50 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexD = ComponentMap.getIndex(componentClassD);
         long componentIdD = this.world.componentRegistry().getComponentId(indexD, componentClassD);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 4);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 4);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 4);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -398,7 +293,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressB;
         long addressC;
         long addressD;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -451,111 +346,58 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexE = ComponentMap.getIndex(componentClassE);
         long componentIdE = this.world.componentRegistry().getComponentId(indexE, componentClassE);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 5);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 5);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 5);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -590,7 +432,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressC;
         long addressD;
         long addressE;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -653,128 +495,66 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexF = ComponentMap.getIndex(componentClassF);
         long componentIdF = this.world.componentRegistry().getComponentId(indexF, componentClassF);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 6);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 6);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 6);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -813,7 +593,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressD;
         long addressE;
         long addressF;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -886,145 +666,74 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexG = ComponentMap.getIndex(componentClassG);
         long componentIdG = this.world.componentRegistry().getComponentId(indexG, componentClassG);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 7);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 7);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 7);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -1067,7 +776,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressE;
         long addressF;
         long addressG;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -1150,162 +859,82 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexH = ComponentMap.getIndex(componentClassH);
         long componentIdH = this.world.componentRegistry().getComponentId(indexH, componentClassH);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 8);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 8);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 8);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -1352,7 +981,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressF;
         long addressG;
         long addressH;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -1445,179 +1074,90 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexI = ComponentMap.getIndex(componentClassI);
         long componentIdI = this.world.componentRegistry().getComponentId(indexI, componentClassI);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 9);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 9);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 9);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -1668,7 +1208,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressG;
         long addressH;
         long addressI;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -1771,196 +1311,98 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexJ = ComponentMap.getIndex(componentClassJ);
         long componentIdJ = this.world.componentRegistry().getComponentId(indexJ, componentClassJ);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 10);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 10);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 10);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -2015,7 +1457,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressH;
         long addressI;
         long addressJ;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -2128,213 +1570,106 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexK = ComponentMap.getIndex(componentClassK);
         long componentIdK = this.world.componentRegistry().getComponentId(indexK, componentClassK);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 11);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 11);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 11);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -2393,7 +1728,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressI;
         long addressJ;
         long addressK;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -2516,230 +1851,114 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexL = ComponentMap.getIndex(componentClassL);
         long componentIdL = this.world.componentRegistry().getComponentId(indexL, componentClassL);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 12);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 12);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 12);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -2802,7 +2021,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressJ;
         long addressK;
         long addressL;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -2935,247 +2154,122 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexM = ComponentMap.getIndex(componentClassM);
         long componentIdM = this.world.componentRegistry().getComponentId(indexM, componentClassM);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 13);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 13);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 13);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -3242,7 +2336,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressK;
         long addressL;
         long addressM;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -3385,264 +2479,130 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexN = ComponentMap.getIndex(componentClassN);
         long componentIdN = this.world.componentRegistry().getComponentId(indexN, componentClassN);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 14);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 14);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 14);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -3713,7 +2673,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressL;
         long addressM;
         long addressN;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -3866,281 +2826,138 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexO = ComponentMap.getIndex(componentClassO);
         long componentIdO = this.world.componentRegistry().getComponentId(indexO, componentClassO);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 15);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 15);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 15);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -4215,7 +3032,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressM;
         long addressN;
         long addressO;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -4378,298 +3195,146 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexP = ComponentMap.getIndex(componentClassP);
         long componentIdP = this.world.componentRegistry().getComponentId(indexP, componentClassP);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 16);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 16);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 16);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -4748,7 +3413,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressN;
         long addressO;
         long addressP;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -4921,315 +3586,154 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexQ = ComponentMap.getIndex(componentClassQ);
         long componentIdQ = this.world.componentRegistry().getComponentId(indexQ, componentClassQ);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 17);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 17);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 17);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -5312,7 +3816,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressO;
         long addressP;
         long addressQ;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -5495,332 +3999,162 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexR = ComponentMap.getIndex(componentClassR);
         long componentIdR = this.world.componentRegistry().getComponentId(indexR, componentClassR);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 18);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 18);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 18);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -5907,7 +4241,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressP;
         long addressQ;
         long addressR;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -6100,349 +4434,170 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexS = ComponentMap.getIndex(componentClassS);
         long componentIdS = this.world.componentRegistry().getComponentId(indexS, componentClassS);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 19);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 19);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 19);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -6533,7 +4688,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressQ;
         long addressR;
         long addressS;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -6736,366 +4891,178 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexT = ComponentMap.getIndex(componentClassT);
         long componentIdT = this.world.componentRegistry().getComponentId(indexT, componentClassT);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 20);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 20);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 20);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -7190,7 +5157,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressR;
         long addressS;
         long addressT;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -7403,383 +5370,186 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexU = ComponentMap.getIndex(componentClassU);
         long componentIdU = this.world.componentRegistry().getComponentId(indexU, componentClassU);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 21);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 21);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 21);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -7878,7 +5648,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressS;
         long addressT;
         long addressU;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -8101,400 +5871,194 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexV = ComponentMap.getIndex(componentClassV);
         long componentIdV = this.world.componentRegistry().getComponentId(indexV, componentClassV);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 22);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 22);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 22);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -8597,7 +6161,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressT;
         long addressU;
         long addressV;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -8830,417 +6394,202 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexW = ComponentMap.getIndex(componentClassW);
         long componentIdW = this.world.componentRegistry().getComponentId(indexW, componentClassW);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 23);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 23);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 23);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -9347,7 +6696,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressU;
         long addressV;
         long addressW;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -9590,434 +6939,210 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexX = ComponentMap.getIndex(componentClassX);
         long componentIdX = this.world.componentRegistry().getComponentId(indexX, componentClassX);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 24);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 24);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 24);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -10128,7 +7253,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressV;
         long addressW;
         long addressX;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -10381,451 +7506,218 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexY = ComponentMap.getIndex(componentClassY);
         long componentIdY = this.world.componentRegistry().getComponentId(indexY, componentClassY);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 25);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 25);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 25);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -10940,7 +7832,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressW;
         long addressX;
         long addressY;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -11203,468 +8095,226 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexZ = ComponentMap.getIndex(componentClassZ);
         long componentIdZ = this.world.componentRegistry().getComponentId(indexZ, componentClassZ);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 26);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 26);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 26);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -11783,7 +8433,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressX;
         long addressY;
         long addressZ;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -12056,485 +8706,234 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexAA = ComponentMap.getIndex(componentClassAA);
         long componentIdAA = this.world.componentRegistry().getComponentId(indexAA, componentClassAA);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 27);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 27);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 26, componentIdAA);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 27);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
                         int columnAA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAA);
                         long addressAA;
                         if (columnAA == -1) {
                             addressAA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAA);
                         } else {
-                            addressAA = flecs_h.ecs_record_get_by_column(recordSeg, columnAA, 0L).address();
+                            addressAA = flecs_h.flecs_entity_get_column(recordSeg, columnAA, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -12657,7 +9056,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressY;
         long addressZ;
         long addressAA;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -12940,502 +9339,242 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexAB = ComponentMap.getIndex(componentClassAB);
         long componentIdAB = this.world.componentRegistry().getComponentId(indexAB, componentClassAB);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 28);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 28);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 26, componentIdAA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 27, componentIdAB);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 28);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
                         int columnAA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAA);
                         long addressAA;
                         if (columnAA == -1) {
                             addressAA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAA);
                         } else {
-                            addressAA = flecs_h.ecs_record_get_by_column(recordSeg, columnAA, 0L).address();
+                            addressAA = flecs_h.flecs_entity_get_column(recordSeg, columnAA, 0L).address();
                         }
                         int columnAB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAB);
                         long addressAB;
                         if (columnAB == -1) {
                             addressAB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAB);
                         } else {
-                            addressAB = flecs_h.ecs_record_get_by_column(recordSeg, columnAB, 0L).address();
+                            addressAB = flecs_h.flecs_entity_get_column(recordSeg, columnAB, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -13562,7 +9701,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressZ;
         long addressAA;
         long addressAB;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -13855,519 +9994,250 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexAC = ComponentMap.getIndex(componentClassAC);
         long componentIdAC = this.world.componentRegistry().getComponentId(indexAC, componentClassAC);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 29);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 29);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 26, componentIdAA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 27, componentIdAB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 28, componentIdAC);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 29);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
                         int columnAA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAA);
                         long addressAA;
                         if (columnAA == -1) {
                             addressAA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAA);
                         } else {
-                            addressAA = flecs_h.ecs_record_get_by_column(recordSeg, columnAA, 0L).address();
+                            addressAA = flecs_h.flecs_entity_get_column(recordSeg, columnAA, 0L).address();
                         }
                         int columnAB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAB);
                         long addressAB;
                         if (columnAB == -1) {
                             addressAB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAB);
                         } else {
-                            addressAB = flecs_h.ecs_record_get_by_column(recordSeg, columnAB, 0L).address();
+                            addressAB = flecs_h.flecs_entity_get_column(recordSeg, columnAB, 0L).address();
                         }
                         int columnAC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAC);
                         long addressAC;
                         if (columnAC == -1) {
                             addressAC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAC);
                         } else {
-                            addressAC = flecs_h.ecs_record_get_by_column(recordSeg, columnAC, 0L).address();
+                            addressAC = flecs_h.flecs_entity_get_column(recordSeg, columnAC, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -14498,7 +10368,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressAA;
         long addressAB;
         long addressAC;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -14801,536 +10671,258 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexAD = ComponentMap.getIndex(componentClassAD);
         long componentIdAD = this.world.componentRegistry().getComponentId(indexAD, componentClassAD);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 30);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAD);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 30);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 26, componentIdAA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 27, componentIdAB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 28, componentIdAC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 29, componentIdAD);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 30);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
                         int columnAA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAA);
                         long addressAA;
                         if (columnAA == -1) {
                             addressAA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAA);
                         } else {
-                            addressAA = flecs_h.ecs_record_get_by_column(recordSeg, columnAA, 0L).address();
+                            addressAA = flecs_h.flecs_entity_get_column(recordSeg, columnAA, 0L).address();
                         }
                         int columnAB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAB);
                         long addressAB;
                         if (columnAB == -1) {
                             addressAB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAB);
                         } else {
-                            addressAB = flecs_h.ecs_record_get_by_column(recordSeg, columnAB, 0L).address();
+                            addressAB = flecs_h.flecs_entity_get_column(recordSeg, columnAB, 0L).address();
                         }
                         int columnAC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAC);
                         long addressAC;
                         if (columnAC == -1) {
                             addressAC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAC);
                         } else {
-                            addressAC = flecs_h.ecs_record_get_by_column(recordSeg, columnAC, 0L).address();
+                            addressAC = flecs_h.flecs_entity_get_column(recordSeg, columnAC, 0L).address();
                         }
                         int columnAD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAD);
                         long addressAD;
                         if (columnAD == -1) {
                             addressAD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAD);
                         } else {
-                            addressAD = flecs_h.ecs_record_get_by_column(recordSeg, columnAD, 0L).address();
+                            addressAD = flecs_h.flecs_entity_get_column(recordSeg, columnAD, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -15465,7 +11057,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressAB;
         long addressAC;
         long addressAD;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -15778,553 +11370,266 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexAE = ComponentMap.getIndex(componentClassAE);
         long componentIdAE = this.world.componentRegistry().getComponentId(indexAE, componentClassAE);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 31);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAE);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 31);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 26, componentIdAA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 27, componentIdAB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 28, componentIdAC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 29, componentIdAD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 30, componentIdAE);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 31);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
                         int columnAA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAA);
                         long addressAA;
                         if (columnAA == -1) {
                             addressAA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAA);
                         } else {
-                            addressAA = flecs_h.ecs_record_get_by_column(recordSeg, columnAA, 0L).address();
+                            addressAA = flecs_h.flecs_entity_get_column(recordSeg, columnAA, 0L).address();
                         }
                         int columnAB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAB);
                         long addressAB;
                         if (columnAB == -1) {
                             addressAB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAB);
                         } else {
-                            addressAB = flecs_h.ecs_record_get_by_column(recordSeg, columnAB, 0L).address();
+                            addressAB = flecs_h.flecs_entity_get_column(recordSeg, columnAB, 0L).address();
                         }
                         int columnAC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAC);
                         long addressAC;
                         if (columnAC == -1) {
                             addressAC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAC);
                         } else {
-                            addressAC = flecs_h.ecs_record_get_by_column(recordSeg, columnAC, 0L).address();
+                            addressAC = flecs_h.flecs_entity_get_column(recordSeg, columnAC, 0L).address();
                         }
                         int columnAD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAD);
                         long addressAD;
                         if (columnAD == -1) {
                             addressAD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAD);
                         } else {
-                            addressAD = flecs_h.ecs_record_get_by_column(recordSeg, columnAD, 0L).address();
+                            addressAD = flecs_h.flecs_entity_get_column(recordSeg, columnAD, 0L).address();
                         }
                         int columnAE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAE);
                         long addressAE;
                         if (columnAE == -1) {
                             addressAE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAE);
                         } else {
-                            addressAE = flecs_h.ecs_record_get_by_column(recordSeg, columnAE, 0L).address();
+                            addressAE = flecs_h.flecs_entity_get_column(recordSeg, columnAE, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -16463,7 +11768,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressAC;
         long addressAD;
         long addressAE;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();
@@ -16786,570 +12091,274 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         int indexAF = ComponentMap.getIndex(componentClassAF);
         long componentIdAF = this.world.componentRegistry().getComponentId(indexAF, componentClassAF);
 
-        if (!flecs_h.ecs_is_deferred(this.world.worldSeg())) {
-            MemorySegment recordSeg = flecs_h.ecs_record_find(this.world.worldSeg(), this.id);
+        if (!flecs_h.ecs_is_stage(this.world.worldSeg())) {
+            MemorySegment recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
             if (recordSeg.address() != 0) {
                 recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
                 MemorySegment tableSeg = ecs_record_t.table(recordSeg);
                 if (tableSeg.address() != 0) {
                     try (Arena arena = Arena.ofConfined()) {
-                        MemorySegment diffSeg = ecs_table_diff_t.allocate(arena);
-                        MemorySegment idSlot = arena.allocate(flecs_h.C_LONG);
-                        MemorySegment addedBuf = arena.allocate(flecs_h.C_LONG, 32);
-                        MemorySegment nextSeg;
-                        int addedCount = 0;
-
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idF);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdG);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idG = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idG);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idG);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdH);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idH = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idH);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idH);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdI);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idI = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idI);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idI);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdJ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idJ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idJ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idJ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdK);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idK = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idK);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idK);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdL);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idL = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idL);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idL);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdM);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idM = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idM);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idM);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdN);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idN = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idN);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idN);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdO);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idO = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idO);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idO);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdP);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idP = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idP);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idP);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdQ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idQ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idQ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idQ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdR);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idR = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idR);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idR);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdS);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idS = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idS);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idS);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdT);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idT = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idT);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idT);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdU);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idU = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idU);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idU);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdV);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idV = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idV);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idV);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdW);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idW = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idW);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idW);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdX);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idX = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idX);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idX);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdY);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idY = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idY);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idY);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdZ);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idZ = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idZ);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idZ);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAA);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAA = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAA);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAA);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAB);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAB = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAB);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAB);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAC);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAC = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAC);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAC);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAD);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAD = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAD);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAD);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAD);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAE);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAE = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAE);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAE);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAE);
-                        }
-                        tableSeg = nextSeg;
-                        idSlot.set(flecs_h.C_LONG, 0, componentIdAF);
-                        nextSeg = flecs_h.flecs_table_traverse_add(this.world.worldSeg(), tableSeg, idSlot, diffSeg);
-                        long idAF = idSlot.get(flecs_h.C_LONG, 0);
-                        if (nextSeg.address() != tableSeg.address()) {
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAF);
-                        } else if ((ecs_table_diff_t.added_flags(diffSeg) & flecs_h.EcsTableHasDontFragment()) != 0) {
-                            flecs_h.ecs_add_id(this.world.worldSeg(), this.id, idAF);
-                            addedBuf.setAtIndex(flecs_h.C_LONG, addedCount++, idAF);
-                        }
-                        tableSeg = nextSeg;
-
-                        if (addedCount > 0) {
-                            MemorySegment typeSeg = ecs_type_t.allocate(arena);
-                            ecs_type_t.array(typeSeg, addedBuf);
-                            ecs_type_t.count(typeSeg, addedCount);
-                            flecs_h.ecs_commit(this.world.worldSeg(), this.id, recordSeg, tableSeg, typeSeg, MemorySegment.NULL);
-                        }
+                        MemorySegment idsBuf = arena.allocate(flecs_h.C_LONG, 32);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 0, componentIdA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 1, componentIdB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 2, componentIdC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 3, componentIdD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 4, componentIdE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 5, componentIdF);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 6, componentIdG);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 7, componentIdH);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 8, componentIdI);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 9, componentIdJ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 10, componentIdK);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 11, componentIdL);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 12, componentIdM);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 13, componentIdN);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 14, componentIdO);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 15, componentIdP);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 16, componentIdQ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 17, componentIdR);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 18, componentIdS);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 19, componentIdT);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 20, componentIdU);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 21, componentIdV);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 22, componentIdW);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 23, componentIdX);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 24, componentIdY);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 25, componentIdZ);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 26, componentIdAA);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 27, componentIdAB);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 28, componentIdAC);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 29, componentIdAD);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 30, componentIdAE);
+                        idsBuf.setAtIndex(flecs_h.C_LONG, 31, componentIdAF);
+                        flecs_h.flecs_add_ids(this.world.worldSeg(), this.id, idsBuf, 32);
+                        recordSeg = flecs_h.flecs_entities_get(this.world.worldSeg(), this.id);
+                        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+                        tableSeg = ecs_record_t.table(recordSeg);
 
                         int columnA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdA);
                         long addressA;
                         if (columnA == -1) {
                             addressA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdA);
                         } else {
-                            addressA = flecs_h.ecs_record_get_by_column(recordSeg, columnA, 0L).address();
+                            addressA = flecs_h.flecs_entity_get_column(recordSeg, columnA, 0L).address();
                         }
                         int columnB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdB);
                         long addressB;
                         if (columnB == -1) {
                             addressB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdB);
                         } else {
-                            addressB = flecs_h.ecs_record_get_by_column(recordSeg, columnB, 0L).address();
+                            addressB = flecs_h.flecs_entity_get_column(recordSeg, columnB, 0L).address();
                         }
                         int columnC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdC);
                         long addressC;
                         if (columnC == -1) {
                             addressC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdC);
                         } else {
-                            addressC = flecs_h.ecs_record_get_by_column(recordSeg, columnC, 0L).address();
+                            addressC = flecs_h.flecs_entity_get_column(recordSeg, columnC, 0L).address();
                         }
                         int columnD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdD);
                         long addressD;
                         if (columnD == -1) {
                             addressD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdD);
                         } else {
-                            addressD = flecs_h.ecs_record_get_by_column(recordSeg, columnD, 0L).address();
+                            addressD = flecs_h.flecs_entity_get_column(recordSeg, columnD, 0L).address();
                         }
                         int columnE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdE);
                         long addressE;
                         if (columnE == -1) {
                             addressE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdE);
                         } else {
-                            addressE = flecs_h.ecs_record_get_by_column(recordSeg, columnE, 0L).address();
+                            addressE = flecs_h.flecs_entity_get_column(recordSeg, columnE, 0L).address();
                         }
                         int columnF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdF);
                         long addressF;
                         if (columnF == -1) {
                             addressF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdF);
                         } else {
-                            addressF = flecs_h.ecs_record_get_by_column(recordSeg, columnF, 0L).address();
+                            addressF = flecs_h.flecs_entity_get_column(recordSeg, columnF, 0L).address();
                         }
                         int columnG = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdG);
                         long addressG;
                         if (columnG == -1) {
                             addressG = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdG);
                         } else {
-                            addressG = flecs_h.ecs_record_get_by_column(recordSeg, columnG, 0L).address();
+                            addressG = flecs_h.flecs_entity_get_column(recordSeg, columnG, 0L).address();
                         }
                         int columnH = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdH);
                         long addressH;
                         if (columnH == -1) {
                             addressH = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdH);
                         } else {
-                            addressH = flecs_h.ecs_record_get_by_column(recordSeg, columnH, 0L).address();
+                            addressH = flecs_h.flecs_entity_get_column(recordSeg, columnH, 0L).address();
                         }
                         int columnI = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdI);
                         long addressI;
                         if (columnI == -1) {
                             addressI = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdI);
                         } else {
-                            addressI = flecs_h.ecs_record_get_by_column(recordSeg, columnI, 0L).address();
+                            addressI = flecs_h.flecs_entity_get_column(recordSeg, columnI, 0L).address();
                         }
                         int columnJ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdJ);
                         long addressJ;
                         if (columnJ == -1) {
                             addressJ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdJ);
                         } else {
-                            addressJ = flecs_h.ecs_record_get_by_column(recordSeg, columnJ, 0L).address();
+                            addressJ = flecs_h.flecs_entity_get_column(recordSeg, columnJ, 0L).address();
                         }
                         int columnK = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdK);
                         long addressK;
                         if (columnK == -1) {
                             addressK = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdK);
                         } else {
-                            addressK = flecs_h.ecs_record_get_by_column(recordSeg, columnK, 0L).address();
+                            addressK = flecs_h.flecs_entity_get_column(recordSeg, columnK, 0L).address();
                         }
                         int columnL = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdL);
                         long addressL;
                         if (columnL == -1) {
                             addressL = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdL);
                         } else {
-                            addressL = flecs_h.ecs_record_get_by_column(recordSeg, columnL, 0L).address();
+                            addressL = flecs_h.flecs_entity_get_column(recordSeg, columnL, 0L).address();
                         }
                         int columnM = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdM);
                         long addressM;
                         if (columnM == -1) {
                             addressM = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdM);
                         } else {
-                            addressM = flecs_h.ecs_record_get_by_column(recordSeg, columnM, 0L).address();
+                            addressM = flecs_h.flecs_entity_get_column(recordSeg, columnM, 0L).address();
                         }
                         int columnN = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdN);
                         long addressN;
                         if (columnN == -1) {
                             addressN = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdN);
                         } else {
-                            addressN = flecs_h.ecs_record_get_by_column(recordSeg, columnN, 0L).address();
+                            addressN = flecs_h.flecs_entity_get_column(recordSeg, columnN, 0L).address();
                         }
                         int columnO = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdO);
                         long addressO;
                         if (columnO == -1) {
                             addressO = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdO);
                         } else {
-                            addressO = flecs_h.ecs_record_get_by_column(recordSeg, columnO, 0L).address();
+                            addressO = flecs_h.flecs_entity_get_column(recordSeg, columnO, 0L).address();
                         }
                         int columnP = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdP);
                         long addressP;
                         if (columnP == -1) {
                             addressP = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdP);
                         } else {
-                            addressP = flecs_h.ecs_record_get_by_column(recordSeg, columnP, 0L).address();
+                            addressP = flecs_h.flecs_entity_get_column(recordSeg, columnP, 0L).address();
                         }
                         int columnQ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdQ);
                         long addressQ;
                         if (columnQ == -1) {
                             addressQ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdQ);
                         } else {
-                            addressQ = flecs_h.ecs_record_get_by_column(recordSeg, columnQ, 0L).address();
+                            addressQ = flecs_h.flecs_entity_get_column(recordSeg, columnQ, 0L).address();
                         }
                         int columnR = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdR);
                         long addressR;
                         if (columnR == -1) {
                             addressR = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdR);
                         } else {
-                            addressR = flecs_h.ecs_record_get_by_column(recordSeg, columnR, 0L).address();
+                            addressR = flecs_h.flecs_entity_get_column(recordSeg, columnR, 0L).address();
                         }
                         int columnS = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdS);
                         long addressS;
                         if (columnS == -1) {
                             addressS = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdS);
                         } else {
-                            addressS = flecs_h.ecs_record_get_by_column(recordSeg, columnS, 0L).address();
+                            addressS = flecs_h.flecs_entity_get_column(recordSeg, columnS, 0L).address();
                         }
                         int columnT = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdT);
                         long addressT;
                         if (columnT == -1) {
                             addressT = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdT);
                         } else {
-                            addressT = flecs_h.ecs_record_get_by_column(recordSeg, columnT, 0L).address();
+                            addressT = flecs_h.flecs_entity_get_column(recordSeg, columnT, 0L).address();
                         }
                         int columnU = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdU);
                         long addressU;
                         if (columnU == -1) {
                             addressU = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdU);
                         } else {
-                            addressU = flecs_h.ecs_record_get_by_column(recordSeg, columnU, 0L).address();
+                            addressU = flecs_h.flecs_entity_get_column(recordSeg, columnU, 0L).address();
                         }
                         int columnV = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdV);
                         long addressV;
                         if (columnV == -1) {
                             addressV = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdV);
                         } else {
-                            addressV = flecs_h.ecs_record_get_by_column(recordSeg, columnV, 0L).address();
+                            addressV = flecs_h.flecs_entity_get_column(recordSeg, columnV, 0L).address();
                         }
                         int columnW = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdW);
                         long addressW;
                         if (columnW == -1) {
                             addressW = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdW);
                         } else {
-                            addressW = flecs_h.ecs_record_get_by_column(recordSeg, columnW, 0L).address();
+                            addressW = flecs_h.flecs_entity_get_column(recordSeg, columnW, 0L).address();
                         }
                         int columnX = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdX);
                         long addressX;
                         if (columnX == -1) {
                             addressX = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdX);
                         } else {
-                            addressX = flecs_h.ecs_record_get_by_column(recordSeg, columnX, 0L).address();
+                            addressX = flecs_h.flecs_entity_get_column(recordSeg, columnX, 0L).address();
                         }
                         int columnY = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdY);
                         long addressY;
                         if (columnY == -1) {
                             addressY = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdY);
                         } else {
-                            addressY = flecs_h.ecs_record_get_by_column(recordSeg, columnY, 0L).address();
+                            addressY = flecs_h.flecs_entity_get_column(recordSeg, columnY, 0L).address();
                         }
                         int columnZ = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdZ);
                         long addressZ;
                         if (columnZ == -1) {
                             addressZ = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdZ);
                         } else {
-                            addressZ = flecs_h.ecs_record_get_by_column(recordSeg, columnZ, 0L).address();
+                            addressZ = flecs_h.flecs_entity_get_column(recordSeg, columnZ, 0L).address();
                         }
                         int columnAA = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAA);
                         long addressAA;
                         if (columnAA == -1) {
                             addressAA = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAA);
                         } else {
-                            addressAA = flecs_h.ecs_record_get_by_column(recordSeg, columnAA, 0L).address();
+                            addressAA = flecs_h.flecs_entity_get_column(recordSeg, columnAA, 0L).address();
                         }
                         int columnAB = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAB);
                         long addressAB;
                         if (columnAB == -1) {
                             addressAB = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAB);
                         } else {
-                            addressAB = flecs_h.ecs_record_get_by_column(recordSeg, columnAB, 0L).address();
+                            addressAB = flecs_h.flecs_entity_get_column(recordSeg, columnAB, 0L).address();
                         }
                         int columnAC = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAC);
                         long addressAC;
                         if (columnAC == -1) {
                             addressAC = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAC);
                         } else {
-                            addressAC = flecs_h.ecs_record_get_by_column(recordSeg, columnAC, 0L).address();
+                            addressAC = flecs_h.flecs_entity_get_column(recordSeg, columnAC, 0L).address();
                         }
                         int columnAD = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAD);
                         long addressAD;
                         if (columnAD == -1) {
                             addressAD = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAD);
                         } else {
-                            addressAD = flecs_h.ecs_record_get_by_column(recordSeg, columnAD, 0L).address();
+                            addressAD = flecs_h.flecs_entity_get_column(recordSeg, columnAD, 0L).address();
                         }
                         int columnAE = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAE);
                         long addressAE;
                         if (columnAE == -1) {
                             addressAE = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAE);
                         } else {
-                            addressAE = flecs_h.ecs_record_get_by_column(recordSeg, columnAE, 0L).address();
+                            addressAE = flecs_h.flecs_entity_get_column(recordSeg, columnAE, 0L).address();
                         }
                         int columnAF = flecs_h.ecs_table_get_column_index(this.world.worldSeg(), tableSeg, componentIdAF);
                         long addressAF;
                         if (columnAF == -1) {
                             addressAF = flecs_h.ecs_get_mut_id(this.world.worldSeg(), this.id, componentIdAF);
                         } else {
-                            addressAF = flecs_h.ecs_record_get_by_column(recordSeg, columnAF, 0L).address();
+                            addressAF = flecs_h.flecs_entity_get_column(recordSeg, columnAF, 0L).address();
                         }
 
                         flecs_h.ecs_table_lock(this.world.worldSeg(), tableSeg);
@@ -17492,7 +12501,7 @@ public abstract class EntityBase<T extends EntityBase<T>> extends Id {
         long addressAD;
         long addressAE;
         long addressAF;
-        if (flecs_h.ecs_is_deferred(this.world.worldSeg())) {
+        if (flecs_h.ecs_is_stage(this.world.worldSeg())) {
             long sizeA = this.world.componentRegistry().getComponent(indexA, componentClassA).size();
             addressA = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentIdA, sizeA).address();
             long sizeB = this.world.componentRegistry().getComponent(indexB, componentClassB).size();

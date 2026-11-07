@@ -17,6 +17,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * struct ecs_script_parameter_t {
  *     const char *name;
  *     ecs_entity_t type;
+ *     _Bool optional;
+ *     const char *brief;
  * }
  * }
  */
@@ -28,7 +30,10 @@ public class ecs_script_parameter_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_POINTER.withName("name"),
-        flecs_h.C_LONG.withName("type")
+        flecs_h.C_LONG.withName("type"),
+        flecs_h.C_BOOL.withName("optional"),
+        MemoryLayout.paddingLayout(7),
+        flecs_h.C_POINTER.withName("brief")
     ).withName("ecs_script_parameter_t");
 
     /**
@@ -124,6 +129,94 @@ public class ecs_script_parameter_t {
      */
     public static void type(MemorySegment struct, long fieldValue) {
         struct.set(type$LAYOUT, type$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean optional$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("optional"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool optional
+     * }
+     */
+    public static final OfBoolean optional$layout() {
+        return optional$LAYOUT;
+    }
+
+    private static final long optional$OFFSET = $LAYOUT.byteOffset(groupElement("optional"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool optional
+     * }
+     */
+    public static final long optional$offset() {
+        return optional$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool optional
+     * }
+     */
+    public static boolean optional(MemorySegment struct) {
+        return struct.get(optional$LAYOUT, optional$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool optional
+     * }
+     */
+    public static void optional(MemorySegment struct, boolean fieldValue) {
+        struct.set(optional$LAYOUT, optional$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout brief$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("brief"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *brief
+     * }
+     */
+    public static final AddressLayout brief$layout() {
+        return brief$LAYOUT;
+    }
+
+    private static final long brief$OFFSET = $LAYOUT.byteOffset(groupElement("brief"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *brief
+     * }
+     */
+    public static final long brief$offset() {
+        return brief$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const char *brief
+     * }
+     */
+    public static MemorySegment brief(MemorySegment struct) {
+        return struct.get(brief$LAYOUT, brief$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const char *brief
+     * }
+     */
+    public static void brief(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(brief$LAYOUT, brief$OFFSET, fieldValue);
     }
 
     /**

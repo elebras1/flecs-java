@@ -17,8 +17,6 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * struct ecs_table_cache_hdr_t {
  *     struct ecs_component_record_t *cr;
  *     ecs_table_t *table;
- *     struct ecs_table_cache_hdr_t *prev;
- *     struct ecs_table_cache_hdr_t *next;
  * }
  * }
  */
@@ -30,9 +28,7 @@ public class ecs_table_cache_hdr_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_POINTER.withName("cr"),
-        flecs_h.C_POINTER.withName("table"),
-        flecs_h.C_POINTER.withName("prev"),
-        flecs_h.C_POINTER.withName("next")
+        flecs_h.C_POINTER.withName("table")
     ).withName("ecs_table_cache_hdr_t");
 
     /**
@@ -128,94 +124,6 @@ public class ecs_table_cache_hdr_t {
      */
     public static void table(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(table$LAYOUT, table$OFFSET, fieldValue);
-    }
-
-    private static final AddressLayout prev$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("prev"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *prev
-     * }
-     */
-    public static final AddressLayout prev$layout() {
-        return prev$LAYOUT;
-    }
-
-    private static final long prev$OFFSET = $LAYOUT.byteOffset(groupElement("prev"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *prev
-     * }
-     */
-    public static final long prev$offset() {
-        return prev$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *prev
-     * }
-     */
-    public static MemorySegment prev(MemorySegment struct) {
-        return struct.get(prev$LAYOUT, prev$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *prev
-     * }
-     */
-    public static void prev(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(prev$LAYOUT, prev$OFFSET, fieldValue);
-    }
-
-    private static final AddressLayout next$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("next"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *next
-     * }
-     */
-    public static final AddressLayout next$layout() {
-        return next$LAYOUT;
-    }
-
-    private static final long next$OFFSET = $LAYOUT.byteOffset(groupElement("next"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *next
-     * }
-     */
-    public static final long next$offset() {
-        return next$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *next
-     * }
-     */
-    public static MemorySegment next(MemorySegment struct) {
-        return struct.get(next$LAYOUT, next$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * struct ecs_table_cache_hdr_t *next
-     * }
-     */
-    public static void next(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(next$LAYOUT, next$OFFSET, fieldValue);
     }
 
     /**

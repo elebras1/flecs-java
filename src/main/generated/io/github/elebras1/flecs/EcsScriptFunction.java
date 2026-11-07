@@ -18,6 +18,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_entity_t return_type;
  *     ecs_vec_t params;
  *     ecs_function_callback_t callback;
+ *     ecs_async_function_callback_t async_callback;
+ *     ecs_async_function_cancel_t async_cancel;
  *     ecs_vector_function_callback_t vector_callbacks[18];
  *     void *ctx;
  *     void *binding_ctx;

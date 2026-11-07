@@ -6,8 +6,8 @@ import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Position;
 
 /**
- * Demonstrates enqueuing a custom event while the world is in deferred mode.
- * The observer is invoked when the command queue is flushed.
+ * Demonstrates enqueuing a custom event on a stage. The observer is invoked
+ * when the stage is merged.
  */
 public class EnqueueEvent {
 
@@ -27,11 +27,16 @@ public class EnqueueEvent {
             Entity e = world.obtainEntity(world.entity("e"))
                     .set(new Position(10, 20));
 
-            // Enqueuing an event while deferred places it in the command queue.
-            world.deferBegin();
+            // Enqueuing an event on a stage places it in that stage's command queue.
+            World stage = world.getStage(0);
+            stage.event(myEvent)
+                    .id(Position.class)
+                    .entity(e)
+                    .enqueue();
             System.out.println("Event enqueued!");
-            e.enqueue(myEvent, Position.class);
-            world.deferEnd();
+
+            // Flushes the queue and invokes the observer.
+            stage.merge();
 
         }
     }

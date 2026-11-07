@@ -33,7 +33,7 @@ java {
     withJavadocJar()
 }
 
-val flecsVersion = "4.1.6"
+val flecsVersion = "4.2.0"
 val flecsDir = layout.buildDirectory.dir("flecs").get().asFile
 val flecsSourceDir = File(flecsDir, "flecs-$flecsVersion")
 
@@ -215,6 +215,7 @@ val applyCriticalDowncalls by tasks.registering(JavaExec::class) {
     description = "Apply the reviewed binding rules of ApplyCriticalDowncalls (critical downcalls, pointer results as long)"
     group = "flecs"
 
+    dependsOn(generateFlecsBindings)
     classpath = sourceSets["generator"].runtimeClasspath
     mainClass.set("io.github.elebras1.flecs.ApplyCriticalDowncalls")
     args(generatedSourcesDir.absolutePath)
@@ -227,10 +228,6 @@ val generateBindings by tasks.registering {
     group = "flecs"
 
     dependsOn(generateFlecsBindings, applyCriticalDowncalls)
-}
-
-tasks.named("applyCriticalDowncalls") {
-    mustRunAfter(generateFlecsBindings)
 }
 
 val validateGeneratedBindings by tasks.registering {
@@ -259,8 +256,6 @@ val generateBase by tasks.registering(JavaExec::class) {
 sourceSets {
     create("generator") {
         java.srcDir(generatorSourcesDir)
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
     }
     main {
         java {
@@ -293,15 +288,29 @@ val compileProcessor by tasks.registering(JavaCompile::class) {
     options.release.set(25)
 }
 
+sourceSets["generator"].apply {
+    compileClasspath += files(compileProcessor)
+    runtimeClasspath += files(compileProcessor)
+}
+
 val copyProcessorResources by tasks.registering(Copy::class) {
+    dependsOn(compileProcessor)
     from("src/main/resources/META-INF/services") {
         include("javax.annotation.processing.Processor")
     }
     into(layout.buildDirectory.dir("classes/java/processor/META-INF/services"))
 }
 
+tasks.named("compileGeneratorJava") {
+    mustRunAfter(copyProcessorResources)
+}
+
 tasks.compileJava {
     dependsOn(validateGeneratedBindings, copyProcessorResources, compileProcessor)
+
+    // Generated sources are committed, so don't force generation on every build.
+    // When generation is in the task graph, patch the sources before compiling them.
+    mustRunAfter(generateFlecsBindings, applyCriticalDowncalls, generateBase)
 
     exclude("**/processor/**")
     exclude("**/annotation/**")

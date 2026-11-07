@@ -17,7 +17,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * struct {
  *     ecs_map_iter_t it;
  *     ecs_hm_bucket_t *bucket;
- *     int32_t index;
+ *     const ecs_hashmap_t *map;
  * }
  * }
  */
@@ -30,9 +30,8 @@ public class flecs_hashmap_iter_t {
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         ecs_map_iter_t.layout().withName("it"),
         flecs_h.C_POINTER.withName("bucket"),
-        flecs_h.C_INT.withName("index"),
-        MemoryLayout.paddingLayout(4)
-    ).withName("$anon$5289:9");
+        flecs_h.C_POINTER.withName("map")
+    ).withName("$anon$5528:9");
 
     /**
      * The layout of this struct
@@ -129,48 +128,48 @@ public class flecs_hashmap_iter_t {
         struct.set(bucket$LAYOUT, bucket$OFFSET, fieldValue);
     }
 
-    private static final OfInt index$LAYOUT = (OfInt)$LAYOUT.select(groupElement("index"));
+    private static final AddressLayout map$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("map"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * int32_t index
+     * const ecs_hashmap_t *map
      * }
      */
-    public static final OfInt index$layout() {
-        return index$LAYOUT;
+    public static final AddressLayout map$layout() {
+        return map$LAYOUT;
     }
 
-    private static final long index$OFFSET = $LAYOUT.byteOffset(groupElement("index"));
+    private static final long map$OFFSET = $LAYOUT.byteOffset(groupElement("map"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * int32_t index
+     * const ecs_hashmap_t *map
      * }
      */
-    public static final long index$offset() {
-        return index$OFFSET;
+    public static final long map$offset() {
+        return map$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * int32_t index
+     * const ecs_hashmap_t *map
      * }
      */
-    public static int index(MemorySegment struct) {
-        return struct.get(index$LAYOUT, index$OFFSET);
+    public static MemorySegment map(MemorySegment struct) {
+        return struct.get(map$LAYOUT, map$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * int32_t index
+     * const ecs_hashmap_t *map
      * }
      */
-    public static void index(MemorySegment struct, int fieldValue) {
-        struct.set(index$LAYOUT, index$OFFSET, fieldValue);
+    public static void map(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(map$LAYOUT, map$OFFSET, fieldValue);
     }
 
     /**

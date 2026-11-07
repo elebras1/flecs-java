@@ -20,6 +20,12 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     char *error;
  *     ecs_script_t *script;
  *     ecs_script_template_t *template_;
+ *     ecs_vec_t observers;
+ *     ecs_vec_t dyn_observers;
+ *     _Bool skip_unknown;
+ *     _Bool ir;
+ *     char *saved_code;
+ *     ecs_vec_t undo;
  * }
  * }
  */
@@ -34,7 +40,14 @@ public class EcsScript {
         flecs_h.C_POINTER.withName("code"),
         flecs_h.C_POINTER.withName("error"),
         flecs_h.C_POINTER.withName("script"),
-        flecs_h.C_POINTER.withName("template_")
+        flecs_h.C_POINTER.withName("template_"),
+        ecs_vec_t.layout().withName("observers"),
+        ecs_vec_t.layout().withName("dyn_observers"),
+        flecs_h.C_BOOL.withName("skip_unknown"),
+        flecs_h.C_BOOL.withName("ir"),
+        MemoryLayout.paddingLayout(6),
+        flecs_h.C_POINTER.withName("saved_code"),
+        ecs_vec_t.layout().withName("undo")
     ).withName("EcsScript");
 
     /**
@@ -262,6 +275,270 @@ public class EcsScript {
      */
     public static void template_(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(template_$LAYOUT, template_$OFFSET, fieldValue);
+    }
+
+    private static final GroupLayout observers$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("observers"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_vec_t observers
+     * }
+     */
+    public static final GroupLayout observers$layout() {
+        return observers$LAYOUT;
+    }
+
+    private static final long observers$OFFSET = $LAYOUT.byteOffset(groupElement("observers"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_vec_t observers
+     * }
+     */
+    public static final long observers$offset() {
+        return observers$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t observers
+     * }
+     */
+    public static MemorySegment observers(MemorySegment struct) {
+        return struct.asSlice(observers$OFFSET, observers$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t observers
+     * }
+     */
+    public static void observers(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, observers$OFFSET, observers$LAYOUT.byteSize());
+    }
+
+    private static final GroupLayout dyn_observers$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("dyn_observers"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_vec_t dyn_observers
+     * }
+     */
+    public static final GroupLayout dyn_observers$layout() {
+        return dyn_observers$LAYOUT;
+    }
+
+    private static final long dyn_observers$OFFSET = $LAYOUT.byteOffset(groupElement("dyn_observers"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_vec_t dyn_observers
+     * }
+     */
+    public static final long dyn_observers$offset() {
+        return dyn_observers$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t dyn_observers
+     * }
+     */
+    public static MemorySegment dyn_observers(MemorySegment struct) {
+        return struct.asSlice(dyn_observers$OFFSET, dyn_observers$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t dyn_observers
+     * }
+     */
+    public static void dyn_observers(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, dyn_observers$OFFSET, dyn_observers$LAYOUT.byteSize());
+    }
+
+    private static final OfBoolean skip_unknown$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("skip_unknown"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static final OfBoolean skip_unknown$layout() {
+        return skip_unknown$LAYOUT;
+    }
+
+    private static final long skip_unknown$OFFSET = $LAYOUT.byteOffset(groupElement("skip_unknown"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static final long skip_unknown$offset() {
+        return skip_unknown$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static boolean skip_unknown(MemorySegment struct) {
+        return struct.get(skip_unknown$LAYOUT, skip_unknown$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static void skip_unknown(MemorySegment struct, boolean fieldValue) {
+        struct.set(skip_unknown$LAYOUT, skip_unknown$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean ir$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("ir"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static final OfBoolean ir$layout() {
+        return ir$LAYOUT;
+    }
+
+    private static final long ir$OFFSET = $LAYOUT.byteOffset(groupElement("ir"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static final long ir$offset() {
+        return ir$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static boolean ir(MemorySegment struct) {
+        return struct.get(ir$LAYOUT, ir$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static void ir(MemorySegment struct, boolean fieldValue) {
+        struct.set(ir$LAYOUT, ir$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout saved_code$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("saved_code"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * char *saved_code
+     * }
+     */
+    public static final AddressLayout saved_code$layout() {
+        return saved_code$LAYOUT;
+    }
+
+    private static final long saved_code$OFFSET = $LAYOUT.byteOffset(groupElement("saved_code"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * char *saved_code
+     * }
+     */
+    public static final long saved_code$offset() {
+        return saved_code$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * char *saved_code
+     * }
+     */
+    public static MemorySegment saved_code(MemorySegment struct) {
+        return struct.get(saved_code$LAYOUT, saved_code$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * char *saved_code
+     * }
+     */
+    public static void saved_code(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(saved_code$LAYOUT, saved_code$OFFSET, fieldValue);
+    }
+
+    private static final GroupLayout undo$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("undo"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_vec_t undo
+     * }
+     */
+    public static final GroupLayout undo$layout() {
+        return undo$LAYOUT;
+    }
+
+    private static final long undo$OFFSET = $LAYOUT.byteOffset(groupElement("undo"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_vec_t undo
+     * }
+     */
+    public static final long undo$offset() {
+        return undo$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t undo
+     * }
+     */
+    public static MemorySegment undo(MemorySegment struct) {
+        return struct.asSlice(undo$OFFSET, undo$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_vec_t undo
+     * }
+     */
+    public static void undo(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, undo$OFFSET, undo$LAYOUT.byteSize());
     }
 
     /**

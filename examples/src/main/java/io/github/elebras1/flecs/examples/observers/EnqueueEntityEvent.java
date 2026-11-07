@@ -7,8 +7,7 @@ import io.github.elebras1.flecs.examples.components.Resize;
 
 /**
  * Demonstrates per-entity event observers and enqueuing events on an entity.
- * Events enqueued while the world is deferred are processed when the queue is
- * flushed.
+ * Events enqueued on a stage are processed when the stage is merged.
  */
 public class EnqueueEntityEvent {
 
@@ -29,16 +28,19 @@ public class EnqueueEntityEvent {
             widget.observe(Resize.class, resize ->
                     System.out.println("resized to {" + resize.width() + ", " + resize.height() + "}!"));
 
-            // Enqueue events while deferred.
-            world.deferBegin();
+            // Enqueue events on a stage.
+            World stage = world.getStage(0);
+            Entity stageWidget = stage.obtainEntity(widget.id());
 
-            widget.enqueue(clickId);
+            stageWidget.enqueue(clickId);
 
             // For a payload event, enqueue the payload with the event.
-            widget.enqueue(Resize.class, new Resize(100, 200));
+            stageWidget.enqueue(Resize.class, new Resize(100, 200));
 
             System.out.println("Events enqueued!");
-            world.deferEnd();
+
+            // Flushes the queue and invokes the observers.
+            stage.merge();
 
         }
     }

@@ -29,7 +29,7 @@ public class ecs_http_key_value_t {
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_POINTER.withName("key"),
         flecs_h.C_POINTER.withName("value")
-    ).withName("$anon$13487:9");
+    ).withName("$anon$13361:9");
 
     /**
      * The layout of this struct

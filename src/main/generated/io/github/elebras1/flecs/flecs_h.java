@@ -17,6 +17,1062 @@ public class flecs_h extends flecs_h_1 {
     flecs_h() {
         // Should not be called directly
     }
+    private static final int BYTE_ORDER = (int)1234L;
+    /**
+     * {@snippet lang=c :
+     * #define BYTE_ORDER 1234
+     * }
+     */
+    public static int BYTE_ORDER() {
+        return BYTE_ORDER;
+    }
+    private static final long _SIGSET_NWORDS = 16L;
+    /**
+     * {@snippet lang=c :
+     * #define _SIGSET_NWORDS 16
+     * }
+     */
+    public static long _SIGSET_NWORDS() {
+        return _SIGSET_NWORDS;
+    }
+    private static final int __NFDBITS = (int)64L;
+    /**
+     * {@snippet lang=c :
+     * #define __NFDBITS 64
+     * }
+     */
+    public static int __NFDBITS() {
+        return __NFDBITS;
+    }
+    private static final int FD_SETSIZE = (int)1024L;
+    /**
+     * {@snippet lang=c :
+     * #define FD_SETSIZE 1024
+     * }
+     */
+    public static int FD_SETSIZE() {
+        return FD_SETSIZE;
+    }
+    private static final int NFDBITS = (int)64L;
+    /**
+     * {@snippet lang=c :
+     * #define NFDBITS 64
+     * }
+     */
+    public static int NFDBITS() {
+        return NFDBITS;
+    }
+    private static final int __PTHREAD_RWLOCK_ELISION_EXTRA = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * #define __PTHREAD_RWLOCK_ELISION_EXTRA 0
+     * }
+     */
+    public static int __PTHREAD_RWLOCK_ELISION_EXTRA() {
+        return __PTHREAD_RWLOCK_ELISION_EXTRA;
+    }
+    private static final int __WCHAR_MAX = (int)2147483647L;
+    /**
+     * {@snippet lang=c :
+     * #define __WCHAR_MAX 2147483647
+     * }
+     */
+    public static int __WCHAR_MAX() {
+        return __WCHAR_MAX;
+    }
+    private static final int __WCHAR_MIN = (int)-2147483648L;
+    /**
+     * {@snippet lang=c :
+     * #define __WCHAR_MIN -2147483648
+     * }
+     */
+    public static int __WCHAR_MIN() {
+        return __WCHAR_MIN;
+    }
+    private static final int INT8_MIN = (int)-128L;
+    /**
+     * {@snippet lang=c :
+     * #define INT8_MIN -128
+     * }
+     */
+    public static int INT8_MIN() {
+        return INT8_MIN;
+    }
+    private static final int INT16_MIN = (int)-32768L;
+    /**
+     * {@snippet lang=c :
+     * #define INT16_MIN -32768
+     * }
+     */
+    public static int INT16_MIN() {
+        return INT16_MIN;
+    }
+    private static final int INT32_MIN = (int)-2147483648L;
+    /**
+     * {@snippet lang=c :
+     * #define INT32_MIN -2147483648
+     * }
+     */
+    public static int INT32_MIN() {
+        return INT32_MIN;
+    }
+    private static final long INT64_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INT64_MIN -9223372036854775808
+     * }
+     */
+    public static long INT64_MIN() {
+        return INT64_MIN;
+    }
+    private static final int INT8_MAX = (int)127L;
+    /**
+     * {@snippet lang=c :
+     * #define INT8_MAX 127
+     * }
+     */
+    public static int INT8_MAX() {
+        return INT8_MAX;
+    }
+    private static final int INT16_MAX = (int)32767L;
+    /**
+     * {@snippet lang=c :
+     * #define INT16_MAX 32767
+     * }
+     */
+    public static int INT16_MAX() {
+        return INT16_MAX;
+    }
+    private static final int INT32_MAX = (int)2147483647L;
+    /**
+     * {@snippet lang=c :
+     * #define INT32_MAX 2147483647
+     * }
+     */
+    public static int INT32_MAX() {
+        return INT32_MAX;
+    }
+    private static final long INT64_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INT64_MAX 9223372036854775807
+     * }
+     */
+    public static long INT64_MAX() {
+        return INT64_MAX;
+    }
+    private static final int UINT8_MAX = (int)255L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT8_MAX 255
+     * }
+     */
+    public static int UINT8_MAX() {
+        return UINT8_MAX;
+    }
+    private static final int UINT16_MAX = (int)65535L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT16_MAX 65535
+     * }
+     */
+    public static int UINT16_MAX() {
+        return UINT16_MAX;
+    }
+    private static final int UINT32_MAX = (int)4294967295L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT32_MAX 4294967295
+     * }
+     */
+    public static int UINT32_MAX() {
+        return UINT32_MAX;
+    }
+    private static final long UINT64_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT64_MAX -1
+     * }
+     */
+    public static long UINT64_MAX() {
+        return UINT64_MAX;
+    }
+    private static final int INT_LEAST8_MIN = (int)-128L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST8_MIN -128
+     * }
+     */
+    public static int INT_LEAST8_MIN() {
+        return INT_LEAST8_MIN;
+    }
+    private static final int INT_LEAST16_MIN = (int)-32768L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST16_MIN -32768
+     * }
+     */
+    public static int INT_LEAST16_MIN() {
+        return INT_LEAST16_MIN;
+    }
+    private static final int INT_LEAST32_MIN = (int)-2147483648L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST32_MIN -2147483648
+     * }
+     */
+    public static int INT_LEAST32_MIN() {
+        return INT_LEAST32_MIN;
+    }
+    private static final long INT_LEAST64_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST64_MIN -9223372036854775808
+     * }
+     */
+    public static long INT_LEAST64_MIN() {
+        return INT_LEAST64_MIN;
+    }
+    private static final int INT_LEAST8_MAX = (int)127L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST8_MAX 127
+     * }
+     */
+    public static int INT_LEAST8_MAX() {
+        return INT_LEAST8_MAX;
+    }
+    private static final int INT_LEAST16_MAX = (int)32767L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST16_MAX 32767
+     * }
+     */
+    public static int INT_LEAST16_MAX() {
+        return INT_LEAST16_MAX;
+    }
+    private static final int INT_LEAST32_MAX = (int)2147483647L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST32_MAX 2147483647
+     * }
+     */
+    public static int INT_LEAST32_MAX() {
+        return INT_LEAST32_MAX;
+    }
+    private static final long INT_LEAST64_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_LEAST64_MAX 9223372036854775807
+     * }
+     */
+    public static long INT_LEAST64_MAX() {
+        return INT_LEAST64_MAX;
+    }
+    private static final int UINT_LEAST8_MAX = (int)255L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_LEAST8_MAX 255
+     * }
+     */
+    public static int UINT_LEAST8_MAX() {
+        return UINT_LEAST8_MAX;
+    }
+    private static final int UINT_LEAST16_MAX = (int)65535L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_LEAST16_MAX 65535
+     * }
+     */
+    public static int UINT_LEAST16_MAX() {
+        return UINT_LEAST16_MAX;
+    }
+    private static final int UINT_LEAST32_MAX = (int)4294967295L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_LEAST32_MAX 4294967295
+     * }
+     */
+    public static int UINT_LEAST32_MAX() {
+        return UINT_LEAST32_MAX;
+    }
+    private static final long UINT_LEAST64_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_LEAST64_MAX -1
+     * }
+     */
+    public static long UINT_LEAST64_MAX() {
+        return UINT_LEAST64_MAX;
+    }
+    private static final int INT_FAST8_MIN = (int)-128L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST8_MIN -128
+     * }
+     */
+    public static int INT_FAST8_MIN() {
+        return INT_FAST8_MIN;
+    }
+    private static final long INT_FAST16_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST16_MIN -9223372036854775808
+     * }
+     */
+    public static long INT_FAST16_MIN() {
+        return INT_FAST16_MIN;
+    }
+    private static final long INT_FAST32_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST32_MIN -9223372036854775808
+     * }
+     */
+    public static long INT_FAST32_MIN() {
+        return INT_FAST32_MIN;
+    }
+    private static final long INT_FAST64_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST64_MIN -9223372036854775808
+     * }
+     */
+    public static long INT_FAST64_MIN() {
+        return INT_FAST64_MIN;
+    }
+    private static final int INT_FAST8_MAX = (int)127L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST8_MAX 127
+     * }
+     */
+    public static int INT_FAST8_MAX() {
+        return INT_FAST8_MAX;
+    }
+    private static final long INT_FAST16_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST16_MAX 9223372036854775807
+     * }
+     */
+    public static long INT_FAST16_MAX() {
+        return INT_FAST16_MAX;
+    }
+    private static final long INT_FAST32_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST32_MAX 9223372036854775807
+     * }
+     */
+    public static long INT_FAST32_MAX() {
+        return INT_FAST32_MAX;
+    }
+    private static final long INT_FAST64_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INT_FAST64_MAX 9223372036854775807
+     * }
+     */
+    public static long INT_FAST64_MAX() {
+        return INT_FAST64_MAX;
+    }
+    private static final int UINT_FAST8_MAX = (int)255L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_FAST8_MAX 255
+     * }
+     */
+    public static int UINT_FAST8_MAX() {
+        return UINT_FAST8_MAX;
+    }
+    private static final long UINT_FAST16_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_FAST16_MAX -1
+     * }
+     */
+    public static long UINT_FAST16_MAX() {
+        return UINT_FAST16_MAX;
+    }
+    private static final long UINT_FAST32_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_FAST32_MAX -1
+     * }
+     */
+    public static long UINT_FAST32_MAX() {
+        return UINT_FAST32_MAX;
+    }
+    private static final long UINT_FAST64_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT_FAST64_MAX -1
+     * }
+     */
+    public static long UINT_FAST64_MAX() {
+        return UINT_FAST64_MAX;
+    }
+    private static final long INTPTR_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INTPTR_MIN -9223372036854775808
+     * }
+     */
+    public static long INTPTR_MIN() {
+        return INTPTR_MIN;
+    }
+    private static final long INTPTR_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INTPTR_MAX 9223372036854775807
+     * }
+     */
+    public static long INTPTR_MAX() {
+        return INTPTR_MAX;
+    }
+    private static final long UINTPTR_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINTPTR_MAX -1
+     * }
+     */
+    public static long UINTPTR_MAX() {
+        return UINTPTR_MAX;
+    }
+    private static final long INTMAX_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INTMAX_MIN -9223372036854775808
+     * }
+     */
+    public static long INTMAX_MIN() {
+        return INTMAX_MIN;
+    }
+    private static final long INTMAX_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INTMAX_MAX 9223372036854775807
+     * }
+     */
+    public static long INTMAX_MAX() {
+        return INTMAX_MAX;
+    }
+    private static final long UINTMAX_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define UINTMAX_MAX -1
+     * }
+     */
+    public static long UINTMAX_MAX() {
+        return UINTMAX_MAX;
+    }
+    private static final long PTRDIFF_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define PTRDIFF_MIN -9223372036854775808
+     * }
+     */
+    public static long PTRDIFF_MIN() {
+        return PTRDIFF_MIN;
+    }
+    private static final long PTRDIFF_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define PTRDIFF_MAX 9223372036854775807
+     * }
+     */
+    public static long PTRDIFF_MAX() {
+        return PTRDIFF_MAX;
+    }
+    private static final int SIG_ATOMIC_MIN = (int)-2147483648L;
+    /**
+     * {@snippet lang=c :
+     * #define SIG_ATOMIC_MIN -2147483648
+     * }
+     */
+    public static int SIG_ATOMIC_MIN() {
+        return SIG_ATOMIC_MIN;
+    }
+    private static final int SIG_ATOMIC_MAX = (int)2147483647L;
+    /**
+     * {@snippet lang=c :
+     * #define SIG_ATOMIC_MAX 2147483647
+     * }
+     */
+    public static int SIG_ATOMIC_MAX() {
+        return SIG_ATOMIC_MAX;
+    }
+    private static final long SIZE_MAX = -1L;
+    /**
+     * {@snippet lang=c :
+     * #define SIZE_MAX -1
+     * }
+     */
+    public static long SIZE_MAX() {
+        return SIZE_MAX;
+    }
+    private static final int WCHAR_MIN = (int)-2147483648L;
+    /**
+     * {@snippet lang=c :
+     * #define WCHAR_MIN -2147483648
+     * }
+     */
+    public static int WCHAR_MIN() {
+        return WCHAR_MIN;
+    }
+    private static final int WCHAR_MAX = (int)2147483647L;
+    /**
+     * {@snippet lang=c :
+     * #define WCHAR_MAX 2147483647
+     * }
+     */
+    public static int WCHAR_MAX() {
+        return WCHAR_MAX;
+    }
+    private static final int WINT_MIN = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * #define WINT_MIN 0
+     * }
+     */
+    public static int WINT_MIN() {
+        return WINT_MIN;
+    }
+    private static final int WINT_MAX = (int)4294967295L;
+    /**
+     * {@snippet lang=c :
+     * #define WINT_MAX 4294967295
+     * }
+     */
+    public static int WINT_MAX() {
+        return WINT_MAX;
+    }
+    private static final int ecs_world_t_magic = (int)1701016439L;
+    /**
+     * {@snippet lang=c :
+     * #define ecs_world_t_magic 1701016439
+     * }
+     */
+    public static int ecs_world_t_magic() {
+        return ecs_world_t_magic;
+    }
+    private static final int ecs_stage_t_magic = (int)1701016435L;
+    /**
+     * {@snippet lang=c :
+     * #define ecs_stage_t_magic 1701016435
+     * }
+     */
+    public static int ecs_stage_t_magic() {
+        return ecs_stage_t_magic;
+    }
+    private static final int ecs_query_t_magic = (int)1701016437L;
+    /**
+     * {@snippet lang=c :
+     * #define ecs_query_t_magic 1701016437
+     * }
+     */
+    public static int ecs_query_t_magic() {
+        return ecs_query_t_magic;
+    }
+    private static final int ecs_observer_t_magic = (int)1701016418L;
+    /**
+     * {@snippet lang=c :
+     * #define ecs_observer_t_magic 1701016418
+     * }
+     */
+    public static int ecs_observer_t_magic() {
+        return ecs_observer_t_magic;
+    }
+    private static final int ECS_ROW_MASK = (int)134217727L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_ROW_MASK 134217727
+     * }
+     */
+    public static int ECS_ROW_MASK() {
+        return ECS_ROW_MASK;
+    }
+    private static final int ECS_ROW_FLAGS_MASK = (int)4160749568L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_ROW_FLAGS_MASK 4160749568
+     * }
+     */
+    public static int ECS_ROW_FLAGS_MASK() {
+        return ECS_ROW_FLAGS_MASK;
+    }
+    private static final long ECS_ID_FLAGS_MASK = -1152921504606846976L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_ID_FLAGS_MASK -1152921504606846976
+     * }
+     */
+    public static long ECS_ID_FLAGS_MASK() {
+        return ECS_ID_FLAGS_MASK;
+    }
+    private static final long ECS_ENTITY_MASK = 4294967295L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_ENTITY_MASK 4294967295
+     * }
+     */
+    public static long ECS_ENTITY_MASK() {
+        return ECS_ENTITY_MASK;
+    }
+    private static final long ECS_GENERATION_MASK = 281470681743360L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_GENERATION_MASK 281470681743360
+     * }
+     */
+    public static long ECS_GENERATION_MASK() {
+        return ECS_GENERATION_MASK;
+    }
+    private static final long ECS_COMPONENT_MASK = 1152921504606846975L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_COMPONENT_MASK 1152921504606846975
+     * }
+     */
+    public static long ECS_COMPONENT_MASK() {
+        return ECS_COMPONENT_MASK;
+    }
+    private static final int FLECS_SPARSE_PAGE_SIZE = (int)64L;
+    /**
+     * {@snippet lang=c :
+     * #define FLECS_SPARSE_PAGE_SIZE 64
+     * }
+     */
+    public static int FLECS_SPARSE_PAGE_SIZE() {
+        return FLECS_SPARSE_PAGE_SIZE;
+    }
+    private static final int FLECS_STACK_PAGE_OFFSET = (int)32L;
+    /**
+     * {@snippet lang=c :
+     * #define FLECS_STACK_PAGE_OFFSET 32
+     * }
+     */
+    public static int FLECS_STACK_PAGE_OFFSET() {
+        return FLECS_STACK_PAGE_OFFSET;
+    }
+    private static final int FLECS_STACK_PAGE_SIZE = (int)992L;
+    /**
+     * {@snippet lang=c :
+     * #define FLECS_STACK_PAGE_SIZE 992
+     * }
+     */
+    public static int FLECS_STACK_PAGE_SIZE() {
+        return FLECS_STACK_PAGE_SIZE;
+    }
+    private static final int ECS_STRBUF_SMALL_STRING_SIZE = (int)512L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_STRBUF_SMALL_STRING_SIZE 512
+     * }
+     */
+    public static int ECS_STRBUF_SMALL_STRING_SIZE() {
+        return ECS_STRBUF_SMALL_STRING_SIZE;
+    }
+    private static final int ECS_STRBUF_MAX_LIST_DEPTH = (int)32L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_STRBUF_MAX_LIST_DEPTH 32
+     * }
+     */
+    public static int ECS_STRBUF_MAX_LIST_DEPTH() {
+        return ECS_STRBUF_MAX_LIST_DEPTH;
+    }
+    private static final int EOF = (int)-1L;
+    /**
+     * {@snippet lang=c :
+     * #define EOF -1
+     * }
+     */
+    public static int EOF() {
+        return EOF;
+    }
+    /**
+     * {@snippet lang=c :
+     * #define P_tmpdir "/tmp"
+     * }
+     */
+    public static MemorySegment P_tmpdir() {
+        class Holder {
+            static final MemorySegment P_tmpdir
+                = flecs_h.LIBRARY_ARENA.allocateFrom("/tmp");
+        }
+        return Holder.P_tmpdir;
+    }
+    private static final long EcsSelf = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsSelf -9223372036854775808
+     * }
+     */
+    public static long EcsSelf() {
+        return EcsSelf;
+    }
+    private static final long EcsUp = 4611686018427387904L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsUp 4611686018427387904
+     * }
+     */
+    public static long EcsUp() {
+        return EcsUp;
+    }
+    private static final long EcsTrav = 2305843009213693952L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsTrav 2305843009213693952
+     * }
+     */
+    public static long EcsTrav() {
+        return EcsTrav;
+    }
+    private static final long EcsCascade = 1152921504606846976L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsCascade 1152921504606846976
+     * }
+     */
+    public static long EcsCascade() {
+        return EcsCascade;
+    }
+    private static final long EcsDesc = 576460752303423488L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsDesc 576460752303423488
+     * }
+     */
+    public static long EcsDesc() {
+        return EcsDesc;
+    }
+    private static final long EcsIsVariable = 288230376151711744L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsIsVariable 288230376151711744
+     * }
+     */
+    public static long EcsIsVariable() {
+        return EcsIsVariable;
+    }
+    private static final long EcsIsEntity = 144115188075855872L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsIsEntity 144115188075855872
+     * }
+     */
+    public static long EcsIsEntity() {
+        return EcsIsEntity;
+    }
+    private static final long EcsIsName = 72057594037927936L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsIsName 72057594037927936
+     * }
+     */
+    public static long EcsIsName() {
+        return EcsIsName;
+    }
+    private static final long EcsTraverseFlags = -576460752303423488L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsTraverseFlags -576460752303423488
+     * }
+     */
+    public static long EcsTraverseFlags() {
+        return EcsTraverseFlags;
+    }
+    private static final long EcsTermRefFlags = -72057594037927936L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsTermRefFlags -72057594037927936
+     * }
+     */
+    public static long EcsTermRefFlags() {
+        return EcsTermRefFlags;
+    }
+    private static final int ECS_TYPE_HOOK_CTOR = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_CTOR 1
+     * }
+     */
+    public static int ECS_TYPE_HOOK_CTOR() {
+        return ECS_TYPE_HOOK_CTOR;
+    }
+    private static final int ECS_TYPE_HOOK_DTOR = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_DTOR 2
+     * }
+     */
+    public static int ECS_TYPE_HOOK_DTOR() {
+        return ECS_TYPE_HOOK_DTOR;
+    }
+    private static final int ECS_TYPE_HOOK_COPY = (int)4L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_COPY 4
+     * }
+     */
+    public static int ECS_TYPE_HOOK_COPY() {
+        return ECS_TYPE_HOOK_COPY;
+    }
+    private static final int ECS_TYPE_HOOK_MOVE = (int)8L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_MOVE 8
+     * }
+     */
+    public static int ECS_TYPE_HOOK_MOVE() {
+        return ECS_TYPE_HOOK_MOVE;
+    }
+    private static final int ECS_TYPE_HOOK_COPY_CTOR = (int)16L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_COPY_CTOR 16
+     * }
+     */
+    public static int ECS_TYPE_HOOK_COPY_CTOR() {
+        return ECS_TYPE_HOOK_COPY_CTOR;
+    }
+    private static final int ECS_TYPE_HOOK_MOVE_CTOR = (int)32L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_MOVE_CTOR 32
+     * }
+     */
+    public static int ECS_TYPE_HOOK_MOVE_CTOR() {
+        return ECS_TYPE_HOOK_MOVE_CTOR;
+    }
+    private static final int ECS_TYPE_HOOK_CTOR_MOVE_DTOR = (int)64L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_CTOR_MOVE_DTOR 64
+     * }
+     */
+    public static int ECS_TYPE_HOOK_CTOR_MOVE_DTOR() {
+        return ECS_TYPE_HOOK_CTOR_MOVE_DTOR;
+    }
+    private static final int ECS_TYPE_HOOK_MOVE_DTOR = (int)128L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_MOVE_DTOR 128
+     * }
+     */
+    public static int ECS_TYPE_HOOK_MOVE_DTOR() {
+        return ECS_TYPE_HOOK_MOVE_DTOR;
+    }
+    private static final int ECS_TYPE_HOOK_CMP = (int)256L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_CMP 256
+     * }
+     */
+    public static int ECS_TYPE_HOOK_CMP() {
+        return ECS_TYPE_HOOK_CMP;
+    }
+    private static final int ECS_TYPE_HOOK_EQUALS = (int)512L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_EQUALS 512
+     * }
+     */
+    public static int ECS_TYPE_HOOK_EQUALS() {
+        return ECS_TYPE_HOOK_EQUALS;
+    }
+    private static final int ECS_TYPE_HOOK_CTOR_ILLEGAL = (int)1024L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_CTOR_ILLEGAL 1024
+     * }
+     */
+    public static int ECS_TYPE_HOOK_CTOR_ILLEGAL() {
+        return ECS_TYPE_HOOK_CTOR_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_DTOR_ILLEGAL = (int)4096L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_DTOR_ILLEGAL 4096
+     * }
+     */
+    public static int ECS_TYPE_HOOK_DTOR_ILLEGAL() {
+        return ECS_TYPE_HOOK_DTOR_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_COPY_ILLEGAL = (int)8192L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_COPY_ILLEGAL 8192
+     * }
+     */
+    public static int ECS_TYPE_HOOK_COPY_ILLEGAL() {
+        return ECS_TYPE_HOOK_COPY_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_MOVE_ILLEGAL = (int)16384L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_MOVE_ILLEGAL 16384
+     * }
+     */
+    public static int ECS_TYPE_HOOK_MOVE_ILLEGAL() {
+        return ECS_TYPE_HOOK_MOVE_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL = (int)32768L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL 32768
+     * }
+     */
+    public static int ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL() {
+        return ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL = (int)65536L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL 65536
+     * }
+     */
+    public static int ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL() {
+        return ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL = (int)131072L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL 131072
+     * }
+     */
+    public static int ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL() {
+        return ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL = (int)262144L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL 262144
+     * }
+     */
+    public static int ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL() {
+        return ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_CMP_ILLEGAL = (int)524288L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_CMP_ILLEGAL 524288
+     * }
+     */
+    public static int ECS_TYPE_HOOK_CMP_ILLEGAL() {
+        return ECS_TYPE_HOOK_CMP_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_EQUALS_ILLEGAL = (int)1048576L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_EQUALS_ILLEGAL 1048576
+     * }
+     */
+    public static int ECS_TYPE_HOOK_EQUALS_ILLEGAL() {
+        return ECS_TYPE_HOOK_EQUALS_ILLEGAL;
+    }
+    private static final int ECS_TYPE_HOOK_IN_USE = (int)2097152L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOK_IN_USE 2097152
+     * }
+     */
+    public static int ECS_TYPE_HOOK_IN_USE() {
+        return ECS_TYPE_HOOK_IN_USE;
+    }
+    private static final int ECS_TYPE_HOOKS = (int)1023L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOKS 1023
+     * }
+     */
+    public static int ECS_TYPE_HOOKS() {
+        return ECS_TYPE_HOOKS;
+    }
+    private static final int ECS_TYPE_HOOKS_ILLEGAL = (int)2094080L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_TYPE_HOOKS_ILLEGAL 2094080
+     * }
+     */
+    public static int ECS_TYPE_HOOKS_ILLEGAL() {
+        return ECS_TYPE_HOOKS_ILLEGAL;
+    }
+    private static final int ECS_MAX_COMPONENT_ID = (int)268435455L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_MAX_COMPONENT_ID 268435455
+     * }
+     */
+    public static int ECS_MAX_COMPONENT_ID() {
+        return ECS_MAX_COMPONENT_ID;
+    }
+    private static final int ECS_MAX_RECURSION = (int)512L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_MAX_RECURSION 512
+     * }
+     */
+    public static int ECS_MAX_RECURSION() {
+        return ECS_MAX_RECURSION;
+    }
+    private static final int ECS_MAX_TOKEN_SIZE = (int)256L;
+    /**
+     * {@snippet lang=c :
+     * #define ECS_MAX_TOKEN_SIZE 256
+     * }
+     */
+    public static int ECS_MAX_TOKEN_SIZE() {
+        return ECS_MAX_TOKEN_SIZE;
+    }
+    private static final int EcsQueryMatchPrefab = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsQueryMatchPrefab 2
+     * }
+     */
+    public static int EcsQueryMatchPrefab() {
+        return EcsQueryMatchPrefab;
+    }
+    private static final int EcsQueryMatchDisabled = (int)4L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsQueryMatchDisabled 4
+     * }
+     */
+    public static int EcsQueryMatchDisabled() {
+        return EcsQueryMatchDisabled;
+    }
+    private static final int EcsQueryMatchEmptyTables = (int)8L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsQueryMatchEmptyTables 8
+     * }
+     */
+    public static int EcsQueryMatchEmptyTables() {
+        return EcsQueryMatchEmptyTables;
+    }
+    private static final int EcsQueryAllowUnresolvedByName = (int)64L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsQueryAllowUnresolvedByName 64
+     * }
+     */
+    public static int EcsQueryAllowUnresolvedByName() {
+        return EcsQueryAllowUnresolvedByName;
+    }
+    private static final int EcsQueryTableOnly = (int)128L;
+    /**
+     * {@snippet lang=c :
+     * #define EcsQueryTableOnly 128
+     * }
+     */
+    public static int EcsQueryTableOnly() {
+        return EcsQueryTableOnly;
+    }
     private static final int EcsQueryDetectChanges = (int)256L;
     /**
      * {@snippet lang=c :
@@ -536,6 +1592,15 @@ public class flecs_h extends flecs_h_1 {
     public static int ECS_ALERT_MAX_SEVERITY_FILTERS() {
         return ECS_ALERT_MAX_SEVERITY_FILTERS;
     }
+    private static final int FLECS_SCRIPT_SHELL_HISTORY_SIZE = (int)256L;
+    /**
+     * {@snippet lang=c :
+     * #define FLECS_SCRIPT_SHELL_HISTORY_SIZE 256
+     * }
+     */
+    public static int FLECS_SCRIPT_SHELL_HISTORY_SIZE() {
+        return FLECS_SCRIPT_SHELL_HISTORY_SIZE;
+    }
     private static final int FLECS_SCRIPT_FUNCTION_ARGS_MAX = (int)16L;
     /**
      * {@snippet lang=c :
@@ -553,6 +1618,15 @@ public class flecs_h extends flecs_h_1 {
      */
     public static int FLECS_SCRIPT_VECTOR_FUNCTION_COUNT() {
         return FLECS_SCRIPT_VECTOR_FUNCTION_COUNT;
+    }
+    private static final int FLECS_SCRIPT_UNDO_MAX = (int)64L;
+    /**
+     * {@snippet lang=c :
+     * #define FLECS_SCRIPT_UNDO_MAX 64
+     * }
+     */
+    public static int FLECS_SCRIPT_UNDO_MAX() {
+        return FLECS_SCRIPT_UNDO_MAX;
     }
     private static final int ECS_MEMBER_DESC_CACHE_SIZE = (int)32L;
     /**

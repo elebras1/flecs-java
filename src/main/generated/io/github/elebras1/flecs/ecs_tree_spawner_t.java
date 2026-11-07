@@ -27,7 +27,7 @@ public class ecs_tree_spawner_t {
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         ecs_vec_t.layout().withName("children")
-    ).withName("$anon$6497:9");
+    ).withName("$anon$6589:9");
 
     /**
      * The layout of this struct

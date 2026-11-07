@@ -727,12 +727,14 @@ class ObserverTest {
         assertThrows(IllegalStateException.class, () -> this.world.observer("GroupByTermObserver")
                 .event(Flecs.OnAdd)
                 .with(Position.class)
+                .with(Velocity.class)
                 .groupBy(region)
                 .each(entityId -> { }));
 
         assertThrows(IllegalStateException.class, () -> this.world.observer("DetectChangesTermObserver")
                 .event(Flecs.OnAdd)
                 .with(Position.class)
+                .with(Velocity.class)
                 .detectChanges()
                 .each(entityId -> { }));
 
@@ -753,6 +755,7 @@ class ObserverTest {
         assertThrows(IllegalStateException.class, () -> this.world.observer("GroupByCtxTermObserver")
                 .event(Flecs.OnAdd)
                 .with(Position.class)
+                .with(Velocity.class)
                 .groupBy(region)
                 .groupByCtx(new Object())
                 .each(entityId -> { }));

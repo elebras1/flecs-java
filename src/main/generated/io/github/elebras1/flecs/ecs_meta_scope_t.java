@@ -24,6 +24,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     const EcsOpaque *opaque;
  *     ecs_hashmap_t *members;
  *     _Bool is_collection;
+ *     _Bool is_map;
+ *     _Bool is_value;
  *     _Bool is_empty_scope;
  *     _Bool is_moved_scope;
  *     int32_t elem;
@@ -48,12 +50,13 @@ public class ecs_meta_scope_t {
         flecs_h.C_POINTER.withName("opaque"),
         flecs_h.C_POINTER.withName("members"),
         flecs_h.C_BOOL.withName("is_collection"),
+        flecs_h.C_BOOL.withName("is_map"),
+        flecs_h.C_BOOL.withName("is_value"),
         flecs_h.C_BOOL.withName("is_empty_scope"),
         flecs_h.C_BOOL.withName("is_moved_scope"),
-        MemoryLayout.paddingLayout(1),
+        MemoryLayout.paddingLayout(3),
         flecs_h.C_INT.withName("elem"),
-        flecs_h.C_INT.withName("elem_count"),
-        MemoryLayout.paddingLayout(4)
+        flecs_h.C_INT.withName("elem_count")
     ).withName("ecs_meta_scope_t");
 
     /**
@@ -457,6 +460,94 @@ public class ecs_meta_scope_t {
      */
     public static void is_collection(MemorySegment struct, boolean fieldValue) {
         struct.set(is_collection$LAYOUT, is_collection$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean is_map$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("is_map"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool is_map
+     * }
+     */
+    public static final OfBoolean is_map$layout() {
+        return is_map$LAYOUT;
+    }
+
+    private static final long is_map$OFFSET = $LAYOUT.byteOffset(groupElement("is_map"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool is_map
+     * }
+     */
+    public static final long is_map$offset() {
+        return is_map$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool is_map
+     * }
+     */
+    public static boolean is_map(MemorySegment struct) {
+        return struct.get(is_map$LAYOUT, is_map$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool is_map
+     * }
+     */
+    public static void is_map(MemorySegment struct, boolean fieldValue) {
+        struct.set(is_map$LAYOUT, is_map$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean is_value$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("is_value"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool is_value
+     * }
+     */
+    public static final OfBoolean is_value$layout() {
+        return is_value$LAYOUT;
+    }
+
+    private static final long is_value$OFFSET = $LAYOUT.byteOffset(groupElement("is_value"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool is_value
+     * }
+     */
+    public static final long is_value$offset() {
+        return is_value$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool is_value
+     * }
+     */
+    public static boolean is_value(MemorySegment struct) {
+        return struct.get(is_value$LAYOUT, is_value$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool is_value
+     * }
+     */
+    public static void is_value(MemorySegment struct, boolean fieldValue) {
+        struct.set(is_value$LAYOUT, is_value$OFFSET, fieldValue);
     }
 
     private static final OfBoolean is_empty_scope$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("is_empty_scope"));

@@ -19,6 +19,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_stack_page_t *tail_page;
  *     ecs_stack_cursor_t *tail_cursor;
  *     int32_t cursor_count;
+ *     int32_t oversized_count;
  * }
  * }
  */
@@ -33,7 +34,7 @@ public class ecs_stack_t {
         flecs_h.C_POINTER.withName("tail_page"),
         flecs_h.C_POINTER.withName("tail_cursor"),
         flecs_h.C_INT.withName("cursor_count"),
-        MemoryLayout.paddingLayout(4)
+        flecs_h.C_INT.withName("oversized_count")
     ).withName("ecs_stack_t");
 
     /**
@@ -217,6 +218,50 @@ public class ecs_stack_t {
      */
     public static void cursor_count(MemorySegment struct, int fieldValue) {
         struct.set(cursor_count$LAYOUT, cursor_count$OFFSET, fieldValue);
+    }
+
+    private static final OfInt oversized_count$LAYOUT = (OfInt)$LAYOUT.select(groupElement("oversized_count"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t oversized_count
+     * }
+     */
+    public static final OfInt oversized_count$layout() {
+        return oversized_count$LAYOUT;
+    }
+
+    private static final long oversized_count$OFFSET = $LAYOUT.byteOffset(groupElement("oversized_count"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t oversized_count
+     * }
+     */
+    public static final long oversized_count$offset() {
+        return oversized_count$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t oversized_count
+     * }
+     */
+    public static int oversized_count(MemorySegment struct) {
+        return struct.get(oversized_count$LAYOUT, oversized_count$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t oversized_count
+     * }
+     */
+    public static void oversized_count(MemorySegment struct, int fieldValue) {
+        struct.set(oversized_count$LAYOUT, oversized_count$OFFSET, fieldValue);
     }
 
     /**

@@ -354,27 +354,6 @@ public class Entity extends EntityBase<Entity> {
         return false;
     }
 
-    public Entity slotOf(long targetId) {
-        return this.add(Flecs.SlotOf, targetId);
-    }
-
-    public Entity slotOf(Entity target) {
-        return this.slotOf(target.id());
-    }
-
-    public <T> Entity slotOf(Class<T> targetClass) {
-        long targetId = this.world.componentRegistry().getComponentId(targetClass);
-        return this.slotOf(targetId);
-    }
-
-    public Entity slot() {
-        long target = this.target(Flecs.ChildOf, 0);
-        if (target == 0) {
-            throw new IllegalStateException("add ChildOf pair before using slot()");
-        }
-        return this.slotOf(target);
-    }
-
     public <E extends Enum<E>> E toConstant(Class<E> enumClass) {
         long underlyingId = flecs_h.FLECS_IDecs_i32_tID_();
         long pairId = flecs_h.ecs_make_pair(Flecs.Constant, underlyingId);

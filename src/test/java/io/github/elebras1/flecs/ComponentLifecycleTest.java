@@ -151,23 +151,6 @@ class ComponentLifecycleTest {
     }
 
     @Test
-    void deferSet() {
-        Entity entity = this.world.obtainEntity(this.world.entity());
-
-        this.world.deferBegin();
-        entity.set(new Position(10, 20));
-        assertFalse(entity.has(Position.class));
-        this.world.deferEnd();
-
-        assertTrue(entity.has(Position.class));
-        Position p = entity.get(Position.class);
-        assertNotNull(p);
-        assertEquals(10.0f, p.x());
-        assertEquals(1, this.onAdd.get());
-        assertEquals(1, this.onSet.get());
-    }
-
-    @Test
     void onReplaceHook() {
         AtomicReference<Position> prev = new AtomicReference<>();
         AtomicReference<Position> next = new AtomicReference<>();

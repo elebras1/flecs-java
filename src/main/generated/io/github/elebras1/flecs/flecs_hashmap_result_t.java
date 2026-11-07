@@ -31,7 +31,7 @@ public class flecs_hashmap_result_t {
         flecs_h.C_POINTER.withName("key"),
         flecs_h.C_POINTER.withName("value"),
         flecs_h.C_LONG.withName("hash")
-    ).withName("$anon$5296:9");
+    ).withName("$anon$5535:9");
 
     /**
      * The layout of this struct

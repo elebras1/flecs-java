@@ -20,6 +20,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     const ecs_type_info_t *type_info;
  *     int32_t sp;
  *     _Bool is_const;
+ *     _Bool owned;
  * }
  * }
  */
@@ -35,7 +36,8 @@ public class ecs_script_var_t {
         flecs_h.C_POINTER.withName("type_info"),
         flecs_h.C_INT.withName("sp"),
         flecs_h.C_BOOL.withName("is_const"),
-        MemoryLayout.paddingLayout(3)
+        flecs_h.C_BOOL.withName("owned"),
+        MemoryLayout.paddingLayout(2)
     ).withName("ecs_script_var_t");
 
     /**
@@ -263,6 +265,50 @@ public class ecs_script_var_t {
      */
     public static void is_const(MemorySegment struct, boolean fieldValue) {
         struct.set(is_const$LAYOUT, is_const$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean owned$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("owned"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool owned
+     * }
+     */
+    public static final OfBoolean owned$layout() {
+        return owned$LAYOUT;
+    }
+
+    private static final long owned$OFFSET = $LAYOUT.byteOffset(groupElement("owned"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool owned
+     * }
+     */
+    public static final long owned$offset() {
+        return owned$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool owned
+     * }
+     */
+    public static boolean owned(MemorySegment struct) {
+        return struct.get(owned$LAYOUT, owned$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool owned
+     * }
+     */
+    public static void owned(MemorySegment struct, boolean fieldValue) {
+        struct.set(owned$LAYOUT, owned$OFFSET, fieldValue);
     }
 
     /**

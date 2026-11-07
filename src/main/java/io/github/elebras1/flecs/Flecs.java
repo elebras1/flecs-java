@@ -38,7 +38,7 @@ public final class Flecs {
     public static final long Sparse = flecs_h.EcsSparse();
 
     public static final long OnInstantiate = flecs_h.EcsOnInstantiate();
-    public static final long Override = flecs_h.EcsOverride();
+    public static final long Copy = flecs_h.EcsCopy();
     public static final long Inherit = flecs_h.EcsInherit();
     public static final long DontInherit = flecs_h.EcsDontInherit();
 
@@ -61,7 +61,6 @@ public final class Flecs {
 
     public static final long IsA = flecs_h.EcsIsA();
     public static final long DependsOn = flecs_h.EcsDependsOn();
-    public static final long SlotOf = flecs_h.EcsSlotOf();
     public static final long OrderedChildren = flecs_h.EcsOrderedChildren();
     public static final long Module = flecs_h.EcsModule();
 
@@ -100,6 +99,8 @@ public final class Flecs {
     public static final long OnStore = flecs_h.EcsOnStore();
     public static final long PostFrame = flecs_h.EcsPostFrame();
 
+    public static final int QueryCacheDefault = flecs_h.EcsQueryCacheDefault();
+    public static final int QueryCacheNone = flecs_h.EcsQueryCacheNone();
     public static final int QueryCacheAuto = flecs_h.EcsQueryCacheAuto();
     public static final int QueryMatchEmptyTables = flecs_h.EcsQueryMatchEmptyTables();
     public static final int QueryMatchPrefab = flecs_h.EcsQueryMatchPrefab();

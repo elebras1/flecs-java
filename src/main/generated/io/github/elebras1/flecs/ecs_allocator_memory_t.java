@@ -15,10 +15,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 /**
  * {@snippet lang=c :
  * struct {
- *     ecs_size_t bytes_graph_edge;
  *     ecs_size_t bytes_component_record;
  *     ecs_size_t bytes_pair_record;
- *     ecs_size_t bytes_table_diff;
  *     ecs_size_t bytes_sparse_chunk;
  *     ecs_size_t bytes_allocator;
  *     ecs_size_t bytes_stack_allocator;
@@ -36,10 +34,8 @@ public class ecs_allocator_memory_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        flecs_h.C_INT.withName("bytes_graph_edge"),
         flecs_h.C_INT.withName("bytes_component_record"),
         flecs_h.C_INT.withName("bytes_pair_record"),
-        flecs_h.C_INT.withName("bytes_table_diff"),
         flecs_h.C_INT.withName("bytes_sparse_chunk"),
         flecs_h.C_INT.withName("bytes_allocator"),
         flecs_h.C_INT.withName("bytes_stack_allocator"),
@@ -47,57 +43,13 @@ public class ecs_allocator_memory_t {
         flecs_h.C_INT.withName("bytes_query_impl"),
         flecs_h.C_INT.withName("bytes_query_cache"),
         flecs_h.C_INT.withName("bytes_misc")
-    ).withName("$anon$15306:9");
+    ).withName("$anon$15160:9");
 
     /**
      * The layout of this struct
      */
     public static final GroupLayout layout() {
         return $LAYOUT;
-    }
-
-    private static final OfInt bytes_graph_edge$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_graph_edge"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_graph_edge
-     * }
-     */
-    public static final OfInt bytes_graph_edge$layout() {
-        return bytes_graph_edge$LAYOUT;
-    }
-
-    private static final long bytes_graph_edge$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_graph_edge"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_graph_edge
-     * }
-     */
-    public static final long bytes_graph_edge$offset() {
-        return bytes_graph_edge$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_graph_edge
-     * }
-     */
-    public static int bytes_graph_edge(MemorySegment struct) {
-        return struct.get(bytes_graph_edge$LAYOUT, bytes_graph_edge$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_graph_edge
-     * }
-     */
-    public static void bytes_graph_edge(MemorySegment struct, int fieldValue) {
-        struct.set(bytes_graph_edge$LAYOUT, bytes_graph_edge$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_component_record$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_component_record"));
@@ -186,50 +138,6 @@ public class ecs_allocator_memory_t {
      */
     public static void bytes_pair_record(MemorySegment struct, int fieldValue) {
         struct.set(bytes_pair_record$LAYOUT, bytes_pair_record$OFFSET, fieldValue);
-    }
-
-    private static final OfInt bytes_table_diff$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_table_diff"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_diff
-     * }
-     */
-    public static final OfInt bytes_table_diff$layout() {
-        return bytes_table_diff$LAYOUT;
-    }
-
-    private static final long bytes_table_diff$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_table_diff"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_diff
-     * }
-     */
-    public static final long bytes_table_diff$offset() {
-        return bytes_table_diff$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_diff
-     * }
-     */
-    public static int bytes_table_diff(MemorySegment struct) {
-        return struct.get(bytes_table_diff$LAYOUT, bytes_table_diff$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_table_diff
-     * }
-     */
-    public static void bytes_table_diff(MemorySegment struct, int fieldValue) {
-        struct.set(bytes_table_diff$LAYOUT, bytes_table_diff$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_sparse_chunk$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_sparse_chunk"));

@@ -15,8 +15,9 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 /**
  * {@snippet lang=c :
  * struct ecs_script_eval_desc_t {
- *     ecs_script_vars_t *vars;
  *     ecs_script_runtime_t *runtime;
+ *     _Bool skip_unknown;
+ *     _Bool ir;
  * }
  * }
  */
@@ -27,8 +28,10 @@ public class ecs_script_eval_desc_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        flecs_h.C_POINTER.withName("vars"),
-        flecs_h.C_POINTER.withName("runtime")
+        flecs_h.C_POINTER.withName("runtime"),
+        flecs_h.C_BOOL.withName("skip_unknown"),
+        flecs_h.C_BOOL.withName("ir"),
+        MemoryLayout.paddingLayout(6)
     ).withName("ecs_script_eval_desc_t");
 
     /**
@@ -36,50 +39,6 @@ public class ecs_script_eval_desc_t {
      */
     public static final GroupLayout layout() {
         return $LAYOUT;
-    }
-
-    private static final AddressLayout vars$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("vars"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_script_vars_t *vars
-     * }
-     */
-    public static final AddressLayout vars$layout() {
-        return vars$LAYOUT;
-    }
-
-    private static final long vars$OFFSET = $LAYOUT.byteOffset(groupElement("vars"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_script_vars_t *vars
-     * }
-     */
-    public static final long vars$offset() {
-        return vars$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_script_vars_t *vars
-     * }
-     */
-    public static MemorySegment vars(MemorySegment struct) {
-        return struct.get(vars$LAYOUT, vars$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_script_vars_t *vars
-     * }
-     */
-    public static void vars(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(vars$LAYOUT, vars$OFFSET, fieldValue);
     }
 
     private static final AddressLayout runtime$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("runtime"));
@@ -124,6 +83,94 @@ public class ecs_script_eval_desc_t {
      */
     public static void runtime(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(runtime$LAYOUT, runtime$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean skip_unknown$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("skip_unknown"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static final OfBoolean skip_unknown$layout() {
+        return skip_unknown$LAYOUT;
+    }
+
+    private static final long skip_unknown$OFFSET = $LAYOUT.byteOffset(groupElement("skip_unknown"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static final long skip_unknown$offset() {
+        return skip_unknown$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static boolean skip_unknown(MemorySegment struct) {
+        return struct.get(skip_unknown$LAYOUT, skip_unknown$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static void skip_unknown(MemorySegment struct, boolean fieldValue) {
+        struct.set(skip_unknown$LAYOUT, skip_unknown$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean ir$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("ir"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static final OfBoolean ir$layout() {
+        return ir$LAYOUT;
+    }
+
+    private static final long ir$OFFSET = $LAYOUT.byteOffset(groupElement("ir"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static final long ir$offset() {
+        return ir$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static boolean ir(MemorySegment struct) {
+        return struct.get(ir$LAYOUT, ir$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static void ir(MemorySegment struct, boolean fieldValue) {
+        struct.set(ir$LAYOUT, ir$OFFSET, fieldValue);
     }
 
     /**

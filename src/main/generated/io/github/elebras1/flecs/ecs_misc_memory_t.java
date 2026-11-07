@@ -24,7 +24,6 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_size_t bytes_locked_components;
  *     ecs_size_t bytes_type_info;
  *     ecs_size_t bytes_commands;
- *     ecs_size_t bytes_rematch_monitor;
  *     ecs_size_t bytes_component_ids;
  *     ecs_size_t bytes_reflection;
  *     ecs_size_t bytes_tree_spawner;
@@ -50,14 +49,13 @@ public class ecs_misc_memory_t {
         flecs_h.C_INT.withName("bytes_locked_components"),
         flecs_h.C_INT.withName("bytes_type_info"),
         flecs_h.C_INT.withName("bytes_commands"),
-        flecs_h.C_INT.withName("bytes_rematch_monitor"),
         flecs_h.C_INT.withName("bytes_component_ids"),
         flecs_h.C_INT.withName("bytes_reflection"),
         flecs_h.C_INT.withName("bytes_tree_spawner"),
         flecs_h.C_INT.withName("bytes_prefab_child_indices"),
         flecs_h.C_INT.withName("bytes_stats"),
         flecs_h.C_INT.withName("bytes_rest")
-    ).withName("$anon$15285:9");
+    ).withName("$anon$15140:9");
 
     /**
      * The layout of this struct
@@ -460,50 +458,6 @@ public class ecs_misc_memory_t {
      */
     public static void bytes_commands(MemorySegment struct, int fieldValue) {
         struct.set(bytes_commands$LAYOUT, bytes_commands$OFFSET, fieldValue);
-    }
-
-    private static final OfInt bytes_rematch_monitor$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_rematch_monitor"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_rematch_monitor
-     * }
-     */
-    public static final OfInt bytes_rematch_monitor$layout() {
-        return bytes_rematch_monitor$LAYOUT;
-    }
-
-    private static final long bytes_rematch_monitor$OFFSET = $LAYOUT.byteOffset(groupElement("bytes_rematch_monitor"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_rematch_monitor
-     * }
-     */
-    public static final long bytes_rematch_monitor$offset() {
-        return bytes_rematch_monitor$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_rematch_monitor
-     * }
-     */
-    public static int bytes_rematch_monitor(MemorySegment struct) {
-        return struct.get(bytes_rematch_monitor$LAYOUT, bytes_rematch_monitor$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_size_t bytes_rematch_monitor
-     * }
-     */
-    public static void bytes_rematch_monitor(MemorySegment struct, int fieldValue) {
-        struct.set(bytes_rematch_monitor$LAYOUT, bytes_rematch_monitor$OFFSET, fieldValue);
     }
 
     private static final OfInt bytes_component_ids$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bytes_component_ids"));

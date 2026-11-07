@@ -118,16 +118,21 @@ public class InventorySystem {
     private static void transferItems(World world, long containedById, long inventoryId, Entity dst, Entity src, long swordId, long armorId, long coinId) {
         System.out.println(">> Transfer items from " + src.name() + " to " + dst.name() + "\n");
 
-        world.defer(() -> {
-            Entity dstContainer = getContainer(world, inventoryId, dst);
-            Entity srcContainer = getContainer(world, inventoryId, src);
+        // Defer structural changes on a stage while iterating the source container.
+        World stage = world.getStage(0);
+        Entity dstContainer = getContainer(stage, inventoryId, stage.obtainEntity(dst.id()));
+        Entity srcContainer = getContainer(stage, inventoryId, stage.obtainEntity(src.id()));
 
-            Query q = world.query().with(ContainedBy.class, srcContainer.id()).build();
-            q.each(itemId -> {
-                Entity item = world.obtainEntity(itemId);
-                transferItem(world, containedById, dstContainer, item, swordId, armorId, coinId);
-            });
-        });
+        Query q = stage.query().with(ContainedBy.class, srcContainer.id()).build();
+        try {
+            q.each(itemId -> transferItem(
+                    stage, containedById, dstContainer, stage.obtainEntity(itemId),
+                    swordId, armorId, coinId));
+        } finally {
+            q.destruct();
+        }
+
+        stage.merge();
     }
 
     private static void attack(World world, long inventoryId, Entity player, Entity weapon, long swordId, long armorId) {

@@ -499,33 +499,6 @@ class EntityTest {
     }
 
     @Test
-    void deferAdd() {
-        Entity entity = this.world.obtainEntity(this.world.entity());
-
-        this.world.deferBegin();
-        assertTrue(this.world.isDeferred());
-        entity.add(Position.class);
-
-        assertFalse(entity.has(Position.class));
-        this.world.deferEnd();
-
-        assertTrue(entity.has(Position.class));
-    }
-
-    @Test
-    void deferSuspendResume() {
-        Entity entity = this.world.obtainEntity(this.world.entity());
-
-        this.world.deferBegin();
-        this.world.deferSuspend();
-        entity.add(Position.class);
-
-        assertTrue(entity.has(Position.class));
-        this.world.deferResume();
-        this.world.deferEnd();
-    }
-
-    @Test
     void insert() {
         Entity entity = this.world.obtainEntity(this.world.entity());
         entity.insert(Position.class, (PositionMutView view) -> {
@@ -609,32 +582,6 @@ class EntityTest {
     }
 
     @Test
-    void insertDeferred() {
-        Entity entity = this.world.obtainEntity(this.world.entity());
-
-        this.world.deferBegin();
-        entity.insert(Position.class, Velocity.class, (PositionMutView pos, VelocityMutView vel) -> {
-            pos.x(10);
-            pos.y(20);
-            vel.x(1);
-            vel.y(2);
-        });
-
-        assertFalse(entity.has(Position.class));
-        assertFalse(entity.has(Velocity.class));
-        this.world.deferEnd();
-
-        assertTrue(entity.has(Position.class));
-        assertTrue(entity.has(Velocity.class));
-        Position p = entity.get(Position.class);
-        assertEquals(10.0f, p.x());
-        assertEquals(20.0f, p.y());
-        Velocity v = entity.get(Velocity.class);
-        assertEquals(1.0f, v.x());
-        assertEquals(2.0f, v.y());
-    }
-
-    @Test
     void setWithTarget() {
         long target = this.world.entity();
         Entity entity = this.world.obtainEntity(this.world.entity())
@@ -685,20 +632,6 @@ class EntityTest {
     }
 
     @Test
-    void slotOf() {
-        long prefab = this.world.entity("prefab");
-        Entity entity = this.world.obtainEntity(this.world.entity()).slotOf(prefab);
-        assertTrue(entity.has(Flecs.SlotOf, prefab));
-
-        Entity entity2 = this.world.obtainEntity(this.world.entity()).slotOf(this.world.obtainEntity(prefab));
-        assertTrue(entity2.has(Flecs.SlotOf, prefab));
-
-        Entity entity3 = this.world.obtainEntity(this.world.entity()).slotOf(Position.class);
-        long positionId = this.world.component(Position.class);
-        assertTrue(entity3.has(Flecs.SlotOf, positionId));
-    }
-
-    @Test
     void setSymbol() {
         Entity entity = this.world.obtainEntity(this.world.entity("symbol_entity"));
         entity.setSymbol("MySymbol");
@@ -706,14 +639,6 @@ class EntityTest {
         java.lang.foreign.MemorySegment symbolSeg = flecs_h.ecs_get_symbol(this.world.worldSeg(), entity.id());
         assertNotNull(symbolSeg);
         assertEquals("MySymbol", symbolSeg.getString(0));
-    }
-
-    void slot() {
-        long prefab = this.world.entity("prefab");
-        Entity child = this.world.obtainEntity(this.world.entity()).childOf(prefab);
-
-        child.slot();
-        assertTrue(child.has(Flecs.SlotOf, prefab));
     }
 
     @Test

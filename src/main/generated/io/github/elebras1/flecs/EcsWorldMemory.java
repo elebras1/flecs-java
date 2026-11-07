@@ -43,7 +43,7 @@ public class EcsWorldMemory {
         ecs_misc_memory_t.layout().withName("misc"),
         ecs_allocator_memory_t.layout().withName("allocators"),
         flecs_h.C_DOUBLE.withName("collection_time")
-    ).withName("$anon$15321:9");
+    ).withName("$anon$15173:9");
 
     /**
      * The layout of this struct

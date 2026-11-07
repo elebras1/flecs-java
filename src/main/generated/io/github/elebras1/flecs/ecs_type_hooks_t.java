@@ -30,6 +30,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_iter_action_t on_set;
  *     ecs_iter_action_t on_remove;
  *     ecs_iter_action_t on_replace;
+ *     ecs_on_validate_t on_validate;
  *     void *ctx;
  *     void *binding_ctx;
  *     void *lifecycle_ctx;
@@ -62,6 +63,7 @@ public class ecs_type_hooks_t {
         flecs_h.C_POINTER.withName("on_set"),
         flecs_h.C_POINTER.withName("on_remove"),
         flecs_h.C_POINTER.withName("on_replace"),
+        flecs_h.C_POINTER.withName("on_validate"),
         flecs_h.C_POINTER.withName("ctx"),
         flecs_h.C_POINTER.withName("binding_ctx"),
         flecs_h.C_POINTER.withName("lifecycle_ctx"),
@@ -735,6 +737,50 @@ public class ecs_type_hooks_t {
      */
     public static void on_replace(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(on_replace$LAYOUT, on_replace$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout on_validate$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("on_validate"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_on_validate_t on_validate
+     * }
+     */
+    public static final AddressLayout on_validate$layout() {
+        return on_validate$LAYOUT;
+    }
+
+    private static final long on_validate$OFFSET = $LAYOUT.byteOffset(groupElement("on_validate"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_on_validate_t on_validate
+     * }
+     */
+    public static final long on_validate$offset() {
+        return on_validate$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_on_validate_t on_validate
+     * }
+     */
+    public static MemorySegment on_validate(MemorySegment struct) {
+        return struct.get(on_validate$LAYOUT, on_validate$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_on_validate_t on_validate
+     * }
+     */
+    public static void on_validate(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(on_validate$LAYOUT, on_validate$OFFSET, fieldValue);
     }
 
     private static final AddressLayout ctx$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("ctx"));

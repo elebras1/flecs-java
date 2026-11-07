@@ -14,9 +14,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 /**
  * {@snippet lang=c :
- * struct {
- *     ecs_vec_t keys;
- *     ecs_vec_t values;
+ * struct ecs_hm_bucket_t {
+ *     struct ecs_hm_bucket_t *next;
  * }
  * }
  */
@@ -27,9 +26,8 @@ public class ecs_hm_bucket_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
-        ecs_vec_t.layout().withName("keys"),
-        ecs_vec_t.layout().withName("values")
-    ).withName("$anon$5274:9");
+        flecs_h.C_POINTER.withName("next")
+    ).withName("ecs_hm_bucket_t");
 
     /**
      * The layout of this struct
@@ -38,92 +36,48 @@ public class ecs_hm_bucket_t {
         return $LAYOUT;
     }
 
-    private static final GroupLayout keys$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("keys"));
+    private static final AddressLayout next$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("next"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * ecs_vec_t keys
+     * struct ecs_hm_bucket_t *next
      * }
      */
-    public static final GroupLayout keys$layout() {
-        return keys$LAYOUT;
+    public static final AddressLayout next$layout() {
+        return next$LAYOUT;
     }
 
-    private static final long keys$OFFSET = $LAYOUT.byteOffset(groupElement("keys"));
+    private static final long next$OFFSET = $LAYOUT.byteOffset(groupElement("next"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * ecs_vec_t keys
+     * struct ecs_hm_bucket_t *next
      * }
      */
-    public static final long keys$offset() {
-        return keys$OFFSET;
+    public static final long next$offset() {
+        return next$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * ecs_vec_t keys
+     * struct ecs_hm_bucket_t *next
      * }
      */
-    public static MemorySegment keys(MemorySegment struct) {
-        return struct.asSlice(keys$OFFSET, keys$LAYOUT.byteSize());
+    public static MemorySegment next(MemorySegment struct) {
+        return struct.get(next$LAYOUT, next$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * ecs_vec_t keys
+     * struct ecs_hm_bucket_t *next
      * }
      */
-    public static void keys(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, keys$OFFSET, keys$LAYOUT.byteSize());
-    }
-
-    private static final GroupLayout values$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("values"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_vec_t values
-     * }
-     */
-    public static final GroupLayout values$layout() {
-        return values$LAYOUT;
-    }
-
-    private static final long values$OFFSET = $LAYOUT.byteOffset(groupElement("values"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_vec_t values
-     * }
-     */
-    public static final long values$offset() {
-        return values$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_vec_t values
-     * }
-     */
-    public static MemorySegment values(MemorySegment struct) {
-        return struct.asSlice(values$OFFSET, values$LAYOUT.byteSize());
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_vec_t values
-     * }
-     */
-    public static void values(MemorySegment struct, MemorySegment fieldValue) {
-        MemorySegment.copy(fieldValue, 0L, struct, values$OFFSET, values$LAYOUT.byteSize());
+    public static void next(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(next$LAYOUT, next$OFFSET, fieldValue);
     }
 
     /**

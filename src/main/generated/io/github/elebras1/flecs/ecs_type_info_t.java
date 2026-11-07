@@ -20,6 +20,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_type_hooks_t hooks;
  *     ecs_entity_t component;
  *     const char *name;
+ *     int32_t refcount;
  * }
  * }
  */
@@ -34,7 +35,9 @@ public class ecs_type_info_t {
         flecs_h.C_INT.withName("alignment"),
         ecs_type_hooks_t.layout().withName("hooks"),
         flecs_h.C_LONG.withName("component"),
-        flecs_h.C_POINTER.withName("name")
+        flecs_h.C_POINTER.withName("name"),
+        flecs_h.C_INT.withName("refcount"),
+        MemoryLayout.paddingLayout(4)
     ).withName("ecs_type_info_t");
 
     /**
@@ -262,6 +265,50 @@ public class ecs_type_info_t {
      */
     public static void name(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(name$LAYOUT, name$OFFSET, fieldValue);
+    }
+
+    private static final OfInt refcount$LAYOUT = (OfInt)$LAYOUT.select(groupElement("refcount"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t refcount
+     * }
+     */
+    public static final OfInt refcount$layout() {
+        return refcount$LAYOUT;
+    }
+
+    private static final long refcount$OFFSET = $LAYOUT.byteOffset(groupElement("refcount"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t refcount
+     * }
+     */
+    public static final long refcount$offset() {
+        return refcount$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t refcount
+     * }
+     */
+    public static int refcount(MemorySegment struct) {
+        return struct.get(refcount$LAYOUT, refcount$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t refcount
+     * }
+     */
+    public static void refcount(MemorySegment struct, int fieldValue) {
+        struct.set(refcount$LAYOUT, refcount$OFFSET, fieldValue);
     }
 
     /**

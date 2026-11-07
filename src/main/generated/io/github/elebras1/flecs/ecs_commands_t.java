@@ -15,9 +15,19 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 /**
  * {@snippet lang=c :
  * struct ecs_commands_t {
+ *     struct ecs_commands_t *prev;
+ *     struct ecs_commands_t *next;
  *     ecs_vec_t queue;
  *     ecs_stack_t stack;
  *     ecs_sparse_t entries;
+ *     ecs_entity_t entity;
+ *     ecs_cmd_entry_t entry;
+ *     int32_t cursor;
+ *     _Bool has_remove;
+ *     ecs_entity_t second_entity;
+ *     ecs_cmd_entry_t second_entry;
+ *     ecs_entity_t last_entity;
+ *     ecs_cmd_entry_t *last_entry;
  * }
  * }
  */
@@ -28,9 +38,20 @@ public class ecs_commands_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+        flecs_h.C_POINTER.withName("prev"),
+        flecs_h.C_POINTER.withName("next"),
         ecs_vec_t.layout().withName("queue"),
         ecs_stack_t.layout().withName("stack"),
-        ecs_sparse_t.layout().withName("entries")
+        ecs_sparse_t.layout().withName("entries"),
+        flecs_h.C_LONG.withName("entity"),
+        ecs_cmd_entry_t.layout().withName("entry"),
+        flecs_h.C_INT.withName("cursor"),
+        flecs_h.C_BOOL.withName("has_remove"),
+        MemoryLayout.paddingLayout(3),
+        flecs_h.C_LONG.withName("second_entity"),
+        ecs_cmd_entry_t.layout().withName("second_entry"),
+        flecs_h.C_LONG.withName("last_entity"),
+        flecs_h.C_POINTER.withName("last_entry")
     ).withName("ecs_commands_t");
 
     /**
@@ -38,6 +59,94 @@ public class ecs_commands_t {
      */
     public static final GroupLayout layout() {
         return $LAYOUT;
+    }
+
+    private static final AddressLayout prev$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("prev"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *prev
+     * }
+     */
+    public static final AddressLayout prev$layout() {
+        return prev$LAYOUT;
+    }
+
+    private static final long prev$OFFSET = $LAYOUT.byteOffset(groupElement("prev"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *prev
+     * }
+     */
+    public static final long prev$offset() {
+        return prev$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *prev
+     * }
+     */
+    public static MemorySegment prev(MemorySegment struct) {
+        return struct.get(prev$LAYOUT, prev$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *prev
+     * }
+     */
+    public static void prev(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(prev$LAYOUT, prev$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout next$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("next"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *next
+     * }
+     */
+    public static final AddressLayout next$layout() {
+        return next$LAYOUT;
+    }
+
+    private static final long next$OFFSET = $LAYOUT.byteOffset(groupElement("next"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *next
+     * }
+     */
+    public static final long next$offset() {
+        return next$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *next
+     * }
+     */
+    public static MemorySegment next(MemorySegment struct) {
+        return struct.get(next$LAYOUT, next$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * struct ecs_commands_t *next
+     * }
+     */
+    public static void next(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(next$LAYOUT, next$OFFSET, fieldValue);
     }
 
     private static final GroupLayout queue$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("queue"));
@@ -170,6 +279,358 @@ public class ecs_commands_t {
      */
     public static void entries(MemorySegment struct, MemorySegment fieldValue) {
         MemorySegment.copy(fieldValue, 0L, struct, entries$OFFSET, entries$LAYOUT.byteSize());
+    }
+
+    private static final OfLong entity$LAYOUT = (OfLong)$LAYOUT.select(groupElement("entity"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static final OfLong entity$layout() {
+        return entity$LAYOUT;
+    }
+
+    private static final long entity$OFFSET = $LAYOUT.byteOffset(groupElement("entity"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static final long entity$offset() {
+        return entity$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static long entity(MemorySegment struct) {
+        return struct.get(entity$LAYOUT, entity$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static void entity(MemorySegment struct, long fieldValue) {
+        struct.set(entity$LAYOUT, entity$OFFSET, fieldValue);
+    }
+
+    private static final GroupLayout entry$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("entry"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t entry
+     * }
+     */
+    public static final GroupLayout entry$layout() {
+        return entry$LAYOUT;
+    }
+
+    private static final long entry$OFFSET = $LAYOUT.byteOffset(groupElement("entry"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t entry
+     * }
+     */
+    public static final long entry$offset() {
+        return entry$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t entry
+     * }
+     */
+    public static MemorySegment entry(MemorySegment struct) {
+        return struct.asSlice(entry$OFFSET, entry$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t entry
+     * }
+     */
+    public static void entry(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, entry$OFFSET, entry$LAYOUT.byteSize());
+    }
+
+    private static final OfInt cursor$LAYOUT = (OfInt)$LAYOUT.select(groupElement("cursor"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t cursor
+     * }
+     */
+    public static final OfInt cursor$layout() {
+        return cursor$LAYOUT;
+    }
+
+    private static final long cursor$OFFSET = $LAYOUT.byteOffset(groupElement("cursor"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t cursor
+     * }
+     */
+    public static final long cursor$offset() {
+        return cursor$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t cursor
+     * }
+     */
+    public static int cursor(MemorySegment struct) {
+        return struct.get(cursor$LAYOUT, cursor$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t cursor
+     * }
+     */
+    public static void cursor(MemorySegment struct, int fieldValue) {
+        struct.set(cursor$LAYOUT, cursor$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean has_remove$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("has_remove"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool has_remove
+     * }
+     */
+    public static final OfBoolean has_remove$layout() {
+        return has_remove$LAYOUT;
+    }
+
+    private static final long has_remove$OFFSET = $LAYOUT.byteOffset(groupElement("has_remove"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool has_remove
+     * }
+     */
+    public static final long has_remove$offset() {
+        return has_remove$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool has_remove
+     * }
+     */
+    public static boolean has_remove(MemorySegment struct) {
+        return struct.get(has_remove$LAYOUT, has_remove$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool has_remove
+     * }
+     */
+    public static void has_remove(MemorySegment struct, boolean fieldValue) {
+        struct.set(has_remove$LAYOUT, has_remove$OFFSET, fieldValue);
+    }
+
+    private static final OfLong second_entity$LAYOUT = (OfLong)$LAYOUT.select(groupElement("second_entity"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_entity_t second_entity
+     * }
+     */
+    public static final OfLong second_entity$layout() {
+        return second_entity$LAYOUT;
+    }
+
+    private static final long second_entity$OFFSET = $LAYOUT.byteOffset(groupElement("second_entity"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_entity_t second_entity
+     * }
+     */
+    public static final long second_entity$offset() {
+        return second_entity$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t second_entity
+     * }
+     */
+    public static long second_entity(MemorySegment struct) {
+        return struct.get(second_entity$LAYOUT, second_entity$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t second_entity
+     * }
+     */
+    public static void second_entity(MemorySegment struct, long fieldValue) {
+        struct.set(second_entity$LAYOUT, second_entity$OFFSET, fieldValue);
+    }
+
+    private static final GroupLayout second_entry$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("second_entry"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t second_entry
+     * }
+     */
+    public static final GroupLayout second_entry$layout() {
+        return second_entry$LAYOUT;
+    }
+
+    private static final long second_entry$OFFSET = $LAYOUT.byteOffset(groupElement("second_entry"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t second_entry
+     * }
+     */
+    public static final long second_entry$offset() {
+        return second_entry$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t second_entry
+     * }
+     */
+    public static MemorySegment second_entry(MemorySegment struct) {
+        return struct.asSlice(second_entry$OFFSET, second_entry$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t second_entry
+     * }
+     */
+    public static void second_entry(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, second_entry$OFFSET, second_entry$LAYOUT.byteSize());
+    }
+
+    private static final OfLong last_entity$LAYOUT = (OfLong)$LAYOUT.select(groupElement("last_entity"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_entity_t last_entity
+     * }
+     */
+    public static final OfLong last_entity$layout() {
+        return last_entity$LAYOUT;
+    }
+
+    private static final long last_entity$OFFSET = $LAYOUT.byteOffset(groupElement("last_entity"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_entity_t last_entity
+     * }
+     */
+    public static final long last_entity$offset() {
+        return last_entity$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t last_entity
+     * }
+     */
+    public static long last_entity(MemorySegment struct) {
+        return struct.get(last_entity$LAYOUT, last_entity$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t last_entity
+     * }
+     */
+    public static void last_entity(MemorySegment struct, long fieldValue) {
+        struct.set(last_entity$LAYOUT, last_entity$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout last_entry$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("last_entry"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t *last_entry
+     * }
+     */
+    public static final AddressLayout last_entry$layout() {
+        return last_entry$LAYOUT;
+    }
+
+    private static final long last_entry$OFFSET = $LAYOUT.byteOffset(groupElement("last_entry"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t *last_entry
+     * }
+     */
+    public static final long last_entry$offset() {
+        return last_entry$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t *last_entry
+     * }
+     */
+    public static MemorySegment last_entry(MemorySegment struct) {
+        return struct.get(last_entry$LAYOUT, last_entry$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_cmd_entry_t *last_entry
+     * }
+     */
+    public static void last_entry(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(last_entry$LAYOUT, last_entry$OFFSET, fieldValue);
     }
 
     /**

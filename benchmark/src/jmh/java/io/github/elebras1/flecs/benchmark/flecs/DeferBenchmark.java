@@ -55,15 +55,15 @@ public class DeferBenchmark {
         long checksum = 0L;
         int[] order = this.order;
         long[] ids = this.ids;
-        this.world.deferBegin();
+        World stage = this.world.getStage(0);
         for (int i = 0; i < this.n; i++) {
             long entityId = ids[order[i]];
-            Entity entity = this.world.obtainEntity(entityId);
+            Entity entity = stage.obtainEntity(entityId);
             entity.add(Position.class);
             entity.add(Velocity.class);
             checksum += entityId;
         }
-        this.world.deferEnd();
+        stage.merge();
         return (double) checksum / this.n;
     }
 }

@@ -50,7 +50,7 @@ public class World extends WorldBase implements AutoCloseable {
         this.observerCallbacks = new HashMap<>();
         this.buffers = new FlecsBuffers();
         this.context = new FlecsContext(this);
-        this.stages = new World[] { this };
+        this.stages = new World[] { null };
         this.destroyed = false;
         this.importingModule = 0;
         this.owned = true;
@@ -407,21 +407,6 @@ public class World extends WorldBase implements AutoCloseable {
         this.removeAll(componentId);
     }
 
-    public long setWith(long componentId) {
-        this.checkDestroyed();
-        return flecs_h.ecs_set_with(this.worldSeg, componentId);
-    }
-
-    public <T> long setWith(Class<T> componentClass) {
-        long componentId = this.componentRegistry.getComponentId(componentClass);
-        return this.setWith(componentId);
-    }
-
-    public long getWith() {
-        this.checkDestroyed();
-        return flecs_h.ecs_get_with(this.worldSeg);
-    }
-
     public int deleteEmptyTables(int clearGeneration, int deleteGeneration) {
         return this.deleteEmptyTables(clearGeneration, deleteGeneration, 0.0, 0);
     }
@@ -475,36 +460,6 @@ public class World extends WorldBase implements AutoCloseable {
         MemorySegment ctxSeg = this.arena.allocate(ValueLayout.JAVA_LONG);
         ctxSeg.set(ValueLayout.JAVA_LONG, 0, id);
         return ctxSeg;
-    }
-
-    public void deferBegin() {
-        this.checkDestroyed();
-        flecs_h.ecs_defer_begin(this.worldSeg);
-    }
-
-    public void defer(Runnable callback) {
-        this.checkDestroyed();
-        flecs_h.ecs_defer_begin(this.worldSeg);
-        try {
-            callback.run();
-        } finally {
-            flecs_h.ecs_defer_end(this.worldSeg);
-        }
-    }
-
-    public void deferEnd() {
-        this.checkDestroyed();
-        flecs_h.ecs_defer_end(this.worldSeg);
-    }
-
-    public void deferSuspend() {
-        this.checkDestroyed();
-        flecs_h.ecs_defer_suspend(this.worldSeg);
-    }
-
-    public void deferResume() {
-        this.checkDestroyed();
-        flecs_h.ecs_defer_resume(this.worldSeg);
     }
 
     public SystemBuilder system() {
@@ -886,9 +841,8 @@ public class World extends WorldBase implements AutoCloseable {
         }
         int stageCount = flecs_h.ecs_get_stage_count(this.worldSeg);
         World[] newStages = new World[stageCount];
-        newStages[0] = this;
-        for (int i = 1; i < this.stages.length; i++) {
-            if (this.stages[i] != null) {
+        for (int i = 0; i < this.stages.length; i++) {
+            if (this.stages[i] != null && this.stages[i] != this) {
                 this.stages[i].arena.close();
             }
         }
@@ -1004,9 +958,9 @@ public class World extends WorldBase implements AutoCloseable {
         }
     }
 
-    public boolean isDeferred() {
+    public boolean isStage() {
         this.checkDestroyed();
-        return flecs_h.ecs_is_deferred(this.worldSeg);
+        return flecs_h.ecs_is_stage(this.worldSeg);
     }
 
     public long setScope(long scopeId) {

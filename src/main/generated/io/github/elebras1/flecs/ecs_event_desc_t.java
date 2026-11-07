@@ -24,6 +24,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_entity_t entity;
  *     void *param;
  *     const void *const_param;
+ *     void *set_ptr;
  *     ecs_poly_t *observable;
  *     ecs_flags32_t flags;
  * }
@@ -45,6 +46,7 @@ public class ecs_event_desc_t {
         flecs_h.C_LONG.withName("entity"),
         flecs_h.C_POINTER.withName("param"),
         flecs_h.C_POINTER.withName("const_param"),
+        flecs_h.C_POINTER.withName("set_ptr"),
         flecs_h.C_POINTER.withName("observable"),
         flecs_h.C_INT.withName("flags"),
         MemoryLayout.paddingLayout(4)
@@ -451,6 +453,50 @@ public class ecs_event_desc_t {
      */
     public static void const_param(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(const_param$LAYOUT, const_param$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout set_ptr$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("set_ptr"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * void *set_ptr
+     * }
+     */
+    public static final AddressLayout set_ptr$layout() {
+        return set_ptr$LAYOUT;
+    }
+
+    private static final long set_ptr$OFFSET = $LAYOUT.byteOffset(groupElement("set_ptr"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * void *set_ptr
+     * }
+     */
+    public static final long set_ptr$offset() {
+        return set_ptr$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * void *set_ptr
+     * }
+     */
+    public static MemorySegment set_ptr(MemorySegment struct) {
+        return struct.get(set_ptr$LAYOUT, set_ptr$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * void *set_ptr
+     * }
+     */
+    public static void set_ptr(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(set_ptr$LAYOUT, set_ptr$OFFSET, fieldValue);
     }
 
     private static final AddressLayout observable$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("observable"));

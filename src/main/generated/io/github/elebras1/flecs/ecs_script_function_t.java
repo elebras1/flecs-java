@@ -18,6 +18,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_entity_t return_type;
  *     ecs_vec_t params;
  *     ecs_function_callback_t callback;
+ *     ecs_async_function_callback_t async_callback;
+ *     ecs_async_function_cancel_t async_cancel;
  *     ecs_vector_function_callback_t vector_callbacks[18];
  *     void *ctx;
  *     void *binding_ctx;
@@ -35,6 +37,8 @@ public class ecs_script_function_t {
         flecs_h.C_LONG.withName("return_type"),
         ecs_vec_t.layout().withName("params"),
         flecs_h.C_POINTER.withName("callback"),
+        flecs_h.C_POINTER.withName("async_callback"),
+        flecs_h.C_POINTER.withName("async_cancel"),
         MemoryLayout.sequenceLayout(18, flecs_h.C_POINTER).withName("vector_callbacks"),
         flecs_h.C_POINTER.withName("ctx"),
         flecs_h.C_POINTER.withName("binding_ctx"),
@@ -178,6 +182,94 @@ public class ecs_script_function_t {
      */
     public static void callback(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(callback$LAYOUT, callback$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout async_callback$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("async_callback"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_async_function_callback_t async_callback
+     * }
+     */
+    public static final AddressLayout async_callback$layout() {
+        return async_callback$LAYOUT;
+    }
+
+    private static final long async_callback$OFFSET = $LAYOUT.byteOffset(groupElement("async_callback"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_async_function_callback_t async_callback
+     * }
+     */
+    public static final long async_callback$offset() {
+        return async_callback$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_async_function_callback_t async_callback
+     * }
+     */
+    public static MemorySegment async_callback(MemorySegment struct) {
+        return struct.get(async_callback$LAYOUT, async_callback$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_async_function_callback_t async_callback
+     * }
+     */
+    public static void async_callback(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(async_callback$LAYOUT, async_callback$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout async_cancel$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("async_cancel"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_async_function_cancel_t async_cancel
+     * }
+     */
+    public static final AddressLayout async_cancel$layout() {
+        return async_cancel$LAYOUT;
+    }
+
+    private static final long async_cancel$OFFSET = $LAYOUT.byteOffset(groupElement("async_cancel"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_async_function_cancel_t async_cancel
+     * }
+     */
+    public static final long async_cancel$offset() {
+        return async_cancel$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_async_function_cancel_t async_cancel
+     * }
+     */
+    public static MemorySegment async_cancel(MemorySegment struct) {
+        return struct.get(async_cancel$LAYOUT, async_cancel$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_async_function_cancel_t async_cancel
+     * }
+     */
+    public static void async_cancel(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(async_cancel$LAYOUT, async_cancel$OFFSET, fieldValue);
     }
 
     private static final SequenceLayout vector_callbacks$LAYOUT = (SequenceLayout)$LAYOUT.select(groupElement("vector_callbacks"));

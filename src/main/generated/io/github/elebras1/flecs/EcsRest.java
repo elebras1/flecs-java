@@ -18,6 +18,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     uint16_t port;
  *     char *ipaddr;
  *     ecs_rest_ctx_t *impl;
+ *     _Bool readonly;
  * }
  * }
  */
@@ -31,8 +32,10 @@ public class EcsRest {
         flecs_h.C_SHORT.withName("port"),
         MemoryLayout.paddingLayout(6),
         flecs_h.C_POINTER.withName("ipaddr"),
-        flecs_h.C_POINTER.withName("impl")
-    ).withName("$anon$13742:9");
+        flecs_h.C_POINTER.withName("impl"),
+        flecs_h.C_BOOL.withName("readonly"),
+        MemoryLayout.paddingLayout(7)
+    ).withName("$anon$13617:9");
 
     /**
      * The layout of this struct
@@ -171,6 +174,50 @@ public class EcsRest {
      */
     public static void impl(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(impl$LAYOUT, impl$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean readonly$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("readonly"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static final OfBoolean readonly$layout() {
+        return readonly$LAYOUT;
+    }
+
+    private static final long readonly$OFFSET = $LAYOUT.byteOffset(groupElement("readonly"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static final long readonly$offset() {
+        return readonly$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static boolean readonly(MemorySegment struct) {
+        return struct.get(readonly$LAYOUT, readonly$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static void readonly(MemorySegment struct, boolean fieldValue) {
+        struct.set(readonly$LAYOUT, readonly$OFFSET, fieldValue);
     }
 
     /**

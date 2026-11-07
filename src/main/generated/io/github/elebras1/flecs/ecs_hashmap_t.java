@@ -19,6 +19,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_compare_action_t compare;
  *     ecs_size_t key_size;
  *     ecs_size_t value_size;
+ *     ecs_size_t value_offset;
+ *     ecs_size_t bucket_size;
  *     ecs_map_t impl;
  * }
  * }
@@ -34,8 +36,10 @@ public class ecs_hashmap_t {
         flecs_h.C_POINTER.withName("compare"),
         flecs_h.C_INT.withName("key_size"),
         flecs_h.C_INT.withName("value_size"),
+        flecs_h.C_INT.withName("value_offset"),
+        flecs_h.C_INT.withName("bucket_size"),
         ecs_map_t.layout().withName("impl")
-    ).withName("$anon$5280:9");
+    ).withName("$anon$5517:9");
 
     /**
      * The layout of this struct
@@ -218,6 +222,94 @@ public class ecs_hashmap_t {
      */
     public static void value_size(MemorySegment struct, int fieldValue) {
         struct.set(value_size$LAYOUT, value_size$OFFSET, fieldValue);
+    }
+
+    private static final OfInt value_offset$LAYOUT = (OfInt)$LAYOUT.select(groupElement("value_offset"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_size_t value_offset
+     * }
+     */
+    public static final OfInt value_offset$layout() {
+        return value_offset$LAYOUT;
+    }
+
+    private static final long value_offset$OFFSET = $LAYOUT.byteOffset(groupElement("value_offset"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_size_t value_offset
+     * }
+     */
+    public static final long value_offset$offset() {
+        return value_offset$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_size_t value_offset
+     * }
+     */
+    public static int value_offset(MemorySegment struct) {
+        return struct.get(value_offset$LAYOUT, value_offset$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_size_t value_offset
+     * }
+     */
+    public static void value_offset(MemorySegment struct, int fieldValue) {
+        struct.set(value_offset$LAYOUT, value_offset$OFFSET, fieldValue);
+    }
+
+    private static final OfInt bucket_size$LAYOUT = (OfInt)$LAYOUT.select(groupElement("bucket_size"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_size_t bucket_size
+     * }
+     */
+    public static final OfInt bucket_size$layout() {
+        return bucket_size$LAYOUT;
+    }
+
+    private static final long bucket_size$OFFSET = $LAYOUT.byteOffset(groupElement("bucket_size"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_size_t bucket_size
+     * }
+     */
+    public static final long bucket_size$offset() {
+        return bucket_size$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bucket_size
+     * }
+     */
+    public static int bucket_size(MemorySegment struct) {
+        return struct.get(bucket_size$LAYOUT, bucket_size$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_size_t bucket_size
+     * }
+     */
+    public static void bucket_size(MemorySegment struct, int fieldValue) {
+        struct.set(bucket_size$LAYOUT, bucket_size$OFFSET, fieldValue);
     }
 
     private static final GroupLayout impl$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("impl"));

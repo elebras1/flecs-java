@@ -20,6 +20,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     int32_t rc;
  *     ecs_map_t cmd_captures;
  *     double last_time;
+ *     _Bool readonly;
  * }
  * }
  */
@@ -35,8 +36,10 @@ public class ecs_rest_ctx_t {
         flecs_h.C_INT.withName("rc"),
         MemoryLayout.paddingLayout(4),
         ecs_map_t.layout().withName("cmd_captures"),
-        flecs_h.C_DOUBLE.withName("last_time")
-    ).withName("$anon$13733:9");
+        flecs_h.C_DOUBLE.withName("last_time"),
+        flecs_h.C_BOOL.withName("readonly"),
+        MemoryLayout.paddingLayout(7)
+    ).withName("$anon$13607:9");
 
     /**
      * The layout of this struct
@@ -263,6 +266,50 @@ public class ecs_rest_ctx_t {
      */
     public static void last_time(MemorySegment struct, double fieldValue) {
         struct.set(last_time$LAYOUT, last_time$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean readonly$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("readonly"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static final OfBoolean readonly$layout() {
+        return readonly$LAYOUT;
+    }
+
+    private static final long readonly$OFFSET = $LAYOUT.byteOffset(groupElement("readonly"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static final long readonly$offset() {
+        return readonly$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static boolean readonly(MemorySegment struct) {
+        return struct.get(readonly$LAYOUT, readonly$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool readonly
+     * }
+     */
+    public static void readonly(MemorySegment struct, boolean fieldValue) {
+        struct.set(readonly$LAYOUT, readonly$OFFSET, fieldValue);
     }
 
     /**

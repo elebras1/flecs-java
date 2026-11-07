@@ -15,9 +15,10 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 /**
  * {@snippet lang=c :
  * struct ecs_table_cache_iter_t {
- *     const struct ecs_table_cache_hdr_t *cur, *next;
- *     _Bool iter_fill;
- *     _Bool iter_empty;
+ *     const ecs_table_cache_elem_t *elems;
+ *     int32_t remaining;
+ *     const ecs_table_cache_elem_t *cur;
+ *     ecs_flags32_t flags;
  * }
  * }
  */
@@ -28,11 +29,12 @@ public class ecs_table_cache_iter_t {
     }
 
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+        flecs_h.C_POINTER.withName("elems"),
+        flecs_h.C_INT.withName("remaining"),
+        MemoryLayout.paddingLayout(4),
         flecs_h.C_POINTER.withName("cur"),
-        flecs_h.C_POINTER.withName("next"),
-        flecs_h.C_BOOL.withName("iter_fill"),
-        flecs_h.C_BOOL.withName("iter_empty"),
-        MemoryLayout.paddingLayout(6)
+        flecs_h.C_INT.withName("flags"),
+        MemoryLayout.paddingLayout(4)
     ).withName("ecs_table_cache_iter_t");
 
     /**
@@ -42,12 +44,100 @@ public class ecs_table_cache_iter_t {
         return $LAYOUT;
     }
 
+    private static final AddressLayout elems$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("elems"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const ecs_table_cache_elem_t *elems
+     * }
+     */
+    public static final AddressLayout elems$layout() {
+        return elems$LAYOUT;
+    }
+
+    private static final long elems$OFFSET = $LAYOUT.byteOffset(groupElement("elems"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const ecs_table_cache_elem_t *elems
+     * }
+     */
+    public static final long elems$offset() {
+        return elems$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const ecs_table_cache_elem_t *elems
+     * }
+     */
+    public static MemorySegment elems(MemorySegment struct) {
+        return struct.get(elems$LAYOUT, elems$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const ecs_table_cache_elem_t *elems
+     * }
+     */
+    public static void elems(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(elems$LAYOUT, elems$OFFSET, fieldValue);
+    }
+
+    private static final OfInt remaining$LAYOUT = (OfInt)$LAYOUT.select(groupElement("remaining"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int32_t remaining
+     * }
+     */
+    public static final OfInt remaining$layout() {
+        return remaining$LAYOUT;
+    }
+
+    private static final long remaining$OFFSET = $LAYOUT.byteOffset(groupElement("remaining"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int32_t remaining
+     * }
+     */
+    public static final long remaining$offset() {
+        return remaining$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int32_t remaining
+     * }
+     */
+    public static int remaining(MemorySegment struct) {
+        return struct.get(remaining$LAYOUT, remaining$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int32_t remaining
+     * }
+     */
+    public static void remaining(MemorySegment struct, int fieldValue) {
+        struct.set(remaining$LAYOUT, remaining$OFFSET, fieldValue);
+    }
+
     private static final AddressLayout cur$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("cur"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *cur
+     * const ecs_table_cache_elem_t *cur
      * }
      */
     public static final AddressLayout cur$layout() {
@@ -59,7 +149,7 @@ public class ecs_table_cache_iter_t {
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *cur
+     * const ecs_table_cache_elem_t *cur
      * }
      */
     public static final long cur$offset() {
@@ -69,7 +159,7 @@ public class ecs_table_cache_iter_t {
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *cur
+     * const ecs_table_cache_elem_t *cur
      * }
      */
     public static MemorySegment cur(MemorySegment struct) {
@@ -79,143 +169,55 @@ public class ecs_table_cache_iter_t {
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *cur
+     * const ecs_table_cache_elem_t *cur
      * }
      */
     public static void cur(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(cur$LAYOUT, cur$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout next$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("next"));
+    private static final OfInt flags$LAYOUT = (OfInt)$LAYOUT.select(groupElement("flags"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *next
+     * ecs_flags32_t flags
      * }
      */
-    public static final AddressLayout next$layout() {
-        return next$LAYOUT;
+    public static final OfInt flags$layout() {
+        return flags$LAYOUT;
     }
 
-    private static final long next$OFFSET = $LAYOUT.byteOffset(groupElement("next"));
+    private static final long flags$OFFSET = $LAYOUT.byteOffset(groupElement("flags"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *next
+     * ecs_flags32_t flags
      * }
      */
-    public static final long next$offset() {
-        return next$OFFSET;
+    public static final long flags$offset() {
+        return flags$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *next
+     * ecs_flags32_t flags
      * }
      */
-    public static MemorySegment next(MemorySegment struct) {
-        return struct.get(next$LAYOUT, next$OFFSET);
+    public static int flags(MemorySegment struct) {
+        return struct.get(flags$LAYOUT, flags$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * const struct ecs_table_cache_hdr_t *next
+     * ecs_flags32_t flags
      * }
      */
-    public static void next(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(next$LAYOUT, next$OFFSET, fieldValue);
-    }
-
-    private static final OfBoolean iter_fill$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("iter_fill"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * _Bool iter_fill
-     * }
-     */
-    public static final OfBoolean iter_fill$layout() {
-        return iter_fill$LAYOUT;
-    }
-
-    private static final long iter_fill$OFFSET = $LAYOUT.byteOffset(groupElement("iter_fill"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * _Bool iter_fill
-     * }
-     */
-    public static final long iter_fill$offset() {
-        return iter_fill$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * _Bool iter_fill
-     * }
-     */
-    public static boolean iter_fill(MemorySegment struct) {
-        return struct.get(iter_fill$LAYOUT, iter_fill$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * _Bool iter_fill
-     * }
-     */
-    public static void iter_fill(MemorySegment struct, boolean fieldValue) {
-        struct.set(iter_fill$LAYOUT, iter_fill$OFFSET, fieldValue);
-    }
-
-    private static final OfBoolean iter_empty$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("iter_empty"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * _Bool iter_empty
-     * }
-     */
-    public static final OfBoolean iter_empty$layout() {
-        return iter_empty$LAYOUT;
-    }
-
-    private static final long iter_empty$OFFSET = $LAYOUT.byteOffset(groupElement("iter_empty"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * _Bool iter_empty
-     * }
-     */
-    public static final long iter_empty$offset() {
-        return iter_empty$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * _Bool iter_empty
-     * }
-     */
-    public static boolean iter_empty(MemorySegment struct) {
-        return struct.get(iter_empty$LAYOUT, iter_empty$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * _Bool iter_empty
-     * }
-     */
-    public static void iter_empty(MemorySegment struct, boolean fieldValue) {
-        struct.set(iter_empty$LAYOUT, iter_empty$OFFSET, fieldValue);
+    public static void flags(MemorySegment struct, int fieldValue) {
+        struct.set(flags$LAYOUT, flags$OFFSET, fieldValue);
     }
 
     /**

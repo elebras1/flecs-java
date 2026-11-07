@@ -20,15 +20,16 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     const struct ecs_query_op_t *ops;
  *     struct ecs_query_op_ctx_t *op_ctx;
  *     uint64_t *written;
+ *     ecs_query_op_profile_t *profile;
+ *     int16_t op;
  *     ecs_query_cache_group_t *group;
  *     ecs_vec_t *tables;
  *     ecs_vec_t *all_tables;
  *     ecs_query_cache_match_t *elem;
  *     int32_t cur;
  *     int32_t all_cur;
- *     ecs_query_op_profile_t *profile;
- *     int16_t op;
  *     _Bool iter_single_group;
+ *     ecs_query_trivial_ctx_t trivial;
  * }
  * }
  */
@@ -44,16 +45,18 @@ public class ecs_query_iter_t {
         flecs_h.C_POINTER.withName("ops"),
         flecs_h.C_POINTER.withName("op_ctx"),
         flecs_h.C_POINTER.withName("written"),
+        flecs_h.C_POINTER.withName("profile"),
+        flecs_h.C_SHORT.withName("op"),
+        MemoryLayout.paddingLayout(6),
         flecs_h.C_POINTER.withName("group"),
         flecs_h.C_POINTER.withName("tables"),
         flecs_h.C_POINTER.withName("all_tables"),
         flecs_h.C_POINTER.withName("elem"),
         flecs_h.C_INT.withName("cur"),
         flecs_h.C_INT.withName("all_cur"),
-        flecs_h.C_POINTER.withName("profile"),
-        flecs_h.C_SHORT.withName("op"),
         flecs_h.C_BOOL.withName("iter_single_group"),
-        MemoryLayout.paddingLayout(5)
+        MemoryLayout.paddingLayout(7),
+        ecs_query_trivial_ctx_t.layout().withName("trivial")
     ).withName("ecs_query_iter_t");
 
     /**
@@ -281,6 +284,94 @@ public class ecs_query_iter_t {
      */
     public static void written(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(written$LAYOUT, written$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout profile$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("profile"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_query_op_profile_t *profile
+     * }
+     */
+    public static final AddressLayout profile$layout() {
+        return profile$LAYOUT;
+    }
+
+    private static final long profile$OFFSET = $LAYOUT.byteOffset(groupElement("profile"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_query_op_profile_t *profile
+     * }
+     */
+    public static final long profile$offset() {
+        return profile$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_query_op_profile_t *profile
+     * }
+     */
+    public static MemorySegment profile(MemorySegment struct) {
+        return struct.get(profile$LAYOUT, profile$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_query_op_profile_t *profile
+     * }
+     */
+    public static void profile(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(profile$LAYOUT, profile$OFFSET, fieldValue);
+    }
+
+    private static final OfShort op$LAYOUT = (OfShort)$LAYOUT.select(groupElement("op"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * int16_t op
+     * }
+     */
+    public static final OfShort op$layout() {
+        return op$LAYOUT;
+    }
+
+    private static final long op$OFFSET = $LAYOUT.byteOffset(groupElement("op"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * int16_t op
+     * }
+     */
+    public static final long op$offset() {
+        return op$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * int16_t op
+     * }
+     */
+    public static short op(MemorySegment struct) {
+        return struct.get(op$LAYOUT, op$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * int16_t op
+     * }
+     */
+    public static void op(MemorySegment struct, short fieldValue) {
+        struct.set(op$LAYOUT, op$OFFSET, fieldValue);
     }
 
     private static final AddressLayout group$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("group"));
@@ -547,94 +638,6 @@ public class ecs_query_iter_t {
         struct.set(all_cur$LAYOUT, all_cur$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout profile$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("profile"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * ecs_query_op_profile_t *profile
-     * }
-     */
-    public static final AddressLayout profile$layout() {
-        return profile$LAYOUT;
-    }
-
-    private static final long profile$OFFSET = $LAYOUT.byteOffset(groupElement("profile"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * ecs_query_op_profile_t *profile
-     * }
-     */
-    public static final long profile$offset() {
-        return profile$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * ecs_query_op_profile_t *profile
-     * }
-     */
-    public static MemorySegment profile(MemorySegment struct) {
-        return struct.get(profile$LAYOUT, profile$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * ecs_query_op_profile_t *profile
-     * }
-     */
-    public static void profile(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(profile$LAYOUT, profile$OFFSET, fieldValue);
-    }
-
-    private static final OfShort op$LAYOUT = (OfShort)$LAYOUT.select(groupElement("op"));
-
-    /**
-     * Layout for field:
-     * {@snippet lang=c :
-     * int16_t op
-     * }
-     */
-    public static final OfShort op$layout() {
-        return op$LAYOUT;
-    }
-
-    private static final long op$OFFSET = $LAYOUT.byteOffset(groupElement("op"));
-
-    /**
-     * Offset for field:
-     * {@snippet lang=c :
-     * int16_t op
-     * }
-     */
-    public static final long op$offset() {
-        return op$OFFSET;
-    }
-
-    /**
-     * Getter for field:
-     * {@snippet lang=c :
-     * int16_t op
-     * }
-     */
-    public static short op(MemorySegment struct) {
-        return struct.get(op$LAYOUT, op$OFFSET);
-    }
-
-    /**
-     * Setter for field:
-     * {@snippet lang=c :
-     * int16_t op
-     * }
-     */
-    public static void op(MemorySegment struct, short fieldValue) {
-        struct.set(op$LAYOUT, op$OFFSET, fieldValue);
-    }
-
     private static final OfBoolean iter_single_group$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("iter_single_group"));
 
     /**
@@ -677,6 +680,50 @@ public class ecs_query_iter_t {
      */
     public static void iter_single_group(MemorySegment struct, boolean fieldValue) {
         struct.set(iter_single_group$LAYOUT, iter_single_group$OFFSET, fieldValue);
+    }
+
+    private static final GroupLayout trivial$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("trivial"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_query_trivial_ctx_t trivial
+     * }
+     */
+    public static final GroupLayout trivial$layout() {
+        return trivial$LAYOUT;
+    }
+
+    private static final long trivial$OFFSET = $LAYOUT.byteOffset(groupElement("trivial"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_query_trivial_ctx_t trivial
+     * }
+     */
+    public static final long trivial$offset() {
+        return trivial$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_query_trivial_ctx_t trivial
+     * }
+     */
+    public static MemorySegment trivial(MemorySegment struct) {
+        return struct.asSlice(trivial$OFFSET, trivial$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_query_trivial_ctx_t trivial
+     * }
+     */
+    public static void trivial(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, trivial$OFFSET, trivial$LAYOUT.byteSize());
     }
 
     /**

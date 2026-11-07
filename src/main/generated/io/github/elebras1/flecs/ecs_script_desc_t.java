@@ -18,6 +18,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_entity_t entity;
  *     const char *filename;
  *     const char *code;
+ *     _Bool skip_unknown;
+ *     _Bool ir;
  * }
  * }
  */
@@ -30,7 +32,10 @@ public class ecs_script_desc_t {
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_LONG.withName("entity"),
         flecs_h.C_POINTER.withName("filename"),
-        flecs_h.C_POINTER.withName("code")
+        flecs_h.C_POINTER.withName("code"),
+        flecs_h.C_BOOL.withName("skip_unknown"),
+        flecs_h.C_BOOL.withName("ir"),
+        MemoryLayout.paddingLayout(6)
     ).withName("ecs_script_desc_t");
 
     /**
@@ -170,6 +175,94 @@ public class ecs_script_desc_t {
      */
     public static void code(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(code$LAYOUT, code$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean skip_unknown$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("skip_unknown"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static final OfBoolean skip_unknown$layout() {
+        return skip_unknown$LAYOUT;
+    }
+
+    private static final long skip_unknown$OFFSET = $LAYOUT.byteOffset(groupElement("skip_unknown"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static final long skip_unknown$offset() {
+        return skip_unknown$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static boolean skip_unknown(MemorySegment struct) {
+        return struct.get(skip_unknown$LAYOUT, skip_unknown$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool skip_unknown
+     * }
+     */
+    public static void skip_unknown(MemorySegment struct, boolean fieldValue) {
+        struct.set(skip_unknown$LAYOUT, skip_unknown$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean ir$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("ir"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static final OfBoolean ir$layout() {
+        return ir$LAYOUT;
+    }
+
+    private static final long ir$OFFSET = $LAYOUT.byteOffset(groupElement("ir"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static final long ir$offset() {
+        return ir$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static boolean ir(MemorySegment struct) {
+        return struct.get(ir$LAYOUT, ir$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * _Bool ir
+     * }
+     */
+    public static void ir(MemorySegment struct, boolean fieldValue) {
+        struct.set(ir$LAYOUT, ir$OFFSET, fieldValue);
     }
 
     /**

@@ -52,6 +52,11 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_os_api_module_to_path_t module_to_etc_;
  *     ecs_os_api_fopen_t fopen_;
  *     ecs_os_api_fclose_t fclose_;
+ *     ecs_os_api_fread_t fread_;
+ *     ecs_os_api_fwrite_t fwrite_;
+ *     ecs_os_api_mkdir_t mkdir_;
+ *     ecs_os_api_remove_t rmdir_;
+ *     ecs_os_api_remove_t remove_;
  *     ecs_os_api_perf_trace_t perf_trace_push_;
  *     ecs_os_api_perf_trace_t perf_trace_pop_;
  *     int32_t log_level_;
@@ -107,6 +112,11 @@ public class ecs_os_api_t {
         flecs_h.C_POINTER.withName("module_to_etc_"),
         flecs_h.C_POINTER.withName("fopen_"),
         flecs_h.C_POINTER.withName("fclose_"),
+        flecs_h.C_POINTER.withName("fread_"),
+        flecs_h.C_POINTER.withName("fwrite_"),
+        flecs_h.C_POINTER.withName("mkdir_"),
+        flecs_h.C_POINTER.withName("rmdir_"),
+        flecs_h.C_POINTER.withName("remove_"),
         flecs_h.C_POINTER.withName("perf_trace_push_"),
         flecs_h.C_POINTER.withName("perf_trace_pop_"),
         flecs_h.C_INT.withName("log_level_"),
@@ -1752,6 +1762,226 @@ public class ecs_os_api_t {
      */
     public static void fclose_(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(fclose_$LAYOUT, fclose_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout fread_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("fread_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fread_t fread_
+     * }
+     */
+    public static final AddressLayout fread_$layout() {
+        return fread_$LAYOUT;
+    }
+
+    private static final long fread_$OFFSET = $LAYOUT.byteOffset(groupElement("fread_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fread_t fread_
+     * }
+     */
+    public static final long fread_$offset() {
+        return fread_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fread_t fread_
+     * }
+     */
+    public static MemorySegment fread_(MemorySegment struct) {
+        return struct.get(fread_$LAYOUT, fread_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fread_t fread_
+     * }
+     */
+    public static void fread_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(fread_$LAYOUT, fread_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout fwrite_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("fwrite_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fwrite_t fwrite_
+     * }
+     */
+    public static final AddressLayout fwrite_$layout() {
+        return fwrite_$LAYOUT;
+    }
+
+    private static final long fwrite_$OFFSET = $LAYOUT.byteOffset(groupElement("fwrite_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fwrite_t fwrite_
+     * }
+     */
+    public static final long fwrite_$offset() {
+        return fwrite_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fwrite_t fwrite_
+     * }
+     */
+    public static MemorySegment fwrite_(MemorySegment struct) {
+        return struct.get(fwrite_$LAYOUT, fwrite_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_fwrite_t fwrite_
+     * }
+     */
+    public static void fwrite_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(fwrite_$LAYOUT, fwrite_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout mkdir_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("mkdir_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_mkdir_t mkdir_
+     * }
+     */
+    public static final AddressLayout mkdir_$layout() {
+        return mkdir_$LAYOUT;
+    }
+
+    private static final long mkdir_$OFFSET = $LAYOUT.byteOffset(groupElement("mkdir_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_mkdir_t mkdir_
+     * }
+     */
+    public static final long mkdir_$offset() {
+        return mkdir_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_mkdir_t mkdir_
+     * }
+     */
+    public static MemorySegment mkdir_(MemorySegment struct) {
+        return struct.get(mkdir_$LAYOUT, mkdir_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_mkdir_t mkdir_
+     * }
+     */
+    public static void mkdir_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(mkdir_$LAYOUT, mkdir_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout rmdir_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("rmdir_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t rmdir_
+     * }
+     */
+    public static final AddressLayout rmdir_$layout() {
+        return rmdir_$LAYOUT;
+    }
+
+    private static final long rmdir_$OFFSET = $LAYOUT.byteOffset(groupElement("rmdir_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t rmdir_
+     * }
+     */
+    public static final long rmdir_$offset() {
+        return rmdir_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t rmdir_
+     * }
+     */
+    public static MemorySegment rmdir_(MemorySegment struct) {
+        return struct.get(rmdir_$LAYOUT, rmdir_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t rmdir_
+     * }
+     */
+    public static void rmdir_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(rmdir_$LAYOUT, rmdir_$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout remove_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("remove_"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t remove_
+     * }
+     */
+    public static final AddressLayout remove_$layout() {
+        return remove_$LAYOUT;
+    }
+
+    private static final long remove_$OFFSET = $LAYOUT.byteOffset(groupElement("remove_"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t remove_
+     * }
+     */
+    public static final long remove_$offset() {
+        return remove_$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t remove_
+     * }
+     */
+    public static MemorySegment remove_(MemorySegment struct) {
+        return struct.get(remove_$LAYOUT, remove_$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_os_api_remove_t remove_
+     * }
+     */
+    public static void remove_(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(remove_$LAYOUT, remove_$OFFSET, fieldValue);
     }
 
     private static final AddressLayout perf_trace_push_$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("perf_trace_push_"));

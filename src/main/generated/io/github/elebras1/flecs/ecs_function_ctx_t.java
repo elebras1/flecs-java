@@ -17,6 +17,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * struct ecs_function_ctx_t {
  *     ecs_world_t *world;
  *     ecs_entity_t function;
+ *     ecs_entity_t entity;
  *     void *ctx;
  * }
  * }
@@ -30,6 +31,7 @@ public class ecs_function_ctx_t {
     private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
         flecs_h.C_POINTER.withName("world"),
         flecs_h.C_LONG.withName("function"),
+        flecs_h.C_LONG.withName("entity"),
         flecs_h.C_POINTER.withName("ctx")
     ).withName("ecs_function_ctx_t");
 
@@ -126,6 +128,50 @@ public class ecs_function_ctx_t {
      */
     public static void function(MemorySegment struct, long fieldValue) {
         struct.set(function$LAYOUT, function$OFFSET, fieldValue);
+    }
+
+    private static final OfLong entity$LAYOUT = (OfLong)$LAYOUT.select(groupElement("entity"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static final OfLong entity$layout() {
+        return entity$LAYOUT;
+    }
+
+    private static final long entity$OFFSET = $LAYOUT.byteOffset(groupElement("entity"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static final long entity$offset() {
+        return entity$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static long entity(MemorySegment struct) {
+        return struct.get(entity$LAYOUT, entity$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_entity_t entity
+     * }
+     */
+    public static void entity(MemorySegment struct, long fieldValue) {
+        struct.set(entity$LAYOUT, entity$OFFSET, fieldValue);
     }
 
     private static final AddressLayout ctx$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("ctx"));

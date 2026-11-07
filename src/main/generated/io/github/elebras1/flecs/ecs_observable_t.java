@@ -19,6 +19,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_event_record_t on_remove;
  *     ecs_event_record_t on_set;
  *     ecs_event_record_t on_wildcard;
+ *     ecs_event_record_t on_table_create;
+ *     ecs_event_record_t on_table_delete;
  *     ecs_sparse_t events;
  *     ecs_vec_t global_observers;
  *     uint64_t last_observer_id;
@@ -36,6 +38,8 @@ public class ecs_observable_t {
         ecs_event_record_t.layout().withName("on_remove"),
         ecs_event_record_t.layout().withName("on_set"),
         ecs_event_record_t.layout().withName("on_wildcard"),
+        ecs_event_record_t.layout().withName("on_table_create"),
+        ecs_event_record_t.layout().withName("on_table_delete"),
         ecs_sparse_t.layout().withName("events"),
         ecs_vec_t.layout().withName("global_observers"),
         flecs_h.C_LONG.withName("last_observer_id")
@@ -222,6 +226,94 @@ public class ecs_observable_t {
      */
     public static void on_wildcard(MemorySegment struct, MemorySegment fieldValue) {
         MemorySegment.copy(fieldValue, 0L, struct, on_wildcard$OFFSET, on_wildcard$LAYOUT.byteSize());
+    }
+
+    private static final GroupLayout on_table_create$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("on_table_create"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_create
+     * }
+     */
+    public static final GroupLayout on_table_create$layout() {
+        return on_table_create$LAYOUT;
+    }
+
+    private static final long on_table_create$OFFSET = $LAYOUT.byteOffset(groupElement("on_table_create"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_create
+     * }
+     */
+    public static final long on_table_create$offset() {
+        return on_table_create$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_create
+     * }
+     */
+    public static MemorySegment on_table_create(MemorySegment struct) {
+        return struct.asSlice(on_table_create$OFFSET, on_table_create$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_create
+     * }
+     */
+    public static void on_table_create(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, on_table_create$OFFSET, on_table_create$LAYOUT.byteSize());
+    }
+
+    private static final GroupLayout on_table_delete$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("on_table_delete"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_delete
+     * }
+     */
+    public static final GroupLayout on_table_delete$layout() {
+        return on_table_delete$LAYOUT;
+    }
+
+    private static final long on_table_delete$OFFSET = $LAYOUT.byteOffset(groupElement("on_table_delete"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_delete
+     * }
+     */
+    public static final long on_table_delete$offset() {
+        return on_table_delete$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_delete
+     * }
+     */
+    public static MemorySegment on_table_delete(MemorySegment struct) {
+        return struct.asSlice(on_table_delete$OFFSET, on_table_delete$LAYOUT.byteSize());
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_event_record_t on_table_delete
+     * }
+     */
+    public static void on_table_delete(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, on_table_delete$OFFSET, on_table_delete$LAYOUT.byteSize());
     }
 
     private static final GroupLayout events$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("events"));

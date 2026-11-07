@@ -24,7 +24,7 @@ import io.github.elebras1.flecs.examples.components.HealthMutView;
 public class SceneManagement {
 
     private static void resetScene(World world, long sceneRootId) {
-        world.defer(() -> world.obtainEntity(sceneRootId).children(id -> world.obtainEntity(id).destruct()));
+        world.obtainEntity(sceneRootId).children(id -> world.obtainEntity(id).destruct());
     }
 
     private static void menuScene(Iter it, long menuSceneId, long sceneRootId) {

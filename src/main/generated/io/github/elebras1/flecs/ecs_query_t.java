@@ -38,7 +38,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     void *ctx;
  *     void *binding_ctx;
  *     ecs_entity_t entity;
- *     ecs_world_t *real_world;
+ *     ecs_world_t *stage;
  *     ecs_world_t *world;
  *     int32_t eval_count;
  * }
@@ -75,7 +75,7 @@ public class ecs_query_t {
         flecs_h.C_POINTER.withName("ctx"),
         flecs_h.C_POINTER.withName("binding_ctx"),
         flecs_h.C_LONG.withName("entity"),
-        flecs_h.C_POINTER.withName("real_world"),
+        flecs_h.C_POINTER.withName("stage"),
         flecs_h.C_POINTER.withName("world"),
         flecs_h.C_INT.withName("eval_count"),
         MemoryLayout.paddingLayout(4)
@@ -1100,48 +1100,48 @@ public class ecs_query_t {
         struct.set(entity$LAYOUT, entity$OFFSET, fieldValue);
     }
 
-    private static final AddressLayout real_world$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("real_world"));
+    private static final AddressLayout stage$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("stage"));
 
     /**
      * Layout for field:
      * {@snippet lang=c :
-     * ecs_world_t *real_world
+     * ecs_world_t *stage
      * }
      */
-    public static final AddressLayout real_world$layout() {
-        return real_world$LAYOUT;
+    public static final AddressLayout stage$layout() {
+        return stage$LAYOUT;
     }
 
-    private static final long real_world$OFFSET = $LAYOUT.byteOffset(groupElement("real_world"));
+    private static final long stage$OFFSET = $LAYOUT.byteOffset(groupElement("stage"));
 
     /**
      * Offset for field:
      * {@snippet lang=c :
-     * ecs_world_t *real_world
+     * ecs_world_t *stage
      * }
      */
-    public static final long real_world$offset() {
-        return real_world$OFFSET;
+    public static final long stage$offset() {
+        return stage$OFFSET;
     }
 
     /**
      * Getter for field:
      * {@snippet lang=c :
-     * ecs_world_t *real_world
+     * ecs_world_t *stage
      * }
      */
-    public static MemorySegment real_world(MemorySegment struct) {
-        return struct.get(real_world$LAYOUT, real_world$OFFSET);
+    public static MemorySegment stage(MemorySegment struct) {
+        return struct.get(stage$LAYOUT, stage$OFFSET);
     }
 
     /**
      * Setter for field:
      * {@snippet lang=c :
-     * ecs_world_t *real_world
+     * ecs_world_t *stage
      * }
      */
-    public static void real_world(MemorySegment struct, MemorySegment fieldValue) {
-        struct.set(real_world$LAYOUT, real_world$OFFSET, fieldValue);
+    public static void stage(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(stage$LAYOUT, stage$OFFSET, fieldValue);
     }
 
     private static final AddressLayout world$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("world"));

@@ -21,6 +21,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     ecs_size_t sizes;
  *     int16_t columns;
  *     const ecs_table_record_t *trs;
+ *     ecs_component_record_t *cr;
  * }
  * }
  */
@@ -37,7 +38,8 @@ public class ecs_each_iter_t {
         flecs_h.C_INT.withName("sizes"),
         flecs_h.C_SHORT.withName("columns"),
         MemoryLayout.paddingLayout(2),
-        flecs_h.C_POINTER.withName("trs")
+        flecs_h.C_POINTER.withName("trs"),
+        flecs_h.C_POINTER.withName("cr")
     ).withName("ecs_each_iter_t");
 
     /**
@@ -309,6 +311,50 @@ public class ecs_each_iter_t {
      */
     public static void trs(MemorySegment struct, MemorySegment fieldValue) {
         struct.set(trs$LAYOUT, trs$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout cr$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("cr"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * ecs_component_record_t *cr
+     * }
+     */
+    public static final AddressLayout cr$layout() {
+        return cr$LAYOUT;
+    }
+
+    private static final long cr$OFFSET = $LAYOUT.byteOffset(groupElement("cr"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * ecs_component_record_t *cr
+     * }
+     */
+    public static final long cr$offset() {
+        return cr$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * ecs_component_record_t *cr
+     * }
+     */
+    public static MemorySegment cr(MemorySegment struct) {
+        return struct.get(cr$LAYOUT, cr$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * ecs_component_record_t *cr
+     * }
+     */
+    public static void cr(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(cr$LAYOUT, cr$OFFSET, fieldValue);
     }
 
     /**

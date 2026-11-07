@@ -33,7 +33,7 @@ public class ecs_tree_spawner_child_t {
         flecs_h.C_POINTER.withName("table"),
         flecs_h.C_INT.withName("child"),
         flecs_h.C_INT.withName("parent_index")
-    ).withName("$anon$6489:9");
+    ).withName("$anon$6581:9");
 
     /**
      * The layout of this struct

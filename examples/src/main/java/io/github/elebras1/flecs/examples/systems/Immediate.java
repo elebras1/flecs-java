@@ -45,19 +45,9 @@ public class Immediate {
                         }
                         EntityView waiter = world.obtainEntityView(waiterRaw);
 
-                        // Suspend deferring so the waiter gets the plate
-                        // immediately. Even in an immediate system, deferring is
-                        // still enabled by default, as adding/removing
-                        // components to the entities being iterated would
-                        // interfere with the system iterator.
-                        world.deferSuspend();
+                        // Immediate systems run outside readonly mode, so these
+                        // changes are applied directly.
                         waiter.add(Plate.class, plate);
-                        world.deferResume();
-
-                        // Now that deferring is resumed, also add the waiter to
-                        // the plate. We can't do this while deferring is
-                        // suspended because the plate is the entity we're
-                        // iterating.
                         plate.add(Waiter.class, waiter);
 
                         System.out.println("Assigned " + waiter.name() + " to " + plate.name() + "!");

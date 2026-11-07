@@ -115,25 +115,6 @@ class EventTest {
     }
 
     @Test
-    void enqueueEvent() {
-        long evt = this.world.entity();
-        long id = this.world.entity();
-        long e1 = this.world.obtainEntity(this.world.entity()).add(id).id();
-
-        AtomicInteger count = new AtomicInteger();
-        this.world.observer()
-                .event(evt)
-                .with(id)
-                .each(entityId -> count.incrementAndGet());
-
-        this.world.deferBegin();
-        this.world.obtainEntity(e1).emit(evt, id);
-        this.world.deferEnd();
-
-        assertEquals(1, count.get());
-    }
-
-    @Test
     void evtType() {
         long evt = this.world.entity("Evt");
         long id = this.world.entity();
@@ -168,25 +149,6 @@ class EventTest {
         this.world.event(evt).id(id).entity(e1).emit();
         assertEquals(1, count.get());
         assertEquals(List.of(e1), ids);
-    }
-
-    @Test
-    void eventBuilderEnqueue() {
-        long evt = this.world.entity();
-        long id = this.world.entity();
-        long e1 = this.world.obtainEntity(this.world.entity()).add(id).id();
-
-        AtomicInteger count = new AtomicInteger();
-        this.world.observer()
-                .event(evt)
-                .with(id)
-                .each(entityId -> count.incrementAndGet());
-
-        this.world.deferBegin();
-        this.world.event(evt).id(id).entity(e1).enqueue();
-        assertEquals(0, count.get());
-        this.world.deferEnd();
-        assertEquals(1, count.get());
     }
 
     @Test
@@ -276,46 +238,5 @@ class EventTest {
         assertEquals(4.0f, p.y());
         assertEquals(1, entities.size());
         assertEquals(e1.id(), entities.get(0));
-    }
-
-    @Test
-    void entityEnqueuePayload() {
-        long positionId = this.world.component(Position.class);
-        Entity e1 = this.world.obtainEntity(this.world.entity()).add(Position.class);
-
-        AtomicReference<Position> received = new AtomicReference<>();
-        this.world.observer()
-                .event(positionId)
-                .with(Flecs.Any)
-                .iter(it -> received.set(it.payload(Position.class)));
-
-        this.world.deferBegin();
-        e1.enqueue(Position.class, new Position(5, 6));
-        assertNull(received.get());
-        this.world.deferEnd();
-
-        Position p = received.get();
-        assertNotNull(p);
-        assertEquals(5.0f, p.x());
-        assertEquals(6.0f, p.y());
-    }
-
-    @Test
-    void entityEnqueueEventId() {
-        long evt = this.world.entity();
-        long id = this.world.entity();
-        long e1 = this.world.obtainEntity(this.world.entity()).add(id).id();
-
-        AtomicInteger count = new AtomicInteger();
-        this.world.observer()
-                .event(evt)
-                .with(id)
-                .each(entityId -> count.incrementAndGet());
-
-        this.world.deferBegin();
-        this.world.obtainEntity(e1).enqueue(evt, id);
-        assertEquals(0, count.get());
-        this.world.deferEnd();
-        assertEquals(1, count.get());
     }
 }

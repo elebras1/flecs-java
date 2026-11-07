@@ -290,16 +290,4 @@ public class Iter {
         flecs_h.ecs_iter_fini(this.iterSeg);
         this.iterSeg = MemorySegment.NULL;
     }
-
-    @Override
-    public String toString() {
-        MemorySegment strSeg = flecs_h.ecs_iter_str(this.iterSeg);
-        if (strSeg.address() == 0) {
-            return "";
-        }
-
-        String str = strSeg.reinterpret(Long.MAX_VALUE).getString(0);
-        FlecsAllocator.free(strSeg);
-        return str;
-    }
 }

@@ -146,7 +146,7 @@ public class SystemBuilder extends SystemBuilderBase {
 
     @Override
     protected Iter iterFor(MemorySegment iterSegment) {
-        MemorySegment stageSeg = ecs_iter_t.world(iterSegment);
+        MemorySegment stageSeg = ecs_iter_t.stage(iterSegment);
         int stageId = flecs_h.ecs_stage_get_id(stageSeg);
         Iter iter = this.iters[stageId];
         iter.setIterSeg(iterSegment);
@@ -170,7 +170,7 @@ public class SystemBuilder extends SystemBuilderBase {
         this.runCallback = callback;
 
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
-            MemorySegment stageSeg = ecs_iter_t.world(iterSeg);
+            MemorySegment stageSeg = ecs_iter_t.stage(iterSeg);
             int stageId = flecs_h.ecs_stage_get_id(stageSeg);
             Iter iter = this.iters[stageId];
             iter.setIterSeg(iterSeg);

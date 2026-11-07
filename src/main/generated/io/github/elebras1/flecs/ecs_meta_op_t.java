@@ -474,7 +474,7 @@ public class ecs_meta_op_t {
             flecs_h.C_POINTER.withName("members"),
             flecs_h.C_POINTER.withName("constants"),
             flecs_h.C_POINTER.withName("opaque")
-        ).withName("$anon$18500:5");
+        ).withName("$anon$20472:5");
 
         /**
          * The layout of this union

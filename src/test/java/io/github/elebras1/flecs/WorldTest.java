@@ -206,17 +206,6 @@ class WorldTest {
     }
 
     @Test
-    void setWith() {
-        this.world.setWith(Position.class);
-        try {
-            long entityId = this.world.entity();
-            assertTrue(this.world.obtainEntity(entityId).has(Position.class));
-        } finally {
-            this.world.setWith(0);
-        }
-    }
-
-    @Test
     void runPostFrame() {
         AtomicBoolean ran = new AtomicBoolean(false);
         this.world.runPostFrame(() -> ran.set(true));
@@ -400,15 +389,6 @@ class WorldTest {
     }
 
     @Test
-    void defer() {
-        assertFalse(this.world.isDeferred());
-        this.world.deferBegin();
-        assertTrue(this.world.isDeferred());
-        this.world.deferEnd();
-        assertFalse(this.world.isDeferred());
-    }
-
-    @Test
     void toJsonAndFromJson() {
         this.world.obtainEntity(this.world.entity("json_entity")).set(new Position(10, 20));
 
@@ -567,18 +547,6 @@ class WorldTest {
     }
 
     @Test
-    void getWith() {
-        long positionId = this.world.id(Position.class);
-        assertEquals(0, this.world.getWith());
-
-        this.world.setWith(positionId);
-        assertEquals(positionId, this.world.getWith());
-
-        this.world.setWith(0);
-        assertEquals(0, this.world.getWith());
-    }
-
-    @Test
     void worldCtx() {
         assertNull(this.world.getCtx());
 
@@ -658,17 +626,6 @@ class WorldTest {
         this.world.set(new Rest().port(27754));
 
         assertNotNull(Flecs.Stats);
-    }
-
-    @Test
-    void deferRunnable() {
-        AtomicInteger count = new AtomicInteger();
-        this.world.defer(() -> {
-            this.world.obtainEntity(this.world.entity()).add(Position.class);
-            count.incrementAndGet();
-        });
-        assertEquals(1, count.get());
-        assertEquals(1, this.world.count(Position.class));
     }
 
     @Test

@@ -19,6 +19,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  *     struct ecs_event_id_record_t *wildcard;
  *     struct ecs_event_id_record_t *wildcard_pair;
  *     ecs_map_t event_ids;
+ *     uint64_t event_ids_filter;
  *     ecs_entity_t event;
  * }
  * }
@@ -34,6 +35,7 @@ public class ecs_event_record_t {
         flecs_h.C_POINTER.withName("wildcard"),
         flecs_h.C_POINTER.withName("wildcard_pair"),
         ecs_map_t.layout().withName("event_ids"),
+        flecs_h.C_LONG.withName("event_ids_filter"),
         flecs_h.C_LONG.withName("event")
     ).withName("ecs_event_record_t");
 
@@ -218,6 +220,50 @@ public class ecs_event_record_t {
      */
     public static void event_ids(MemorySegment struct, MemorySegment fieldValue) {
         MemorySegment.copy(fieldValue, 0L, struct, event_ids$OFFSET, event_ids$LAYOUT.byteSize());
+    }
+
+    private static final OfLong event_ids_filter$LAYOUT = (OfLong)$LAYOUT.select(groupElement("event_ids_filter"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint64_t event_ids_filter
+     * }
+     */
+    public static final OfLong event_ids_filter$layout() {
+        return event_ids_filter$LAYOUT;
+    }
+
+    private static final long event_ids_filter$OFFSET = $LAYOUT.byteOffset(groupElement("event_ids_filter"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint64_t event_ids_filter
+     * }
+     */
+    public static final long event_ids_filter$offset() {
+        return event_ids_filter$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint64_t event_ids_filter
+     * }
+     */
+    public static long event_ids_filter(MemorySegment struct) {
+        return struct.get(event_ids_filter$LAYOUT, event_ids_filter$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint64_t event_ids_filter
+     * }
+     */
+    public static void event_ids_filter(MemorySegment struct, long fieldValue) {
+        struct.set(event_ids_filter$LAYOUT, event_ids_filter$OFFSET, fieldValue);
     }
 
     private static final OfLong event$LAYOUT = (OfLong)$LAYOUT.select(groupElement("event"));
