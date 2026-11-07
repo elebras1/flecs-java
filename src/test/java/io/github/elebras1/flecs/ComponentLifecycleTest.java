@@ -1,11 +1,14 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -75,6 +78,88 @@ class ComponentLifecycleTest {
         entity.set(new Position(30, 40));
         assertEquals(2, this.onSet.get());
         assertEquals(1, this.onAdd.get());
+    }
+
+    @Test
+    void onValidateHook() {
+        AtomicInteger onSet = new AtomicInteger();
+        AtomicInteger onSetObservers = new AtomicInteger();
+        AtomicReference<Entity> validated = new AtomicReference<>();
+
+        this.world.component(Mass.class, hooks -> {
+            hooks.onValidate((entity, mass) -> {
+                validated.set(entity);
+                return mass.value() >= 0;
+            });
+            hooks.onSet(components -> onSet.addAndGet(components.length));
+        });
+        this.world.observer()
+                .event(Flecs.OnSet)
+                .with(Mass.class)
+                .each(entityId -> onSetObservers.incrementAndGet());
+
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        entity.set(new Mass(-1));
+
+        assertNotNull(validated.get());
+        assertEquals(0, onSet.get());
+        assertEquals(0, onSetObservers.get());
+
+        entity.set(new Mass(1));
+
+        assertEquals(1, onSet.get());
+        assertEquals(1, onSetObservers.get());
+    }
+
+    @Test
+    void onCompareAndOnEqualsHooks() {
+        AtomicInteger compareCalls = new AtomicInteger();
+        AtomicInteger equalsCalls = new AtomicInteger();
+
+        this.world.component(Mass.class, hooks -> {
+            hooks.onCompare((a, b) -> {
+                compareCalls.incrementAndGet();
+                return Float.compare(a.value(), b.value());
+            });
+            hooks.onEquals((a, b) -> {
+                equalsCalls.incrementAndGet();
+                return a.value() == b.value();
+            });
+        });
+
+        Component<Mass> component = this.world.componentRegistry().getComponent(Mass.class);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment first = componentValue(component, arena, new Mass(1));
+            MemorySegment second = componentValue(component, arena, new Mass(2));
+            MemorySegment firstCopy = componentValue(component, arena, new Mass(1));
+
+            MemorySegment firstValue = value(arena, first);
+            MemorySegment secondValue = value(arena, second);
+            MemorySegment firstCopyValue = value(arena, firstCopy);
+
+            assertTrue(flecs_h.ecs_value_compare(this.world.worldSeg(), firstValue, secondValue) < 0);
+            assertTrue(flecs_h.ecs_value_compare(this.world.worldSeg(), secondValue, firstValue) > 0);
+            assertEquals(0, flecs_h.ecs_value_compare(this.world.worldSeg(), firstValue, firstCopyValue));
+
+            assertTrue(flecs_h.ecs_value_equals(this.world.worldSeg(), firstValue, firstCopyValue));
+            assertFalse(flecs_h.ecs_value_equals(this.world.worldSeg(), firstValue, secondValue));
+
+            assertTrue(compareCalls.get() > 0);
+            assertTrue(equalsCalls.get() > 0);
+        }
+    }
+
+    private MemorySegment componentValue(Component<Mass> component, Arena arena, Mass value) {
+        MemorySegment segment = arena.allocate(component.layout());
+        component.write(segment, 0, value);
+        return segment;
+    }
+
+    private MemorySegment value(Arena arena, MemorySegment componentPtr) {
+        MemorySegment value = ecs_value_t.allocate(arena);
+        ecs_value_t.type(value, this.world.id(Mass.class));
+        ecs_value_t.ptr(value, componentPtr);
+        return value;
     }
 
     @Test

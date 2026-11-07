@@ -1,12 +1,15 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.callback.CompareHookCallback;
 import io.github.elebras1.flecs.callback.CopyMoveCallback;
 import io.github.elebras1.flecs.callback.CtorCallback;
 import io.github.elebras1.flecs.callback.DtorCallback;
+import io.github.elebras1.flecs.callback.EqualsHookCallback;
 import io.github.elebras1.flecs.callback.IterHookCallback;
 import io.github.elebras1.flecs.callback.IterHookContextCallback;
 import io.github.elebras1.flecs.callback.ReplaceHookCallback;
 import io.github.elebras1.flecs.callback.ReplaceHookContextCallback;
+import io.github.elebras1.flecs.callback.ValidateHookCallback;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -31,6 +34,9 @@ public class ComponentHooks<T> {
     private IterHookContextCallback<T> onRemoveContextCallback;
     private ReplaceHookCallback<T> onReplaceCallback;
     private ReplaceHookContextCallback<T> onReplaceContextCallback;
+    private ValidateHookCallback<T> onValidateCallback;
+    private CompareHookCallback<T> onCompareCallback;
+    private EqualsHookCallback<T> onEqualsCallback;
     private CtorCallback<T> ctorCallback;
     private DtorCallback<T> dtorCallback;
     private CopyMoveCallback<T> copyCallback;
@@ -89,6 +95,21 @@ public class ComponentHooks<T> {
     public ComponentHooks<T> onReplace(ReplaceHookContextCallback<T> callback) {
         this.onReplaceContextCallback = callback;
         this.onReplaceCallback = null;
+        return this;
+    }
+
+    public ComponentHooks<T> onValidate(ValidateHookCallback<T> callback) {
+        this.onValidateCallback = callback;
+        return this;
+    }
+
+    public ComponentHooks<T> onCompare(CompareHookCallback<T> callback) {
+        this.onCompareCallback = callback;
+        return this;
+    }
+
+    public ComponentHooks<T> onEquals(EqualsHookCallback<T> callback) {
+        this.onEqualsCallback = callback;
         return this;
     }
 
@@ -164,6 +185,15 @@ public class ComponentHooks<T> {
             } else if (this.onReplaceCallback != null) {
                 ecs_type_hooks_t.on_replace(hooks, this.createReplaceHookStub(this.onReplaceCallback, "on_replace"));
             }
+            if (this.onValidateCallback != null) {
+                ecs_type_hooks_t.on_validate(hooks, this.createValidateHookStub(this.onValidateCallback));
+            }
+            if (this.onCompareCallback != null) {
+                ecs_type_hooks_t.cmp(hooks, this.createCompareHookStub(this.onCompareCallback));
+            }
+            if (this.onEqualsCallback != null) {
+                ecs_type_hooks_t.equals(hooks, this.createEqualsHookStub(this.onEqualsCallback));
+            }
 
             flecs_h.ecs_set_hooks_id(worldHandle, componentId, hooks);
         }
@@ -216,6 +246,27 @@ public class ComponentHooks<T> {
                 MethodType.methodType(void.class, ReplaceHookContextCallback.class, String.class, MemorySegment.class),
                 callback, hookName);
         return this.upcall(target, FunctionDescriptor.ofVoid(ADDRESS));
+    }
+
+    private MemorySegment createValidateHookStub(ValidateHookCallback<T> callback) {
+        MethodHandle target = this.bind("invokeValidateHook",
+                MethodType.methodType(boolean.class, ValidateHookCallback.class, MemorySegment.class, long.class, MemorySegment.class),
+                callback);
+        return this.upcall(target, FunctionDescriptor.of(flecs_h.C_BOOL, ADDRESS, flecs_h.C_LONG, ADDRESS));
+    }
+
+    private MemorySegment createCompareHookStub(CompareHookCallback<T> callback) {
+        MethodHandle target = this.bind("invokeCompareHook",
+                MethodType.methodType(int.class, CompareHookCallback.class, MemorySegment.class, MemorySegment.class, MemorySegment.class),
+                callback);
+        return this.upcall(target, FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, ADDRESS));
+    }
+
+    private MemorySegment createEqualsHookStub(EqualsHookCallback<T> callback) {
+        MethodHandle target = this.bind("invokeEqualsHook",
+                MethodType.methodType(boolean.class, EqualsHookCallback.class, MemorySegment.class, MemorySegment.class, MemorySegment.class),
+                callback);
+        return this.upcall(target, FunctionDescriptor.of(flecs_h.C_BOOL, ADDRESS, ADDRESS, ADDRESS));
     }
 
     private MemorySegment createCtorStub(CtorCallback<T> callback) {
@@ -315,6 +366,54 @@ public class ComponentHooks<T> {
         } catch (Throwable e) {
             report(hookName, e);
         }
+    }
+
+    private boolean invokeValidateHook(ValidateHookCallback<T> callback, MemorySegment worldSeg, long entityId, MemorySegment ptr) {
+        try {
+            T value = this.readComponent(ptr);
+            if (value == null) {
+                return true;
+            }
+            return callback.invoke(this.world.obtainEntity(entityId), value);
+        } catch (Throwable e) {
+            report("on_validate", e);
+            return false;
+        }
+    }
+
+    private int invokeCompareHook(CompareHookCallback<T> callback, MemorySegment aPtr, MemorySegment bPtr, MemorySegment typeInfo) {
+        try {
+            T a = this.readComponent(aPtr);
+            T b = this.readComponent(bPtr);
+            if (a == null || b == null) {
+                return 0;
+            }
+            return callback.invoke(a, b);
+        } catch (Throwable e) {
+            report("cmp", e);
+            return 0;
+        }
+    }
+
+    private boolean invokeEqualsHook(EqualsHookCallback<T> callback, MemorySegment aPtr, MemorySegment bPtr, MemorySegment typeInfo) {
+        try {
+            T a = this.readComponent(aPtr);
+            T b = this.readComponent(bPtr);
+            if (a == null || b == null) {
+                return false;
+            }
+            return callback.invoke(a, b);
+        } catch (Throwable e) {
+            report("equals", e);
+            return false;
+        }
+    }
+
+    private T readComponent(MemorySegment ptr) {
+        if (ptr == null || ptr.address() == 0 || this.component.size() == 0) {
+            return null;
+        }
+        return this.component.read(ptr.reinterpret(this.component.size()), 0);
     }
 
     private void invokeCtor(CtorCallback<T> callback, String hookName, MemorySegment segment, int count, MemorySegment typeInfo) {
