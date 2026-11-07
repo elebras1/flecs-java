@@ -7,7 +7,7 @@
 [![Java 25+](https://img.shields.io/badge/Java-25%2B-orange)](https://github.com/elebras1/flecs-java)
 [![Documentation](https://img.shields.io/badge/docs-flecs.dev-blue)](https://www.flecs.dev/flecs/)
 
-Java bindings for [Flecs](https://github.com/SanderMertens/flecs) (v4.1.6) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
+Java bindings for [Flecs](https://github.com/SanderMertens/flecs) (v4.2.0) - A fast and flexible Entity Component System (ECS) using Java 25's Foreign Function & Memory API (FFM).
 
 - **Zero JNI overhead**: direct native calls via Project Panama's FFM API
 - **Type-safe components**: define components as plain Java records, an annotation processor generates the memory layout and accessors
@@ -49,8 +49,8 @@ If this project is useful to you, consider giving it a ⭐, it helps others find
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:1.0.1'
-    annotationProcessor 'io.github.elebras1:flecs-java:1.0.1'
+    implementation 'io.github.elebras1:flecs-java:1.1.0'
+    annotationProcessor 'io.github.elebras1:flecs-java:1.1.0'
 }
 ```
 
