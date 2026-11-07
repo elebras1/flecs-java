@@ -499,6 +499,58 @@ class EntityTest {
     }
 
     @Test
+    void stageEntity() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        World stage = this.world.getStage(0);
+
+        Entity staged = entity.stage(stage);
+        staged.add(Position.class);
+
+        assertFalse(entity.has(Position.class));
+        stage.merge();
+        assertTrue(entity.has(Position.class));
+    }
+
+    @Test
+    void defaultStageEntity() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+
+        Entity staged = entity.stage();
+        staged.add(Position.class);
+
+        assertFalse(entity.has(Position.class));
+        this.world.getStage(0).merge();
+        assertTrue(entity.has(Position.class));
+    }
+
+    @Test
+    void ensure() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+
+        PositionMutView view = entity.ensure(Position.class);
+        view.x(7);
+        view.y(8);
+
+        Position position = entity.get(Position.class);
+        assertEquals(7.0f, position.x());
+        assertEquals(8.0f, position.y());
+    }
+
+    @Test
+    void ensurePair() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        Entity target = this.world.obtainEntity(this.world.entity());
+
+        PositionMutView view = entity.ensure(Position.class, target);
+        view.x(9);
+        view.y(10);
+
+        Position position = entity.get(Position.class, target.id());
+        assertEquals(9.0f, position.x());
+        assertEquals(10.0f, position.y());
+    }
+
+    @Test
     void insert() {
         Entity entity = this.world.obtainEntity(this.world.entity());
         entity.insert(Position.class, (PositionMutView view) -> {

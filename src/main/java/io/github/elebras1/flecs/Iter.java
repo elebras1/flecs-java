@@ -11,6 +11,7 @@ public class Iter {
 
     private MemorySegment iterSeg;
     private final World world;
+    private World stage;
     private final Field<?>[] fields;
     private final Table table;
     private int count;
@@ -19,6 +20,7 @@ public class Iter {
     Iter(MemorySegment iterSeg, World world) {
         this.iterSeg = iterSeg;
         this.world = world;
+        this.stage = world;
         this.fields = new Field[32];
         this.table = new Table(world, MemorySegment.NULL);
         this.count = -1;
@@ -28,10 +30,28 @@ public class Iter {
     void setIterSeg(MemorySegment iterSeg) {
         this.iterSeg = iterSeg;
         this.count = ecs_iter_t.count(iterSeg);
+        if (iterSeg.address() != 0) {
+            MemorySegment stageSeg = ecs_iter_t.stage(iterSeg);
+            if (stageSeg != null && stageSeg.address() != 0) {
+                int stageId = flecs_h.ecs_stage_get_id(stageSeg);
+                this.stage = this.world.isStage() ? this.world : this.world.getStage(stageId);
+            }
+        }
     }
 
     public World world() {
         return this.world;
+    }
+
+    public World stage() {
+        return this.stage;
+    }
+
+    public int frameOffset() {
+        assert !this.destructed : "Iterator has been destructed";
+        assert this.iterSeg.address() != 0 : "Iterator is not set";
+        assert (ecs_iter_t.flags(this.iterSeg) & flecs_h.EcsIterIsValid()) != 0 : "operation invalid before calling next()";
+        return ecs_iter_t.frame_offset(this.iterSeg);
     }
 
     public boolean next() {
@@ -285,7 +305,7 @@ public class Iter {
         int flags = ecs_iter_t.flags(this.iterSeg);
         MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
         if((flags & flecs_h.EcsIterIsValid()) != 0 && tableSeg.address() != 0) {
-            flecs_h.ecs_table_unlock(this.world.worldSeg(), tableSeg);
+            flecs_h.ecs_table_unlock(this.stage.worldSeg(), tableSeg);
         }
         flecs_h.ecs_iter_fini(this.iterSeg);
         this.iterSeg = MemorySegment.NULL;

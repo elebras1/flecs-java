@@ -685,6 +685,23 @@ class QueryTest {
     }
 
     @Test
+    void iterStageAndFrameOffset() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        AtomicInteger count = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                assertNotNull(it.stage());
+                assertTrue(it.frameOffset() >= 0);
+                count.incrementAndGet();
+            }
+        });
+
+        assertTrue(count.get() > 0);
+    }
+
+    @Test
     void iterAccessors() {
         long rel = this.world.entity();
         long target = this.world.entity();

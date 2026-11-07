@@ -19,6 +19,25 @@ public class Entity extends EntityBase<Entity> {
         return this.world;
     }
 
+    public Entity stage() {
+        return new Entity(this.world.isStage() ? this.world : this.world.getStage(0), this.id);
+    }
+
+    public Entity stage(World stage) {
+        if (stage.isReadonly()) {
+            throw new IllegalStateException("cannot use read-only world/stage to create mutable handle");
+        }
+        return new Entity(stage, this.id);
+    }
+
+    public Entity stage(Iter iter) {
+        return this.stage(iter.stage());
+    }
+
+    public Entity stage(Entity entity) {
+        return this.stage(entity.world());
+    }
+
     public Entity add(long entityId) {
         flecs_h.ecs_add_id(this.world.worldSeg(), this.id, entityId);
         return this;
@@ -683,6 +702,33 @@ public class Entity extends EntityBase<Entity> {
         view.setBaseAddress(address);
 
         return (T) view;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ComponentMutView> T ensure(Class<?> componentClass) {
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
+        long size = this.world.componentRegistry().getComponent(index, componentClass).size();
+        long address = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentId, size).address();
+        ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
+        view.setBaseAddress(address);
+        return (T) view;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ComponentMutView> T ensure(Class<?> componentClass, long target) {
+        int index = ComponentMap.getIndex(componentClass);
+        long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
+        long size = this.world.componentRegistry().getComponent(index, componentClass).size();
+        long pairId = flecs_h.ecs_make_pair(componentId, target);
+        long address = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size).address();
+        ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
+        view.setBaseAddress(address);
+        return (T) view;
+    }
+
+    public <T extends ComponentMutView> T ensure(Class<?> componentClass, Entity target) {
+        return this.ensure(componentClass, target.id());
     }
 
     public <T> Ref<T> getRef(Class<T> componentClass) {
