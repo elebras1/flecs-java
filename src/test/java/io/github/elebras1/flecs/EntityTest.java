@@ -524,6 +524,18 @@ class EntityTest {
     }
 
     @Test
+    void eachIncludesDontFragment() {
+        long massId = this.world.id(Mass.class);
+        this.world.obtainEntity(massId).add(Flecs.DontFragment);
+
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(Mass.class);
+        List<Long> ids = new ArrayList<>();
+        entity.each(ids::add);
+
+        assertTrue(ids.contains(massId));
+    }
+
+    @Test
     void ensure() {
         Entity entity = this.world.obtainEntity(this.world.entity());
 

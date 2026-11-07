@@ -1148,17 +1148,7 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public void each(LongConsumer callback) {
-        MemorySegment typeSeg = flecs_h.ecs_get_type(this.world.worldSeg(), this.id);
-        if (typeSeg.address() == 0) {
-            return;
-        }
-
-        int count = ecs_type_t.count(typeSeg);
-        MemorySegment ids = ecs_type_t.array(typeSeg);
-
-        for (int i = 0; i < count; i++) {
-            callback.accept(ids.getAtIndex(ValueLayout.JAVA_LONG, i));
-        }
+        this.eachId(0, false, callback);
     }
 
     public void each(long relation, LongConsumer callback) {
@@ -1166,24 +1156,51 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public void each(long relation, long target, LongConsumer callback) {
-        MemorySegment typeSeg = flecs_h.ecs_get_type(this.world.worldSeg(), this.id);
-        if (typeSeg.address() == 0) {
+        long pattern = target == 0 ? relation : flecs_h.ecs_make_pair(relation, target);
+        this.eachId(pattern, true, id -> {
+            Id typeId = this.world.obtainId(id);
+            if (target == 0 || typeId.isPair()) {
+                callback.accept(id);
+            }
+        });
+    }
+
+    private void eachId(long pattern, boolean match, LongConsumer callback) {
+        MemorySegment realWorld = flecs_h.ecs_get_world(this.world.worldSeg());
+        MemorySegment typeSeg = flecs_h.ecs_get_type(realWorld, this.id);
+        if (typeSeg.address() != 0) {
+            int count = ecs_type_t.count(typeSeg);
+            MemorySegment ids = ecs_type_t.array(typeSeg);
+            for (int i = 0; i < count; i++) {
+                long id = ids.getAtIndex(ValueLayout.JAVA_LONG, i);
+                if (match && !flecs_h.ecs_id_match(id, pattern)) {
+                    continue;
+                }
+                callback.accept(id);
+            }
+        }
+
+        MemorySegment recordSeg = flecs_h.flecs_entities_get(realWorld, this.id);
+        if (recordSeg.address() == 0) {
             return;
         }
 
-        int count = ecs_type_t.count(typeSeg);
-        MemorySegment ids = ecs_type_t.array(typeSeg);
+        recordSeg = recordSeg.reinterpret(ecs_record_t.layout().byteSize());
+        int row = ecs_record_t.row(recordSeg);
+        if ((row & flecs_h.EcsEntityHasDontFragment()) == 0) {
+            return;
+        }
 
-        for (int i = 0; i < count; i++) {
-            long id = ids.getAtIndex(ValueLayout.JAVA_LONG, i);
-            Id typeId = this.world.obtainId(id);
-            if (!typeId.isPair() || (relation != Flecs.Wildcard && typeId.first() != relation)) {
-                continue;
+        MemorySegment cr = flecs_h.flecs_component_dont_fragment_first(realWorld);
+        while (cr.address() != 0) {
+            long id = flecs_h.flecs_component_get_id(cr);
+            if (!flecs_h.ecs_id_is_wildcard(id) && (!match || flecs_h.ecs_id_match(id, pattern))) {
+                MemorySegment sparse = flecs_h.flecs_component_get_sparse(cr);
+                if (sparse.address() != 0 && flecs_h.flecs_sparse_has(sparse, this.id)) {
+                    callback.accept(id);
+                }
             }
-            if (target != Flecs.Wildcard && typeId.second() != target) {
-                continue;
-            }
-            callback.accept(id);
+            cr = flecs_h.flecs_component_dont_fragment_next(cr);
         }
     }
 
