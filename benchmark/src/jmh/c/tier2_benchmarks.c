@@ -194,7 +194,7 @@ static void prefabInheritGet_setup(void *ptr) {
     PrefabInheritCtx *ctx = ptr;
     ctx->world = bench_world_new();
     ecs_add_pair(ctx->world, ecs_id(Position), EcsOnInstantiate, EcsInherit);
-    ecs_entity_t prefab = ecs_entity(ctx->world, { .add = ecs_ids(EcsPrefab) });
+    ecs_entity_t prefab = ecs_new_w_id(ctx->world, EcsPrefab);
     ecs_set(ctx->world, prefab, Position, { 1.0f, 2.0f });
     for (int i = 0; i < ctx->n; i++) {
         ctx->entities[i] =
@@ -333,14 +333,14 @@ static void deferAdd_after(void *ptr) {
 
 static void deferAdd_run(void *ptr) {
     DeferCtx *ctx = ptr;
-    ecs_defer_begin(ctx->world);
+    ecs_world_t *stage = ecs_get_stage(ctx->world, 0);
     unsigned long long acc = 0;
     for (int i = 0; i < ctx->n; i++) {
-        ecs_set(ctx->world, ctx->entities[i], Position, { 1.0f, 2.0f });
-        ecs_set(ctx->world, ctx->entities[i], Velocity, { 3.0f, 4.0f });
+        ecs_set(stage, ctx->entities[i], Position, { 1.0f, 2.0f });
+        ecs_set(stage, ctx->entities[i], Velocity, { 3.0f, 4.0f });
         acc ^= (unsigned long long)ctx->entities[i];
     }
-    ecs_defer_end(ctx->world);
+    ecs_merge(stage);
     bench_sink_u64(acc);
 }
 
@@ -375,11 +375,10 @@ static void multiThreadedProgress_setup(void *ptr) {
         ecs_set(ctx->world, entity, Position, { (float)i, (float)i + 1.0f });
         ecs_set(ctx->world, entity, Velocity, { 1.0f, 0.5f });
     }
+    ecs_entity_t systemEntity = ecs_entity(ctx->world, { .name = "MultiThreadedMove" });
+    ecs_add_pair(ctx->world, systemEntity, EcsDependsOn, EcsOnUpdate);
     ecs_system(ctx->world, {
-        .entity = ecs_entity(ctx->world, {
-            .name = "MultiThreadedMove",
-            .add = ecs_ids(ecs_dependson(EcsOnUpdate))
-        }),
+        .entity = systemEntity,
         .query.terms = {
             { .id = ecs_id(Position) },
             { .id = ecs_id(Velocity) }

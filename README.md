@@ -49,8 +49,8 @@ If this project is useful to you, consider giving it a ⭐, it helps others find
 
 ```gradle
 dependencies {
-    implementation 'io.github.elebras1:flecs-java:1.1.0'
-    annotationProcessor 'io.github.elebras1:flecs-java:1.1.0'
+    implementation 'io.github.elebras1:flecs-java:1.1.1'
+    annotationProcessor 'io.github.elebras1:flecs-java:1.1.1'
 }
 ```
 

@@ -95,7 +95,7 @@ typedef struct {
 static void createFromPrefab_before(void *ptr) {
     PrefabCtx *ctx = ptr;
     ctx->world = bench_world_new();
-    ctx->prefab = ecs_entity(ctx->world, { .add = ecs_ids(EcsPrefab) });
+    ctx->prefab = ecs_new_w_id(ctx->world, EcsPrefab);
     ecs_set(ctx->world, ctx->prefab, Position, { 1.0f, 2.0f });
     ecs_set(ctx->world, ctx->prefab, Velocity, { 3.0f, 4.0f });
 }
@@ -462,11 +462,10 @@ static void systemRun_setup(void *ptr) {
         ecs_set(ctx->world, entity, Position, { (float)i, (float)i + 1.0f });
         ecs_set(ctx->world, entity, Velocity, { 1.0f, 0.5f });
     }
+    ecs_entity_t systemEntity = ecs_entity(ctx->world, { .name = "Move" });
+    ecs_add_pair(ctx->world, systemEntity, EcsDependsOn, EcsOnUpdate);
     ctx->system = ecs_system(ctx->world, {
-        .entity = ecs_entity(ctx->world, {
-            .name = "Move",
-            .add = ecs_ids(ecs_dependson(EcsOnUpdate))
-        }),
+        .entity = systemEntity,
         .query.terms = {
             { .id = ecs_id(Position) },
             { .id = ecs_id(Velocity) }
@@ -611,11 +610,10 @@ static void systemRun5_setup(void *ptr) {
         ecs_set(ctx->world, entity, Mass, { 1.0f });
         ecs_set(ctx->world, entity, Age, { 10 });
     }
+    ecs_entity_t systemEntity = ecs_entity(ctx->world, { .name = "Move5" });
+    ecs_add_pair(ctx->world, systemEntity, EcsDependsOn, EcsOnUpdate);
     ctx->system = ecs_system(ctx->world, {
-        .entity = ecs_entity(ctx->world, {
-            .name = "Move5",
-            .add = ecs_ids(ecs_dependson(EcsOnUpdate))
-        }),
+        .entity = systemEntity,
         .query.terms = {
             { .id = ecs_id(Position) },
             { .id = ecs_id(Velocity) },
