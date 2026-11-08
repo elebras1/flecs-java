@@ -30486,7 +30486,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("flecs_table_traverse_add");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**
@@ -39371,7 +39371,7 @@ class flecs_h_2 extends flecs_h$shared {
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecs_new_w_parent");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**

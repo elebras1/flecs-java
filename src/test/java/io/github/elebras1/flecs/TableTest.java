@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs;
 
+import java.util.concurrent.atomic.LongAdder;
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.PositionView;
@@ -187,5 +188,40 @@ class TableTest {
 
         Table table = this.world.obtainEntity(e).table();
         assertTrue(table.size() >= 1);
+    }
+
+    @Test
+    void multiThreadedTableViewsAreNotShared() {
+        int n = 50_000;
+        this.world.setThreads(8);
+        for (int i = 0; i < n; i++) {
+            this.world.obtainEntity(this.world.entity()).set(new Position(i, -i));
+        }
+
+        LongAdder wrong = new LongAdder();
+        LongAdder reads = new LongAdder();
+        this.world.system()
+                .with(Position.class)
+                .multiThreaded()
+                .iter(it -> {
+                    Table table = it.table();
+                    int rows = table.count();
+                    for (int row = 0; row < rows; row++) {
+                        PositionView view = table.getView(Position.class, row);
+                        float x = view.x();
+                        float y = view.y();
+                        if (x != -y) {
+                            wrong.increment();
+                        }
+                        reads.increment();
+                    }
+                });
+
+        for (int frame = 0; frame < 5; frame++) {
+            this.world.progress();
+        }
+
+        assertTrue(reads.sum() > 0);
+        assertEquals(0, wrong.sum());
     }
 }

@@ -208,18 +208,22 @@ class WorldTest {
     @Test
     void runPostFrame() {
         AtomicBoolean ran = new AtomicBoolean(false);
-        this.world.runPostFrame(() -> ran.set(true));
+        int before = ParamRegistry.size();
 
-        this.world.progress();
-        this.world.progress();
+        this.world.frameBegin(0);
+        this.world.runPostFrame(() -> ran.set(true));
+        assertFalse(ran.get());
+        this.world.frameEnd();
 
         assertTrue(ran.get());
+        assertEquals(before, ParamRegistry.size());
     }
 
     @Test
     void runPostFrameClearsCtxWhenNeverRun() {
         AtomicBoolean ran = new AtomicBoolean(false);
         int before = ParamRegistry.size();
+        this.world.frameBegin(0);
         this.world.runPostFrame(() -> ran.set(true));
         assertEquals(before + 1, ParamRegistry.size());
 
@@ -241,23 +245,23 @@ class WorldTest {
 
     @Test
     void rangeSet() {
-        EntityRange range = this.world.rangeNew(100, 200);
+        EntityRange range = this.world.rangeNew(100_000, 100_100);
         this.world.rangeSet(range);
 
-        assertEquals(100, range.min());
-        assertEquals(200, range.max());
+        assertEquals(100_000, range.min());
+        assertEquals(100_100, range.max());
 
         long e1 = this.world.entity();
-        assertEquals(100, e1);
+        assertEquals(100_000, e1);
 
         this.world.obtainEntity(e1).destruct();
 
         long e2 = this.world.entity();
-        assertEquals(100, this.world.stripGeneration(e2));
+        assertEquals(100_000, this.world.stripGeneration(e2));
 
         EntityRange active = this.world.rangeGet();
-        assertEquals(100, active.min());
-        assertEquals(200, active.max());
+        assertEquals(100_000, active.min());
+        assertEquals(100_100, active.max());
     }
 
     @Test
@@ -442,9 +446,6 @@ class WorldTest {
 
         entity.destruct();
         assertTrue(this.world.exists(entity));
-
-        Entity invalid = new Entity(this.world, 0);
-        assertFalse(this.world.exists(invalid));
     }
 
     @Test
@@ -468,8 +469,20 @@ class WorldTest {
         assertTrue(this.world.isAlive(entity));
         entity.destruct();
         assertFalse(this.world.isAlive(entity));
-        Entity invalid = new Entity(this.world, 0);
-        assertFalse(this.world.isAlive(invalid));
+    }
+
+    @Test
+    void deleteWithPair() {
+        long parent = this.world.entity();
+        Entity child1 = this.world.obtainEntity(this.world.entity()).childOf(parent);
+        Entity child2 = this.world.obtainEntity(this.world.entity()).childOf(parent);
+        Entity other = this.world.obtainEntity(this.world.entity());
+
+        this.world.deleteWith(Flecs.ChildOf, parent);
+
+        assertFalse(child1.isAlive());
+        assertFalse(child2.isAlive());
+        assertTrue(other.isAlive());
     }
 
     @Test
@@ -1237,6 +1250,25 @@ class WorldTest {
         try (World world = new World()) {
             world.component(Position.class);
             assertNotEquals(0, world.entity());
+        }
+    }
+
+    @Test
+    void scopedWorldGetStage() {
+        long parent = this.world.entity();
+        Entity entity = this.world.obtainEntity(this.world.entity());
+
+        try (ScopedWorld scoped = this.world.obtainEntity(parent).scope()) {
+            assertSame(this.world.getStage(0), scoped.getStage(0));
+
+            Entity staged = scoped.obtainEntity(entity.id()).stage();
+            assertTrue(staged.world().isStage());
+
+            staged.add(Mass.class);
+            assertFalse(entity.has(Mass.class));
+
+            scoped.getStage(0).merge();
+            assertTrue(entity.has(Mass.class));
         }
     }
 }

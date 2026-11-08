@@ -167,4 +167,20 @@ class RefTest {
 
         ref.destruct();
     }
+
+    @Test
+    void refFromStageEntity() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Ref<Position> ref = this.world.getStage(0).obtainEntity(entity.id()).getRef(Position.class);
+        assertEquals(1.0f, ref.get().x());
+
+        entity.add(Velocity.class);
+        entity.set(new Position(3, 4));
+        assertEquals(3.0f, ref.get().x());
+
+        PositionMutView view = ref.getMutView();
+        view.x(5);
+        assertEquals(5.0f, entity.get(Position.class).x());
+    }
 }

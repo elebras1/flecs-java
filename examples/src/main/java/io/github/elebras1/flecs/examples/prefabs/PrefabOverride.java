@@ -52,8 +52,8 @@ public class PrefabOverride {
     }
 
     // Output:
-    // Damage,(Identifier,Name),(IsA,SpaceShip)
-    // Attack,Damage,(Identifier,Name),(IsA,SpaceShip)
+    // Damage, (Identifier,Name), (IsA,SpaceShip)
+    // Attack, Damage, (Identifier,Name), (IsA,SpaceShip)
     // attack: 75.0
     // defense: 100.0
     // damage: 50.0

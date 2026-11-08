@@ -128,7 +128,7 @@ public class ComponentRegistry {
 
                 MemorySegment typeInfo = ecs_component_desc_t.type(componentDesc);
                 ecs_type_info_t.size(typeInfo, (int) component.size());
-                ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
+                ecs_type_info_t.alignment(typeInfo, component.size() == 0 ? 0 : (int) component.alignment());
 
                 componentId = flecs_h.ecs_component_init(this.worldSeg, componentDesc);
 
@@ -143,7 +143,7 @@ public class ComponentRegistry {
 
                 MemorySegment typeInfo = ecs_component_desc_t.type(componentDesc);
                 ecs_type_info_t.size(typeInfo, (int) component.size());
-                ecs_type_info_t.alignment(typeInfo, (int) component.alignment());
+                ecs_type_info_t.alignment(typeInfo, component.size() == 0 ? 0 : (int) component.alignment());
 
                 componentId = flecs_h.ecs_component_init(this.worldSeg, componentDesc);
 

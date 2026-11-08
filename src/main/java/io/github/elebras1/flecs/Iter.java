@@ -11,32 +11,23 @@ public class Iter {
 
     private MemorySegment iterSeg;
     private final World world;
-    private World stage;
+    private final World stage;
     private final Field<?>[] fields;
     private final Table table;
     private int count;
-    private boolean destructed;
 
-    Iter(MemorySegment iterSeg, World world) {
+    Iter(MemorySegment iterSeg, World stage) {
         this.iterSeg = iterSeg;
-        this.world = world;
-        this.stage = world;
+        this.world = stage.realWorld();
+        this.stage = stage;
         this.fields = new Field[32];
-        this.table = new Table(world, MemorySegment.NULL);
+        this.table = new Table(stage, MemorySegment.NULL);
         this.count = -1;
-        this.destructed = false;
     }
 
     void setIterSeg(MemorySegment iterSeg) {
         this.iterSeg = iterSeg;
         this.count = ecs_iter_t.count(iterSeg);
-        if (iterSeg.address() != 0) {
-            MemorySegment stageSeg = ecs_iter_t.stage(iterSeg);
-            if (stageSeg != null && stageSeg.address() != 0) {
-                int stageId = flecs_h.ecs_stage_get_id(stageSeg);
-                this.stage = this.world.isStage() ? this.world : this.world.getStage(stageId);
-            }
-        }
     }
 
     public World world() {
@@ -48,14 +39,12 @@ public class Iter {
     }
 
     public int frameOffset() {
-        assert !this.destructed : "Iterator has been destructed";
         assert this.iterSeg.address() != 0 : "Iterator is not set";
         assert (ecs_iter_t.flags(this.iterSeg) & flecs_h.EcsIterIsValid()) != 0 : "operation invalid before calling next()";
         return ecs_iter_t.frame_offset(this.iterSeg);
     }
 
     public boolean next() {
-        assert !this.destructed : "Iterator has been destructed";
         assert this.iterSeg.address() != 0 : "Iterator is not set";
         boolean hasNext = flecs_h.ecs_iter_next(this.iterSeg);
         this.count = hasNext ? ecs_iter_t.count(this.iterSeg) : 0;
@@ -63,14 +52,12 @@ public class Iter {
     }
 
     public int count() {
-        assert !this.destructed : "Iterator has been destructed";
         assert this.iterSeg.address() != 0 : "Iterator is not set";
         assert this.count >= 0 : "Iterator has not been advanced";
         return this.count;
     }
 
     public long entityId(int index) {
-        assert !this.destructed : "Iterator has been destructed";
         assert this.iterSeg.address() != 0 : "Iterator is not set";
         assert index >= 0 && index < this.count : "The index must be between 0 and count - 1.";
 
@@ -94,7 +81,6 @@ public class Iter {
     }
 
     private void checkField(int index) {
-        assert !this.destructed : "Iterator has been destructed";
         assert this.iterSeg.address() != 0 : "Iterator is not set";
         assert index >= 0 && index < this.fieldCount() : "The field index must be between 0 and field count - 1.";
     }
@@ -102,6 +88,8 @@ public class Iter {
     @SuppressWarnings("unchecked")
     public <T> Field<T> field(Class<T> componentClass, int index) {
         this.checkField(index);
+        assert (ecs_iter_t.row_fields(this.iterSeg) & (1 << index)) == 0 : "use fieldAt to access fields for sparse components";
+        assert flecs_h.ecs_field_stride(this.iterSeg, (byte) index) == flecs_h.ecs_field_size(this.iterSeg, (byte) index) : "field is matched on a derived component, use baseField";
 
         Field<T> field = (Field<T>) this.fields[index];
         boolean shared = !flecs_h.ecs_field_is_self(this.iterSeg, (byte) index);
@@ -109,14 +97,42 @@ public class Iter {
 
         if (field == null) {
             Component<T> component = this.world.componentRegistry().getComponent(componentClass);
+            assert component.size() != 0 : "operation invalid for empty type";
             MemorySegment columnSeg = flecs_h.ecs_field_w_size(this.iterSeg, component.size(), (byte) index);
-            field = new Field<>(columnSeg, fieldCount, this.world, componentClass, shared);
+            field = new Field<>(columnSeg, fieldCount, this.stage, componentClass, shared);
             this.fields[index] = field;
         } else {
             MemorySegment columnSeg = flecs_h.ecs_field_w_size(this.iterSeg, field.componentSize(), (byte) index);
-            field.reset(columnSeg, fieldCount, shared);
+            field.reset(columnSeg, fieldCount, shared, field.componentSize());
         }
 
+        return field;
+    }
+
+    public <T> Field<T> baseField(Class<T> componentClass, int index) {
+        this.checkField(index);
+        Field<T> field = this.fieldObject(componentClass, index);
+        boolean shared = !flecs_h.ecs_field_is_self(this.iterSeg, (byte) index);
+        MemorySegment columnSeg = flecs_h.ecs_base_field_w_size(this.iterSeg, field.componentSize(), (byte) index);
+        field.reset(columnSeg, shared ? 1 : this.count(), shared, flecs_h.ecs_field_stride(this.iterSeg, (byte) index));
+        return field;
+    }
+
+    public <T> Field<T> fieldAt(Class<T> componentClass, int index, int row) {
+        this.checkField(index);
+        Field<T> field = this.fieldObject(componentClass, index);
+        MemorySegment columnSeg = flecs_h.ecs_field_at_w_size(this.iterSeg, field.componentSize(), (byte) index, row);
+        field.reset(columnSeg, 1, false, field.componentSize());
+        return field;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Field<T> fieldObject(Class<T> componentClass, int index) {
+        Field<T> field = (Field<T>) this.fields[index];
+        if (field == null) {
+            field = new Field<>(MemorySegment.NULL, 0, this.stage, componentClass, false);
+            this.fields[index] = field;
+        }
         return field;
     }
 
@@ -184,7 +200,7 @@ public class Iter {
         if (tableSeg == null || tableSeg.address() == 0) {
             return null;
         }
-        return new Table(this.world, tableSeg);
+        return new Table(this.stage, tableSeg);
     }
 
     public long id(int index) {
@@ -230,10 +246,10 @@ public class Iter {
     public Type type() {
         MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
         if (tableSeg.address() == 0) {
-            return new Type(this.world, MemorySegment.NULL);
+            return new Type(this.stage, MemorySegment.NULL);
         }
         MemorySegment typeSeg = flecs_h.ecs_table_get_type(tableSeg);
-        return new Type(this.world, typeSeg);
+        return new Type(this.stage, typeSeg);
     }
 
     public Table table() {
@@ -253,12 +269,16 @@ public class Iter {
 
     @SuppressWarnings("unchecked")
     public <T> T payload(Class<T> payloadClass) {
+        Component<T> component = this.world.componentRegistry().getComponent(payloadClass);
+        if (component.size() == 0) {
+            return component.read(MemorySegment.NULL, 0);
+        }
+
         MemorySegment paramSeg = ecs_iter_t.param(this.iterSeg);
         if (paramSeg == null || paramSeg.address() == 0) {
             return null;
         }
 
-        Component<T> component = this.world.componentRegistry().getComponent(payloadClass);
         MemorySegment dataSeg = paramSeg.reinterpret(component.size());
         return component.read(dataSeg, 0);
     }
@@ -298,14 +318,8 @@ public class Iter {
     }
 
     public void destruct() {
-        if (this.destructed) {
+        if (this.iterSeg.address() == 0) {
             return;
-        }
-        this.destructed = true;
-        int flags = ecs_iter_t.flags(this.iterSeg);
-        MemorySegment tableSeg = ecs_iter_t.table(this.iterSeg);
-        if((flags & flecs_h.EcsIterIsValid()) != 0 && tableSeg.address() != 0) {
-            flecs_h.ecs_table_unlock(this.stage.worldSeg(), tableSeg);
         }
         flecs_h.ecs_iter_fini(this.iterSeg);
         this.iterSeg = MemorySegment.NULL;

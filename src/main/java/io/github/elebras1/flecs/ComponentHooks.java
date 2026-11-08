@@ -25,6 +25,7 @@ import static java.lang.foreign.ValueLayout.JAVA_INT;
 public class ComponentHooks<T> {
     private final Linker linker;
     private final World world;
+    private final World stage;
     private final Component<T> component;
     private IterHookCallback<T> onAddCallback;
     private IterHookContextCallback<T> onAddContextCallback;
@@ -47,6 +48,7 @@ public class ComponentHooks<T> {
     public ComponentHooks(World world, Component<T> component) {
         this.linker = Linker.nativeLinker();
         this.world = world;
+        this.stage = world.realWorld().getStage(0);
         this.component = component;
     }
 
@@ -464,7 +466,7 @@ public class ComponentHooks<T> {
     }
 
     private Iter instantiateIter(MemorySegment iterSeg) {
-        Iter iter = new Iter(iterSeg, this.world);
+        Iter iter = new Iter(iterSeg, this.stage);
         iter.setIterSeg(iterSeg);
         return iter;
     }

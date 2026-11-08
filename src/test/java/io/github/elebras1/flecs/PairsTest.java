@@ -758,4 +758,29 @@ class PairsTest {
         assertEquals(1, count.get());
     }
 
+    @Test
+    void pairWithTagFirstUsesStorageOfSecond() {
+        long pair = flecs_h.ecs_make_pair(this.tagId, this.positionId);
+
+        assertEquals(this.positionId, flecs_h.ecs_get_typeid(this.world.worldSeg(), pair));
+        assertEquals(Float.BYTES * 2, this.world.typeInfo(pair).size());
+    }
+
+    @Test
+    void pairWithTagFirstStoresEachEntity() {
+        Entity first = this.world.obtainEntity(this.world.entity());
+        Entity second = this.world.obtainEntity(this.world.entity());
+
+        first.setSecond(Position.class, this.tagId, (PositionMutView view) -> {
+            view.x(10);
+            view.y(20);
+        });
+        second.setSecond(Position.class, this.tagId, (PositionMutView view) -> {
+            view.x(30);
+            view.y(40);
+        });
+
+        assertEquals(new Position(10, 20), first.getSecond(Position.class, this.tagId));
+        assertEquals(new Position(30, 40), second.getSecond(Position.class, this.tagId));
+    }
 }

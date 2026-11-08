@@ -269,9 +269,7 @@ public final class MemoryAccess {
 
     public static MemoryLayout createStructLayout(String name, MemoryLayout... elements) {
         if (elements == null || elements.length == 0) {
-            return MemoryLayout.structLayout(
-                    MemoryLayout.paddingLayout(1)
-            ).withName(name);
+            return MemoryLayout.structLayout().withName(name);
         }
 
         List<MemoryLayout> layouts = new ArrayList<>();

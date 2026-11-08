@@ -6,6 +6,7 @@ import java.lang.foreign.MemorySegment;
 public class Ref<T> {
 
     private final World world;
+    private final World stage;
     private final long entityId;
     private final long id;
     private final Class<T> componentClass;
@@ -19,11 +20,13 @@ public class Ref<T> {
     }
 
     Ref(World world, long entityId, long id, Class<T> componentClass) {
-        this.world = world;
+        this.world = world.realWorld();
+        this.stage = world;
         this.entityId = entityId;
         this.id = id;
         this.componentClass = componentClass;
         this.component = world.componentRegistry().getComponent(componentClass);
+        assert this.component.size() != 0 : "cannot create ref to empty type";
         this.arena = Arena.ofConfined();
         this.refSeg = flecs_h.ecs_ref_init_id(this.arena, world.worldSeg(), entityId, this.id);
     }
@@ -49,7 +52,7 @@ public class Ref<T> {
     @SuppressWarnings("unchecked")
     public <A extends ComponentView> A getView() {
         this.checkDestructed();
-        ComponentView view = this.world.viewCache().getComponentView(this.componentClass);
+        ComponentView view = this.stage.viewCache().getComponentView(this.componentClass);
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
         if (address == 0) {
             return null;
@@ -62,7 +65,7 @@ public class Ref<T> {
     @SuppressWarnings("unchecked")
     public <A extends ComponentMutView> A getMutView() {
         this.checkDestructed();
-        ComponentMutView view = this.world.viewCache().getComponentMutView(this.componentClass);
+        ComponentMutView view = this.stage.viewCache().getComponentMutView(this.componentClass);
         long address = flecs_h.ecs_ref_get_id(this.world.worldSeg(), this.refSeg, this.id);
         if (address == 0) {
             return null;

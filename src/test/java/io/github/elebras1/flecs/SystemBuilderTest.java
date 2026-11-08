@@ -346,4 +346,25 @@ class SystemBuilderTest {
         sys.run();
         assertEquals(1, count.get());
     }
+
+    @Test
+    void iterTableIsBoundToRealWorld() {
+        long entity = this.world.obtainEntity(this.world.entity()).set(new Position(3, 4)).id();
+
+        FlecsSystem system = this.world.system("ResetPosition")
+                .with(Position.class)
+                .iter(iter -> {
+                    assertFalse(iter.world().isStage());
+                    assertTrue(iter.stage().isStage());
+                    assertNotSame(iter.world(), iter.stage());
+                    assertNotNull(iter.table());
+                    iter.table().resetColumn(Position.class);
+                });
+
+        system.run();
+
+        Position position = this.world.obtainEntity(entity).get(Position.class);
+        assertEquals(0f, position.x());
+        assertEquals(0f, position.y());
+    }
 }

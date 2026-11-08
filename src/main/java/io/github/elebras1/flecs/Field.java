@@ -6,6 +6,7 @@ public class Field<T> {
     private MemorySegment memorySegment;
     private int count;
     private final long componentSize;
+    private long stride;
     private final Component<T> component;
     private final ComponentView componentView;
     private final ComponentMutView componentMutView;
@@ -16,6 +17,7 @@ public class Field<T> {
         this.count = count;
         this.component = world.componentRegistry().getComponent(componentClass);
         this.componentSize = this.component.size();
+        this.stride = this.componentSize;
         this.componentView = world.viewCache().getComponentView(componentClass);
         this.componentMutView = world.viewCache().getComponentMutView(componentClass);
         this.shared = shared;
@@ -25,10 +27,11 @@ public class Field<T> {
         return this.componentSize;
     }
 
-    void reset(MemorySegment memorySegment, int count, boolean shared) {
+    void reset(MemorySegment memorySegment, int count, boolean shared, long stride) {
         this.memorySegment = memorySegment;
         this.count = count;
         this.shared = shared;
+        this.stride = stride;
     }
 
     public int count() {
@@ -40,7 +43,7 @@ public class Field<T> {
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
         assert !this.shared || i == 0 : "Non-zero index invalid for shared field";
 
-        long elementOffset = i * this.componentSize;
+        long elementOffset = i * this.stride;
         return this.component.read(this.memorySegment, elementOffset);
     }
 
@@ -50,7 +53,7 @@ public class Field<T> {
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
         assert !this.shared || i == 0 : "Non-zero index invalid for shared field";
 
-        long elementOffset = i * this.componentSize;
+        long elementOffset = i * this.stride;
         this.componentView.setBaseAddress(this.memorySegment.address() + elementOffset);
 
         return (V) this.componentView;
@@ -62,7 +65,7 @@ public class Field<T> {
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
         assert !this.shared || i == 0 : "Non-zero index invalid for shared field";
 
-        long elementOffset = i * this.componentSize;
+        long elementOffset = i * this.stride;
         this.componentMutView.setBaseAddress(this.memorySegment.address() + elementOffset);
 
         return (V) this.componentMutView;
@@ -73,7 +76,7 @@ public class Field<T> {
         assert i >= 0 && i < this.count : "Index " + i + " out of bounds";
         assert !this.shared || i == 0 : "Non-zero index invalid for shared field";
 
-        long elementOffset = i * this.componentSize;
+        long elementOffset = i * this.stride;
         this.component.write(this.memorySegment, elementOffset, componentData);
     }
 

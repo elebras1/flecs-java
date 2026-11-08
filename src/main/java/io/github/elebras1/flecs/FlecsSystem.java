@@ -160,7 +160,7 @@ public class FlecsSystem extends Entity {
         }
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
             int stageId = flecs_h.ecs_stage_get_id(ecs_iter_t.stage(iterSeg));
-            Iter iter = stageId < iters.length ? iters[stageId] : new Iter(MemorySegment.NULL, this.world);
+            Iter iter = stageId < iters.length ? iters[stageId] : new Iter(MemorySegment.NULL, this.world.realWorld().getStage(stageId));
             while (flecs_h.ecs_iter_next(iterSeg)) {
                 iter.setIterSeg(iterSeg);
                 callback.accept(iter);

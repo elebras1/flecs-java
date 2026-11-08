@@ -23,13 +23,10 @@ public class Query extends QueryBase {
         }
     }
 
-    private Iter iter() {
+    private Iter takeIter() {
         Iter local = this.iter;
-        if (local == null) {
-            local = new Iter(MemorySegment.NULL, this.world);
-            this.iter = local;
-        }
-        return local;
+        this.iter = null;
+        return local != null ? local : new Iter(MemorySegment.NULL, this.world);
     }
 
     private MemorySegment createIterSeg(Arena arena) {
@@ -64,11 +61,12 @@ public class Query extends QueryBase {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
 
-            Iter iter = this.iter();
+            Iter iter = this.takeIter();
             while (flecs_h.ecs_iter_next(iterSeg)) {
                 iter.setIterSeg(iterSeg);
                 callback.accept(iter);
             }
+            this.iter = iter;
         }
     }
 
@@ -80,9 +78,10 @@ public class Query extends QueryBase {
             if (iterSeg.address() == 0) {
                 throw new IllegalStateException("ecs_query_iter returned a null iterator");
             }
-            Iter iter = this.iter();
+            Iter iter = this.takeIter();
             iter.setIterSeg(iterSeg);
             callback.accept(iter);
+            this.iter = iter;
         }
     }
 

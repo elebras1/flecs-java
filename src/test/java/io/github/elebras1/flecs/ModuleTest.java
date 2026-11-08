@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ModuleTest {
@@ -63,6 +65,31 @@ class ModuleTest {
         Entity module1 = this.world.importModule(new SimpleModule());
         Entity module2 = this.world.importModule(new SimpleModule());
         assertEquals(module1.id(), module2.id());
+    }
+
+    @Test
+    void importTwiceInitializesOnce() {
+        AtomicInteger inits = new AtomicInteger();
+        FlecsModule module = new CountingModule(inits);
+
+        this.world.importModule(module);
+        this.world.importModule(module);
+
+        assertEquals(1, inits.get());
+    }
+
+    public static class CountingModule implements FlecsModule {
+        private final AtomicInteger inits;
+
+        CountingModule(AtomicInteger inits) {
+            this.inits = inits;
+        }
+
+        @Override
+        public void initModule(World world) {
+            this.inits.incrementAndGet();
+            world.module(this);
+        }
     }
 
     @Test

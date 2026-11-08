@@ -100,9 +100,11 @@ public class EventBuilder {
                         throw new IllegalArgumentException("Event payload size (" + component.size() + ") does not match event type size (" + eventComponent.size() + ")");
                     }
                 }
-                MemorySegment dataSeg = tempArena.allocate(component.layout());
-                component.write(dataSeg, 0, this.payload);
-                ecs_event_desc_t.param(descSeg, dataSeg);
+                if (component.size() != 0) {
+                    MemorySegment dataSeg = tempArena.allocate(component.layout());
+                    component.write(dataSeg, 0, this.payload);
+                    ecs_event_desc_t.param(descSeg, dataSeg);
+                }
             }
 
             if (deferred) {

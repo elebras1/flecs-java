@@ -90,6 +90,8 @@ public class IterateComponents {
     }
 
     // Output:
+    // Entity's components:
+    // Position, Velocity, Human, (Eats,Apples)
     //
     // 0: Position
     // 1: Velocity
@@ -101,15 +103,20 @@ public class IterateComponents {
     // 2: entity: Human
     // 3: rel: Eats, tgt: Apples
     //
-    //
     // Position's components:
-    // Component, (Identifier,Name), (Identifier,Symbol)
+    // Component, flecs.meta.struct, flecs.meta.TypeSerializer, flecs.meta.type, (Identifier,Name), (Identifier,Symbol)
     //
     // 0: Component
-    // 1: (Identifier,Name)
-    // 2: (Identifier,Symbol)
+    // 1: flecs.meta.struct
+    // 2: flecs.meta.TypeSerializer
+    // 3: flecs.meta.type
+    // 4: (Identifier,Name)
+    // 5: (Identifier,Symbol)
     //
     // 0: entity: Component
-    // 1: rel: Identifier, tgt: Name
-    // 2: rel: Identifier, tgt: Symbol
+    // 1: entity: struct
+    // 2: entity: TypeSerializer
+    // 3: entity: type
+    // 4: rel: Identifier, tgt: Name
+    // 5: rel: Identifier, tgt: Symbol
 }

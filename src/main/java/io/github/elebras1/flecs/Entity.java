@@ -410,6 +410,7 @@ public class Entity extends EntityBase<Entity> {
         int index = ComponentMap.getIndex(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        assert component.size() != 0 : "operation invalid for empty type";
 
         MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
         component.write(dataSeg, 0, data);
@@ -427,6 +428,7 @@ public class Entity extends EntityBase<Entity> {
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        assert component.size() != 0 : "operation invalid for empty type";
         MemorySegment dataSeg = this.world.getComponentBuffer(component.size());
         component.write(dataSeg, 0, data);
 
@@ -440,6 +442,7 @@ public class Entity extends EntityBase<Entity> {
         int index = ComponentMap.getIndex(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long size = this.world.componentRegistry().getComponent(index, componentClass).size();
+        assert size != 0 : "operation invalid for empty type";
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
         MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size);
@@ -456,6 +459,7 @@ public class Entity extends EntityBase<Entity> {
         int index = ComponentMap.getIndex(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long size = this.world.componentRegistry().getComponent(index, componentClass).size();
+        assert size != 0 : "operation invalid for empty type";
         long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
         MemorySegment dataSeg = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size);
@@ -500,6 +504,7 @@ public class Entity extends EntityBase<Entity> {
         int index = ComponentMap.getIndex(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        assert component.size() != 0 : "operation invalid for empty type";
         long address = flecs_h.ecs_get_id(this.world.worldSeg(), this.id, componentId);
 
         if (address == 0) {
@@ -522,6 +527,7 @@ public class Entity extends EntityBase<Entity> {
     public <T> T tryGet(Class<T> componentClass, long target) {
         int index = ComponentMap.getIndex(componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        assert component.size() != 0 : "operation invalid for empty type";
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long pairId = flecs_h.ecs_make_pair(componentId, target);
 
@@ -553,6 +559,7 @@ public class Entity extends EntityBase<Entity> {
     public <T> T tryGetSecond(Class<T> componentClass, long relationId) {
         int index = ComponentMap.getIndex(componentClass);
         Component<T> component = this.world.componentRegistry().getComponent(index, componentClass);
+        assert component.size() != 0 : "operation invalid for empty type";
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long pairId = flecs_h.ecs_make_pair(relationId, componentId);
 
@@ -579,6 +586,7 @@ public class Entity extends EntityBase<Entity> {
     }
 
     public <T> Entity modified(Class<T> componentClass) {
+        assert this.world.componentRegistry().getComponent(componentClass).size() != 0 : "operation invalid for empty type";
         long componentId = this.world.componentRegistry().getComponentId(componentClass);
         return this.modified(componentId);
     }
@@ -611,6 +619,7 @@ public class Entity extends EntityBase<Entity> {
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T tryGetView(Class<?> componentClass) {
         int index = ComponentMap.getIndex(componentClass);
+        assert this.world.componentRegistry().getComponent(index, componentClass).size() != 0 : "operation invalid for empty type";
         ComponentView view = this.world.viewCache().getComponentView(index, componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
 
@@ -636,6 +645,7 @@ public class Entity extends EntityBase<Entity> {
     @SuppressWarnings("unchecked")
     public <T extends ComponentView> T tryGetView(Class<?> componentClass, long target) {
         int index = ComponentMap.getIndex(componentClass);
+        assert this.world.componentRegistry().getComponent(index, componentClass).size() != 0 : "operation invalid for empty type";
         ComponentView view = this.world.viewCache().getComponentView(index, componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
@@ -663,6 +673,7 @@ public class Entity extends EntityBase<Entity> {
     @SuppressWarnings("unchecked")
     public <T extends ComponentMutView> T tryGetMutView(Class<?> componentClass) {
         int index = ComponentMap.getIndex(componentClass);
+        assert this.world.componentRegistry().getComponent(index, componentClass).size() != 0 : "operation invalid for empty type";
         ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
 
@@ -688,6 +699,7 @@ public class Entity extends EntityBase<Entity> {
     @SuppressWarnings("unchecked")
     public <T extends ComponentMutView> T tryGetMutView(Class<?> componentClass, long target) {
         int index = ComponentMap.getIndex(componentClass);
+        assert this.world.componentRegistry().getComponent(index, componentClass).size() != 0 : "operation invalid for empty type";
         ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
 
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
@@ -709,6 +721,7 @@ public class Entity extends EntityBase<Entity> {
         int index = ComponentMap.getIndex(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long size = this.world.componentRegistry().getComponent(index, componentClass).size();
+        assert size != 0 : "operation invalid for empty type";
         long address = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, componentId, size).address();
         ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);
         view.setBaseAddress(address);
@@ -720,6 +733,7 @@ public class Entity extends EntityBase<Entity> {
         int index = ComponentMap.getIndex(componentClass);
         long componentId = this.world.componentRegistry().getComponentId(index, componentClass);
         long size = this.world.componentRegistry().getComponent(index, componentClass).size();
+        assert size != 0 : "operation invalid for empty type";
         long pairId = flecs_h.ecs_make_pair(componentId, target);
         long address = flecs_h.ecs_ensure_id(this.world.worldSeg(), this.id, pairId, size).address();
         ComponentMutView view = this.world.viewCache().getComponentMutView(index, componentClass);

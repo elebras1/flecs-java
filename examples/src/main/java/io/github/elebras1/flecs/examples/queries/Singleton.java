@@ -24,8 +24,8 @@ public class Singleton {
             Entity gravity = world.singleton(Gravity.class);
             gravity.add(Flecs.Singleton);
 
-            // Set the singleton value on the component entity.
-            gravity.set(new Gravity(9.81f));
+            // Set the singleton value, which is stored on the component entity.
+            world.set(new Gravity(9.81f));
 
             // Create entities with Velocity.
             world.obtainEntity(world.entity("e1")).set(new Velocity(0, 0));

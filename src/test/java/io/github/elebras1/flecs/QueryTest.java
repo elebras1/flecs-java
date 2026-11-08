@@ -1,5 +1,8 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.component.MassMutView;
+import io.github.elebras1.flecs.component.TagView;
+import io.github.elebras1.flecs.component.Tag;
 import io.github.elebras1.flecs.callback.ComparatorComponent;
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.internal.ParamRegistry;
@@ -692,7 +695,7 @@ class QueryTest {
         AtomicInteger count = new AtomicInteger();
         query.run(it -> {
             while (it.next()) {
-                assertNotNull(it.stage());
+                assertFalse(it.stage().isStage());
                 assertTrue(it.frameOffset() >= 0);
                 count.incrementAndGet();
             }
@@ -877,5 +880,346 @@ class QueryTest {
         assertEquals(2, calls.get());
         assertEquals(new Mass(7), masses.get(withMass));
         assertNull(masses.get(withoutMass));
+    }
+
+    @Test
+    void queryRunStageIsRealWorld() {
+        long other = this.world.entity();
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        query.run(it -> {
+            while (it.next()) {
+                assertFalse(it.stage().isStage());
+                assertSame(it.world(), it.stage());
+                it.stage().obtainEntity(other).add(Velocity.class);
+            }
+        });
+
+        assertTrue(this.world.obtainEntity(other).has(Velocity.class));
+    }
+
+    @Test
+    void queryOnStageIterStageIsStage() {
+        World stage = this.world.getStage(0);
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = stage.query(Position.class);
+        AtomicInteger count = new AtomicInteger();
+        query.run(it -> {
+            while (it.next()) {
+                assertTrue(it.stage().isStage());
+                assertSame(stage, it.stage());
+                assertFalse(it.world().isStage());
+                count.incrementAndGet();
+            }
+        });
+        query.destruct();
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void structuralChangeAfterDestructIterator() {
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        query.run(it -> {
+            assertTrue(it.next());
+            it.destruct();
+        });
+
+        entity.add(Velocity.class);
+        assertTrue(entity.has(Velocity.class));
+    }
+
+    @Test
+    void queryEachOnTag() {
+        this.world.component(Tag.class);
+        this.world.obtainEntity(this.world.entity()).add(Tag.class);
+        this.world.obtainEntity(this.world.entity()).add(Tag.class);
+
+        AtomicInteger count = new AtomicInteger();
+        Query query = this.world.query(Tag.class);
+        query.each(Tag.class, (Tag tag) -> {
+            assertNotNull(tag);
+            count.incrementAndGet();
+        });
+        query.destruct();
+
+        assertEquals(2, count.get());
+    }
+
+    @Test
+    void queryEachViewOnTag() {
+        this.world.component(Tag.class);
+        this.world.obtainEntity(this.world.entity()).add(Tag.class);
+
+        AtomicInteger count = new AtomicInteger();
+        Query query = this.world.query(Tag.class);
+        query.eachView(Tag.class, (TagView tag) -> count.incrementAndGet());
+        query.destruct();
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
+    void queryEachWithTagAndComponent() {
+        this.world.component(Tag.class);
+        this.world.obtainEntity(this.world.entity()).add(Tag.class).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).add(Tag.class).set(new Position(3, 4));
+
+        AtomicInteger sum = new AtomicInteger();
+        Query query = this.world.query(Tag.class, Position.class);
+        query.each(Tag.class, Position.class, (Tag tag, Position position) -> {
+            assertNotNull(tag);
+            sum.addAndGet((int) position.x());
+        });
+        query.destruct();
+
+        assertEquals(4, sum.get());
+    }
+
+    @Test
+    void iterFieldOnTagIsInvalid() {
+        this.world.component(Tag.class);
+        this.world.obtainEntity(this.world.entity()).add(Tag.class);
+
+        Query query = this.world.query(Tag.class);
+        query.run(it -> {
+            while (it.next()) {
+                assertThrows(AssertionError.class, () -> it.field(Tag.class, 0));
+            }
+        });
+        query.destruct();
+    }
+
+    @Test
+    void destructIteratorAcrossRuns() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Velocity(1, 2)).add(Position.class);
+
+        Query query = this.world.query(Position.class);
+        AtomicInteger runs = new AtomicInteger();
+        for (int i = 0; i < 3; i++) {
+            query.run(it -> {
+                assertTrue(it.next());
+                it.destruct();
+                runs.incrementAndGet();
+            });
+        }
+
+        assertEquals(3, runs.get());
+    }
+
+    @Test
+    void nestedIterOnSameQuery() {
+        long e1 = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).id();
+        long e2 = this.world.obtainEntity(this.world.entity()).set(new Position(3, 4)).id();
+
+        Query query = this.world.query(Position.class);
+        List<Long> ids = new ArrayList<>();
+        query.iter(outer -> {
+            for (int i = 0; i < outer.count(); i++) {
+                long id = outer.entity(i);
+                query.iter(inner -> {
+                    for (int j = 0; j < inner.count(); j++) {
+                        ids.add(inner.entity(j));
+                    }
+                });
+                assertEquals(id, outer.entity(i));
+                assertEquals(id == e1 ? 1.0f : 3.0f, outer.field(Position.class, 0).get(i).x());
+            }
+        });
+
+        assertEquals(List.of(e1, e2, e1, e2), ids);
+    }
+
+    @Test
+    void nestedRunOnSameQuery() {
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        AtomicInteger count = new AtomicInteger();
+        query.run(outer -> {
+            while (outer.next()) {
+                query.run(inner -> {
+                    while (inner.next()) {
+                        count.addAndGet(inner.count());
+                    }
+                });
+                count.addAndGet(outer.count());
+            }
+        });
+
+        assertEquals(2, count.get());
+    }
+
+    private void positionInheritsMass() {
+        this.world.obtainEntity(this.world.id(Position.class)).isA(this.world.id(Mass.class));
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+    }
+
+    @Test
+    void componentInheritanceEach() {
+        this.positionInheritsMass();
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query(Mass.class);
+        query.each(Mass.class, (Mass mass) -> values.add(mass.value()));
+
+        assertEquals(List.of(1.0f, 3.0f), values);
+    }
+
+    @Test
+    void componentInheritanceEachWithEntityAndIter() {
+        this.positionInheritsMass();
+
+        Query query = this.world.query(Mass.class);
+        List<Float> byEntity = new ArrayList<>();
+        query.each(Mass.class, (long entityId, Mass mass) -> {
+            assertEquals(this.world.obtainEntity(entityId).get(Position.class).x(), mass.value());
+            byEntity.add(mass.value());
+        });
+        List<Integer> rows = new ArrayList<>();
+        query.each(Mass.class, (Iter it, int row, Mass mass) -> rows.add(row));
+
+        assertEquals(List.of(1.0f, 3.0f), byEntity);
+        assertEquals(List.of(0, 1), rows);
+    }
+
+    @Test
+    void componentInheritanceEachView() {
+        this.positionInheritsMass();
+
+        Query query = this.world.query(Mass.class);
+        query.eachView(Mass.class, (MassMutView mass) -> mass.value(mass.value() + 10));
+
+        List<Position> positions = new ArrayList<>();
+        this.world.query(Position.class).each(Position.class, (Position position) -> positions.add(position));
+        assertEquals(List.of(new Position(11, 2), new Position(13, 4)), positions);
+    }
+
+    @Test
+    void componentInheritanceFind() {
+        this.positionInheritsMass();
+
+        Query query = this.world.query(Mass.class);
+        long found = query.find(Mass.class, (Mass mass) -> mass.value() == 3.0f);
+
+        assertEquals(new Position(3, 4), this.world.obtainEntity(found).get(Position.class));
+    }
+
+    @Test
+    void componentInheritanceBaseField() {
+        this.positionInheritsMass();
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query(Mass.class);
+        query.run(it -> {
+            while (it.next()) {
+                Field<Mass> masses = it.baseField(Mass.class, 0);
+                for (int i = 0; i < it.count(); i++) {
+                    values.add(masses.get(i).value());
+                }
+            }
+        });
+
+        assertEquals(List.of(1.0f, 3.0f), values);
+    }
+
+    @Test
+    void sparseComponentEach() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.Sparse);
+        long e1 = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).id();
+        long e2 = this.world.obtainEntity(this.world.entity()).set(new Position(3, 4)).id();
+
+        Query query = this.world.query(Position.class);
+        List<Float> values = new ArrayList<>();
+        query.each(Position.class, (Position position) -> values.add(position.x()));
+        assertEquals(List.of(1.0f, 3.0f), values);
+
+        List<Long> ids = new ArrayList<>();
+        query.each(Position.class, (long entityId, Position position) -> ids.add(entityId));
+        assertEquals(List.of(e1, e2), ids);
+
+        assertEquals(e2, query.find(Position.class, (Position position) -> position.x() == 3.0f));
+    }
+
+    @Test
+    void sparseComponentEachView() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.Sparse);
+        Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        Query query = this.world.query(Position.class);
+        query.eachView(Position.class, (PositionMutView position) -> position.x(position.x() + 10));
+
+        assertEquals(new Position(11, 2), entity.get(Position.class));
+    }
+
+    @Test
+    void sparseAndTableComponentsEach() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.Sparse);
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).set(new Velocity(5, 6));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4)).set(new Velocity(7, 8));
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query(Position.class, Velocity.class);
+        query.each(Position.class, Velocity.class, (Position position, Velocity velocity) -> {
+            values.add(position.x());
+            values.add(velocity.x());
+        });
+
+        assertEquals(List.of(1.0f, 5.0f, 3.0f, 7.0f), values);
+    }
+
+    @Test
+    void dontFragmentComponentEach() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.DontFragment);
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query(Position.class);
+        query.each(Position.class, (Position position) -> values.add(position.x()));
+
+        values.sort(Float::compare);
+        assertEquals(List.of(1.0f, 3.0f), values);
+    }
+
+    @Test
+    void sparseComponentFieldAt() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.Sparse);
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query(Position.class);
+        query.run(it -> {
+            while (it.next()) {
+                for (int i = 0; i < it.count(); i++) {
+                    values.add(it.fieldAt(Position.class, 0, i).get(0).x());
+                }
+            }
+        });
+
+        assertEquals(List.of(1.0f, 3.0f), values);
+    }
+
+    @Test
+    void sparseComponentAndTagEach() {
+        this.world.component(Tag.class);
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.Sparse);
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2)).add(Tag.class);
+
+        List<Float> values = new ArrayList<>();
+        Query query = this.world.query(Position.class, Tag.class);
+        query.each(Position.class, Tag.class, (Position position, Tag tag) -> {
+            assertNotNull(tag);
+            values.add(position.x());
+        });
+
+        assertEquals(List.of(1.0f), values);
     }
 }

@@ -23,7 +23,7 @@ public class ObserverBuilder extends ObserverBuilderBase {
     private ObserverBuilder(World world, Arena arena) {
         super(world, arena, ecs_observer_desc_t.allocate(arena));
         this.arena = arena;
-        this.iter = new Iter(MemorySegment.NULL, this.world);
+        this.iter = new Iter(MemorySegment.NULL, this.world.realWorld().getStage(0));
         this.eventCount = 0;
     }
 

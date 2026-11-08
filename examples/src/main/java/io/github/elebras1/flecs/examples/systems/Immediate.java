@@ -1,11 +1,11 @@
 package io.github.elebras1.flecs.examples.systems;
 
 import io.github.elebras1.flecs.Entity;
-import io.github.elebras1.flecs.EntityView;
 import io.github.elebras1.flecs.Query;
 import io.github.elebras1.flecs.World;
 import io.github.elebras1.flecs.examples.components.Plate;
 import io.github.elebras1.flecs.Flecs;
+import io.github.elebras1.flecs.Iter;
 import io.github.elebras1.flecs.examples.components.Waiter;
 
 /**
@@ -34,23 +34,19 @@ public class Immediate {
                     .with(Plate.class)
                     .without(Waiter.class, Flecs.Wildcard)
                     .immediate()
-                    .each(entityId -> {
-                        EntityView plate = world.obtainEntityView(entityId);
+                    .each((Iter it, int i) -> {
+                        Entity plate = it.stage().obtainEntity(it.entity(i));
 
                         // Find an available waiter.
-                        long waiterRaw = qWaiter.first();
-                        if (waiterRaw == 0) {
-                            // No available waiters.
-                            return;
+                        long waiterId = qWaiter.first();
+                        if (waiterId != 0) {
+                            Entity waiter = world.obtainEntity(waiterId);
+                            waiter.stage(it.world()).add(Plate.class, plate);
+
+                            plate.add(Waiter.class, waiter);
+
+                            System.out.println("Assigned " + waiter.name() + " to " + plate.name() + "!");
                         }
-                        EntityView waiter = world.obtainEntityView(waiterRaw);
-
-                        // Immediate systems run outside readonly mode, so these
-                        // changes are applied directly.
-                        waiter.add(Plate.class, plate);
-                        plate.add(Waiter.class, waiter);
-
-                        System.out.println("Assigned " + waiter.name() + " to " + plate.name() + "!");
                     });
 
             // Create a few waiters and plates.

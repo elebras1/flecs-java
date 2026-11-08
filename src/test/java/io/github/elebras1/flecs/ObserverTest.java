@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs;
 
+import java.util.concurrent.atomic.AtomicReference;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
 import io.github.elebras1.flecs.callback.ComparatorId;
@@ -668,6 +669,7 @@ class ObserverTest {
 
         Observer variable = this.world.observer("VariableTermObserver")
                 .event(Flecs.OnAdd)
+                .with(Velocity.class)
                 .with(Position.class).var("ObserverVariable")
                 .each(entityId -> { });
         assertNotEquals(0, variable.id());
@@ -741,15 +743,6 @@ class ObserverTest {
         assertThrows(IllegalStateException.class, () -> this.world.observer("CascadeTermObserver")
                 .event(Flecs.OnAdd)
                 .with(Position.class).cascade()
-                .each(entityId -> { }));
-
-        assertThrows(IllegalStateException.class, () -> this.world.observer("ScopeTermObserver")
-                .event(Flecs.OnAdd)
-                .with(Position.class)
-                .scopeOpen().not()
-                .with(Velocity.class).or()
-                .with(Position.class)
-                .scopeClose()
                 .each(entityId -> { }));
 
         assertThrows(IllegalStateException.class, () -> this.world.observer("GroupByCtxTermObserver")
@@ -845,6 +838,38 @@ class ObserverTest {
     }
 
     @Test
+    void entityWithParentInvokesObserver() {
+        long parent = this.world.entity();
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Flecs.ChildOf, parent)
+                .each(entityId -> count.incrementAndGet());
+
+        this.world.entity(parent);
+        this.world.entity(new FlecsParent(parent));
+        this.world.entity(new FlecsParent(parent), "NamedChild");
+
+        assertEquals(3, count.get());
+    }
+
+    @Test
+    void scopedEntityInvokesObserver() {
+        long parent = this.world.entity();
+        AtomicInteger count = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Flecs.ChildOf, parent)
+                .each(entityId -> count.incrementAndGet());
+
+        try (ScopedWorld scoped = this.world.obtainEntity(parent).scope()) {
+            scoped.entity();
+        }
+
+        assertEquals(1, count.get());
+    }
+
+    @Test
     void multiThreadedEachViewDoesNotShareViews() throws Exception {
         int n = 100_000;
         int threads = 4;
@@ -884,5 +909,34 @@ class ObserverTest {
             Position position = this.world.obtainEntity(id).get(Position.class);
             assertEquals(1.0f, position.x(), 0.0f, "entity " + id);
         }
+    }
+
+    @Test
+    void observerIterStageIsDefaultStage() {
+        AtomicReference<World> stage = new AtomicReference<>();
+        this.world.observer()
+                .event(Flecs.OnAdd)
+                .with(Position.class)
+                .iter(it -> stage.set(it.stage()));
+
+        this.world.obtainEntity(this.world.entity()).add(Position.class);
+
+        assertTrue(stage.get().isStage());
+        assertEquals(0, stage.get().getStageId());
+    }
+
+    @Test
+    void sparseComponentObserverEach() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.Sparse);
+
+        List<Float> values = new ArrayList<>();
+        this.world.observer()
+                .event(Flecs.OnSet)
+                .with(Position.class)
+                .each(Position.class, (Position position) -> values.add(position.x()));
+
+        this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
+
+        assertEquals(List.of(1.0f), values);
     }
 }

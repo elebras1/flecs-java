@@ -65,27 +65,18 @@ public class MultipleQueries {
             world.system("BumpingBees")
                     .kind(Flecs.OnUpdate)
                     .run(it -> {
-                        bees.iter(beeIt -> {
-                            for (int i = 0; i < beeIt.count(); i++) {
-                                final int idx = i;
-                                long bee1 = beeIt.entity(idx);
-                                Bee b1 = beeIt.field(Bee.class, 1).get(idx);
-                                if (b1.flower() == 0) {
-                                    continue;
-                                }
-
-                                bees.iter(otherBeeIt -> {
-                                    for (int j = 0; j < otherBeeIt.count(); j++) {
-                                        long bee2 = otherBeeIt.entity(j);
-                                        Bee b2 = otherBeeIt.field(Bee.class, 1).get(j);
-                                        if (bee1 > bee2 && b2.flower() != 0 && b1.flower() == b2.flower()) {
-                                            Entity e1 = world.obtainEntity(bee1);
-                                            Entity e2 = world.obtainEntity(bee2);
-                                            System.out.println("Bee " + e1.name() + " and bee " + e2.name() + " bumped into each other");
-                                        }
-                                    }
-                                });
+                        bees.each(Position.class, Bee.class, (long bee1, Position p1, Bee b1) -> {
+                            if (b1.flower() == 0) {
+                                return;
                             }
+
+                            bees.each(Position.class, Bee.class, (long bee2, Position p2, Bee b2) -> {
+                                if (bee1 > bee2 && b2.flower() != 0 && b1.flower() == b2.flower()) {
+                                    Entity e1 = world.obtainEntity(bee1);
+                                    Entity e2 = world.obtainEntity(bee2);
+                                    System.out.println("Bee " + e1.name() + " and bee " + e2.name() + " bumped into each other");
+                                }
+                            });
                         });
                     });
 
@@ -99,7 +90,7 @@ public class MultipleQueries {
             for (int i = 0; i < 10; i++) {
                 world.obtainEntity(world.entity("Flower_" + i))
                         .set(new Position(randf(rand, 20), randf(rand, 20)))
-                        .set(new Flower());
+                        .add(Flower.class);
             }
 
             world.progress(0.016f);

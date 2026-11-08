@@ -42,7 +42,7 @@ public class Movement {
                             Velocity vel = velocities.get(i);
                             pos.x(pos.x() + vel.dx());
                             pos.y(pos.y() + vel.dy());
-                            EntityView entity = it.world().obtainEntityView(it.entity(i));
+                            EntityView entity = it.stage().obtainEntityView(it.entity(i));
                             System.out.println(entity.name() + ": {" + pos.x() + ", " + pos.y() + "}");
                         }
                     });

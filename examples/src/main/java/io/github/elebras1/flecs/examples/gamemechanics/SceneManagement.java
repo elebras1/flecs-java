@@ -23,41 +23,40 @@ import io.github.elebras1.flecs.examples.components.HealthMutView;
  */
 public class SceneManagement {
 
+    // Removes all entities that are children of the current scene root.
     private static void resetScene(World world, long sceneRootId) {
-        world.obtainEntity(sceneRootId).children(id -> world.obtainEntity(id).destruct());
+        world.deleteWith(Flecs.ChildOf, sceneRootId);
     }
 
     private static void menuScene(Iter it, long menuSceneId, long sceneRootId) {
         System.out.println("\n>> ActiveScene has changed to `MenuScene`\n");
 
-        World world = it.world();
-        resetScene(world, sceneRootId);
+        World stage = it.stage();
+        resetScene(stage, sceneRootId);
 
         // Create a start menu button when entering the menu scene.
-        world.obtainEntity(world.entity("Start Button"))
+        stage.obtainEntity(stage.entity("Start Button"))
                 .set(new Button("Play the Game!"))
                 .set(new Position(50, 50))
                 .childOf(sceneRootId);
 
-        long menuPip = world.obtainEntity(Flecs.World).get(MenuScene.class).pip();
-        world.setPipeline(menuPip);
+        it.world().setPipeline(stage.get(MenuScene.class).pip());
     }
 
     private static void gameScene(Iter it, long gameSceneId, long sceneRootId) {
         System.out.println("\n>> ActiveScene has changed to `GameScene`\n");
 
-        World world = it.world();
-        resetScene(world, sceneRootId);
+        World stage = it.stage();
+        resetScene(stage, sceneRootId);
 
         // Create a player character when entering the game scene.
-        world.obtainEntity(world.entity("Player"))
-                .set(new Character())
+        stage.obtainEntity(stage.entity("Player"))
+                .add(Character.class)
                 .set(new Health(2))
                 .set(new Position(0, 0))
                 .childOf(sceneRootId);
 
-        long gamePip = world.obtainEntity(Flecs.World).get(GameScene.class).pip();
-        world.setPipeline(gamePip);
+        it.world().setPipeline(stage.get(GameScene.class).pip());
     }
 
     private static void initScenes(World world, long activeSceneId, long sceneRootId, long menuSceneId, long gameSceneId) {
@@ -76,7 +75,7 @@ public class SceneManagement {
                 .without(MenuScene.class)
                 .build();
 
-        // Store pipeline ids on the world so observers can retrieve them.
+        // Store pipeline ids in singletons so observers can retrieve them.
         world.set(new MenuScene(menu.id()))
                 .set(new GameScene(game.id()));
 
@@ -132,21 +131,21 @@ public class SceneManagement {
             initSystems(world, menuSceneId, gameSceneId);
 
             // Start in the menu scene.
-            world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
+            world.add(ActiveScene.class, MenuScene.class);
             world.progress();
 
             // Switch to game scene and run a few frames.
-            world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
+            world.add(ActiveScene.class, GameScene.class);
             world.progress();
             world.progress();
             world.progress();
 
             // Switch back to menu.
-            world.obtainEntity(Flecs.World).add(ActiveScene.class, MenuScene.class);
+            world.add(ActiveScene.class, MenuScene.class);
             world.progress();
 
             // Switch back to game and run a few frames.
-            world.obtainEntity(Flecs.World).add(ActiveScene.class, GameScene.class);
+            world.add(ActiveScene.class, GameScene.class);
             world.progress();
             world.progress();
             world.progress();

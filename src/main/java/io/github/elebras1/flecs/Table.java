@@ -8,10 +8,12 @@ import java.lang.foreign.ValueLayout;
 
 public class Table {
     private final World world;
+    private final World stage;
     private MemorySegment tableSeg;
 
-    Table(World world, MemorySegment tableSeg) {
-        this.world = world;
+    Table(World stage, MemorySegment tableSeg) {
+        this.world = stage.realWorld();
+        this.stage = stage;
         this.tableSeg = tableSeg;
     }
 
@@ -232,7 +234,7 @@ public class Table {
         if (columnSeg.address() == 0) {
             return null;
         }
-        V view = (V) this.world.viewCache().getComponentView(componentClass);
+        V view = (V) this.stage.viewCache().getComponentView(componentClass);
         view.setBaseAddress(columnSeg.address() + (long) row * component.size());
         return view;
     }
@@ -248,7 +250,7 @@ public class Table {
         if (columnSeg.address() == 0) {
             return;
         }
-        V view = (V) this.world.viewCache().getComponentView(componentClass);
+        V view = (V) this.stage.viewCache().getComponentView(componentClass);
         long size  = component.size();
         int  count = this.count();
         for (int i = 0; i < count; i++) {
@@ -309,7 +311,7 @@ public class Table {
         if (columnSeg.address() == 0) {
             return null;
         }
-        V view = (V) this.world.viewCache().getComponentRowView(componentClass);
+        V view = (V) this.stage.viewCache().getComponentRowView(componentClass);
         view.setSegment(columnSeg);
         view.setCount(this.count());
         return view;
@@ -345,7 +347,7 @@ public class Table {
         long size = component.size();
         long elementOffset = (long) row * size;
         MemorySegment slice = columnSeg.reinterpret(size * this.count()).asSlice(elementOffset, size);
-        V view = (V) this.world.viewCache().getComponentMutView(componentClass);
+        V view = (V) this.stage.viewCache().getComponentMutView(componentClass);
         view.setBaseAddress(slice.address());
         return view;
     }
@@ -360,7 +362,7 @@ public class Table {
         long size = component.size();
         long elementOffset = (long) row * size;
         MemorySegment slice = columnSeg.reinterpret(size * this.count()).asSlice(elementOffset, size);
-        V view = (V) this.world.viewCache().getComponentView(componentClass);
+        V view = (V) this.stage.viewCache().getComponentView(componentClass);
         view.setBaseAddress(slice.address());
         return view;
     }

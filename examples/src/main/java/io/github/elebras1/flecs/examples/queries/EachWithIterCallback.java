@@ -42,7 +42,7 @@ public class EachWithIterCallback {
                 pos.x(pos.x() + vel.dx());
                 pos.y(pos.y() + vel.dy());
 
-                EntityView entity = it.world().obtainEntityView(it.entity(index));
+                EntityView entity = it.stage().obtainEntityView(it.entity(index));
                 System.out.println(entity.name() + ": {" + pos.x() + ", " + pos.y() + "}" );
             });
 

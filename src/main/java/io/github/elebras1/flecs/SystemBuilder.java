@@ -148,7 +148,7 @@ public class SystemBuilder extends SystemBuilderBase {
     protected Iter iterFor(MemorySegment iterSegment) {
         MemorySegment stageSeg = ecs_iter_t.stage(iterSegment);
         int stageId = flecs_h.ecs_stage_get_id(stageSeg);
-        Iter iter = this.iters[stageId];
+        Iter iter = stageId < this.iters.length ? this.iters[stageId] : new Iter(MemorySegment.NULL, this.world.realWorld().getStage(stageId));
         iter.setIterSeg(iterSegment);
         return iter;
     }
@@ -172,9 +172,9 @@ public class SystemBuilder extends SystemBuilderBase {
         MemorySegment callbackStub = ecs_run_action_t.allocate(iterSeg -> {
             MemorySegment stageSeg = ecs_iter_t.stage(iterSeg);
             int stageId = flecs_h.ecs_stage_get_id(stageSeg);
-            Iter iter = this.iters[stageId];
+            Iter iter = stageId < this.iters.length ? this.iters[stageId] : new Iter(MemorySegment.NULL, this.world.realWorld().getStage(stageId));
             iter.setIterSeg(iterSeg);
-            callback.accept(this.iters[stageId]);
+            callback.accept(iter);
         }, this.world.arena());
 
         ecs_system_desc_t.run(this.desc, callbackStub);
@@ -209,6 +209,8 @@ public class SystemBuilder extends SystemBuilderBase {
         if (systemId == 0) {
             throw new IllegalStateException("Failed to create system");
         }
+
+        this.fieldRefs = FieldRef.requiredByQuery(ecs_system_t.query(flecs_h.ecs_system_get(this.world.worldSeg(), systemId)));
 
         if (this.phase != 0) {
             flecs_h.ecs_add_id(this.world.worldSeg(), systemId, this.phase);

@@ -46,7 +46,7 @@ public class SyncPointDelete {
                         for (int i = 0; i < it.count(); i++) {
                             Position p = positions.get(i);
                             if (p.x() >= 3) {
-                                Entity entity = world.obtainEntity(it.entity(i));
+                                Entity entity = it.stage().obtainEntity(it.entity(i));
                                 System.out.println("Delete entity " + entity.name());
                                 entity.destruct();
                             }
@@ -60,7 +60,7 @@ public class SyncPointDelete {
                     .iter(it -> {
                         Field<Position> positions = it.field(Position.class, 0);
                         for (int i = 0; i < it.count(); i++) {
-                            Entity entity = world.obtainEntity(it.entity(i));
+                            Entity entity = it.stage().obtainEntity(it.entity(i));
                             Position p = positions.get(i);
                             System.out.println(entity.name() + ": {" + p.x() + ", " + p.y() + "}");
                         }
@@ -87,7 +87,5 @@ public class SyncPointDelete {
     // e2: {2.0, 4.0}
     // Delete entity e2
     // e1: {2.0, 4.0}
-    // e2: {3.0, 6.0}
     // Delete entity e1
-    // e1: {3.0, 6.0}
 }

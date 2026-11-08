@@ -236,6 +236,23 @@ class ComponentLifecycleTest {
     }
 
     @Test
+    void setOnStage() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        World stage = this.world.getStage(0);
+
+        stage.obtainEntity(entity.id()).set(new Position(10, 20));
+        assertFalse(entity.has(Position.class));
+        stage.merge();
+
+        assertTrue(entity.has(Position.class));
+        Position p = entity.get(Position.class);
+        assertNotNull(p);
+        assertEquals(10.0f, p.x());
+        assertEquals(1, this.onAdd.get());
+        assertEquals(1, this.onSet.get());
+    }
+
+    @Test
     void onReplaceHook() {
         AtomicReference<Position> prev = new AtomicReference<>();
         AtomicReference<Position> next = new AtomicReference<>();

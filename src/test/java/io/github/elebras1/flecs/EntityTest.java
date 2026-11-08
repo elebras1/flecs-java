@@ -1,5 +1,6 @@
 package io.github.elebras1.flecs;
 
+import io.github.elebras1.flecs.component.Tag;
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
 import io.github.elebras1.flecs.component.Velocity;
@@ -536,6 +537,69 @@ class EntityTest {
     }
 
     @Test
+    void stageFromEntityUsesItsStage() {
+        World stage = this.world.getStage(0);
+        Entity first = this.world.obtainEntity(this.world.entity()).stage(stage);
+        Entity second = this.world.obtainEntity(this.world.entity()).stage(first);
+
+        assertSame(stage, second.world());
+        assertSame(stage, second.stage().world());
+    }
+
+    @Test
+    void stageRejectsReadonlyWorld() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+
+        this.world.readonlyBegin();
+        assertThrows(IllegalStateException.class, () -> entity.stage(this.world));
+        this.world.readonlyEnd();
+    }
+
+    @Test
+    void setOnStage() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        World stage = this.world.getStage(0);
+
+        stage.obtainEntity(entity.id()).set(new Position(1, 2));
+        assertFalse(entity.has(Position.class));
+
+        stage.merge();
+        assertEquals(new Position(1, 2), entity.get(Position.class));
+    }
+
+    @Test
+    void destructOnStage() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        World stage = this.world.getStage(0);
+
+        stage.obtainEntity(entity.id()).destruct();
+        assertTrue(entity.isAlive());
+
+        stage.merge();
+        assertFalse(entity.isAlive());
+    }
+
+    @Test
+    void insertOnStage() {
+        Entity entity = this.world.obtainEntity(this.world.entity());
+        World stage = this.world.getStage(0);
+
+        stage.obtainEntity(entity.id()).insert(Position.class, Velocity.class, (PositionMutView pos, VelocityMutView vel) -> {
+            pos.x(10);
+            pos.y(20);
+            vel.x(1);
+            vel.y(2);
+        });
+
+        assertFalse(entity.has(Position.class));
+        assertFalse(entity.has(Velocity.class));
+        stage.merge();
+
+        assertEquals(new Position(10, 20), entity.get(Position.class));
+        assertEquals(new Velocity(1, 2), entity.get(Velocity.class));
+    }
+
+    @Test
     void ensure() {
         Entity entity = this.world.obtainEntity(this.world.entity());
 
@@ -666,6 +730,7 @@ class EntityTest {
 
     @Test
     void enableDisableComponent() {
+        this.world.obtainEntity(this.world.id(Position.class)).add(Flecs.CanToggle);
         Entity entity = this.world.obtainEntity(this.world.entity()).set(new Position(10, 20));
         assertTrue(entity.enabled(Position.class));
         entity.disable(Position.class);
@@ -790,5 +855,51 @@ class EntityTest {
         Entity entity = this.world.obtainEntity(this.world.entity("Bob"));
 
         assertTrue(entity.toString().contains("Bob"));
+    }
+
+    @Test
+    void emptyRecordHasNoStorage() {
+        this.world.component(Tag.class);
+        assertEquals(0, this.world.componentRegistry().getComponent(Tag.class).size());
+        assertNull(this.world.typeInfo(Tag.class));
+    }
+
+    @Test
+    void tagAddHasRemove() {
+        this.world.component(Tag.class);
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(Tag.class);
+        assertTrue(entity.has(Tag.class));
+
+        entity.remove(Tag.class);
+        assertFalse(entity.has(Tag.class));
+    }
+
+    @Test
+    void tagDataOperationsAreInvalid() {
+        this.world.component(Tag.class);
+        long target = this.world.entity();
+        Entity entity = this.world.obtainEntity(this.world.entity()).add(Tag.class);
+
+        assertThrows(AssertionError.class, () -> entity.set(new Tag()));
+        assertThrows(AssertionError.class, () -> entity.set(new Tag(), target));
+        assertThrows(AssertionError.class, () -> entity.ensure(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.ensure(Tag.class, target));
+        assertThrows(AssertionError.class, () -> entity.get(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.tryGet(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.tryGet(Tag.class, target));
+        assertThrows(AssertionError.class, () -> entity.getView(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.tryGetView(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.getMutView(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.tryGetMutView(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.modified(Tag.class));
+        assertThrows(AssertionError.class, () -> entity.getRef(Tag.class));
+    }
+
+    @Test
+    void tagDataOperationsAreInvalidOnStage() {
+        this.world.component(Tag.class);
+        Entity entity = this.world.getStage(0).obtainEntity(this.world.entity());
+
+        assertThrows(AssertionError.class, () -> entity.set(new Tag()));
     }
 }

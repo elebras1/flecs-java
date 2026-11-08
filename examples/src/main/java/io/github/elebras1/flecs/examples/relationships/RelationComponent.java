@@ -76,7 +76,7 @@ public class RelationComponent {
     // requires: 1.21
     // expires: 0.5
     // Requires
-    // Gigawatts
+    // Requires
     // Expires
     // 0
     // requires 1.21 gigawatts

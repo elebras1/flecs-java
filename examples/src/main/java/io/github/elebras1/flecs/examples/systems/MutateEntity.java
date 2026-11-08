@@ -30,7 +30,7 @@ public class MutateEntity {
                         timeout.value(timeout.value() - it.deltaTime());
                         if (timeout.value() <= 0) {
                             long entityId = it.entity(index);
-                            EntityView entity = it.world().obtainEntityView(entityId);
+                            EntityView entity = it.stage().obtainEntityView(entityId);
                             System.out.println("Expire: " + entity.name() + " deleted!");
                             entity.destruct();
                         }

@@ -17,9 +17,10 @@ import java.util.function.Consumer;
 
 public class World extends WorldBase implements AutoCloseable {
     public static final MemorySegment WHOLE_MEMORY;
-    private final MemorySegment worldSeg;
+    private MemorySegment worldSeg;
     private final Arena arena;
     private final ComponentRegistry componentRegistry;
+    private final World realWorld;
     private final Map<Long, SystemCallbacks> systemCallbacks;
     private final Map<Long, ObserverCallbacks> observerCallbacks;
     private final Object queryLock = new Object();
@@ -45,6 +46,7 @@ public class World extends WorldBase implements AutoCloseable {
         if (this.worldSeg.address() == 0) {
             throw new IllegalStateException("Flecs world initialization failed");
         }
+        this.realWorld = this;
         this.componentRegistry = new ComponentRegistry(this.worldSeg);
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
@@ -58,10 +60,11 @@ public class World extends WorldBase implements AutoCloseable {
         this.hookFailure = new AtomicReference<>();
     }
 
-    World(MemorySegment stageSeg, ComponentRegistry componentRegistry) {
+    World(MemorySegment stageSeg, ComponentRegistry componentRegistry, World realWorld) {
         this.arena = Arena.ofShared();
         this.worldSeg = stageSeg;
         this.componentRegistry = componentRegistry;
+        this.realWorld = realWorld;
         this.systemCallbacks = new HashMap<>();
         this.observerCallbacks = new HashMap<>();
         this.buffers = new FlecsBuffers();
@@ -386,10 +389,25 @@ public class World extends WorldBase implements AutoCloseable {
         return this.count(firstId, secondId);
     }
 
-    public void deleteWith(Class<?> componentClass) {
+    public void deleteWith(long id) {
         this.checkDestroyed();
-        long componentId = this.componentRegistry.getComponentId(componentClass);
-        flecs_h.ecs_delete_with(this.worldSeg, componentId);
+        flecs_h.ecs_delete_with(this.worldSeg, id);
+    }
+
+    public void deleteWith(Class<?> componentClass) {
+        this.deleteWith(this.componentRegistry.getComponentId(componentClass));
+    }
+
+    public void deleteWith(long first, long second) {
+        this.deleteWith(flecs_h.ecs_make_pair(first, second));
+    }
+
+    public void deleteWith(Class<?> first, long second) {
+        this.deleteWith(this.componentRegistry.getComponentId(first), second);
+    }
+
+    public void deleteWith(Class<?> first, Class<?> second) {
+        this.deleteWith(this.componentRegistry.getComponentId(first), this.componentRegistry.getComponentId(second));
     }
 
     public void removeAll(long componentId) {
@@ -840,13 +858,14 @@ public class World extends WorldBase implements AutoCloseable {
             throw new IllegalStateException("Stage operations are not supported on a stage world");
         }
         int stageCount = flecs_h.ecs_get_stage_count(this.worldSeg);
-        World[] newStages = new World[stageCount];
-        for (int i = 0; i < this.stages.length; i++) {
-            if (this.stages[i] != null && this.stages[i] != this) {
-                this.stages[i].arena.close();
+        if (stageCount > this.stages.length) {
+            this.stages = Arrays.copyOf(this.stages, stageCount);
+        }
+        for (int i = 0; i < stageCount; i++) {
+            if (this.stages[i] != null) {
+                this.stages[i].worldSeg = flecs_h.ecs_get_stage(this.worldSeg, i);
             }
         }
-        this.stages = newStages;
     }
 
     public int getStageCount() {
@@ -866,7 +885,7 @@ public class World extends WorldBase implements AutoCloseable {
         World stage = this.stages[stageId];
         if(stage == null) {
             MemorySegment stageSeg = flecs_h.ecs_get_stage(this.worldSeg, stageId);
-            stage = new World(stageSeg, this.componentRegistry);
+            stage = new World(stageSeg, this.componentRegistry, this.realWorld);
             this.stages[stageId] = stage;
         }
         return stage;
@@ -877,17 +896,21 @@ public class World extends WorldBase implements AutoCloseable {
         return flecs_h.ecs_stage_get_id(this.worldSeg);
     }
 
+    public World realWorld() {
+        return this.realWorld;
+    }
+
     public World stage() {
         this.checkDestroyed();
         MemorySegment stageSeg = flecs_h.ecs_stage_new(this.worldSeg);
-        return new World(stageSeg, this.componentRegistry);
+        return new World(stageSeg, this.componentRegistry, this.realWorld);
     }
 
     public World asyncStage() {
         this.checkDestroyed();
         MemorySegment stageSeg = flecs_h.ecs_stage_new(this.worldSeg);
         flecs_h.flecs_poly_release_(stageSeg);
-        return new World(stageSeg, this.componentRegistry);
+        return new World(stageSeg, this.componentRegistry, this.realWorld);
     }
 
     public void freeStage() {
@@ -1106,19 +1129,189 @@ public class World extends WorldBase implements AutoCloseable {
         return new AppBuilder(this);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> World set(T value) {
-        this.checkDestroyed();
-        Class<T> componentClass = (Class<T>) value.getClass();
-        int index = ComponentMap.getIndex(componentClass);
-        long componentId = this.componentRegistry().getComponentId(index, componentClass);
-        Component<T> component = this.componentRegistry().getComponent(index, componentClass);
-
-        MemorySegment dataSeg = this.getComponentBuffer(component.size());
-        component.write(dataSeg, 0, value);
-        flecs_h.ecs_set_id(this.worldSeg, Flecs.World, componentId, component.size(), dataSeg);
-
+        this.singleton(value.getClass()).set(value);
         return this;
+    }
+
+    public <T> World set(T value, long second) {
+        this.singleton(value.getClass()).set(value, second);
+        return this;
+    }
+
+    public <T> World set(T value, Class<?> second) {
+        return this.set(value, this.componentRegistry.getComponentId(second));
+    }
+
+    public <V extends ComponentView> World insert(Class<?> componentClass, ComponentView1Callback<V> callback) {
+        this.singleton(componentClass).insert(componentClass, callback);
+        return this;
+    }
+
+    public <T> T get(Class<T> componentClass) {
+        return this.singleton(componentClass).get(componentClass);
+    }
+
+    public <T> T tryGet(Class<T> componentClass) {
+        return this.singleton(componentClass).tryGet(componentClass);
+    }
+
+    public <T> T get(Class<T> first, long second) {
+        return this.singleton(first).get(first, second);
+    }
+
+    public <T> T tryGet(Class<T> first, long second) {
+        return this.singleton(first).tryGet(first, second);
+    }
+
+    public <T> T get(Class<T> first, Class<?> second) {
+        return this.singleton(first).get(first, second);
+    }
+
+    public <T> T tryGet(Class<T> first, Class<?> second) {
+        return this.singleton(first).tryGet(first, second);
+    }
+
+    public <V extends ComponentView> V getView(Class<?> componentClass) {
+        return this.singleton(componentClass).getView(componentClass);
+    }
+
+    public <V extends ComponentView> V tryGetView(Class<?> componentClass) {
+        return this.singleton(componentClass).tryGetView(componentClass);
+    }
+
+    public <V extends ComponentView> V getView(Class<?> first, long second) {
+        return this.singleton(first).getView(first, second);
+    }
+
+    public <V extends ComponentView> V tryGetView(Class<?> first, long second) {
+        return this.singleton(first).tryGetView(first, second);
+    }
+
+    public <V extends ComponentMutView> V getMutView(Class<?> componentClass) {
+        return this.singleton(componentClass).getMutView(componentClass);
+    }
+
+    public <V extends ComponentMutView> V tryGetMutView(Class<?> componentClass) {
+        return this.singleton(componentClass).tryGetMutView(componentClass);
+    }
+
+    public <V extends ComponentMutView> V getMutView(Class<?> first, long second) {
+        return this.singleton(first).getMutView(first, second);
+    }
+
+    public <V extends ComponentMutView> V tryGetMutView(Class<?> first, long second) {
+        return this.singleton(first).tryGetMutView(first, second);
+    }
+
+    public <V extends ComponentMutView> V ensure(Class<?> componentClass) {
+        return this.singleton(componentClass).ensure(componentClass);
+    }
+
+    public <V extends ComponentMutView> V ensure(Class<?> first, long second) {
+        return this.singleton(first).ensure(first, second);
+    }
+
+    public World modified(Class<?> componentClass) {
+        this.singleton(componentClass).modified(componentClass);
+        return this;
+    }
+
+    public boolean has(long id) {
+        this.checkDestroyed();
+        return this.obtainEntity(id).has(id);
+    }
+
+    public boolean has(Class<?> componentClass) {
+        return this.singleton(componentClass).has(componentClass);
+    }
+
+    public boolean has(long first, long second) {
+        this.checkDestroyed();
+        return this.obtainEntity(first).has(first, second);
+    }
+
+    public boolean has(Class<?> first, long second) {
+        return this.singleton(first).has(first, second);
+    }
+
+    public boolean has(Class<?> first, Class<?> second) {
+        return this.singleton(first).has(first, second);
+    }
+
+    public World add(long id) {
+        this.checkDestroyed();
+        this.obtainEntity(id).add(id);
+        return this;
+    }
+
+    public World add(Class<?> componentClass) {
+        this.singleton(componentClass).add(componentClass);
+        return this;
+    }
+
+    public World add(long first, long second) {
+        this.checkDestroyed();
+        this.obtainEntity(first).add(first, second);
+        return this;
+    }
+
+    public World add(Class<?> first, long second) {
+        this.singleton(first).add(first, second);
+        return this;
+    }
+
+    public World add(Class<?> first, Class<?> second) {
+        this.singleton(first).add(first, second);
+        return this;
+    }
+
+    public World remove(long id) {
+        this.checkDestroyed();
+        this.obtainEntity(id).remove(id);
+        return this;
+    }
+
+    public World remove(Class<?> componentClass) {
+        this.singleton(componentClass).remove(componentClass);
+        return this;
+    }
+
+    public World remove(long first, long second) {
+        this.checkDestroyed();
+        this.obtainEntity(first).remove(first, second);
+        return this;
+    }
+
+    public World remove(Class<?> first, long second) {
+        this.singleton(first).remove(first, second);
+        return this;
+    }
+
+    public World remove(Class<?> first, Class<?> second) {
+        this.singleton(first).remove(first, second);
+        return this;
+    }
+
+    public long target(Class<?> first) {
+        return this.target(first, 0);
+    }
+
+    public long target(Class<?> first, int index) {
+        return this.singleton(first).target(first, index);
+    }
+
+    public long target(Class<?> componentClass, long first, int index) {
+        return this.singleton(componentClass).target(first, index);
+    }
+
+    public long target(long first) {
+        return this.target(first, 0);
+    }
+
+    public long target(long first, int index) {
+        this.checkDestroyed();
+        return this.obtainEntity(first).target(first, index);
     }
 
     public void importModule(BuiltinModule module) {
@@ -1152,7 +1345,12 @@ public class World extends WorldBase implements AutoCloseable {
     public Entity importModule(FlecsModule module) {
         this.checkDestroyed();
 
-        long moduleEntity = this.lookup(module.name());
+        long moduleEntity;
+        try (Arena pathArena = Arena.ofConfined()) {
+            MemorySegment pathSeg = flecs_h.flecs_module_path_from_c(pathArena.allocateFrom(module.name()));
+            moduleEntity = flecs_h.ecs_lookup(this.worldSeg, pathSeg);
+            FlecsAllocator.free(pathSeg);
+        }
         if (moduleEntity != 0 && flecs_h.ecs_has_id(this.worldSeg, moduleEntity, Flecs.Module)) {
             return new Entity(this, moduleEntity);
         }

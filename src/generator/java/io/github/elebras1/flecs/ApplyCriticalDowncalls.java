@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 public final class ApplyCriticalDowncalls {
 
     private static final List<String> CRITICAL_FUNCTIONS = List.of(
-            "ecs_cpp_new",
             "ecs_exists",
             "ecs_field_is_self",
             "ecs_field_w_size",
@@ -29,14 +28,12 @@ public final class ApplyCriticalDowncalls {
             "ecs_lookup_path_w_sep",
             "ecs_make_pair",
             "ecs_new",
-            "ecs_new_w_parent",
             "ecs_owns_id",
             "flecs_entities_get",
             "flecs_entity_get_column",
             "ecs_ref_get_id",
             "ecs_stage_get_id",
-            "ecs_table_get_column_index",
-            "flecs_table_traverse_add");
+            "ecs_table_get_column_index");
 
     private static final List<String> POINTER_RESULT_AS_LONG = List.of(
             "ecs_get_id",

@@ -89,17 +89,19 @@ class QueryBuilderTest {
     }
 
     @Test
-    void idWithFlagsTerm() {
+    void toggleIdInTableType() {
         long positionId = this.world.component(Position.class);
         this.world.obtainEntity(positionId).add(Flecs.CanToggle);
 
         Entity disabled = this.world.obtainEntity(this.world.entity()).set(new Position(1, 2));
-        this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
+        Entity enabled = this.world.obtainEntity(this.world.entity()).set(new Position(3, 4));
         disabled.disable(Position.class);
 
-        Query query = this.world.query().with(Flecs.Toggle | positionId).build();
-        assertEquals(1, query.count());
-        assertEquals(disabled.id(), query.first());
+        assertTrue(disabled.table().has(Flecs.Toggle | positionId));
+        assertFalse(enabled.table().has(Flecs.Toggle | positionId));
+
+        Query query = this.world.query().with(Position.class).build();
+        assertEquals(enabled.id(), query.first());
     }
 
     @Test
@@ -188,13 +190,13 @@ class QueryBuilderTest {
 
     @Test
     void singletonTerm() {
-        this.world.obtainEntity(Flecs.World).set(new Position(10, 20));
+        this.world.set(new Position(10, 20));
         this.world.obtainEntity(this.world.entity()).set(new Velocity(1, 2));
 
         Query query = this.world.query()
                 .with(Velocity.class)
                 .with(Position.class)
-                .src(Flecs.World)
+                .src(Position.class)
                 .build();
 
         assertEquals(1, query.count());

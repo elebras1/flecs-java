@@ -2,6 +2,8 @@ package io.github.elebras1.flecs;
 
 import io.github.elebras1.flecs.component.Mass;
 import io.github.elebras1.flecs.component.Position;
+import io.github.elebras1.flecs.component.PositionMutView;
+import io.github.elebras1.flecs.component.PositionView;
 import io.github.elebras1.flecs.component.Tag;
 import io.github.elebras1.flecs.component.Velocity;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,43 +35,203 @@ class SingletonTest {
 
     @Test
     void setGetSingleton() {
-        this.world.obtainEntity(Flecs.World).set(new Position(10, 20));
+        this.world.set(new Position(10, 20));
 
-        Position p = this.world.obtainEntity(Flecs.World).get(Position.class);
+        Position p = this.world.get(Position.class);
         assertNotNull(p);
         assertEquals(10.0f, p.x());
         assertEquals(20.0f, p.y());
     }
 
     @Test
-    void hasSingleton() {
-        assertFalse(this.world.obtainEntity(Flecs.World).has(Position.class));
+    void setIsStoredOnComponentEntity() {
+        this.world.set(new Position(10, 20));
 
-        this.world.obtainEntity(Flecs.World).set(new Position(10, 20));
-        assertTrue(this.world.obtainEntity(Flecs.World).has(Position.class));
+        Entity singleton = this.world.singleton(Position.class);
+        assertEquals(this.world.id(Position.class), singleton.id());
+        assertEquals(new Position(10, 20), singleton.get(Position.class));
+        assertFalse(this.world.obtainEntity(Flecs.World).has(Position.class));
     }
 
     @Test
-    void addRemoveSingleton() {
-        Entity worldEntity = this.world.obtainEntity(Flecs.World);
+    void setWithSingletonTrait() {
+        this.world.singleton(Mass.class).add(Flecs.Singleton);
 
-        worldEntity.add(Position.class);
-        assertTrue(worldEntity.has(Position.class));
+        this.world.set(new Mass(1.5f));
 
-        worldEntity.remove(Position.class);
-        assertFalse(worldEntity.has(Position.class));
+        assertEquals(1.5f, this.world.get(Mass.class).value());
+    }
+
+    @Test
+    void tryGetSingleton() {
+        assertNull(this.world.tryGet(Position.class));
+        assertThrows(IllegalStateException.class, () -> this.world.get(Position.class));
+
+        this.world.set(new Position(10, 20));
+        assertEquals(new Position(10, 20), this.world.tryGet(Position.class));
+    }
+
+    @Test
+    void viewSingleton() {
+        this.world.set(new Position(10, 20));
+
+        PositionView view = this.world.getView(Position.class);
+        assertEquals(10.0f, view.x());
+
+        PositionMutView mutView = this.world.getMutView(Position.class);
+        mutView.x(30);
+        assertEquals(30.0f, this.world.get(Position.class).x());
+
+        assertNull(this.world.tryGetView(Velocity.class));
+        assertNull(this.world.tryGetMutView(Velocity.class));
+    }
+
+    @Test
+    void ensureAndModifiedSingleton() {
+        AtomicInteger onSet = new AtomicInteger();
+        this.world.observer()
+                .event(Flecs.OnSet)
+                .with(Position.class)
+                .each(entityId -> onSet.incrementAndGet());
+
+        PositionMutView view = this.world.ensure(Position.class);
+        view.x(1);
+        view.y(2);
+        assertEquals(0, onSet.get());
+
+        this.world.modified(Position.class);
+
+        assertEquals(1, onSet.get());
+        assertEquals(new Position(1, 2), this.world.get(Position.class));
+    }
+
+    @Test
+    void insertSingleton() {
+        this.world.insert(Position.class, (PositionMutView view) -> {
+            view.x(1);
+            view.y(2);
+        });
+
+        assertEquals(new Position(1, 2), this.world.get(Position.class));
+    }
+
+    @Test
+    void refSingleton() {
+        this.world.set(new Position(10, 20));
+
+        Ref<Position> ref = this.world.getRef(Position.class);
+        assertEquals(10.0f, ref.get().x());
+
+        this.world.set(new Position(30, 40));
+        assertEquals(30.0f, ref.get().x());
+    }
+
+    @Test
+    void addHasRemoveSingleton() {
+        assertFalse(this.world.has(Position.class));
+
+        this.world.add(Position.class);
+        assertTrue(this.world.has(Position.class));
+
+        this.world.remove(Position.class);
+        assertFalse(this.world.has(Position.class));
+    }
+
+    @Test
+    void addHasRemoveSingletonById() {
+        long tag = this.world.entity();
+        assertFalse(this.world.has(tag));
+
+        this.world.add(tag);
+        assertTrue(this.world.has(tag));
+        assertTrue(this.world.obtainEntity(tag).has(tag));
+
+        this.world.remove(tag);
+        assertFalse(this.world.has(tag));
+    }
+
+    @Test
+    void setGetSingletonPair() {
+        long target = this.world.entity();
+
+        this.world.set(new Position(10, 20), target);
+
+        assertTrue(this.world.has(Position.class, target));
+        assertEquals(new Position(10, 20), this.world.get(Position.class, target));
+        assertEquals(new Position(10, 20), this.world.tryGet(Position.class, target));
+        assertTrue(this.world.singleton(Position.class).has(Position.class, target));
+    }
+
+    @Test
+    void setGetSingletonPairWithClass() {
+        this.world.set(new Position(10, 20), Velocity.class);
+
+        assertTrue(this.world.has(Position.class, Velocity.class));
+        assertEquals(new Position(10, 20), this.world.get(Position.class, Velocity.class));
+    }
+
+    @Test
+    void addRemoveSingletonPair() {
+        long first = this.world.entity();
+        long second = this.world.entity();
+
+        this.world.add(first, second);
+        assertTrue(this.world.has(first, second));
+        assertTrue(this.world.obtainEntity(first).has(first, second));
+
+        this.world.remove(first, second);
+        assertFalse(this.world.has(first, second));
+
+        this.world.add(Position.class, second);
+        assertTrue(this.world.has(Position.class, second));
+        this.world.remove(Position.class, second);
+        assertFalse(this.world.has(Position.class, second));
+
+        this.world.add(Position.class, Velocity.class);
+        assertTrue(this.world.has(Position.class, Velocity.class));
+        this.world.remove(Position.class, Velocity.class);
+        assertFalse(this.world.has(Position.class, Velocity.class));
+    }
+
+    @Test
+    void getTarget() {
+        long relation = this.world.component(Tag.class);
+        long obj1 = this.world.obtainEntity(this.world.entity()).add(Position.class).id();
+        long obj2 = this.world.obtainEntity(this.world.entity()).add(Velocity.class).id();
+        long obj3 = this.world.obtainEntity(this.world.entity()).add(Mass.class).id();
+
+        this.world.add(Tag.class, obj1);
+        this.world.add(Tag.class, obj2);
+        this.world.add(relation, obj3);
+
+        assertEquals(obj1, this.world.target(Tag.class));
+        assertEquals(obj2, this.world.target(Tag.class, 1));
+        assertEquals(obj3, this.world.target(relation, 2));
+        assertEquals(obj1, this.world.target(relation));
+        assertEquals(obj2, this.world.target(Tag.class, relation, 1));
+    }
+
+    @Test
+    void setOnStageIsDeferred() {
+        World stage = this.world.getStage(0);
+
+        stage.set(new Position(10, 20));
+        assertFalse(this.world.has(Position.class));
+
+        stage.merge();
+        assertEquals(new Position(10, 20), this.world.get(Position.class));
     }
 
     @Test
     void singletonQuery() {
-        this.world.obtainEntity(Flecs.World).set(new Position(10, 20));
+        this.world.set(new Position(10, 20));
         this.world.obtainEntity(this.world.entity()).set(new Velocity(1, 2));
         this.world.obtainEntity(this.world.entity()).set(new Velocity(3, 4));
 
         Query query = this.world.query()
                 .with(Velocity.class)
                 .with(Position.class)
-                .src(Flecs.World)
+                .src(Position.class)
                 .build();
 
         List<Float> values = new ArrayList<>();
@@ -85,8 +248,8 @@ class SingletonTest {
     }
 
     private void setupMassSingleton(float value) {
-        this.world.obtainEntity(this.world.id(Mass.class)).add(Flecs.Singleton);
-        this.world.obtainEntity(this.world.id(Mass.class)).set(new Mass(value));
+        this.world.singleton(Mass.class).add(Flecs.Singleton);
+        this.world.set(new Mass(value));
     }
 
     @Test
@@ -235,30 +398,20 @@ class SingletonTest {
     }
 
     @Test
-    void getTarget() {
-        long relation = this.world.component(Tag.class);
-        this.world.obtainEntity(relation).add(Flecs.Singleton);
-        long obj1 = this.world.obtainEntity(this.world.entity()).add(Position.class).id();
-        long obj2 = this.world.obtainEntity(this.world.entity()).add(Velocity.class).id();
-        long obj3 = this.world.obtainEntity(this.world.entity()).add(Mass.class).id();
+    void getWithId() {
+        long positionId = this.world.id(Position.class);
+        this.world.set(new Position(10, 20));
 
-        Entity singleton = this.world.obtainEntity(Flecs.World);
-        singleton.add(relation, obj1);
-        singleton.add(relation, obj2);
-        singleton.add(relation, obj3);
-
-        assertEquals(obj1, singleton.target(relation, 0));
-        assertEquals(obj2, singleton.target(relation, 1));
-        assertEquals(obj3, singleton.target(relation, 2));
+        Position p = this.world.singleton(Position.class).get(positionId);
+        assertNotNull(p);
+        assertEquals(10.0f, p.x());
     }
 
     @Test
-    void getWithId() {
-        long positionId = this.world.id(Position.class);
-        this.world.obtainEntity(Flecs.World).set(new Position(10, 20));
-
-        Position p = this.world.obtainEntity(Flecs.World).get(positionId);
-        assertNotNull(p);
-        assertEquals(10.0f, p.x());
+    void tagSingletonDataOperationsAreInvalid() {
+        this.world.component(Tag.class);
+        assertThrows(AssertionError.class, () -> this.world.set(new Tag()));
+        assertThrows(AssertionError.class, () -> this.world.get(Tag.class));
+        assertThrows(AssertionError.class, () -> this.world.ensure(Tag.class));
     }
 }
